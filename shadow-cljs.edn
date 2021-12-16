@@ -1,29 +1,26 @@
-{:nrepl {:port 8777}
+{:nrepl        {:port 8777}
 
- 
-
- :source-paths ["src/cljs"]
+ :source-paths ["src/cljs" "env/dev/cljs"]
 
  :dependencies
  [[reagent "1.1.0"]
   [re-frame "1.2.0"]
-
   [binaryage/devtools "1.0.3"]]
 
- :dev-http
- {8280 "resources/public"
-  8290 "target/browser-test"}
+ ;:dev-http
+ ;{8280 "resources/public"
+ ; 8290 "target/browser-test"}
 
  :builds
  {:app
-  {:target     :browser
-   :output-dir "resources/public/js/compiled"
-   :asset-path "/js/compiled"
-   :modules
-   {:app {:init-fn bh.rccst.core/init}}
-   :devtools
-   {:preloads []}
-   :dev
-   {:compiler-options
-    {:closure-defines
-     {}}}}}}
+  {:target       :browser
+   :output-dir   "resources/public/js/compiled"
+   :asset-path   "/js/compiled"
+   :source-map   true,
+   :pretty-print true,
+   :modules      {:app {:entries [rccst.app]
+                        :init-fn bh.rccst.core/init}}
+   :devtools     {:preloads []}
+   :dev          {:compiler-options
+                  {:closure-defines
+                   {}}}}}}
