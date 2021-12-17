@@ -24,16 +24,23 @@
 
 
 (re-frame/reg-event-db
+  ::remove-from-set
+  (fn [db [_ new-value]]
+    (log/info "remove-from-set" (:set db) "<-" new-value)
+    (update db :set disj new-value)))
+
+
+(re-frame/reg-event-db
   ::union-set
   (fn [db [_ new-values]]
-    (log/info "add-to-set" (:set db) "<-" new-values)
+    (log/info "union-set" (:set db) "<-" new-values)
     (update db :set clojure.set/union new-values)))
 
 
 (re-frame/reg-event-db
   ::diff-set
   (fn [db [_ new-values]]
-    (log/info "add-to-set" (:set db) "<-" new-values)
+    (log/info "diff-set" (:set db) "<-" new-values)
     (update db :set clojure.set/difference new-values)))
 
 
@@ -53,6 +60,9 @@
 
   ; this one doesn't add anything as they are duplicates
   (re-frame/dispatch [::union-set #{0 35}])
+
+  ; try removing some items that exist
+  (re-frame/dispatch [::remove-from-set 1])
 
   ; try removing some items that exist
   (re-frame/dispatch [::diff-set #{0 35}])
