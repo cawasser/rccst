@@ -1,45 +1,46 @@
 (ns bh.rccst.events
   (:require [taoensso.timbre :as log]
             [re-frame.core :as re-frame]
+            [day8.re-frame.tracing :refer-macros [fn-traced]]
             [bh.rccst.db :as db]))
 
 
 (re-frame/reg-event-db
   ::initialize-db
-  (fn [_ _]
+  (fn-traced [_ _]
     db/default-db))
 
 
 (re-frame/reg-event-db
   ::name
-  (fn [db [_ name]]
+  (fn-traced [db [_ name]]
     (assoc db :name name)))
 
 
 (re-frame/reg-event-db
   ::add-to-set
-  (fn [db [_ new-value]]
+  (fn-traced [db [_ new-value]]
     (log/info "add-to-set" (:set db) "<-" new-value)
     (update db :set conj new-value)))
 
 
 (re-frame/reg-event-db
   ::remove-from-set
-  (fn [db [_ new-value]]
+  (fn-traced [db [_ new-value]]
     (log/info "remove-from-set" (:set db) "<-" new-value)
     (update db :set disj new-value)))
 
 
 (re-frame/reg-event-db
   ::union-set
-  (fn [db [_ new-values]]
+  (fn-traced [db [_ new-values]]
     (log/info "union-set" (:set db) "<-" new-values)
     (update db :set clojure.set/union new-values)))
 
 
 (re-frame/reg-event-db
   ::diff-set
-  (fn [db [_ new-values]]
+  (fn-traced [db [_ new-values]]
     (log/info "diff-set" (:set db) "<-" new-values)
     (update db :set clojure.set/difference new-values)))
 
