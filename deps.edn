@@ -5,7 +5,7 @@
            compojure/compojure             {:mvn/version "1.6.2"}
            com.stuartsierra/component      {:mvn/version "1.0.0"}
            com.stuartsierra/component.repl {:mvn/version "0.2.0"}
-
+           http-kit/http-kit               {:mvn/version "2.5.3"}
            ring/ring                       {:mvn/version "1.9.4"}}
 
  :aliases {:run {:main-opts ["-m" "bh.rccst.core"]}}}
