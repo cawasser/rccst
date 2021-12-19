@@ -7,9 +7,17 @@ A [re-frame](https://github.com/day8/re-frame) application to explore using
 RCCST stands for ["Ring"](https://github.com/ring-clojure/ring), 
 ["Component"](https://github.com/stuartsierra/component), 
 ["Compojure"](https://github.com/weavejester/compojure),
-[Sente](https://github.com/ptaoussanis/sente) 
-and [Transit](https://github.com/cognitect/transit-clj), all the Clojure technologies we intend to 
+["Sente"](https://github.com/ptaoussanis/sente) 
+and ["Transit"](https://github.com/cognitect/transit-clj), all the Clojure technologies we intend to 
 explore making work together.
+
+## Future Plans
+
+There are many things we want to learn to do, and we are trying to use this repo to learn them:
+
+[ ] [Combine back into a single server](/docs/single-server.md)
+[ ] [Push data from the server](/docs/data-push.md)
+[ ] [Use transit (or maybe just EDN?) to exchange ALL data between the Client and the Sever](/docs/transit.md)
 
 ## Getting Started
 
