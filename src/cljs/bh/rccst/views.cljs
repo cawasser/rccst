@@ -2,15 +2,19 @@
   (:require
    [re-frame.core :as re-frame]
    [bh.rccst.subs :as subs]
-   [bh.rccst.events :as events]))
+   [bh.rccst.events :as events]
+   [bh.rccst.subscriptions :as subscriptions]))
 
 
 (defn main-panel []
   (let [name (re-frame/subscribe [::subs/name])
+        counter (re-frame/subscribe [::subs/counter])
         s (re-frame/subscribe [::subs/set])]
     (fn []
       [:div
        [:h1 "Hello from " @name]
+       [:h3 "Counter: " @counter]
+       [:button {:on-click #(re-frame/dispatch [::subscriptions/start])} "Start"]
        [:h3 (str @s)]])))
 
 

@@ -18,6 +18,12 @@
 
 
 (re-frame/reg-event-db
+  ::counter
+  (fn-traced [db _]
+    (update db :counter inc)))
+
+
+(re-frame/reg-event-db
   ::add-to-set
   (fn-traced [db [_ new-value]]
     (log/info "add-to-set" (:set db) "<-" new-value)

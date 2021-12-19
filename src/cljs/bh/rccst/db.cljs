@@ -2,4 +2,5 @@
 
 (def default-db
   {:name "re-frame"
+   :counter 0
    :set #{0 1 2}})
