@@ -1,9 +1,45 @@
 # bh/rccst
 
-A [re-frame](https://github.com/day8/re-frame) application designed to ... well, that part is up to
-you.
+A [re-frame](https://github.com/day8/re-frame) application to explore using 
+[Sente](https://github.com/ptaoussanis/sente) for server-side push of data updates to connected 
+(and subscribed) clients.
+
+RCCST stands for ["Ring"](https://github.com/ring-clojure/ring), 
+["Component"](https://github.com/stuartsierra/component), 
+["Compojure"](https://github.com/weavejester/compojure),
+[Sente](https://github.com/ptaoussanis/sente) 
+and [Transit](https://github.com/cognitect/transit-clj), all the Clojure technologies we intend to 
+explore making work together.
 
 ## Getting Started
+
+This app is actually in 2 parts:
+
+### Client
+
+The clinet is built using [shadow-cljs](https://shadow-cljs.github.io/docs/UsersGuide.html). It can be run 
+at the terminal using:
+
+    shadow-cljs watch :app
+
+Then you can open a browser to:
+
+    http//localhost:8280
+
+The client also hosts an [nRepl](https://nrepl.org/nrepl/index.html) at port 8777.
+
+Additional detail on working with the client are [below](#development)
+
+### Push Server
+
+The "push" server is build using the [Clojure CLI](https://clojure.org/guides/deps_and_cli) and can be started at the terminal with:
+
+    clojure -M:run
+
+If you prefer, you can start the server at a local repl. Configure you IDE to start a repl; don't
+worry about any aliases, there aren't any at this time.
+
+Then open src/clj/bh/rccst/core.clj. Load the file into the open repl and then begin evaluating
 
 ### Project Overview
 
@@ -178,17 +214,3 @@ Use `debug?` for logging or other tasks that should run only on `dev` builds:
 (when config/debug?
   (println "This message will appear in the browser console only on dev builds."))
 ```
-
-## Production
-
-Build the app with the `prod` profile:
-
-```sh
-npm install
-npm run release
-```
-
-Please be patient; it may take over 15 seconds to see any output, and over 30 seconds to complete.
-
-The `resources/public/js/compiled` directory is created, containing the compiled `app.js` and
-`manifest.edn` files.

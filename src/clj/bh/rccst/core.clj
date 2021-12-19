@@ -16,7 +16,8 @@
   (let []
     (component/system-map
       :server (server/map->HTTPServer args)
-      :nrepl (nrepl/start-server :port (:nrepl args)))))
+      :nrepl (nrepl/start-server :port (:nrepl args))
+      :broadcaster (socket/start-example-broadcaster!))))
 
 
 (defn -main [& args]
