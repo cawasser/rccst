@@ -15,9 +15,9 @@ explore making work together.
 
 There are many things we want to learn to do, and we are trying to use this repo to learn them:
 
-[ ] [Combine back into a single server](/docs/single-server.md)
-[ ] [Push data from the server](/docs/data-push.md)
-[ ] [Use transit (or maybe just EDN?) to exchange ALL data between the Client and the Sever](/docs/transit.md)
+1. [ ] [Combine back into a single server](/docs/single-server.md)
+2. [ ] [Push data from the server](/docs/data-push.md)
+3. [ ] [Use transit (or maybe just EDN?) to exchange ALL data between the Client and the Sever](/docs/transit.md)
 
 ## Getting Started
 
@@ -25,7 +25,7 @@ This app is actually in 2 parts:
 
 ### Client
 
-The clinet is built using [shadow-cljs](https://shadow-cljs.github.io/docs/UsersGuide.html). It can be run 
+The client is built using [shadow-cljs](https://shadow-cljs.github.io/docs/UsersGuide.html). It can be run 
 at the terminal using:
 
     shadow-cljs watch :app
