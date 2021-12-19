@@ -6,13 +6,13 @@
             [bh.rccst.routes :as routes]))
 
 
-(defrecord HTTPServer [port server]
+(defrecord HTTPServer [port server socket]
   component/Lifecycle
 
   (start [component]
     (println ";; Starting HTTP server" port server)
     (tap> "starting server")
-    (let [server (server/run-server #'routes/routes {:port port})]
+    (let [server (server/run-server (routes/routes socket) {:port port})]
       (assoc component :server server)))
 
   (stop [component]

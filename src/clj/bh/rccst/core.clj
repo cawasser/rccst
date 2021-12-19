@@ -15,18 +15,21 @@
 (defn new-system [args _]
   (let []
     (component/system-map
-      :server (server/map->HTTPServer args)
+      :server (component/using (server/map->HTTPServer args) [:socket])
       :nrepl (nrepl/start-server :port (:nrepl args))
-      :broadcaster (socket/start-example-broadcaster!))))
+      :socket (socket/map->WebSocketServer args))))
+    ;:broadcaster (socket/start-example-broadcaster!))))
 
 
 (defn -main [& args]
   (log/info "This is the main entrypoint!")
 
   (component/start
-    (new-system {:host              "localhost"
-                 :port              http-port
-                 :nrepl             nRepl-port}
+    (new-system {:host          "localhost"
+                 :port          http-port
+                 :nrepl         nRepl-port
+                 :socket-params {:packer        :edn
+                                 :csrf-token-fn nil}}
       {})))
 
 
@@ -36,9 +39,11 @@
   (-main)
 
   (set-init (partial new-system
-              {:host              "localhost"
-               :port              http-port
-               :nrepl             nRepl-port}))
+              {:host          "localhost"
+               :port          http-port
+               :nrepl         nRepl-port
+               :socket-params {:packer        :edn
+                               :csrf-token-fn nil}}))
 
   (:server system)
   (:nrepl system)
@@ -48,6 +53,6 @@
   (reset)
 
 
-  (socket/start-example-broadcaster!)
+  (socket/start-example-broadcaster! (:socket system))
 
   ())
