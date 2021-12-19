@@ -9,6 +9,11 @@
 
 
 (re-frame/reg-sub
+  ::counter
+  (fn [db]
+    (:counter db)))
+
+(re-frame/reg-sub
   ::set
   (fn [db]
     (:set db)))

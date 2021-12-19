@@ -1,7 +1,6 @@
 (ns bh.rccst.webserver
   (:require [com.stuartsierra.component :as component]
-            [ring.adapter.jetty :as jetty]
-            ;[org.httpkit.server :as server]
+            [org.httpkit.server :as server]
             [clojure.tools.logging :as log]
 
             [bh.rccst.routes :as routes]))
@@ -11,14 +10,14 @@
   component/Lifecycle
 
   (start [component]
-    (log/info ";; Starting HTTP server" port server)
+    (println ";; Starting HTTP server" port server)
     (tap> "starting server")
-    (let [server (jetty/run-jetty #'routes/routes {:port port :join? false})]
+    (let [server (server/run-server #'routes/routes {:port port})]
       (assoc component :server server)))
 
   (stop [component]
     (println ";; Stopping HTTP server")
-    (.stop server)
+    (server :timeout 100)
     (assoc component :server nil)))
 
 

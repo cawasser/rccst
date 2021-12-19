@@ -4,8 +4,12 @@
             [com.stuartsierra.component.repl :refer [reset set-init start stop system]]
             [clojure.tools.nrepl.server :as nrepl]
 
-            [bh.rccst.webserver :as server]))
+            [bh.rccst.webserver :as server]
+            [bh.rccst.websocket :as socket]))
 
+
+(def http-port 5555)
+(def nRepl-port 7777)
 
 
 (defn new-system [args _]
@@ -19,7 +23,10 @@
   (log/info "This is the main entrypoint!")
 
   (component/start
-    (new-system {:host "localhost" :port 8280} {})))
+    (new-system {:host              "localhost"
+                 :port              http-port
+                 :nrepl             nRepl-port}
+      {})))
 
 
 
@@ -27,7 +34,10 @@
 (comment
   (-main)
 
-  (set-init (partial new-system {:host "localhost" :port 8280 :nrepl 7777}))
+  (set-init (partial new-system
+              {:host              "localhost"
+               :port              http-port
+               :nrepl             nRepl-port}))
 
   (:server system)
   (:nrepl system)
@@ -35,5 +45,8 @@
   (start)
   (stop)
   (reset)
+
+
+  (socket/start-example-broadcaster!)
 
   ())
