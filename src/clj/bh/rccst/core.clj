@@ -5,7 +5,8 @@
             [clojure.tools.nrepl.server :as nrepl]
 
             [bh.rccst.webserver :as server]
-            [bh.rccst.websocket :as socket]))
+            [bh.rccst.websocket :as socket]
+            [bh.rccst.broadcast :as broadcast]))
 
 
 (def http-port 5555)
@@ -17,19 +18,20 @@
     (component/system-map
       :server (component/using (server/map->HTTPServer args) [:socket])
       :nrepl (nrepl/start-server :port (:nrepl args))
-      :socket (socket/map->WebSocketServer args))))
-    ;:broadcaster (socket/start-example-broadcaster!))))
+      :socket (socket/map->WebSocketServer args)
+      :broadcast (component/using (broadcast/map->Broadcast args) [:socket]))))
 
 
 (defn -main [& args]
   (log/info "This is the main entrypoint!")
 
   (component/start
-    (new-system {:host          "localhost"
-                 :port          http-port
-                 :nrepl         nRepl-port
-                 :socket-params {:packer        :edn
-                                 :csrf-token-fn nil}}
+    (new-system {:host              "localhost"
+                 :port              http-port
+                 :nrepl             nRepl-port
+                 :socket-params     {:packer        :edn
+                                     :csrf-token-fn nil}
+                 :broadcast-timeout 5}                      ; in seconds
       {})))
 
 
@@ -39,14 +41,17 @@
   (-main)
 
   (set-init (partial new-system
-              {:host          "localhost"
-               :port          http-port
-               :nrepl         nRepl-port
-               :socket-params {:packer        :edn
-                               :csrf-token-fn nil}}))
+              {:host              "localhost"
+               :port              http-port
+               :nrepl             nRepl-port
+               :socket-params     {:packer        :edn
+                                   :csrf-token-fn nil}
+               :broadcast-timeout 5}))
 
   (:server system)
   (:nrepl system)
+  (:socket system)
+  (:broadcast system)
 
   (start)
   (stop)
