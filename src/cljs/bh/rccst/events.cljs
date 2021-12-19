@@ -19,8 +19,9 @@
 
 (re-frame/reg-event-db
   ::counter
-  (fn-traced [db _]
-    (update db :counter inc)))
+  (fn-traced [db [_ [event-type data :as ?data]]]
+    (log/info "::counter" event-type (:i data))
+    (assoc db :counter (:i data))))
 
 
 (re-frame/reg-event-db
