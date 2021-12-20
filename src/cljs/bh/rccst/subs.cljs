@@ -13,7 +13,21 @@
   (fn [db]
     (:counter db)))
 
+
 (re-frame/reg-sub
   ::set
   (fn [db]
     (:set db)))
+
+
+(re-frame/reg-sub
+  ::lookup
+  (fn [db]
+    (:lookup db)))
+
+
+(re-frame/reg-sub
+  ::lookup-error
+  (fn [db]
+    (:lookup-error db)))
+

@@ -2,6 +2,8 @@
   (:require [taoensso.timbre :as log]
             [re-frame.core :as re-frame]
             [day8.re-frame.tracing :refer-macros [fn-traced]]
+            [day8.re-frame.http-fx]
+            [ajax.core :as ajax]
             [bh.rccst.db :as db]))
 
 
@@ -52,6 +54,33 @@
     (log/info "diff-set" (:set db) "<-" new-values)
     (update db :set clojure.set/difference new-values)))
 
+
+(re-frame/reg-event-db
+  ::good-lookup-result
+  (fn-traced [db [_ result]]
+    (assoc db
+      :lookup result
+      :lookup-error "")))
+
+
+(re-frame/reg-event-db
+  ::bad-lookup-result
+  (fn-traced [db [_ result]]
+    (assoc db
+      :lookup ""
+      :lookup-error result)))
+
+
+(re-frame/reg-event-fx
+  ::lookup
+  (fn-traced [_ _]
+    (log/info "::lookup")
+    {:http-xhrio {:method :get
+                  :uri             "/lookup"
+                  :timeout         8000                                       ;; optional see API docs
+                  :response-format (ajax/transit-request-format)  ;; IMPORTANT!: You must provide this.
+                  :on-success      [::good-lookup-result]
+                  :on-failure      [::bad-lookup-result]}}))
 
 
 ; some events to dispatch from the REPL

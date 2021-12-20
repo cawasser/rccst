@@ -6,6 +6,16 @@
    [bh.rccst.subscriptions :as subscriptions]))
 
 
+(defn- lookup-control []
+  (let [result (re-frame/subscribe [::subs/lookup])
+        error (re-frame/subscribe [::subs/lookup-error])]
+    [:div
+     [:button.button {:on-click #(re-frame/dispatch [::events/lookup])} "Lookup"]
+     [:div
+      [:h3 "Result: " @result]
+      [:h3 "Error: " @error]]]))
+
+
 (defn main-panel []
   (let [name (re-frame/subscribe [::subs/name])
         counter (re-frame/subscribe [::subs/counter])
@@ -14,8 +24,10 @@
       [:div
        [:h1 "Hello from " @name]
        [:h3 "Counter: " @counter]
-       [:button {:on-click #(re-frame/dispatch [::subscriptions/start])} "Start"]
-       [:h3 "Last 3: " (str @s)]])))
+       [:button.button {:on-click #(re-frame/dispatch [::subscriptions/start])} "Start"]
+       [:h3 "Last 3: " (str @s)]
+
+       [lookup-control]])))
 
 
 ; some things for the repl

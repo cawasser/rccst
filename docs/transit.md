@@ -14,3 +14,12 @@ The simplest way to see if we are passing Clojure data is to just modify the exi
 bh.rccst.broadcast/broadcast!, namely, let's just add another field ot the message to hold a set of
 the last 3 values for :i that we've sent. See [bh.rccst.broadcast](https://github.com/cawasser/rccst/blob/master/src/clj/bh/rccst/broadcast.clj)
 
+## Step 2
+
+Now we need to add at least one ["endpoint"](https://study.com/academy/lesson/what-is-web-service-endpoint-definition-concept.html) 
+for the client to "query" such that the response contains some Clojure data collections, namely sets and 
+hash-maps.
+
+Let's call the new endpoint `/lookup`. We'll add an "FX" handler to bh.rccst.events, and we'll also need
+to add a dependency on [day8.re-frame/http-fx](https://github.com/Day8/re-frame-http-fx).
+
