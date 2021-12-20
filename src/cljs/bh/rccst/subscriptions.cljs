@@ -29,7 +29,7 @@
              :packer   :edn
              :protocol :http
              :host     "localhost"
-             :port     5555})   ; this is the port of the "real server"
+             :port     8280})   ; this is the port of the "real server"
 
 
 (defn state-watcher [_key _atom _old-state new-state]

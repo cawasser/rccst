@@ -15,7 +15,7 @@ explore making work together.
 
 There are many things we want to learn to do, and we are trying to use this repo to learn them:
 
-1. [ ] [Combine back into a single server](/docs/single-server.md)
+1. [X] [Combine back into a single server](/docs/single-server.md)
 2. [ ] [Push data from the server](/docs/data-push.md)
 3. [ ] [Use transit (or maybe just EDN?) to exchange ALL data between the Client and the Sever](/docs/transit.md)
 

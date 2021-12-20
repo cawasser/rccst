@@ -2,7 +2,7 @@
 
  :source-paths ["src/cljs" "env/dev/cljs"]
 
- :dev-http {8280 "resources/public"}
+ ;:dev-http {8280 "resources/public"}
 
  :dependencies [[reagent "1.1.0"]
                 [re-frame "1.2.0"]

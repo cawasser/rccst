@@ -9,7 +9,7 @@
             [bh.rccst.broadcast :as broadcast]))
 
 
-(def http-port 5555)
+(def http-port 8280);5555)
 (def nRepl-port 7777)
 
 
