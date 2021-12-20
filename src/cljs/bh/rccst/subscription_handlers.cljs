@@ -19,7 +19,7 @@
 
 (defmethod -event-msg-handler :chsk/recv
   [{:keys [?data]}]
-  (rf/dispatch [::events/counter ?data])
+  (rf/dispatch [::events/server-update ?data])
   (log/info "Push event from server:" ?data))
 
 

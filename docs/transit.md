@@ -6,3 +6,11 @@ having to "play games" to get this data across a JSON-only exchange is both a pa
 
 > Note: JSON does NOT include a set literal type, therefore and Clojure sets get converted into just
 > an array/vector and there is no way to have an automated conversion back into a Clojure set.
+
+
+## Step 1
+
+The simplest way to see if we are passing Clojure data is to just modify the existing message sent by
+bh.rccst.broadcast/broadcast!, namely, let's just add another field ot the message to hold a set of
+the last 3 values for :i that we've sent. See [bh.rccst.broadcast](https://github.com/cawasser/rccst/blob/master/src/clj/bh/rccst/broadcast.clj)
+

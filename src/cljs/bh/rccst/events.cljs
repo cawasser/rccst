@@ -18,10 +18,11 @@
 
 
 (re-frame/reg-event-db
-  ::counter
+  ::server-update
   (fn-traced [db [_ [event-type data :as ?data]]]
-    (log/info "::counter" event-type (:i data))
-    (assoc db :counter (:i data))))
+    ;(log/info "::server-update" event-type (:i data))
+    (assoc db :counter (:i data)
+      :set (:last-3 data))))
 
 
 (re-frame/reg-event-db

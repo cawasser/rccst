@@ -15,16 +15,28 @@
        [:some/broadcast (assoc msg :to-whom uid)]))))
 
 
+(defn- last-3-conj [last-3 i]
+  (swap! last-3 (fn [v]
+                  (as-> v x
+                    (conj x i)
+                    (if (> (count x) 3)
+                      (drop 1 x)
+                      x)
+                    (apply sorted-set x)))))
+
+
 (defrecord Broadcast [broadcast-timeout broadcast socket]
   component/Lifecycle
 
   (start [component]
     (println ";; Broadcast" broadcast-timeout)
     (tap> "starting broadcast")
-    (let [broadcast-loop (go-loop [i 0]
+    (let [last-3 (atom #{0})
+          broadcast-loop (go-loop [i 0]
                            (<! (async/timeout (->milliseconds broadcast-timeout)))
                            (broadcast! socket {:what-is-this "An async broadcast pushed from server"
                                                :how-often    (str "Every " broadcast-timeout " seconds")
+                                               :last-3       (last-3-conj last-3 i)
                                                :i            i})
                            (recur (inc i)))]
       (assoc component :broadcast broadcast-loop)))

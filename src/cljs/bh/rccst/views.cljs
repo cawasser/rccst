@@ -15,7 +15,7 @@
        [:h1 "Hello from " @name]
        [:h3 "Counter: " @counter]
        [:button {:on-click #(re-frame/dispatch [::subscriptions/start])} "Start"]
-       [:h3 (str @s)]])))
+       [:h3 "Last 3: " (str @s)]])))
 
 
 ; some things for the repl
