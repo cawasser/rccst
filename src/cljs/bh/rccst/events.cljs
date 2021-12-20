@@ -78,7 +78,7 @@
     {:http-xhrio {:method :get
                   :uri             "/lookup"
                   :timeout         8000                                       ;; optional see API docs
-                  :response-format (ajax/transit-request-format)  ;; IMPORTANT!: You must provide this.
+                  :response-format (ajax/transit-response-format)  ;; IMPORTANT!: You must provide this.
                   :on-success      [::good-lookup-result]
                   :on-failure      [::bad-lookup-result]}}))
 

@@ -1,16 +1,17 @@
 {:paths   ["src/clj" "resources"]
 
- :deps    {org.clojure/clojure             {:mvn/version "1.10.3"}
-           org.clojure/core.async          {:mvn/version "1.5.648"}
-           org.clojure/tools.nrepl         {:mvn/version "0.2.13"}
-           compojure/compojure             {:mvn/version "1.6.2"}
-           com.stuartsierra/component      {:mvn/version "1.0.0"}
-           com.stuartsierra/component.repl {:mvn/version "0.2.0"}
-           com.taoensso/sente              {:mvn/version "1.16.2"}
-           metosin/ring-http-response      {:mvn/version "0.9.3"}
-           http-kit/http-kit               {:mvn/version "2.5.3"}
-           ring/ring-defaults              {:mvn/version "0.3.3"}
-           ring-cors/ring-cors             {:mvn/version "0.1.13"}
-           ring/ring                       {:mvn/version "1.9.4"}}
+ :deps    {org.clojure/clojure                           {:mvn/version "1.10.3"}
+           org.clojure/core.async                        {:mvn/version "1.5.648"}
+           org.clojure/tools.nrepl                       {:mvn/version "0.2.13"}
+           compojure/compojure                           {:mvn/version "1.6.2"}
+           com.stuartsierra/component                    {:mvn/version "1.0.0"}
+           com.stuartsierra/component.repl               {:mvn/version "0.2.0"}
+           com.taoensso/sente                            {:mvn/version "1.16.2"}
+           metosin/ring-http-response                    {:mvn/version "0.9.3"}
+           http-kit/http-kit                             {:mvn/version "2.5.3"}
+           ring/ring-defaults                            {:mvn/version "0.3.3"}
+           ring-cors/ring-cors                           {:mvn/version "0.1.13"}
+           ring/ring                                     {:mvn/version "1.9.4"}
+           ring-middleware-format/ring-middleware-format {:mvn/version "0.7.4"}}
 
  :aliases {:run {:main-opts ["-m" "bh.rccst.core"]}}}

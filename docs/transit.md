@@ -23,3 +23,17 @@ hash-maps.
 Let's call the new endpoint `/lookup`. We'll add an "FX" handler to bh.rccst.events, and we'll also need
 to add a dependency on [day8.re-frame/http-fx](https://github.com/Day8/re-frame-http-fx).
 
+## Solution
+
+Again, this is pretty easy once we understand how all the libraries work together:
+
+1. The Client needs to make the request with the `:response-format` set to [`(ajax/transit-response-format)`](). 
+This ensures that it will be able to parse al the Clojure data we get back from the server.
+2. The Server needs to separate the "websocket" routes from the "general" routes because they need different processing. See [here]().
+3. We also need a handler for the "/lookup" call, so we've added bh.rccst.data-source.lookup. It has one function `lookup-function` which
+returns the complex Clojure data structure wrapped in the "application/transit+json" content-type. This converts the Clojure data into JSON using
+the transit marshalling approach.
+4. We need to add a few dependencies to shadow-cljs.edn and deps.edn to support these calls and middlewares.
+
+> Note: we should look into wrapping all the "endpoint" calls inside the "application/transit+json" content-type at once
+> so we can't forget to do it on each one
