@@ -22,7 +22,9 @@ There are many things we want to learn to do, and we are trying to use this repo
 
 ## Getting Started
 
-This app is actually in 2 parts:
+We have successfully converted this 2-part app back into just having a single server at port 8280. The startup and development
+instructions must change accordingly. You still use 2 CLI tools to develop the app, but there is only
+ony webpage now.
 
 ### Client
 
@@ -31,7 +33,7 @@ at the terminal using:
 
     shadow-cljs watch :app
 
-Then you can open a browser to:
+ONce the Server is running, you can open a browser to:
 
     http//localhost:8280
 
@@ -39,9 +41,9 @@ The client also hosts an [nRepl](https://nrepl.org/nrepl/index.html) at port 877
 
 Additional detail on working with the client are [below](#development)
 
-### Push Server
+### Server
 
-The "push" server is build using the [Clojure CLI](https://clojure.org/guides/deps_and_cli) and can be started at the terminal with:
+The server is build using the [Clojure CLI](https://clojure.org/guides/deps_and_cli) and can be started at the terminal with:
 
     clojure -M:run
 
