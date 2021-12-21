@@ -44,4 +44,5 @@ and wire them to the handler functions.
 ### Cons
 
 1. less well-known than Compojure, fewer examples
+2. we don't know it (how do we implement middleware? how does sente fit? etc.?)
 

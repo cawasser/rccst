@@ -89,10 +89,10 @@ just as complex in the logic.
 Rocky-road also provides a more "on demand" mechanism for pushing data to connected clients, specifically
 [subscription-manager](https://github.com/cawasser/rocky-road/blob/master/bases/vanilla/src/rocky_road/vanilla/subscription_manager.clj#L72).
 
->Note: Let's be frank right up front: subscription-manage is ["complected"](); it manages the subscribers (adding and removing) _and_
-> it provides function to push messages to one or more subscribers.
+>Note: Let's be frank right up front: subscription-manage is ["complected"](https://medium.com/netdef/complect-ca7e65f6354d); it 
+> manages the subscribers (adding and removing) _and_ it provides function to push messages to one or more subscribers.
 > 
 > We should split these apart if we choose to move forward with this kind of implementation.
 
-Unfortunately, this mechanism cannot be considered "reactive" as the psuh function must be called by the code implementing the
+Unfortunately, this mechanism cannot be considered "reactive" as the push function must be called by the code implementing the
 data update.
