@@ -4,6 +4,30 @@
 A key feature we want to maintain in our "new approach" is the asynchronous push of new or updated data from the "Server"
 to each connected Client.
 
+And we'd like it to be "general purpose" and perhaps even "reactive".
+
+
+> NOTE: this discussion is _not_ about data queries from the server suing http(s) via GET, POST, etc.
+
+### General Purpose
+
+We want the mechanism to be the same regardless of how it is used. For example, we may have data sources in the Server that 
+
+- are updated periodically (using a timer or schedule), 
+- are updated by some third-party over the network (to which the server itself "subscribes")
+- can be generated on the Server via the REPL
+
+In each case we want all the subscribed clients to be pushed the new data.
+
+### Reactive
+
+In many systems the publication mechanism is exposed throughout the applications, in Clojure it would just be a function, which puts
+the onus on the code that recognized the changing data to explicitly call the publication function. This is as opposed to something
+like [Reagent]() or [Re-frame]() which provide a mechanism similar to ["watchers"]() on `atoms` that automatically call any function 
+which dereferences the atom (Reagent) or atom-like value returned by a subscription (Re-frame). In this way the only action needed
+is ot update the "data source" wiht its new value, and the watcher mechansim would automatically publish the change to all the 
+subscribed clients.
+
 ## Examples
 
 ### Rocky-Road
@@ -33,6 +57,7 @@ context around the system. For example, the same result could be achieved by pas
 WebsocketServer to every data-source, but using core.async as a "common carrier" is cleaner. Each "end" only 
 needs to know of core.async, rather that the actual implementor on either side.
 
+This is the implementation the dashboard-clj developers chose for providing "reactive" updates. 
 
 ##### Pros
 
@@ -56,6 +81,8 @@ and [here](https://github.com/cawasser/rocky-road/blob/e32bfd804295f5d23d5f94403
 As can be seen in the code, Rocky-road store the SystemMap in a global atom to make this easier on the coding, but
 just as complex in the logic.
 
+3. The "reactive" mechanism seems inextricably tied to the scheduled updates ot data-sources baked into the data-source definitions.
+
 
 #### subscription-manager
 
@@ -67,4 +94,5 @@ Rocky-road also provides a more "on demand" mechanism for pushing data to connec
 > 
 > We should split these apart if we choose to move forward with this kind of implementation.
 
-
+Unfortunately, this mechanism cannot be considered "reactive" as the psuh function must be called by the code implementing the
+data update.
