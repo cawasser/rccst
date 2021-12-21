@@ -17,7 +17,7 @@ There are many things we want to learn to do, and we are trying to use this repo
 
 1. [X] [Combine back into a single server](/docs/single-server.md)
 2. [ ] [Push data from the server](/docs/data-push.md)
-3. [ ] [Use transit (or maybe just EDN?) to exchange ALL data between the Client and the Sever](/docs/transit.md)
+3. [X] [Use transit (or maybe just EDN?) to exchange ALL data between the Client and the Sever](/docs/transit.md)
 4. [ ] [Add Swaggerui using Compojure-api](/docs/swagger-ui.md)
 
 ## Getting Started

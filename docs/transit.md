@@ -1,8 +1,9 @@
 # Using Transit (or EDN) for everything
 
 Our goal is to be able to exchange full-fidelity Clojure data structures between the 
-Clients and the "data" Server. We use Clojure [sets]() especially throughout Rocky-road and
-having to "play games" to get this data across a JSON-only exchange is both a pain and error-prone.
+Clients and the "data" Server. We use Clojure [sets](https://clojure.org/reference/data_structures#Sets) 
+especially throughout Rocky-road and having to "play games" to get this data across a JSON-only exchange 
+is both a pain and error-prone.
 
 > Note: JSON does NOT include a set literal type, therefore and Clojure sets get converted into just
 > an array/vector and there is no way to have an automated conversion back into a Clojure set.
@@ -27,9 +28,9 @@ to add a dependency on [day8.re-frame/http-fx](https://github.com/Day8/re-frame-
 
 Again, this is pretty easy once we understand how all the libraries work together:
 
-1. The Client needs to make the request with the `:response-format` set to [`(ajax/transit-response-format)`](). 
+1. The Client needs to make the request with the `:response-format` set to [`(ajax/transit-response-format)`](https://github.com/cawasser/rccst/blob/3f6ffcc50b6594ff4686474d21d910eac91c0fd2/src/cljs/bh/rccst/events.cljs#L81). 
 This ensures that it will be able to parse al the Clojure data we get back from the server.
-2. The Server needs to separate the "websocket" routes from the "general" routes because they need different processing. See [here]().
+2. The Server needs to separate the "websocket" routes from the "general" routes because they need different processing. See [here](https://github.com/cawasser/rccst/blob/3f6ffcc50b6594ff4686474d21d910eac91c0fd2/src/clj/bh/rccst/routes.clj#L19).
 3. We also need a handler for the "/lookup" call, so we've added bh.rccst.data-source.lookup. It has one function `lookup-function` which
 returns the complex Clojure data structure wrapped in the "application/transit+json" content-type. This converts the Clojure data into JSON using
 the transit marshalling approach.
