@@ -1,26 +1,10 @@
 (ns bh.rccst.data-source.lookup
   (:require [ring.util.http-response :as http]
             [ring.util.response :as rr]
-
             [compojure.api.sweet :as sweet]
-            [schema.core :as s]))
 
-
-(s/defschema EmbeddedMap
-  {:or s/Keyword :hashmaps s/Str})
-
-
-(s/defschema EmbeddedSet
-  #{s/Keyword})
-
-
-(s/defschema Subitem
-  {:a s/Str :b s/Str :c EmbeddedSet :d EmbeddedMap})
-
-
-(s/defschema Lookup
-  {:item     s/Str
-   :sub-item Subitem})
+            [bh.rccst.data-source.lookup.schema :as s]
+            [bh.rccst.data-source.common :as c]))
 
 
 (def response {:item     "This is a 'Lookup' response"
@@ -33,6 +17,6 @@
 
 (def lookup-handler
   (sweet/GET "/lookup" _
-    :return Lookup
+    :return s/Lookup
     :summary "lookup some data in the server"
-    (http/content-type (rr/response response) "application/transit+json")))
+    (c/wrapper response)))
