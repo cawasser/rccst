@@ -47,6 +47,7 @@
                :socket-params     {:packer        :edn
                                    :csrf-token-fn nil}
                :broadcast-timeout 5}))
+  (start)
 
   (:server system)
   (:nrepl system)

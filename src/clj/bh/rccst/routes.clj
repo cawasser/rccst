@@ -10,7 +10,7 @@
             [ring.util.response :as rr]
             [compojure.route :as route]
 
-            [bh.rccst.data-source.lookup :as lookup]))
+            [bh.rccst.data-source.api :as api]))
 
 
 (defn routes [{:keys [ring-ajax-post ring-ajax-get-or-ws-handshake]}]
@@ -31,7 +31,7 @@
                        "text/html; charset=utf-8"))
           (route/resources "/")
 
-          (GET "/lookup" req (lookup/lookup-handler req))
+          api/api
 
           (route/not-found "<h1>Page not found</h1>"))
 
@@ -42,4 +42,11 @@
       wrap-params)))
 
 
+
+(comment
+  (routes {:ring-ajax-post nil
+           :ring-ajax-get-or-ws-handshake nil})
+
+
+  ())
 

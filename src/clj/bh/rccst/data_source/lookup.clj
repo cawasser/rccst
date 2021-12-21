@@ -1,8 +1,26 @@
 (ns bh.rccst.data-source.lookup
-  (:require [clojure.tools.logging :as log]
-            [ring.util.http-response :as http]
-            [ring.util.response :as rr]))
+  (:require [ring.util.http-response :as http]
+            [ring.util.response :as rr]
 
+            [compojure.api.sweet :as sweet]
+            [schema.core :as s]))
+
+
+(s/defschema EmbeddedMap
+  {:or s/Keyword :hashmaps s/Str})
+
+
+(s/defschema EmbeddedSet
+  #{s/Keyword})
+
+
+(s/defschema Subitem
+  {:a s/Str :b s/Str :c EmbeddedSet :d EmbeddedMap})
+
+
+(s/defschema Lookup
+  {:item     s/Str
+   :sub-item Subitem})
 
 
 (def response {:item     "This is a 'Lookup' response"
@@ -13,7 +31,8 @@
                               :hashmaps "and keywords all over the place"}}})
 
 
-(defn lookup-handler [req]
-  (log/info "lookup-handler" req)
-  (println "lookup-handler" req)
-  (http/content-type (rr/response response) "application/transit+json"))
+(def lookup-handler
+  (sweet/GET "/lookup" _
+    :return Lookup
+    :summary "lookup some data in the server"
+    (http/content-type (rr/response response) "application/transit+json")))

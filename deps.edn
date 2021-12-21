@@ -7,8 +7,10 @@
            com.stuartsierra/component                    {:mvn/version "1.0.0"}
            com.stuartsierra/component.repl               {:mvn/version "0.2.0"}
            com.taoensso/sente                            {:mvn/version "1.16.2"}
-           metosin/ring-http-response                    {:mvn/version "0.9.3"}
            http-kit/http-kit                             {:mvn/version "2.5.3"}
+           metosin/compojure-api                         {:mvn/version "2.0.0-alpha31"}
+           metosin/ring-http-response                    {:mvn/version "0.9.3"}
+           prismatic/schema                              {:mvn/version "1.2.0"}
            ring/ring-defaults                            {:mvn/version "0.3.3"}
            ring-cors/ring-cors                           {:mvn/version "0.1.13"}
            ring/ring                                     {:mvn/version "1.9.4"}

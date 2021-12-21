@@ -18,7 +18,7 @@ There are many things we want to learn to do, and we are trying to use this repo
 1. [X] [Combine back into a single server](/docs/single-server.md)
 2. [ ] [Push data from the server](/docs/data-push.md)
 3. [X] [Use transit (or maybe just EDN?) to exchange ALL data between the Client and the Sever](/docs/transit.md)
-4. [ ] [Add Swaggerui using Compojure-api](/docs/swagger-ui.md)
+4. [X] [Add Swaggerui using Compojure-api](/docs/swagger-ui.md)
 
 ## Getting Started
 
@@ -52,7 +52,16 @@ worry about any aliases, there aren't any at this time.
 
 Then open src/clj/bh/rccst/core.clj. Load the file into the open repl and then begin evaluating
 
-### Project Overview
+### Swagger-UI
+
+The app now provides a swagger-ui page so you can interactively try out all the ednpoint calls (GETs and POSTs).
+Just open a new browser tab to:
+
+    localhost:8280/api-docs
+
+And have a ball.
+
+## Project Overview
 
 * Architecture:
 [Single Page Application (SPA)](https://en.wikipedia.org/wiki/Single-page_application)
@@ -69,7 +78,7 @@ Then open src/clj/bh/rccst/core.clj. Load the file into the open repl and then b
 * Development tools
   - Debugging: [CLJS DevTools](https://github.com/binaryage/cljs-devtools)
 
-#### Directory structure
+### Directory structure
 
 * [`/`](/../../): project config files
 * [`dev/`](dev/): source files compiled only with the [dev](#running-the-app) profile
