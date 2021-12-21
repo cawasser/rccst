@@ -1,3 +1,33 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [bh/rccst](#bhrccst)
+  - [Future Plans](#future-plans)
+  - [Getting Started](#getting-started)
+    - [Client](#client)
+    - [Server](#server)
+    - [Swagger-UI](#swagger-ui)
+  - [Project Overview](#project-overview)
+    - [Directory structure](#directory-structure)
+    - [Editor/IDE](#editoride)
+    - [Environment Setup](#environment-setup)
+    - [Browser Setup](#browser-setup)
+      - [Chrome/Chromium](#chromechromium)
+      - [Firefox](#firefox)
+  - [Development](#development)
+    - [Running the App](#running-the-app)
+      - [Connecting to the browser REPL from your editor](#connecting-to-the-browser-repl-from-your-editor)
+      - [Connecting to the browser REPL from a terminal](#connecting-to-the-browser-repl-from-a-terminal)
+    - [Running `shadow-cljs` Actions](#running-shadow-cljs-actions)
+    - [Debug Logging](#debug-logging)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+> Note: to update the ToC here and in all the markdown files, install [doctoc](https://github.com/thlorenz/doctoc) and run:
+>`doctoc .`
+
+
 # bh/rccst
 
 A [re-frame](https://github.com/day8/re-frame) application to explore using 

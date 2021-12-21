@@ -1,3 +1,14 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Using Transit (or EDN) for everything](#using-transit-or-edn-for-everything)
+  - [Step 1](#step-1)
+  - [Step 2](#step-2)
+  - [Solution](#solution)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Using Transit (or EDN) for everything
 
 Our goal is to be able to exchange full-fidelity Clojure data structures between the 

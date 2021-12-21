@@ -1,3 +1,12 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Combine the project back into a Single Server](#combine-the-project-back-into-a-single-server)
+  - [Solution](#solution)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Combine the project back into a Single Server
 
 As originally built, there are actually 2 separate "servers"

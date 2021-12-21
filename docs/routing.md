@@ -1,3 +1,17 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Routing](#routing)
+  - [Compojure](#compojure)
+    - [Pros](#pros)
+    - [Cons](#cons)
+  - [Reitit](#reitit)
+    - [Pros](#pros-1)
+    - [Cons](#cons-1)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Routing
 
 Currently, we are using [Compojure](https://github.com/weavejester/compojure) (and some supporting libraries) 

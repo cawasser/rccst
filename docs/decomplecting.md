@@ -1,3 +1,12 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Decomplecting the Solution](#decomplecting-the-solution)
+  - [Places in the Design that are Complected](#places-in-the-design-that-are-complected)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Decomplecting the Solution
 
 First, some definitions:

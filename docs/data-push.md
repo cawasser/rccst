@@ -1,3 +1,19 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Pushing Data to Clients](#pushing-data-to-clients)
+    - [General Purpose](#general-purpose)
+    - [Reactive](#reactive)
+  - [Examples](#examples)
+    - [Rocky-Road](#rocky-road)
+      - [FetchableDataSource](#fetchabledatasource)
+        - [Pros](#pros)
+        - [Cons](#cons)
+      - [subscription-manager](#subscription-manager)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Pushing Data to Clients
 
 

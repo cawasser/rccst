@@ -1,3 +1,13 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Swagger-UI using Compojure-api and Compojure.sweet](#swagger-ui-using-compojure-api-and-compojuresweet)
+  - [Solution](#solution)
+  - [Future Expansion](#future-expansion)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Swagger-UI using Compojure-api and Compojure.sweet
 
 [Swagger-UI](https://swagger.io/tools/swagger-ui/), enabled by [compojure-api](https://github.com/metosin/compojure-api) 
