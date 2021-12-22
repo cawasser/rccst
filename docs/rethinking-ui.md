@@ -1,3 +1,15 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Re-thinking the UI](#re-thinking-the-ui)
+  - [Background](#background)
+    - [Pros](#pros)
+    - [Cons](#cons)
+  - [What do we want?](#what-do-we-want)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Re-thinking the UI
 
 ## Background
