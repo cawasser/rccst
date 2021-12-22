@@ -50,7 +50,8 @@ There are many things we want to learn to do, and we are trying to use this repo
 3. [X] [Use transit (or maybe just EDN?) to exchange ALL data between the Client and the Sever](/docs/transit.md)
 4. [X] [Add Swaggerui using Compojure-api](/docs/swagger-ui.md)
 5. [ ] [De-complecting things](/docs/decompleting.md)
-6. [ ] (optional) Consider moving to [Reitit](/docs/routing.md)
+6. [ ] [Re-thinking the UI](/docs/rethinking-ui.md)
+7. [ ] (optional) Consider moving to [Reitit](/docs/routing.md)
 
 ## Getting Started
 
