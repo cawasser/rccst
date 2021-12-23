@@ -1,4 +1,4 @@
-(ns bh.rccst.routes
+(ns bh.rccst.api.routes
   (:require [clojure.tools.logging :as log]
             [ring.middleware.defaults :refer [wrap-defaults site-defaults]]
             [ring.middleware.cors :refer [wrap-cors]]
@@ -10,7 +10,7 @@
             [ring.util.response :as rr]
             [compojure.route :as route]
 
-            [bh.rccst.data-source.api :as api]))
+            [bh.rccst.api.api :as api]))
 
 
 (defn routes [{:keys [ring-ajax-post ring-ajax-get-or-ws-handshake]}]

@@ -3,13 +3,13 @@
             [com.stuartsierra.component :as component]
             [com.stuartsierra.component.repl :refer [reset set-init start stop system]]
 
-            [bh.rccst.webserver :as server]
-            [bh.rccst.websocket :as socket]
-            [bh.rccst.broadcast :as broadcast]
-            [bh.rccst.system :as system]
-            [bh.rccst.repl :as repl]
+            [bh.rccst.components.webserver :as server]
+            [bh.rccst.components.websocket :as socket]
+            [bh.rccst.components.broadcast :as broadcast]
+            [bh.rccst.components.system :as system]
+            [bh.rccst.components.repl :as repl]
             
-            [bh.rccst.publish]))
+            [bh.rccst.components.websocket.publish]))
 
 
 (def http-port 8280);5555)

@@ -4,7 +4,7 @@
             [compojure.api.sweet :as sweet]
 
             [bh.rccst.data-source.lookup.schema :as s]
-            [bh.rccst.data-source.common :as c]))
+            [bh.rccst.api.common :as c]))
 
 
 (def response {:item     "This is a 'Lookup' response"

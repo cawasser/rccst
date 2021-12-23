@@ -1,4 +1,4 @@
-(ns bh.rccst.websocket.handler
+(ns bh.rccst.components.websocket.handler
   (:require [clojure.tools.logging :as log]))
 
 

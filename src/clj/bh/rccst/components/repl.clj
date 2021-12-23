@@ -1,4 +1,4 @@
-(ns bh.rccst.repl
+(ns bh.rccst.components.repl
   (:require [clojure.tools.logging :as log]
             [clojure.tools.nrepl.server :as nrepl]))
 

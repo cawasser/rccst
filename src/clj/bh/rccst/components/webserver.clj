@@ -1,9 +1,9 @@
-(ns bh.rccst.webserver
+(ns bh.rccst.components.webserver
   (:require [clojure.tools.logging :as log]
             [com.stuartsierra.component :as component]
             [org.httpkit.server :as server]
 
-            [bh.rccst.routes :as routes]))
+            [bh.rccst.api.routes :as routes]))
 
 
 (defrecord HTTPServer [port server socket]

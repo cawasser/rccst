@@ -1,5 +1,7 @@
-(ns bh.rccst.data-source.api
+(ns bh.rccst.api.api
   (:require [compojure.api.sweet :as sweet]
+
+            [bh.rccst.api.login :as login]
             [bh.rccst.data-source.lookup :as lookup]))
 
 
@@ -17,4 +19,5 @@
     (sweet/context "/" []
       :tags ["api"]
 
+      login/login-handler
       lookup/lookup-handler)))

@@ -1,4 +1,4 @@
-(ns bh.rccst.websocket
+(ns bh.rccst.components.websocket
   (:require [clojure.tools.logging :as log]
             [com.stuartsierra.component :as component]
             [taoensso.sente :as sente]

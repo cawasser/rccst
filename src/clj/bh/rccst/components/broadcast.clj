@@ -1,4 +1,4 @@
-(ns bh.rccst.broadcast
+(ns bh.rccst.components.broadcast
   (:require [clojure.tools.logging :as log]
             [com.stuartsierra.component :as component]
             [clojure.core.async :as async :refer [go-loop <!]]))

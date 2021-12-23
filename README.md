@@ -49,10 +49,11 @@ There are many things we want to learn to do, and we are trying to use this repo
 2. [X] [Push data from the server](/docs/data-push.md)
 3. [X] [Use transit (or maybe just EDN?) to exchange ALL data between the Client and the Sever](/docs/transit.md)
 4. [X] [Add Swaggerui using Compojure-api](/docs/swagger-ui.md)
-5. [X] Get logging to work correctly (just needed to add dependency for ch.qos.logback/logback-classic "1.2.5"
-6. [ ] [De-complecting things](/docs/decompleting.md)
-7. [ ] [Re-thinking the UI](/docs/rethinking-ui.md)
-8. [ ] (optional) Consider moving to [Reitit](/docs/routing.md)
+5. [X] Get logging to work correctly (need to add ch.qos.logback/logback-classic "1.2.5", see [here](https://spin.atomicobject.com/2015/05/11/clojure-logging/))
+6. [ ] [Develop a more complex API (paving the way to Rocky-road)]() 
+7. [ ] [De-complecting things](/docs/decompleting.md)
+8. [ ] [Re-thinking the UI](/docs/rethinking-ui.md)
+9. [ ] (optional) Consider moving to [Reitit](/docs/routing.md)
 
 ## Getting Started
 

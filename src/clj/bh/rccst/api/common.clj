@@ -1,4 +1,4 @@
-(ns bh.rccst.data-source.common
+(ns bh.rccst.api.common
   (:require [ring.util.http-response :as http]
             [ring.util.response :as rr]))
 

@@ -1,6 +1,6 @@
-(ns bh.rccst.publish
+(ns bh.rccst.components.websocket.publish
   (:require [clojure.tools.logging :as log]
-            [bh.rccst.system :as system]))
+            [bh.rccst.components.system :as system]))
 
 
 (defn publish-all! [msg]
