@@ -6,7 +6,8 @@
 
             [bh.rccst.webserver :as server]
             [bh.rccst.websocket :as socket]
-            [bh.rccst.broadcast :as broadcast]))
+            [bh.rccst.broadcast :as broadcast]
+            [bh.rccst.system :as system]))
 
 
 (def http-port 8280);5555)
@@ -22,17 +23,23 @@
       :broadcast (component/using (broadcast/map->Broadcast args) [:socket]))))
 
 
+(defn start! []
+  (reset! system/system
+    (component/start
+      (new-system {:host              "localhost"
+                   :port              http-port
+                   :nrepl             nRepl-port
+                   :socket-params     {:packer        :edn
+                                       :csrf-token-fn nil}
+                   :broadcast-timeout 5}                      ; in seconds
+        {}))))
+
+
 (defn -main [& args]
   (log/info "This is the main entrypoint!")
+  (start!))
 
-  (component/start
-    (new-system {:host              "localhost"
-                 :port              http-port
-                 :nrepl             nRepl-port
-                 :socket-params     {:packer        :edn
-                                     :csrf-token-fn nil}
-                 :broadcast-timeout 5}                      ; in seconds
-      {})))
+
 
 
 
@@ -40,14 +47,16 @@
 (comment
   (-main)
 
-  (set-init (partial new-system
-              {:host              "localhost"
-               :port              http-port
-               :nrepl             nRepl-port
-               :socket-params     {:packer        :edn
-                                   :csrf-token-fn nil}
-               :broadcast-timeout 5}))
-  (start)
+  (do
+    (set-init (partial new-system
+                {:host              "localhost"
+                 :port              http-port
+                 :nrepl             nRepl-port
+                 :socket-params     {:packer        :edn
+                                     :csrf-token-fn nil}
+                 :broadcast-timeout 5}))
+    (start)
+    (reset! system/system system))
 
   (:server system)
   (:nrepl system)

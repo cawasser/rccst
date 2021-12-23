@@ -13,6 +13,7 @@
         - [Pros](#pros)
         - [Cons](#cons)
       - [subscription-manager](#subscription-manager)
+  - [Solution](#solution)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -123,3 +124,17 @@ Rocky-road also provides a more "on demand" mechanism for pushing data to connec
 
 Unfortunately, this mechanism cannot be considered "reactive" as the push function must be called by the code implementing the
 data update.
+
+
+
+## Solution
+
+1. Initially, we just need to make the socket accessible throughout the Server, specifically using
+an `(atom)` hosted in a global [namespace]()
+2. create a new message type (:data/update) that marks the push of a data-source
+3. add a publish-all! function in its own [namespace]()
+   1. this publishes the message to ALL connected clients
+   2. we'll work on subscriptions next
+4. add some UI elements, so we can see the updated data
+5. and we need some default data, as well as event-handlers and subscriptions on the client-side
+6. 

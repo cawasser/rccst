@@ -1,7 +1,7 @@
 (ns bh.rccst.subscription-handlers
   (:require [re-frame.core :as rf]
             [taoensso.timbre :as log]
-            [bh.rccst.events :as events]))
+            [bh.rccst.data-source-handler :as dh]))
 
 
 (defmulti -event-msg-handler :id)
@@ -18,9 +18,8 @@
 
 
 (defmethod -event-msg-handler :chsk/recv
-  [{:keys [?data]}]
-  (rf/dispatch [::events/server-update ?data])
-  (log/info "Push event from server:" ?data))
+  [{:keys [_ ?data] :as msg}]
 
+  ;(log/info "Push event from server:" ?data)
+  (dh/data-source-msg-handler ?data))
 
-;(defmethod -event-msg-handler :data/sync)

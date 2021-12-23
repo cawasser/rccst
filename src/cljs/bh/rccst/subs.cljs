@@ -31,3 +31,8 @@
   (fn [db]
     (:lookup-error db)))
 
+
+(re-frame/reg-sub
+  ::source
+  (fn [db [_ id]]
+    (get-in db [:sources id])))

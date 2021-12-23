@@ -16,6 +16,16 @@
       [:h3 "Error: " @error]]]))
 
 
+(defn- number-control []
+  (let [number (re-frame/subscribe [::subs/source :number])]
+    [:h3 "Number: " @number]))
+
+
+(defn- string-control []
+  (let [s (re-frame/subscribe [::subs/source :string])]
+    [:h3 "String: " @s]))
+
+
 (defn main-panel []
   (let [name (re-frame/subscribe [::subs/name])
         counter (re-frame/subscribe [::subs/counter])
@@ -27,6 +37,8 @@
        [:button.button {:on-click #(re-frame/dispatch [::subscriptions/start])} "Start"]
        [:h3 "Last 3: " (str @s)]
 
+       [number-control]
+       [string-control]
        [lookup-control]])))
 
 
