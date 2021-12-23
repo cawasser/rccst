@@ -7,7 +7,9 @@
             [bh.rccst.webserver :as server]
             [bh.rccst.websocket :as socket]
             [bh.rccst.broadcast :as broadcast]
-            [bh.rccst.system :as system]))
+            [bh.rccst.system :as system]
+            
+            [bh.rccst.publish]))
 
 
 (def http-port 8280);5555)

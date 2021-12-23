@@ -17,5 +17,7 @@
   (publish-all! [:publish/data-update {:id :number :value 999}])
 
   (publish-all! [:publish/data-update {:id :string :value "This is cool"}])
+  (publish-all! [:publish/data-update {:id :string :value "I can change things from the repl"}])
+  (publish-all! [:publish/data-update {:id :string :value "And have them pushed from the server"}])
 
   ())
