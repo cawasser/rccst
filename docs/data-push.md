@@ -24,6 +24,10 @@ And we'd like it to be "general purpose" and perhaps even "reactive".
 
 
 > NOTE: this discussion is _not_ about data queries from the server suing http(s) via GET, POST, etc.
+ 
+## What do we want?
+
+It's good to lay out our goals for the design _before_ we start to implement things
 
 ### General Purpose
 
@@ -35,7 +39,7 @@ We want the mechanism to be the same regardless of how it is used. For example, 
 
 In each case we want all the subscribed clients to be pushed the new data.
 
-### Reactive
+### Reactive?
 
 In many systems the publication mechanism is exposed throughout the applications, in Clojure it would just be a function, which puts
 the onus on the code that recognized the changing data to explicitly call the publication function. This is as opposed to something
@@ -43,6 +47,11 @@ like [Reagent]() or [Re-frame]() which provide a mechanism similar to ["watchers
 which dereferences the atom (Reagent) or atom-like value returned by a subscription (Re-frame). In this way the only action needed
 is ot update the "data source" wiht its new value, and the watcher mechansim would automatically publish the change to all the 
 subscribed clients.
+
+### A Step in the DAG
+
+Since we expect to use this mechanism as (typically) the last step in a DAG (e.g., a Kafka topology) we'd like it to work
+in that fashion. This seems to contradict the notion of "reactive"
 
 ## Examples
 
@@ -97,7 +106,7 @@ and [here](https://github.com/cawasser/rocky-road/blob/e32bfd804295f5d23d5f94403
 As can be seen in the code, Rocky-road store the SystemMap in a global atom to make this easier on the coding, but
 just as complex in the logic.
 
-3. The "reactive" mechanism seems inextricably tied to the scheduled updates ot data-sources baked into the data-source definitions.
+3. The "reactive" mechanism seems inextricably tied to the scheduled updates to data-sources baked into the data-source definitions.
 
 
 #### subscription-manager
@@ -105,8 +114,8 @@ just as complex in the logic.
 Rocky-road also provides a more "on demand" mechanism for pushing data to connected clients, specifically
 [subscription-manager](https://github.com/cawasser/rocky-road/blob/master/bases/vanilla/src/rocky_road/vanilla/subscription_manager.clj#L72).
 
->Note: Let's be frank right up front: subscription-manage is ["complected"](https://medium.com/netdef/complect-ca7e65f6354d); it 
-> manages the subscribers (adding and removing) _and_ it provides function to push messages to one or more subscribers.
+>Note: Let's be frank right up front: subscription-manager is ["complected"](https://medium.com/netdef/complect-ca7e65f6354d); it 
+> manages the subscribers (adding and removing) _and_ it provides functions to push messages to one or more subscribers.
 > 
 > We should split these apart if we choose to move forward with this kind of implementation.
 
