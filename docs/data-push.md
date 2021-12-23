@@ -130,11 +130,11 @@ data update.
 ## Solution
 
 1. Initially, we just need to make the socket accessible throughout the Server, specifically using
-an `(atom)` hosted in a global [namespace]()
+an `(atom)` hosted in a global [namespace](https://github.com/cawasser/rccst/blob/master/src/clj/bh/rccst/system.clj)
 2. create a new message type (:data/update) that marks the push of a data-source
-3. add a publish-all! function in its own [namespace]()
+3. add a publish-all! function in its own [namespace](https://github.com/cawasser/rccst/blob/master/src/clj/bh/rccst/publish.clj)
    1. this publishes the message to ALL connected clients
    2. we'll work on subscriptions next
-4. add some UI elements, so we can see the updated data
-5. and we need some default data, as well as event-handlers and subscriptions on the client-side
-6. 
+4. add some [UI elements](https://github.com/cawasser/rccst/blob/8d897bcf518c70dbeea9fb623abe22582fc04326/src/cljs/bh/rccst/views.cljs#L40), so we can see the updated data 
+5. and we need some [default data](), as well as [event-handlers](https://github.com/cawasser/rccst/blob/8d897bcf518c70dbeea9fb623abe22582fc04326/src/cljs/bh/rccst/events.cljs#L30) 
+and [subscriptions](https://github.com/cawasser/rccst/blob/8d897bcf518c70dbeea9fb623abe22582fc04326/src/cljs/bh/rccst/subs.cljs#L35) on the client-side
