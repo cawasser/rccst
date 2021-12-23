@@ -1,5 +1,6 @@
 (ns bh.rccst.websocket
-  (:require [com.stuartsierra.component :as component]
+  (:require [clojure.tools.logging :as log]
+            [com.stuartsierra.component :as component]
             [taoensso.sente :as sente]
             [taoensso.sente.server-adapters.http-kit :refer (get-sch-adapter)]
             [clojure.core.async :as async :refer [go-loop <!]]))
@@ -9,7 +10,7 @@
   component/Lifecycle
   (start [component]
 
-    (println "starting Socket" socket-params socket)
+    (log/info "starting Socket" socket-params socket)
     (tap> "starting socket")
 
     (let [{:keys [ch-recv send-fn connected-uids
@@ -24,7 +25,7 @@
         :connected-uids connected-uids)))
 
   (stop [component]
-    (println "stopping socket" socket)
+    (log/info "stopping socket" socket)
     (assoc component
       :ring-ajax-post nil
       :ring-ajax-get-or-ws-handshake nil
@@ -36,7 +37,7 @@
 (defn broadcast! [socket msg]
   (let [uids (:any @(:connected-uids socket))]
     (doseq [uid uids]
-      (println "broadcast to user: " uid)
+      (log/info "broadcast to user: " uid)
       ((:chsk-send! socket) uid
        [:some/broadcast (assoc msg :to-whom uid)]))))
 
@@ -46,7 +47,7 @@
   event to all connected users every 10 seconds"
   [socket]
 
-  (println "start-example-broadcaster!")
+  (log/info "start-example-broadcaster!")
 
   (go-loop [i 0]
     (<! (async/timeout 1000))

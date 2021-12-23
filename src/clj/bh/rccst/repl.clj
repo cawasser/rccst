@@ -6,5 +6,4 @@
 (defn start-repl [args]
   (let [port (:nrepl args)]
     (log/info "Starting nRepl at" port)
-    (println "Starting nRepl at" port)
     (nrepl/start-server :port port)))

@@ -1,11 +1,12 @@
 (ns bh.rccst.publish
-  (:require [bh.rccst.system :as system]))
+  (:require [clojure.tools.logging :as log]
+            [bh.rccst.system :as system]))
 
 
 (defn publish-all! [msg]
   (let [uids (:any @(get-in @system/system [:socket :connected-uids]))]
     (doseq [uid uids]
-      (println "publish! to user: " uid)
+      (log/info "publish! to user: " uid)
       ((get-in @system/system [:socket :chsk-send!]) uid msg))))
 
 

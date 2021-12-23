@@ -1,5 +1,6 @@
 (ns bh.rccst.broadcast
-  (:require [com.stuartsierra.component :as component]
+  (:require [clojure.tools.logging :as log]
+            [com.stuartsierra.component :as component]
             [clojure.core.async :as async :refer [go-loop <!]]))
 
 
@@ -10,7 +11,7 @@
 (defn broadcast! [socket msg]
   (let [uids (:any @(:connected-uids socket))]
     (doseq [uid uids]
-      (println "broadcast to user: " uid)
+      (log/info "broadcast to user: " uid)
       ((:chsk-send! socket) uid
        [:some/broadcast (assoc msg :to-whom uid)]))))
 
@@ -29,7 +30,7 @@
   component/Lifecycle
 
   (start [component]
-    (println ";; Broadcast" broadcast-timeout)
+    (log/info ";; Broadcast" broadcast-timeout)
     (tap> "starting broadcast")
     (let [last-3 (atom #{0})
           broadcast-loop (go-loop [i 0]
@@ -42,7 +43,7 @@
       (assoc component :broadcast broadcast-loop)))
 
   (stop [component]
-    (println ";; Stopping broadcast")
+    (log/info ";; Stopping broadcast")
     ; need some way to turn the go-loop off...
     (assoc component :broadcast nil)))
 

@@ -14,7 +14,7 @@
 
 
 (defn routes [{:keys [ring-ajax-post ring-ajax-get-or-ws-handshake]}]
-  (println "setting up the routes")
+  (log/info "setting up the routes")
 
   (compojure.core/routes
     ; the websocket routes need minimal processing

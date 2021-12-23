@@ -1,7 +1,7 @@
 (ns bh.rccst.webserver
-  (:require [com.stuartsierra.component :as component]
+  (:require [clojure.tools.logging :as log]
+            [com.stuartsierra.component :as component]
             [org.httpkit.server :as server]
-            [clojure.tools.logging :as log]
 
             [bh.rccst.routes :as routes]))
 
@@ -10,13 +10,13 @@
   component/Lifecycle
 
   (start [component]
-    (println ";; Starting HTTP server" port server)
+    (log/info ";; Starting HTTP server" port server)
     (tap> "starting server")
     (let [server (server/run-server (routes/routes socket) {:port port})]
       (assoc component :server server)))
 
   (stop [component]
-    (println ";; Stopping HTTP server")
+    (log/info ";; Stopping HTTP server")
     (server :timeout 100)
     (assoc component :server nil)))
 

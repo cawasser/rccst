@@ -2,6 +2,7 @@
   (:require
    [reagent.dom :as rdom]
    [re-frame.core :as re-frame]
+   [taoensso.timbre :as log]
    [bh.rccst.events :as events]
    [bh.rccst.views :as views]
    [bh.rccst.config :as config]))
@@ -9,7 +10,7 @@
 
 (defn dev-setup []
   (when config/debug?
-    (println "dev mode")))
+    (log/info "dev mode")))
 
 
 (defn ^:dev/after-load mount-root []
@@ -20,7 +21,7 @@
 
 
 (defn init []
-  (println "rccts.core/init")
+  (log/info "rccts.core/init")
 
   (re-frame/dispatch-sync [::events/initialize-db])
   (dev-setup)
