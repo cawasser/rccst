@@ -3,8 +3,10 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Pushing Data to Clients](#pushing-data-to-clients)
+  - [What do we want?](#what-do-we-want)
     - [General Purpose](#general-purpose)
-    - [Reactive](#reactive)
+    - [Reactive?](#reactive)
+    - [A Step in the DAG](#a-step-in-the-dag)
   - [Examples](#examples)
     - [Rocky-Road](#rocky-road)
       - [FetchableDataSource](#fetchabledatasource)

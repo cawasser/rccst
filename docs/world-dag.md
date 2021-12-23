@@ -1,3 +1,18 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [All the World's a DAG](#all-the-worlds-a-dag)
+  - [Functions](#functions)
+  - [Kafka Topology](#kafka-topology)
+  - [Re-frame](#re-frame)
+  - [React/Reagent](#reactreagent)
+  - [Widgets and UI Composition](#widgets-and-ui-composition)
+  - [Microservices](#microservices)
+  - [System Composition](#system-composition)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # All the World's a DAG
 
 
@@ -24,7 +39,7 @@ We program in Clojure, a functional programming language. As such, functions the
 anyway) exhibit this one-way directional flow:
 
 ![](figures/atwiad/atwiad.001.png)
-Figure 1: Functions take inputs and prouce and output.
+Figure 1: Functions take inputs and produce an output.
 
 Clojure even has idiomatic notation (`->`, `->>`, `as->`, etc.) that make this notion explicit in the source code itself.
 

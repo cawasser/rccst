@@ -64,4 +64,4 @@ UI components. For example, it would be nice to compose Widgets out of charts, t
 - We want an "information model" (literal data structure) to define components, containers and such, up to and including 
 the overall UI
   - we've done a bunch of work on this already, documented [here](https://github.com/cawasser/rocky-road/blob/master/docs/datt/user-interface.md)
-  - see also [All the World's a DAG]()
+  - see also [All the World's a DAG](/docs/world-dag.md)
