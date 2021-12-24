@@ -5,8 +5,8 @@
 
 
 (defn publish! [socket subscribers [data-tag & _ :as message]]
-  (doseq [subs (get-in @subscribers [:sources data-tag])]
-    ()))
+  (doseq [sub (get-in @subscribers [:sources data-tag])]
+    ((:chsk-send! socket) sub message)))
 
 
 (defn subscribe [subscriptions data-tag uid]
@@ -50,7 +50,8 @@
         :subscriptions subscriptions
         :subscribe (partial subscribe subscriptions)
         :cancel (partial cancel subscriptions)
-        :cancel-all (partial cancel subscriptions))))
+        :cancel-all (partial cancel subscriptions)
+        :publish! (partial publish! socket subscriptions))))
 
   (stop [component]
     (log/info ";; Stopping subscribers")

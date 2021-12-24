@@ -8,6 +8,7 @@
             [bh.rccst.components.broadcast :as broadcast]
             [bh.rccst.components.system :as system]
             [bh.rccst.components.repl :as repl]
+            [bh.rccst.data-source.subscribers :as subscribers]
             
             [bh.rccst.components.websocket.publish]))
 
@@ -22,7 +23,8 @@
       :server (component/using (server/map->HTTPServer args) [:socket])
       :nrepl (repl/start-repl args)
       :socket (socket/map->WebSocketServer args)
-      :broadcast (component/using (broadcast/map->Broadcast args) [:socket]))))
+      :broadcast (component/using (broadcast/map->Broadcast args) [:socket])
+      :subscriptions (component/using (subscribers/map->Subscribers args) [:socket]))))
 
 
 (defn start! []
@@ -61,6 +63,7 @@
   (:nrepl system)
   (:socket system)
   (:broadcast system)
+  (:subscriptions system)
 
   (start)
   (stop)
