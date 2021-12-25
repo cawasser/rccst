@@ -84,6 +84,6 @@
   (:broadcast @system/system)
 
 
-  (get-in @system/system [:subscriptions :subscribe])
+  (get-in @system/system [:subscriptions :subscriptions])
 
   ())

@@ -92,19 +92,20 @@
 
 (re-frame/reg-event-db
   ::good-subscribe-result
-  (fn-traced [db [_ result]]
-    (log/info ":good-subscribe-result" result)
-    (assoc db
-      :subscribed? true
-      :subscribe-error "")))
+  (fn-traced [db [_ source result]]
+    (let [current (:subscribed db)]
+      (log/info ":good-subscribe-result" source result
+        "////" current)
+      (assoc db
+        :subscribed (set (conj current source))
+        :subscribe-error ""))))
 
 
 (re-frame/reg-event-db
   ::bad-subscribe-result
-  (fn-traced [db [_ result]]
-    (log/info "::bad-subscribe-result" result)
+  (fn-traced [db [_ source result]]
+    (log/info "::bad-subscribe-result" source result)
     (assoc db
-      :subscribed? false
       :subscribe-error result)))
 
 
@@ -119,8 +120,8 @@
                   :params          {:user-id "client" :data-sources source}
                   :format          (ajax/transit-request-format)
                   :response-format (ajax/transit-response-format)
-                  :on-success      [::good-subscribe-result]
-                  :on-failure      [::bad-subscribe-result]}}))
+                  :on-success      [::good-subscribe-result source]
+                  :on-failure      [::bad-subscribe-result source]}}))
 
 
 ; some events to dispatch from the REPL

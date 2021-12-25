@@ -21,7 +21,7 @@
     (-> (compojure.core/routes
           (GET "/chsk" req (ring-ajax-get-or-ws-handshake req))
           (POST "/chsk" req (ring-ajax-post req)))
-      (wrap-defaults site-defaults)
+      (wrap-defaults (assoc-in site-defaults [:security :anti-forgery] false))
       (wrap-cors :access-control-allow-origin [#".*"]))
 
     ; while the "general' routes need all the transit and parsing support
@@ -35,7 +35,7 @@
 
           (route/not-found "<h1>Page not found</h1>"))
 
-      (wrap-defaults site-defaults)
+      (wrap-defaults (assoc-in site-defaults [:security :anti-forgery] false))
       (wrap-cors :access-control-allow-origin [#".*"])
       (wrap-restful-format :formats [:transit-json :edn])
       wrap-keyword-params

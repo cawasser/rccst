@@ -39,9 +39,9 @@
 
 
 (re-frame/reg-sub
-  ::subscribe
-  (fn [db _]
-    (:subscribe db)))
+  ::subscribed
+  (fn [db [_ source]]
+    (contains? (:subscribed db) source)))
 
 
 (re-frame/reg-sub
