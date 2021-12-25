@@ -65,12 +65,11 @@
   (:broadcast system)
   (:subscriptions system)
 
+  @(get-in system [:subscriptions :subscriptions])
+
   (start)
   (stop)
   (reset)
-
-
-  (socket/start-example-broadcaster! (:socket system))
 
   ())
 
@@ -83,5 +82,8 @@
   (:nrepl @system/system)
   (:socket @system/system)
   (:broadcast @system/system)
+
+
+  (get-in @system/system [:subscriptions :subscribe])
 
   ())

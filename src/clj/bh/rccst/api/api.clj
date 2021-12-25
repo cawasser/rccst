@@ -2,6 +2,7 @@
   (:require [compojure.api.sweet :as sweet]
 
             [bh.rccst.api.login :as login]
+            [bh.rccst.api.subscribe :as subscribe]
             [bh.rccst.api.version :as version]
             [bh.rccst.data-source.lookup :as lookup]))
 
@@ -25,7 +26,10 @@
       lookup/lookup-handler)
 
     ; "user"
-    login/login-handlers))
+    login/login-handlers
+
+    ; subscription
+    subscribe/subscription-handlers))
 
     ; "initialization"
 

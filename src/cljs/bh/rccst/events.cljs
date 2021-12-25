@@ -82,12 +82,45 @@
   ::lookup
   (fn-traced [_ _]
     (log/info "::lookup")
-    {:http-xhrio {:method :get
+    {:http-xhrio {:method          :get
                   :uri             "/lookup"
-                  :timeout         8000                                       ;; optional see API docs
-                  :response-format (ajax/transit-response-format)  ;; IMPORTANT!: You must provide this.
+                  :timeout         8000                     ;; optional see API docs
+                  :response-format (ajax/transit-response-format) ;; IMPORTANT!: You must provide this.
                   :on-success      [::good-lookup-result]
                   :on-failure      [::bad-lookup-result]}}))
+
+
+(re-frame/reg-event-db
+  ::good-subscribe-result
+  (fn-traced [db [_ result]]
+    (log/info ":good-subscribe-result" result)
+    (assoc db
+      :subscribed? true
+      :subscribe-error "")))
+
+
+(re-frame/reg-event-db
+  ::bad-subscribe-result
+  (fn-traced [db [_ result]]
+    (log/info "::bad-subscribe-result" result)
+    (assoc db
+      :subscribed? false
+      :subscribe-error result)))
+
+
+(re-frame/reg-event-fx
+  ::subscribe-to
+  (fn-traced [_ [_ source]]
+    (log/info "::subscribe-to" source
+      "////" {:user-id "client" :data-sources source})
+    {:http-xhrio {:method          :post
+                  :uri             "/subscribe/data-source"
+                  :timeout         8000
+                  :params          {:user-id "client" :data-sources source}
+                  :format          (ajax/transit-request-format)
+                  :response-format (ajax/transit-response-format)
+                  :on-success      [::good-subscribe-result]
+                  :on-failure      [::bad-subscribe-result]}}))
 
 
 ; some events to dispatch from the REPL
@@ -114,5 +147,8 @@
 
   ; and these also do nothing since they aren't in the set anyway
   (re-frame/dispatch [::diff-set #{9 200}])
+
+
+  (re-frame/dispatch [::subscribe-to :dummy])
 
   ())

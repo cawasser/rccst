@@ -26,6 +26,17 @@
     [:h3 "String: " @s]))
 
 
+(defn- subscription-control []
+  (let [result (re-frame/subscribe [::subs/source :subscribe])
+        error (re-frame/subscribe [::subs/subscribe-error])]
+    [:div
+     [:button.button.is-primary
+      {:on-click #(re-frame/dispatch [::events/subscribe-to :dummy])}
+      ":dummy"]
+     [:h3 "Result:" @result]
+     [:h3 "Error:" @error]]))
+
+
 (defn main-panel []
   (let [name (re-frame/subscribe [::subs/name])
         counter (re-frame/subscribe [::subs/counter])
@@ -39,7 +50,8 @@
 
        [number-control]
        [string-control]
-       [lookup-control]])))
+       [lookup-control]
+       [subscription-control]])))
 
 
 ; some things for the repl

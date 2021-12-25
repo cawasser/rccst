@@ -9,16 +9,17 @@
     ((:chsk-send! socket) sub message)))
 
 
-(defn subscribe [subscriptions data-tag uid]
+(defn subscribe [subscriptions uid data-tag]
   (let [current-sources (get-in @subscriptions [:sources data-tag])
         current-subscribers (get-in @subscriptions [:subscribers uid])]
+    (log/info "subscribe" uid data-tag)
     (reset! subscriptions
       (-> @subscriptions
         (assoc-in [:sources data-tag] (set (conj current-sources uid)))
         (assoc-in [:subscribers uid] (set (conj current-subscribers data-tag)))))))
 
 
-(defn cancel [subscriptions data-tag uid]
+(defn cancel [subscriptions uid data-tag]
   (let [current-sources (get-in @subscriptions [:sources data-tag])
         current-subscribers (get-in @subscriptions [:subscribers uid])]
     (reset! subscriptions
@@ -77,16 +78,16 @@
 
 
   ; subscribe
-  (subscribe subscriptions :dummy "dummy")
-  (subscribe subscriptions :dummy "alpha")
-  (subscribe subscriptions :dummy "brave")
-  (subscribe subscriptions :something-new "dummy")
+  (subscribe subscriptions "dummy" :dummy)
+  (subscribe subscriptions "alpha" :dummy)
+  (subscribe subscriptions "brave" :dummy)
+  (subscribe subscriptions "dummy" :something-new)
 
   ; cancel
-  (cancel subscriptions :dummy "dummy")
-  (cancel subscriptions :dummy "alpha")
-  (cancel subscriptions :something-new "alpha")
-  (cancel subscriptions :something-new "dummy")
+  (cancel subscriptions "dummy" :dummy)
+  (cancel subscriptions "alpha" :dummy)
+  (cancel subscriptions "alpha" :something-new)
+  (cancel subscriptions "dummy" :something-new)
 
   ; cancel-all
   (def current-subscriptions (get-in @subscriptions [:subscribers "dummy"]))

@@ -36,3 +36,15 @@
   ::source
   (fn [db [_ id]]
     (get-in db [:sources id])))
+
+
+(re-frame/reg-sub
+  ::subscribe
+  (fn [db _]
+    (:subscribe db)))
+
+
+(re-frame/reg-sub
+  ::subscribe-error
+  (fn [db _]
+    (:subscribe-error db)))
