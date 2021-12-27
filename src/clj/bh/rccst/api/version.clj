@@ -1,5 +1,6 @@
 (ns bh.rccst.api.version
-  (:require [compojure.core :as compojure]
+  (:require [clojure.tools.logging :as log]
+            [compojure.core :as compojure]
             [compojure.api.sweet :as sweet]
             [schema.core :as s]
             [bh.rccst.api.common :as c]))
@@ -10,6 +11,7 @@
 
 
 (defn- get-version []
+  (log/info "get-version")
   {:version "0.0.1"})
 
 

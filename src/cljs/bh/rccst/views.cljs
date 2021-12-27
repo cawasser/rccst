@@ -43,11 +43,16 @@
 
 (defn main-panel []
   (let [name (re-frame/subscribe [::subs/name])
+        version (re-frame/subscribe [::subs/version])
         counter (re-frame/subscribe [::subs/counter])
         s (re-frame/subscribe [::subs/set])]
     (fn []
       [:div {:style {:width "75%"}}
-       [:h1 "Hello from " @name]
+       [:div {:style {:display :flex
+                      :margin "10px"}}
+        [:h1 "Hello from " @name]
+        [:h3 "version: " @version]]
+
        [:h3 "Counter: " @counter]
        [:button.button {:on-click #(re-frame/dispatch [::subscriptions/start])} "Start"]
        [:h3 "Last 3: " (str @s)]

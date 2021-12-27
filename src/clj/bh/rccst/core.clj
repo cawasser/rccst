@@ -17,9 +17,11 @@
 (def http-port 8280)
 (def nRepl-port 7777)
 
+(def last-req (atom {}))
 
 (defn- csrf-fn [ring-req]
   (log/info "csrf-fn" ring-req)
+  (reset! last-req ring-req)
   (or (:anti-forgery-token ring-req)
     (get-in ring-req [:session :csrf-token])
     (get-in ring-req [:session :ring.middleware.anti-forgery/anti-forgery-token])
@@ -47,8 +49,10 @@
       (new-system {:host              "localhost"
                    :port              http-port
                    :nrepl             nRepl-port
-                   :socket-params     {:packer        :edn
-                                       :csrf-token-fn nil}
+                   :dev-mode          false
+                   :socket-params     {:user-id-fn    user-fn
+                                       :packer        (sente-transit/get-transit-packer)
+                                       :csrf-token-fn csrf-fn}
                    :broadcast-timeout 5}                    ; in seconds
         {}))))
 
@@ -62,17 +66,35 @@
 (comment
   (-main)
 
+  ; dev-mode
   (do
     (set-init (partial new-system
                 {:host              "localhost"
                  :port              http-port
                  :nrepl             nRepl-port
+                 :dev-mode          true
+                 :socket-params     {:user-id-fn    user-fn
+                                     :packer        (sente-transit/get-transit-packer)
+                                     :csrf-token-fn nil}
+                 :broadcast-timeout 5}))
+    (start)
+    (reset! system/system system))
+
+  ; prod-mode
+  (do
+    (set-init (partial new-system
+                {:host              "localhost"
+                 :port              http-port
+                 :nrepl             nRepl-port
+                 :dev-mode          false
                  :socket-params     {:user-id-fn    user-fn
                                      :packer        (sente-transit/get-transit-packer)
                                      :csrf-token-fn csrf-fn}
                  :broadcast-timeout 5}))
     (start)
     (reset! system/system system))
+
+  (def r @last-req)
 
   (:server system)
   (:nrepl system)

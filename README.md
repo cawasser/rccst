@@ -40,9 +40,9 @@ There are many things we want to learn to do, and we are trying to use this repo
 5. [X] Get logging to work correctly (added ch.qos.logback/logback-classic "1.2.5", see [here](https://spin.atomicobject.com/2015/05/11/clojure-logging/))
 6. [ ] [Develop a more complex API (paving the way to Rocky-road)](/docs/complex-api.md)
 7. [X] [Anti-forgery support](/docs/anti-forgery.md)
-   1. [ ] Toggle anti-forgery OFF when doing development
-      1. [ ] Client-side
-      2. [ ] Server-side
+   1. [X] Toggle anti-forgery OFF when doing development
+      2. [X] Server-side
+      3. [X] Do some testing in "production mode"
 8. [X] Add :edn format to the swagger-UI to make it easier to work with
 9. [ ] Remove the "broadcast" (Concept22 doesn't really support this idea)
 10. [ ] [De-complecting things](/docs/decompleting.md)

@@ -14,68 +14,61 @@
   {:user-id s/Str :password s/Str})
 
 (s/defschema LoginSuccess
-  {:user-id s/Str :uuid s/Str})
-
-
-(s/defschema RegisterRequest
-  {:user-id s/Str})
+  {:logged-in s/Bool
+   (s/optional-key :uuid) s/Str})
 
 (s/defschema RegisterSuccess
-  {:user-id s/Str :result s/Keyword})
+  {:registered s/Bool})
 
 
 (s/defschema User
   {:user-id s/Str})
 
-(s/defschema Logged-inUser
-  {:user-id s/Str :uuid s/Str :password s/Str})
-
 (s/defschema Users
   {:users [s/Str]})
 
-(s/defschema Logged-inSuccess
-  {:logged-in s/Bool})
 
 
-(defn- register [user-id]
+(defn- register [user-id password]
   (log/info "register" user-id)
-  {:user-id user-id :uuid "dummy-uuid"})
+  (if-let [user (first (filter #(= user-id (:user-id %)) @users-logged-in))]
+    {:registered false}
+    (do
+      (swap! users-logged-in
+        conj {:user-id user-id :uuid "dummy-uuid" :password password})
+      {:registered true})))
 
 
 (defn- login [user-id password]
   (log/info "login" user-id "////" password)
-  {:user-id user-id :password password})
+  (if-let [user (first (filter #(= user-id (:user-id %)) @users-logged-in))]
+    (if (= password (:password user))
+      {:logged-in true :uuid (:uuid user)}
+      {:logged-in false})))
 
 
 (defn- users []
+  (log/info "users")
   {:users (into [] (map :user-id @users-logged-in))})
 
 
 (defn- user-logged-in? [user-id]
-  (if (empty? (filter #(= user-id (:user-id %)) @users-logged-in))
-    {:logged-in false}
-    {:logged-in true}))
+  (log/info "user-logged-in?" user-id)
+  (if-let [user (first (filter #(= user-id (:user-id %)) @users-logged-in))]
+    {:logged-in true :uuid (:uuid user)}
+    {:logged-in false}))
 
-
-
-(s/defschema Pizza
-  {:name                         s/Str
-   (s/optional-key :description) s/Str
-   :size                         (s/enum :L :M :S)
-   :origin                       {:country (s/enum :FI :PO)
-                                  :city    s/Str}})
 
 
 (def login-handlers
   (sweet/context "/user" []
     :tags ["user"]
 
-
-    (sweet/POST "/echo" []
-      :return Pizza
-      :body [pizza Pizza]
-      :summary "echoes a Pizza"
-      (c/wrapper pizza))
+    ;(sweet/POST "/echo-user" []
+    ;  :return User
+    ;  :body [user User]
+    ;  :summary "echoes a User"
+    ;  (c/wrapper user))
 
     (sweet/GET "/users" _
       :return Users
@@ -84,42 +77,28 @@
         (log/info "users")
         (c/wrapper (users))))
 
-    (sweet/GET "/logged-in" [req]
-      :body [{:keys [user-id]} User]
-      :return Logged-inSuccess
+    (sweet/POST "/logged-in" []
+      :return LoginSuccess
+      :body [{:keys [user-id] :as user} User]
       :summary "is the given user-id logged into the server?"
       (do
-        (log/info "logged-in?" req "////" user-id)
-        (c/wrapper (users-logged-in user-id))))
+        (log/info "logged-in" user "////" user-id)
+        (c/wrapper (user-logged-in? user-id))))
 
-    (sweet/POST "/login" [req]
-      :body [{:keys [user-id password]} LoginRequest]
+    (sweet/POST "/login" []
       :return LoginSuccess
+      :body [{:keys [user-id password]} LoginRequest]
       :summary "log into the server"
       (do
-        (log/info "login" req "////" user-id "////" password)
+        (log/info "login" user-id "////" password)
         (c/wrapper (login user-id password))))
 
-    (sweet/POST "/register" [req]
-      :body [{:keys [user-id]} RegisterRequest]
+    (sweet/POST "/register" []
       :return RegisterSuccess
+      :body [{:keys [user-id password]} LoginRequest]
       :summary "log into the server"
       (do
-        (log/info "register" user-id "////" req)
-        (c/wrapper (register user-id))))))
+        (log/info "register" user-id)
+        (c/wrapper (register user-id password))))))
 
 
-; test out schemas
-(comment
-  (s/validate LoginParams {:user-id "chris" :password "dummy"})
-  (s/validate LoginParams {:user-id "chris"})
-
-  (s/validate LoginSuccess {:user-id "chris" :uuid "dummy-uuid"})
-
-
-  (def user-id "chris")
-  (s/validate User {:user-id user-id})
-  (s/validate Logged-inSuccess (user-logged-in? user-id))
-
-
-  ())

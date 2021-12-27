@@ -48,48 +48,94 @@
     "text/html; charset=utf-8"))
 
 
-(defn routes [{:keys [ring-ajax-post ring-ajax-get-or-ws-handshake]}]
-  (log/info "setting up the routes")
+(defn routes [{:keys [ring-ajax-post ring-ajax-get-or-ws-handshake]} dev-mode]
+  (log/info "setting up the routes" dev-mode)
 
-  (compojure.core/routes
-    ; the websocket routes need minimal processing
-    (-> (compojure.core/routes
-          (GET "/chsk" req (ring-ajax-get-or-ws-handshake req))
-          (POST "/chsk" req (ring-ajax-post req)))
-      ;need to turn "off" the built-in anti-forgery because it returns HTML, and we need transit
-      (wrap-defaults
-        (assoc-in site-defaults [:security :anti-forgery] false))
-      (wrap-cors :access-control-allow-origin [#".*"])
-      (wrap-anti-forgery {:error-handler csrf-error-handler})
-      (wrap-session {:cookie-attrs {:max-age 3600}
-                     :store (cookie-store {:key (byte-array (.getBytes "ahY9poQuaghahc7I"))})}))
+  (if dev-mode
+    (compojure.core/routes
+      ; the websocket routes need minimal processing
+      (-> (compojure.core/routes
+            (GET "/chsk" req (ring-ajax-get-or-ws-handshake req))
+            (POST "/chsk" req (ring-ajax-post req)))
+        ;need to turn "off" the built-in anti-forgery because it returns HTML, and we need transit
+        (wrap-defaults
+          (assoc-in site-defaults [:security :anti-forgery] false))
+        (wrap-cors :access-control-allow-origin [#".*"])
+        (wrap-session {:cookie-attrs {:max-age 3600}
+                       :store (cookie-store {:key (byte-array (.getBytes "ahY9poQuaghahc7I"))})}))
 
-    ; while the "general' routes need all the transit and parsing support
-    (-> (compojure.core/routes
-          (GET "/" _ (render "public/index.html"))
-          (route/resources "/")
+      ; while the "general" routes need all the transit and parsing support
+      (-> (compojure.core/routes
+            (GET "/" _ (render "public/index.html"))
+            (route/resources "/")
 
-          #'api/api
+            #'api/api
 
-          (route/not-found "<h1>Page not found</h1>"))
+            (route/not-found "<h1>Page not found</h1>"))
 
-      ;need to turn "off" the built-in anti-forgery because it returns HTML, and we need transit
-      (wrap-defaults
-        (assoc-in site-defaults [:security :anti-forgery] false))
-      (wrap-cors :access-control-allow-origin [#".*"])
-      (wrap-restful-format :formats [:transit-json :edn])
-      wrap-keyword-params
-      wrap-params
-      (wrap-anti-forgery {:error-handler csrf-error-handler})
-      (wrap-session {:cookie-attrs {:max-age 3600}
-                     :store (cookie-store {:key (byte-array (.getBytes "ahY9poQuaghahc7I"))})}))))
+        ;need to turn "off" the built-in anti-forgery because it returns HTML, and we need transit
+        (wrap-defaults
+          (assoc-in site-defaults [:security :anti-forgery] false))
+        (wrap-cors :access-control-allow-origin [#".*"])
+        (wrap-restful-format :formats [:transit-json :edn])
+        wrap-keyword-params
+        wrap-params
+        (wrap-session {:cookie-attrs {:max-age 3600}
+                       :store (cookie-store {:key (byte-array (.getBytes "ahY9poQuaghahc7I"))})})));(do
 
+    (compojure.core/routes
+      ; the websocket routes need minimal processing
+      (-> (compojure.core/routes
+            (GET "/chsk" req (ring-ajax-get-or-ws-handshake req))
+            (POST "/chsk" req (ring-ajax-post req)))
+        ;need to turn "off" the built-in anti-forgery because it returns HTML, and we need transit
+        (wrap-defaults
+          (assoc-in site-defaults [:security :anti-forgery] false))
+        (wrap-cors :access-control-allow-origin [#".*"])
+        (wrap-anti-forgery {:error-handler csrf-error-handler})
+        (wrap-session {:cookie-attrs {:max-age 3600}
+                       :store (cookie-store {:key (byte-array (.getBytes "ahY9poQuaghahc7I"))})}))
+
+      ; while the "general" routes need all the transit and parsing support
+      (-> (compojure.core/routes
+            (GET "/" _ (render "public/index.html"))
+            (route/resources "/")
+
+            #'api/api
+
+            (route/not-found "<h1>Page not found</h1>"))
+
+        ;need to turn "off" the built-in anti-forgery because it returns HTML, and we need transit
+        (wrap-defaults
+          (assoc-in site-defaults [:security :anti-forgery] false))
+        (wrap-cors :access-control-allow-origin [#".*"])
+        (wrap-restful-format :formats [:transit-json :edn])
+        wrap-keyword-params
+        wrap-params
+        (wrap-anti-forgery {:error-handler csrf-error-handler})
+        (wrap-session {:cookie-attrs {:max-age 3600}
+                       :store (cookie-store {:key (byte-array (.getBytes "ahY9poQuaghahc7I"))})})))))
 
 (comment
-  (routes {:ring-ajax-post                nil
-           :ring-ajax-get-or-ws-handshake nil})
+
+  (do
+    (def dev-mode true)
+    (def ring-ajax-get-or-ws-handshake nil)
+    (def ring-ajax-post nil))
+
+  (dev-mode ring-ajax-get-or-ws-handshake ring-ajax-post)
+  (prod-mode ring-ajax-get-or-ws-handshake ring-ajax-post)
+
+  (if true
+    (dev-mode ring-ajax-get-or-ws-handshake ring-ajax-post)
+    (prod-mode ring-ajax-get-or-ws-handshake ring-ajax-post))
+
 
   (anti-forgery-field)
+
+  (routes {:ring-ajax-post                nil
+           :ring-ajax-get-or-ws-handshake nil} true)
+
 
 
   ())
