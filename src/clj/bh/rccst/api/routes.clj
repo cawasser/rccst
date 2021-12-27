@@ -22,7 +22,11 @@
 (parser/add-tag! :csrf-field (fn [_ _] (anti-forgery-field)))
 
 
-(defn csrf-error-handler [request]
+(defn csrf-error-handler
+  "csrf-error-handler is needed because we need to be sure anti-forgery only returns TRANSIT,
+  not the html that's built-in"
+
+  [request]
   (http/content-type
     (http/forbidden
       {:error-text "Invalid CSRF Token"
@@ -51,8 +55,8 @@
     (-> (compojure.core/routes
           (GET "/chsk" req (ring-ajax-get-or-ws-handshake req))
           (POST "/chsk" req (ring-ajax-post req)))
+      ;need to turn "off" the built-in anti-forgery because it returns HTML, and we need transit
       (wrap-defaults
-        ;site-defaults)
         (assoc-in site-defaults [:security :anti-forgery] false))
       (wrap-cors :access-control-allow-origin [#".*"])
       (wrap-anti-forgery {:error-handler csrf-error-handler})
@@ -68,8 +72,8 @@
 
           (route/not-found "<h1>Page not found</h1>"))
 
+      ;need to turn "off" the built-in anti-forgery because it returns HTML, and we need transit
       (wrap-defaults
-        ;site-defaults)
         (assoc-in site-defaults [:security :anti-forgery] false))
       (wrap-cors :access-control-allow-origin [#".*"])
       (wrap-restful-format :formats [:transit-json :edn])
