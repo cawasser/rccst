@@ -16,20 +16,20 @@
                     :description "Web API for the RCCTS exploratory app"}
              :tags [{:name "api", :description "general purpose endpoints"}
                     {:name "user" :description "endpoints for managing and using User accounts"}]
-             :consumes ["application/transit+json"]
-             :produces ["application/transit+json"]}}}
+             :consumes ["application/transit+json" "application/edn"]
+             :produces ["application/transit+json"  "application/edn"]}}}
 
     (sweet/context "/" []
       :tags ["api"]
 
-      version/version-handler
-      lookup/lookup-handler)
+      #'version/version-handler
+      #'lookup/lookup-handler)
 
     ; "user"
-    login/login-handlers
+    #'login/login-handlers
 
     ; subscription
-    subscribe/subscription-handlers))
+    #'subscribe/subscription-handlers))
 
     ; "initialization"
 

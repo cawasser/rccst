@@ -27,6 +27,7 @@
   not the html that's built-in"
 
   [request]
+  (log/info "csrf-error-handler" request)
   (http/content-type
     (http/forbidden
       {:error-text "Invalid CSRF Token"
@@ -68,7 +69,7 @@
           (GET "/" _ (render "public/index.html"))
           (route/resources "/")
 
-          api/api
+          #'api/api
 
           (route/not-found "<h1>Page not found</h1>"))
 
