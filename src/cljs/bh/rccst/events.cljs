@@ -4,7 +4,15 @@
             [day8.re-frame.tracing :refer-macros [fn-traced]]
             [day8.re-frame.http-fx]
             [ajax.core :as ajax]
-            [bh.rccst.db :as db]))
+
+            [bh.rccst.db :as db]
+            [bh.rccst.csrf :refer [?csrf-token]]))
+
+
+(def default-header {:timeout         8000
+                     :format          (ajax/transit-request-format)
+                     :response-format (ajax/transit-response-format)
+                     :headers         {"x-csrf-token" ?csrf-token}})
 
 
 (re-frame/reg-event-db
@@ -82,12 +90,11 @@
   ::lookup
   (fn-traced [_ _]
     (log/info "::lookup")
-    {:http-xhrio {:method          :get
-                  :uri             "/lookup"
-                  :timeout         8000                     ;; optional see API docs
-                  :response-format (ajax/transit-response-format) ;; IMPORTANT!: You must provide this.
-                  :on-success      [::good-lookup-result]
-                  :on-failure      [::bad-lookup-result]}}))
+    {:http-xhrio (merge default-header
+                   {:method     :get
+                    :uri        "/lookup"
+                    :on-success [::good-lookup-result]
+                    :on-failure [::bad-lookup-result]})}))
 
 
 (re-frame/reg-event-db
@@ -114,14 +121,12 @@
   (fn-traced [_ [_ source]]
     (log/info "::subscribe-to" source
       "////" {:user-id "client" :data-sources source})
-    {:http-xhrio {:method          :post
-                  :uri             "/subscribe/data-source"
-                  :timeout         8000
-                  :params          {:user-id "client" :data-sources source}
-                  :format          (ajax/transit-request-format)
-                  :response-format (ajax/transit-response-format)
-                  :on-success      [::good-subscribe-result source]
-                  :on-failure      [::bad-subscribe-result source]}}))
+    {:http-xhrio (merge default-header
+                   {:method          :post
+                    :uri             "/subscribe/data-source"
+                    :params          {:user-id "client" :data-sources source}
+                    :on-success      [::good-subscribe-result source]
+                    :on-failure      [::bad-subscribe-result source]})}))
 
 
 ; some events to dispatch from the REPL

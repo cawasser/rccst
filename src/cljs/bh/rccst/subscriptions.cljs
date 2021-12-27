@@ -5,9 +5,9 @@
     [re-frame.core :as re-frame]
     [day8.re-frame.tracing :refer-macros [fn-traced]]
     [taoensso.timbre :as log]
-    ;[cljs.core.async :as async :refer (<! >! put! chan)]
     [taoensso.sente :as sente]
-    [bh.rccst.subscription-handlers :as handlers]))
+    [bh.rccst.subscription-handlers :as handlers]
+    [bh.rccst.csrf :refer [?csrf-token]]))
 
 
 (declare start!)
@@ -37,7 +37,11 @@
 
 
 (defn create-client! []
-  (let [{:keys [ch-recv send-fn state]} (sente/make-channel-socket-client! "/chsk" nil config)]
+  (log/info "create-client" ?csrf-token)
+  (let [{:keys [ch-recv send-fn state]} (sente/make-channel-socket-client!
+                                          "/chsk"
+                                          ?csrf-token
+                                          config)]
     (reset! ch-chsk ch-recv)
     (reset! chsk-send! send-fn)
     (add-watch state :state-watcher state-watcher)))

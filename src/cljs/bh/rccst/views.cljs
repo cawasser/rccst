@@ -46,7 +46,7 @@
         counter (re-frame/subscribe [::subs/counter])
         s (re-frame/subscribe [::subs/set])]
     (fn []
-      [:div
+      [:div {:style {:width "75%"}}
        [:h1 "Hello from " @name]
        [:h3 "Counter: " @counter]
        [:button.button {:on-click #(re-frame/dispatch [::subscriptions/start])} "Start"]

@@ -2,6 +2,7 @@
   (:require [clojure.tools.logging :as log]
             [com.stuartsierra.component :as component]
             [com.stuartsierra.component.repl :refer [reset set-init start stop system]]
+            [taoensso.sente.packers.transit :as sente-transit]
 
             [bh.rccst.components.webserver :as server]
             [bh.rccst.components.websocket :as socket]
@@ -9,12 +10,25 @@
             [bh.rccst.components.system :as system]
             [bh.rccst.components.repl :as repl]
             [bh.rccst.data-source.subscribers :as subscribers]
-            
+
             [bh.rccst.components.websocket.publish]))
 
 
-(def http-port 8280);5555)
+(def http-port 8280)
 (def nRepl-port 7777)
+
+
+(defn- csrf-fn [ring-req]
+  (log/info "csrf-fn" ring-req)
+  (or (:anti-forgery-token ring-req)
+    (get-in ring-req [:session :csrf-token])
+    (get-in ring-req [:session :ring.middleware.anti-forgery/anti-forgery-token])
+    (get-in ring-req [:session "__anti-forgery-token"])
+    #_:sente/no-reference-csrf-token))
+
+
+(defn- user-fn [ring-req]
+  (:client-id ring-req))
 
 
 (defn new-system [args _]
@@ -35,7 +49,7 @@
                    :nrepl             nRepl-port
                    :socket-params     {:packer        :edn
                                        :csrf-token-fn nil}
-                   :broadcast-timeout 5}                      ; in seconds
+                   :broadcast-timeout 5}                    ; in seconds
         {}))))
 
 
@@ -53,8 +67,9 @@
                 {:host              "localhost"
                  :port              http-port
                  :nrepl             nRepl-port
-                 :socket-params     {:packer        :edn
-                                     :csrf-token-fn nil}
+                 :socket-params     {:user-id-fn    user-fn
+                                     :packer        :edn    ;(sente-transit/get-transit-packer); :edn
+                                     :csrf-token-fn nil}    ;csrf-fn}
                  :broadcast-timeout 5}))
     (start)
     (reset! system/system system))
