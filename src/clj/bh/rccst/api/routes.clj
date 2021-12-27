@@ -55,6 +55,7 @@
         ;site-defaults)
         (assoc-in site-defaults [:security :anti-forgery] false))
       (wrap-cors :access-control-allow-origin [#".*"])
+      (wrap-anti-forgery {:error-handler csrf-error-handler})
       (wrap-session {:cookie-attrs {:max-age 3600}
                      :store (cookie-store {:key (byte-array (.getBytes "ahY9poQuaghahc7I"))})}))
 
@@ -74,6 +75,7 @@
       (wrap-restful-format :formats [:transit-json :edn])
       wrap-keyword-params
       wrap-params
+      (wrap-anti-forgery {:error-handler csrf-error-handler})
       (wrap-session {:cookie-attrs {:max-age 3600}
                      :store (cookie-store {:key (byte-array (.getBytes "ahY9poQuaghahc7I"))})}))))
 

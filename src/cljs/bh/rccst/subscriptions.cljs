@@ -6,6 +6,8 @@
     [day8.re-frame.tracing :refer-macros [fn-traced]]
     [taoensso.timbre :as log]
     [taoensso.sente :as sente]
+    [taoensso.sente.packers.transit :as sente-transit]
+
     [bh.rccst.subscription-handlers :as handlers]
     [bh.rccst.csrf :refer [?csrf-token]]))
 
@@ -26,10 +28,11 @@
 (def chsk-state (atom nil))
 
 (def config {:type     :auto
-             :packer   :edn
+             :packer   (sente-transit/get-transit-packer) ;:edn
              :protocol :http
              :host     "localhost"
-             :port     8280})   ; this is the port of the "real server"
+             :port     8280
+             :client-id "client"})   ; this is the port of the "real server"
 
 
 (defn state-watcher [_key _atom _old-state new-state]

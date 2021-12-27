@@ -115,12 +115,12 @@
     (assoc db
       :subscribe-error result)))
 
-
 (re-frame/reg-event-fx
   ::subscribe-to
   (fn-traced [_ [_ source]]
     (log/info "::subscribe-to" source
-      "////" {:user-id "client" :data-sources source})
+      "////" {:user-id "client" :data-sources source}
+      "////" ?csrf-token)
     {:http-xhrio (merge default-header
                    {:method          :post
                     :uri             "/subscribe/data-source"

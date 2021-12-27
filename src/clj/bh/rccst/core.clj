@@ -68,8 +68,8 @@
                  :port              http-port
                  :nrepl             nRepl-port
                  :socket-params     {:user-id-fn    user-fn
-                                     :packer        :edn    ;(sente-transit/get-transit-packer); :edn
-                                     :csrf-token-fn nil}    ;csrf-fn}
+                                     :packer        (sente-transit/get-transit-packer)
+                                     :csrf-token-fn csrf-fn}
                  :broadcast-timeout 5}))
     (start)
     (reset! system/system system))
