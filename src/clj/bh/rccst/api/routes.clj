@@ -48,8 +48,9 @@
     "text/html; charset=utf-8"))
 
 
-(defn routes [{:keys [ring-ajax-post ring-ajax-get-or-ws-handshake]} dev-mode]
-  (log/info "setting up the routes" dev-mode)
+(defn routes [{:keys [ring-ajax-post ring-ajax-get-or-ws-handshake]}
+              database dev-mode]
+  (log/info "setting up the routes" dev-mode database)
 
   (if dev-mode
     (compojure.core/routes
@@ -69,7 +70,7 @@
             (GET "/" _ (render "public/index.html"))
             (route/resources "/")
 
-            #'api/api
+            (api/api database)
 
             (route/not-found "<h1>Page not found</h1>"))
 

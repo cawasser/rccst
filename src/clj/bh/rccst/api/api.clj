@@ -7,7 +7,7 @@
             [bh.rccst.data-source.lookup :as lookup]))
 
 
-(def api
+(defn api [database]
   (sweet/api
     {:swagger
      {:ui "/api-docs"
@@ -26,7 +26,7 @@
       #'lookup/lookup-handler)
 
     ; "user"
-    #'login/login-handlers
+    (login/login-handlers database)
 
     ; subscription
     #'subscribe/subscription-handlers))

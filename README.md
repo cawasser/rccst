@@ -44,10 +44,20 @@ There are many things we want to learn to do, and we are trying to use this repo
       2. [X] Server-side
       3. [X] Do some testing in "production mode"
 8. [X] Add :edn format to the swagger-UI to make it easier to work with
-9. [ ] Remove the "broadcast" (Concept22 doesn't really support this idea)
-10. [ ] [De-complecting things](/docs/decompleting.md)
-11. [ ] [Re-thinking the UI](/docs/rethinking-ui.md)
-12. [ ] (optional) Consider moving to [Reitit](/docs/routing.md)
+9. [X] [Add a database](/docs/database.md)
+   1. [X] Postgres
+   2. [X] SQLite
+10. [ ] Implement more of the API:
+    1. [ ] Fix 
+       1. [ ] [Login]()
+       2. [ ] [Register]()
+    2. [ ] Widgets/Layouts
+    3. [ ] Comms
+    4. [ ] Sensors/Beams
+11. [ ] Remove the "broadcast" (Concept22 doesn't really support this notion of the server publishing on a timer)
+12. [ ] [De-complecting things](/docs/decompleting.md)
+13. [ ] [Re-thinking the UI](/docs/rethinking-ui.md)
+14. [ ] (optional) Consider moving to [Reitit](/docs/routing.md)
 
 ## Getting Started
 
