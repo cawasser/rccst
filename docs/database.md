@@ -1,3 +1,16 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Database](#database)
+  - [Postgres](#postgres)
+    - [What to know beforehand](#what-to-know-beforehand)
+  - [SQLite](#sqlite)
+    - [What to know beforehand](#what-to-know-beforehand-1)
+  - [HugSQL](#hugsql)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Database
 
 Any "real" server needs a way to store (durability) 

@@ -57,7 +57,7 @@ There are many things we want to learn to do, and we are trying to use this repo
     3. [ ] Comms
     4. [ ] Sensors/Beams
 11. [ ] Get "repl reload" working again
-12. [ ] Docstrings
+12. [X] Docstrings
 13. [X] Defaults for system configuration parameters
     1. [X] Webserver port
     2. [X] nRepl port
