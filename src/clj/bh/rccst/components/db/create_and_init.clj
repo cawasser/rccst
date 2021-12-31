@@ -2,7 +2,6 @@
   (:require [hugsql.adapter.next-jdbc :as next-adapter]
             [hugsql.core :as hugsql]
 
-            [bh.rccst.components.db.db :as db]
             [bh.rccst.components.db.users :as users]))
 
 
@@ -12,27 +11,36 @@
   {:adapter (next-adapter/hugsql-adapter-next-jdbc)})
 
 
-
-(defn create-database [db]
+(defn create-database
+  "Creates the database and all the tables."
+  [db]
   (-> db
     (create-database! db)
     users/create-users-table))
 
 
-(defn delete-database [db]
+(defn delete-database
+  "delete all the tables and the database itself."
+  [db]
   (-> db
     users/drop-users-table))
 
 
-(defn init-database [db]
+(defn init-database
+  "loading all the starting data"
+  [db]
   (-> db))
 
 
-(defn create-and-init [db]
+(defn create-and-init
+  "create the database and all the tables, then load all the starting data"
+  [db]
   (create-database db)
   (init-database db))
 
 
-(defn rebuild-database [db]
+(defn rebuild-database
+  "delete and re-create the database and all the tables"
+  [db]
   (delete-database db)
   (create-and-init db))

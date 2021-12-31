@@ -24,8 +24,10 @@
 
 (defn csrf-error-handler
   "csrf-error-handler is needed because we need to be sure anti-forgery only returns TRANSIT,
-  not the html that's built-in"
+  not the html that's built-in
 
+  - request - (string) the request that does NOT include the required CSRF token
+  "
   [request]
   (log/info "csrf-error-handler" request)
   (http/content-type
@@ -36,7 +38,17 @@
 
 
 (defn render
-  "renders the HTML template located relative to resources/html"
+  "renders the HTML template located relative to resources/html, using Selmer to substitute values
+  (given in the params) in place of tags embedded in the html template
+
+  - template - (string) the 'raw' html page, typically with Selmer tags embedded
+  - params - (hash-map, optional) the mapping from 'tags' to 'values' for substitution
+
+  > See also:
+  >
+  > [Http-response](https://github.com/metosin/ring-http-response)
+  > [Selmer](https://github.com/yogthos/Selmer)
+  "
   [template & [params]]
   (http/content-type
     (http/ok
@@ -48,11 +60,31 @@
     "text/html; charset=utf-8"))
 
 
-(defn routes [{:keys [ring-ajax-post ring-ajax-get-or-ws-handshake]}
-              database dev-mode]
+(defn routes
+  "'routes' provide the middleware wrappers for all the URL endpoint and their handlers
+
+  - 'socket parameters' - (hash-map)
+    1. ring-ajax-post - (function)
+    2. ring-ajax-get-or-ws-handshake - (function)
+  - database - (Component, Database) the database supporting any URL handlers
+  - dev-mode - (bool) if `true` use the CSRF config and wrappers, if `false` do not
+
+  > See also:
+  >
+  > [Compojure](https://github.com/weavejester/compojure)
+  > [Sente](https://github.com/ptaoussanis/sente)
+  > [Ring](https://github.com/ring-clojure/ring)
+  > [ring.middleware.anti-forgery](https://github.com/ring-clojure/ring-anti-forgery)
+  > [ring.middleware.format](https://github.com/ngrunwald/ring-middleware-format)
+  > [ring.middleware.defaults](https://github.com/ring-clojure/ring-defaults)
+  > [ring.middleware.cors](https://github.com/r0man/ring-cors)
+  "
+  [{:keys [ring-ajax-post ring-ajax-get-or-ws-handshake]}
+   database dev-mode]
   (log/info "setting up the routes" dev-mode database)
 
   (if dev-mode
+    ; dev-mode
     (compojure.core/routes
       ; the websocket routes need minimal processing
       (-> (compojure.core/routes
@@ -84,6 +116,7 @@
         (wrap-session {:cookie-attrs {:max-age 3600}
                        :store (cookie-store {:key (byte-array (.getBytes "ahY9poQuaghahc7I"))})})));(do
 
+    ; prod-mode
     (compojure.core/routes
       ; the websocket routes need minimal processing
       (-> (compojure.core/routes
@@ -117,6 +150,8 @@
         (wrap-session {:cookie-attrs {:max-age 3600}
                        :store (cookie-store {:key (byte-array (.getBytes "ahY9poQuaghahc7I"))})})))))
 
+
+; work out how sente integrates wth the routes
 (comment
 
   (do

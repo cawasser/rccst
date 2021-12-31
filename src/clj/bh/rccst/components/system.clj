@@ -1,6 +1,6 @@
 (ns bh.rccst.components.system)
 
 
-; this atom will hold the running "system", including all the Components
-
-(def system (atom nil))
+(def system
+  "atom to hold the Component 'system' _object_"
+  (atom nil))

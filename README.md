@@ -29,6 +29,8 @@ RCCST stands for ["Ring"](https://github.com/ring-clojure/ring),
 and ["Transit"](https://github.com/cognitect/transit-clj), all the Clojure technologies we intend to 
 explore and make work together.
 
+Read all about the API [here](/docs/api/index.html).
+
 ## Future Plans
 
 There are many things we want to learn to do, and we are trying to use this repo to learn them:
@@ -44,7 +46,7 @@ There are many things we want to learn to do, and we are trying to use this repo
       2. [X] Server-side
       3. [X] Do some testing in "production mode"
 8. [X] Add :edn format to the swagger-UI to make it easier to work with
-9. [X] [Add a database](/docs/database.md)
+9. [X] [Add a "real" database](/docs/database.md)
    1. [X] Postgres
    2. [X] SQLite
 10. [ ] Implement more of the API:
@@ -55,10 +57,16 @@ There are many things we want to learn to do, and we are trying to use this repo
     3. [ ] Comms
     4. [ ] Sensors/Beams
 11. [ ] Get "repl reload" working again
-12. [ ] Remove the "broadcast" (Concept22 doesn't really support this notion of the server publishing on a timer)
-13. [ ] [De-complecting things](/docs/decompleting.md)
-14. [ ] [Re-thinking the UI](/docs/rethinking-ui.md)
-15. [ ] (optional) Consider moving to [Reitit](/docs/routing.md)
+12. [ ] Docstrings
+13. [X] Defaults for system configuration parameters
+    1. [X] Webserver port
+    2. [X] nRepl port
+    3. [X] Broadcast timeout
+14. [X] [Codox](https://github.com/weavejester/codox) (weavejester comes through again!)
+15. [ ] Remove the "broadcast" (Concept22 doesn't really support this notion of the server publishing on a timer)
+16. [ ] [De-complecting things](/docs/decompleting.md)
+17. [ ] [Re-thinking the UI](/docs/rethinking-ui.md)
+18. [ ] (optional) Consider moving to [Reitit](/docs/routing.md)
 
 ## Getting Started
 

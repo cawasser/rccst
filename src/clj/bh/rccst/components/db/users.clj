@@ -12,11 +12,22 @@
   {:adapter (next-adapter/hugsql-adapter-next-jdbc)})
 
 
-(defn create-users-table [db]
+(defn create-users-table
+  ""
+  [db]
   (create-users-table! db))
 
 
-(defn drop-users-table [db]
+(defn drop-users-table
+  "drop the Users table, regardless of whether it is empty or not
+
+  - db - the database Component
+
+  > See also:
+  >
+  > [HugSQL]()
+  "
+  [db]
   (drop-users-table! db))
 
 
@@ -29,21 +40,40 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (s/defschema LoginRequest
+  "data required to log into the system"
   {:user-id s/Str :password s/Str})
 
-(s/defschema LoginSuccess
+(s/defschema LoginResponse
+  "data returned by the login process.
+
+  - :logged-in - `true` if the login was successful, `false` if not
+  - :uuid - if the login was successful, this key will be present and contain the uuid associated with the user-id
+  "
   {:logged-in             s/Bool
    (s/optional-key :uuid) s/Str})
 
-(s/defschema RegisterSuccess
+(s/defschema RegisterResponse
+  "data returned when checking to see if the user is already registered.
+
+  - ::registered - `true` if the user is registered , `false` if not
+  - :uuid - if the login was successful, this key will be present and contain the uuid associated with the user-id
+  "
   {:registered            s/Bool
    (s/optional-key :uuid) s/Str})
 
 
 (s/defschema User
+  "string which uniquely identified the user in the system
+
+  - :user-id
+  "
   {:user-id s/Str})
 
 (s/defschema Users
+  "string which uniquely identified the user in the system
+
+  - :users - vector of user IDs
+  "
   {:users [s/Str]})
 
 
@@ -55,7 +85,19 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn register [database user-id password]
+(defn register
+  "add a new user to the Users table. Check to see if the user-id already exists
+
+  - database - (Component, Database) the database Component
+  - user-id - (string) user ID, uniqueness will be enforced at the database
+  - password - (string) the password for the user
+
+  > See also:
+  >
+  > [Component](https://github.com/stuartsierra/component)
+  > [HugSQL](https://www.hugsql.org)
+  "
+  [database user-id password]
   (log/info "users/register" user-id)
   (if-let [user (get-user database {:username user-id})]
     {:registered false}
@@ -68,20 +110,53 @@
       {:registered true})))
 
 
-(defn login [database user-id password]
+(defn login
+  "check to see if the user-id/password combination is in the User table.
+
+  - database - (Component, Database) the database Component
+  - user-id - (string) user ID
+  - password - (string) the password for the user
+
+  > See also:
+  >
+  > [Component](https://github.com/stuartsierra/component)
+  > [HugSQL](https://www.hugsql.org)
+  "
+  [database user-id password]
   (log/info "users/login" user-id "////" password)
   (if-let [user (verify-credentials database {:username user-id :pass password})]
     {:logged-in true :uuid (:uuid user)}
     {:logged-in false}))
 
 
-(defn users [database]
+(defn users
+  "return al the user in the User table.
+
+  - database - (Component, Database) the database Component
+
+  > See also:
+  >
+  > [Component](https://github.com/stuartsierra/component)
+  > [HugSQL](https://www.hugsql.org)
+  "
+  [database]
   (log/info "users/users" database)
   {:users (into []
             (map :username (get-users database)))})
 
 
-(defn user-registered? [database user-id]
+(defn user-registered?
+  "check to see if the user-id is already in the User table
+
+  - database - (Component, Database) the database Component
+  - user-id - (string) user ID
+
+  > See also:
+  >
+  > [Component](https://github.com/stuartsierra/component)
+  > [HugSQL](https://www.hugsql.org)
+  "
+  [database user-id]
   (log/info "users/user-registered?" user-id)
   (if-let [user (get-user database {:username user-id})]
     {:registered true :uuid (:uuid user)}
@@ -144,14 +219,14 @@
 
   (->>
     (register database "test-user" "test-pwd")
-    (s/validate RegisterSuccess))
+    (s/validate RegisterResponse))
 
   (->>
     (user-registered? database "test-user")
-    (s/validate RegisterSuccess))
+    (s/validate RegisterResponse))
 
   (->>
     (login database "test-user" "test-pwd")
-    (s/validate LoginSuccess))
+    (s/validate LoginResponse))
 
   ())

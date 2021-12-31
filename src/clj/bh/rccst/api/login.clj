@@ -30,7 +30,7 @@
         (c/wrapper (users/users database))))
 
     (sweet/POST "/register" []
-      :return users/RegisterSuccess
+      :return users/RegisterResponse
       :body [{:keys [user-id password]} users/LoginRequest]
       :summary "log into the server"
       (do
@@ -38,7 +38,7 @@
         (c/wrapper (users/register database user-id password))))
 
     (sweet/POST "/registered" []
-      :return users/RegisterSuccess
+      :return users/RegisterResponse
       :body [{:keys [user-id] :as user} users/User]
       :summary "is the given user-id registered?"
       (do
@@ -46,7 +46,7 @@
         (c/wrapper (users/user-registered? database user-id))))
 
     (sweet/POST "/login" []
-      :return users/LoginSuccess
+      :return users/LoginResponse
       :body [{:keys [user-id password]} users/LoginRequest]
       :summary "log into the server"
       (do

@@ -3,16 +3,20 @@
             [com.stuartsierra.component :as component]
             [org.httpkit.server :as server]
 
-            [bh.rccst.api.routes :as routes]))
+            [bh.rccst.api.routes :as routes]
+            [bh.rccst.defaults :as default]))
 
 
-(defrecord HTTPServer [dev-mode port server socket database]
+(defrecord HTTPServer
+  [dev-mode port server socket database]
   component/Lifecycle
 
   (start [component]
-    (log/info ";; Starting HTTP server" port server)
-    (tap> "starting server")
-    (let [server (server/run-server (routes/routes socket database dev-mode) {:port port})]
+    (let [p (or port default/http-port)
+          server (server/run-server (routes/routes socket database dev-mode) {:port p})]
+      (log/info ";; Starting HTTP server" port server)
+      (tap> "starting server")
+
       (assoc component :server server)))
 
   (stop [component]

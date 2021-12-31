@@ -1,7 +1,9 @@
 (ns bh.rccst.components.broadcast
   (:require [clojure.tools.logging :as log]
             [com.stuartsierra.component :as component]
-            [clojure.core.async :as async :refer [go-loop <!]]))
+            [clojure.core.async :as async :refer [go-loop <!]]
+
+            [bh.rccst.defaults :as default]))
 
 
 (defn ->milliseconds [t]
@@ -30,16 +32,18 @@
   component/Lifecycle
 
   (start [component]
-    (log/info ";; Broadcast" broadcast-timeout)
-    (tap> "starting broadcast")
     (let [last-3 (atom #{0})
+          timeout (or broadcast-timeout default/broadcast-timeout)
           broadcast-loop (go-loop [i 0]
-                           (<! (async/timeout (->milliseconds broadcast-timeout)))
+                           (<! (async/timeout (->milliseconds timeout)))
                            (broadcast! socket {:what-is-this "An async broadcast pushed from server"
                                                :how-often    (str "Every " broadcast-timeout " seconds")
                                                :last-3       (last-3-conj last-3 i)
                                                :i            i})
                            (recur (inc i)))]
+      (log/info ";; Broadcast" broadcast-timeout)
+      (tap> "starting broadcast")
+
       (assoc component :broadcast broadcast-loop)))
 
   (stop [component]
