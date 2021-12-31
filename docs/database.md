@@ -31,3 +31,12 @@ disk, but the actual processing is part of the application, not a separate appli
 
 Since it is embedded in RCCST, SQLit is easier to work with. Everything needed to creat the database, the tables, and the initial
 data is all built into the application.
+
+
+## HugSQL
+
+To allow us to use multiple SQL databases, we are leveraging the [HugSQL](https://www.hugsql.org) Clojure library.
+
+HugSQL uses special annotations (embedded in comments) inside plain old SQL files which are pre-processed when your
+application starts into Clojure calls are run-time. This lets us get the best of SQL and combine it with the best of
+Clojure.

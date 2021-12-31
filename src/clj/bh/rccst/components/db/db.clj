@@ -1,11 +1,11 @@
 (ns bh.rccst.components.db.db
-  (:require [clojure.java.io :as jio]
+  (:require ;[clojure.java.io :as jio]
             [clojure.tools.logging :as log]
             [com.stuartsierra.component :as component]
-            [hugsql.adapter.next-jdbc :as next-adapter]
-            [hugsql.core :as hugsql]
-            [next.jdbc :as jdbc]
-            [next.jdbc.sql :as sql]))
+            ;[hugsql.adapter.next-jdbc :as next-adapter]
+            ;[hugsql.core :as hugsql]
+            [next.jdbc :as jdbc]))
+            ;[next.jdbc.sql :as sql]))
 
 
 ;;;;;;;;;;;;;;;;;
@@ -15,12 +15,8 @@
 ;
 ; https://github.com/seancorfield/usermanager-example
 ;
-;;;;
+;;;;;;;;;;;;;;;;;
 
-
-; Instantiate hugsql functions, with an adapter for next-jdbc
-(hugsql/def-db-fns "sql/sql-support.sql"
-  {:adapter (next-adapter/hugsql-adapter-next-jdbc)})
 
 
 ;;;;;;;;;;;;;;;;;;;;;
@@ -36,7 +32,6 @@
 
       ; start things up
       (do
-
         (assoc this :database (jdbc/get-datasource db-spec)))))
 
   (stop [this]

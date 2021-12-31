@@ -1,20 +1,8 @@
---------------
--- Database --
---------------
-
-
--- :name create-database!
--- :command :execute
--- :result :raw
--- :doc Create the rccst database
-CREATE DATABASE rccst;
-
-
 -----------
 -- USERS --
 -----------
 
--- :name create-user-table!
+-- :name create-users-table!
 -- :command :execute
 -- :result :raw
 -- :doc Create users table
@@ -24,7 +12,7 @@ create table users (
     pass            TEXT);
 
 
--- :name drop-users-table :!
+-- :name drop-users-table! :!
 -- :doc Drop users table if exists
 drop table if exists users
 

@@ -48,16 +48,17 @@ There are many things we want to learn to do, and we are trying to use this repo
    1. [X] Postgres
    2. [X] SQLite
 10. [ ] Implement more of the API:
-    1. [ ] Fix 
+    1. [ ] Fix Users
        1. [ ] [Login]()
        2. [ ] [Register]()
     2. [ ] Widgets/Layouts
     3. [ ] Comms
     4. [ ] Sensors/Beams
-11. [ ] Remove the "broadcast" (Concept22 doesn't really support this notion of the server publishing on a timer)
-12. [ ] [De-complecting things](/docs/decompleting.md)
-13. [ ] [Re-thinking the UI](/docs/rethinking-ui.md)
-14. [ ] (optional) Consider moving to [Reitit](/docs/routing.md)
+11. [ ] Get "repl reload" working again
+12. [ ] Remove the "broadcast" (Concept22 doesn't really support this notion of the server publishing on a timer)
+13. [ ] [De-complecting things](/docs/decompleting.md)
+14. [ ] [Re-thinking the UI](/docs/rethinking-ui.md)
+15. [ ] (optional) Consider moving to [Reitit](/docs/routing.md)
 
 ## Getting Started
 
