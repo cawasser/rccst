@@ -127,7 +127,7 @@
     (component/system-map
       :database (db/map->Database args)
       :server (component/using (server/map->HTTPServer args) [:socket :database])
-      :nrepl (repl/start-repl args)
+      :nrepl (repl/map->nRepl args)
       :socket (socket/map->WebSocketServer args)
       :broadcast (component/using (broadcast/map->Broadcast args) [:socket])
       :subscriptions (component/using (subscribers/map->Subscribers args) [:socket]))))
@@ -193,16 +193,14 @@
 
   ; dev-mode!
   (do
+    ; leaving a few config params out to we test 'default'
     (set-init (partial new-system
                 {:host              "localhost"
-                 ;:port              default/http-port
-                 ;:nrepl             default/nRepl-port
                  :db-spec           db-type
                  :dev-mode          true
                  :socket-params     {:user-id-fn    user-fn
                                      :packer        (sente-transit/get-transit-packer)
                                      :csrf-token-fn nil}}))
-                 ;:broadcast-timeout default/broadcast-timeout}))
     (start)
     (reset! system/system system))
 

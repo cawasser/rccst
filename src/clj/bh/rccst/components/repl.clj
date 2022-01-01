@@ -1,11 +1,22 @@
 (ns bh.rccst.components.repl
   (:require [clojure.tools.logging :as log]
             [clojure.tools.nrepl.server :as nrepl]
+            [com.stuartsierra.component :as component]
 
             [bh.rccst.defaults :as default]))
 
 
-(defn start-repl [args]
-  (let [port (or (:nrepl args) default/nRepl-port)]
-    (log/info "Starting nRepl at" port)
-    (nrepl/start-server :port port)))
+(defrecord nRepl [nrepl-port nrepl]
+  component/Lifecycle
+  (start [component]
+
+    (let [p (or nrepl-port default/nRepl-port)]
+      (log/info "starting rRepl" p)
+
+      (assoc component :nrepl (nrepl/start-server :port p))))
+
+  (stop [component]
+    (log/info "stopping nrepl" nrepl)
+    (nrepl/stop-server nrepl)
+    (assoc component :nrepl nil)))
+
