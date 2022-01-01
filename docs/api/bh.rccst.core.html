@@ -4,60 +4,64 @@
 <ul>
 <li>args - a vector of command-line arguments. Currently, ignored.</li>
 </ul>
-<p>calls <code>start!</code> to build the Components and start them running</p>
+<p>calls <a href="null">(start!)</a> to build the Components and start them running</p>
 <blockquote>
-<p>Se also:</p>
+<p>See also:</p>
 <p><a href="https://github.com/stuartsierra/component">Component</a></p>
 </blockquote>
 </div></div></div><div class="public anchor" id="var-last-req"><h3>last-req</h3><div class="usage"></div><div class="doc"><div class="markdown"><p>last-req is uses to grab the most recent request made by a client so we can explore at the repl</p>
 </div></div></div><div class="public anchor" id="var-new-system"><h3>new-system</h3><div class="usage"><code>(new-system args _)</code></div><div class="doc"><div class="markdown"><p>Constructs a system-map, per Stuart Sierra Component. This brings together all the various ‘stateful’ Components of the system:</p>
-<ul>
-<li><em>Database</em>       - durable SQL storage</li>
-<li><em>Web Server</em>     - handling URL Endpoints</li>
-<li><em>Socket Server</em>  - data Pub/Sub</li>
-<li><em>nRepl</em>          - providing a remote Repl for interactive development</li>
-<li><em>Broadcast</em>      - a timer-based publication mechanism (temporary)</li>
-<li><em>Subscription</em>   - mechanism for managing Client subscriptions to data-sources</li>
-</ul>
+<table>
+<thead>
+<tr><th align="center"> component         </th><th align="center"> description               </th></tr>
+</thead>
+<tbody>
+<tr><td align="center"> Database          </td><td align="center"> durable SQL storage       </td></tr>
+<tr><td align="center"> Web Server        </td><td align="center"> handling URL Endpoints    </td></tr>
+<tr><td align="center"> Socket Server     </td><td align="center"> data Pub/Sub              </td></tr>
+<tr><td align="center"> nRepl             </td><td align="center"> providing a remote Repl for interactive development </td></tr>
+<tr><td align="center"> Broadcast         </td><td align="center"> a timer-based publication mechanism (temporary) </td></tr>
+<tr><td align="center"> Subscription      </td><td align="center"> mechanism for managing Client subscriptions to data-sources </td></tr>
+</tbody>
+</table>
 <blockquote>
-<p>These Components form a Directed Acyclic Graph (DAG) based upon their interdependencies. <img src="/docs/figures/system-component-dag.png" alt="DAG" /></p>
+<p>These Components form a Directed Acyclic Graph (DAG) based upon their interdependencies. <img src="../figures/system-component-dag.png" alt="/docs/figures/system-component-dag.png" /></p>
 </blockquote>
 <ul>
 <li>args - (hash-map) configuration items for the various Components, expects the following keys:</li>
 </ul>
-<ol>
-<li>:host - (string) DNS name for the Web Server, defaults to <code>localhost</code></li>
-<li>:port - (integer) TCP port number for the Web Server, defaults to 8280</li>
-<li>:nrepl - (integer) TCP port for the embedded <a href="https://nrepl.org/nrepl/index.html">nREPL</a>, defaults to 7777</li>
-<li>:dev-mode - (boolean) <code>true</code> or <code>false</code>. If <code>true</code> hen we start <em>without</em> CSRF anti-forgery. Use this when you want to do development and have the <code>/api-docs/</code> (Swagger-UI) page support <code>POST</code> and <code>PUT</code> endpoint examples.</li>
-<li>:db-spec - (hash-map) database configuration information. Two are currently provided:
-<ol>
-<li>rccst-postgres - configuration for a locally hosted <a href="https://www.postgresql.org">Postgres</a> database</li>
-<li>rccst-sqlite - configuration for a locally hosted <a href="https://sqlite.org/index.html">SQLite</a> database.</li>
-</ol>
-</li>
-<li>:socket-params - (hash-map) configuration parameters for the <a href="https://github.com/ptaoussanis/sente">Sente</a>-based websocket. Expected keys are:
-<ol>
-<li>:client-fn - a function to extract the client-id from the incoming HTTP request</li>
-<li>:packer - function to marshall data into /out-of the socket. We currently are using <a href="https://github.com/cognitect/transit-clj">Transit</a>, hence <code>(sente-transit/get-transit-packer)</code></li>
-<li>:csfr-token-fn - function to return the CSRF, if using CSRF Anti-forgery, <code>nil</code> of not.</li>
-</ol>
-</li>
-<li>:broadcast-timeout - (integer) number of seconds between ‘publish’ events, defaults to 5 seconds</li>
-</ol>
+<table>
+<thead>
+<tr><th align="left"> keyword       </th><th align="center"> type     </th><th align="left">  description              </th></tr>
+</thead>
+<tbody>
+<tr><td align="left"> :host         </td><td align="center"> string   </td><td align="left"> DNS name for the Web Server, defaults to <code>localhost</code> </td></tr>
+<tr><td align="left"> :port         </td><td align="center"> integer  </td><td align="left"> TCP port number for the Web Server, defaults to 8280 </td></tr>
+<tr><td align="left"> :nrepl        </td><td align="center"> integer  </td><td align="left"> TCP port for the embedded <a href="https://nrepl.org/nrepl/index.html">nREPL</a>, defaults to 7777 </td></tr>
+<tr><td align="left"> :dev-mode     </td><td align="center"> boolean  </td><td align="left"> <code>true</code> or <code>false</code>. If <code>true</code> we start <em>without</em> CSRF anti-forgery. Use this when you want to do development and have the <code>/api-docs/</code> (Swagger-UI) page support <code>POST</code> and <code>PUT</code> endpoint examples. </td></tr>
+<tr><td align="left"> :db-spec      </td><td align="center"> hash-map </td><td align="left"> database configuration information. Two are currently provided: </td></tr>
+<tr><td align="left" colspan="2"></td><td align="left"> <code>rccst-postgres</code> - configuration for a locally hosted <a href="https://www.postgresql.org">Postgres</a> database. </td></tr>
+<tr><td align="left" colspan="2"></td><td align="left"> <code>rccst-sqlite</code>   - configuration for a locally hosted <a href="https://sqlite.org/index.html">SQLite</a> database. </td></tr>
+<tr><td align="left"> :socket-params </td><td align="center"> hash-map </td><td align="left"> configuration parameters for the <a href="https://github.com/ptaoussanis/sente">Sente</a>-based websocket. Expected keys are: </td></tr>
+<tr><td align="left" colspan="2"></td><td align="left"> <code>:client-fn</code> - function to extract the client-id from the incoming HTTP request </td></tr>
+<tr><td align="left" colspan="2"></td><td align="left"> <code>:packer</code>    - function to marshall data into /out-of the socket. We currently are using <a href="https://github.com/cognitect/transit-clj">Transit</a>, hence <code>(sente-transit/get-transit-packer)</code> </td></tr>
+<tr><td align="left" colspan="2"></td><td align="left"> <code>:csfr-token-fn</code> - function to return the CSRF, if using CSRF Anti-forgery, <code>nil</code> of not. </td></tr>
+<tr><td align="left"> :broadcast-timeout </td><td align="center"> integer </td><td align="left"> number of seconds between ‘publish’ events, defaults to 5 seconds. </td></tr>
+</tbody>
+</table>
 <blockquote>
 <p>See also:</p>
 <p><a href="https://github.com/stuartsierra/component">Component</a> <a href="https://nrepl.org/nrepl/index.html">nREPL</a> <a href="https://www.postgresql.org">Postgres</a> <a href="https://github.com/ptaoussanis/sente">Sente</a> <a href="https://sqlite.org/index.html">SQLite</a></p>
 </blockquote>
 </div></div></div><div class="public anchor" id="var-rccst-postgres"><h3>rccst-postgres</h3><div class="usage"></div><div class="doc"><div class="markdown"><p>postgresql database connection spec.</p>
 </div></div></div><div class="public anchor" id="var-rccst-sqlite"><h3>rccst-sqlite</h3><div class="usage"></div><div class="doc"><div class="markdown"><p>sqlite database connection spec.</p>
-</div></div></div><div class="public anchor" id="var-start.21"><h3>start!</h3><div class="usage"><code>(start! db-type)</code></div><div class="doc"><div class="markdown"><p>Starts the system, defined by <code>(new-system)</code>. Presumes a <em>production</em>-type environment, so it will use CSRF tokens.</p>
+</div></div></div><div class="public anchor" id="var-start.21"><h3>start!</h3><div class="usage"><code>(start! db-type)</code></div><div class="doc"><div class="markdown"><p>Starts the system, defined by <a href="null">(new-system)</a>. Presumes a <em>production</em>-type environment, so it will use CSRF tokens.</p>
 <blockquote>
 <p>Note: the <code>/api-docs/</code> (Swagger-UI) does <strong>NOT</strong> support CSRf on <code>POST</code> or <code>POST</code> endpoints!</p>
 <p>If you want to work with the complete API using <code>/api-docs/</code>, you will need to start the server manually at the Repl, so you can access <em>dev-mode</em> (See the Rich Comments).</p>
 </blockquote>
 <ul>
-<li>db-type - which database server to use, we support 2: [<em>Postgres</em>}(<a href="https://www.postgresql.org">https://www.postgresql.org</a>) and <a href="https://sqlite.org/index.html"><em>Sqlite</em></a></li>
+<li>db-type - which database server to use, we support 2: <a href="https://www.postgresql.org"><em>Postgres</em></a> and <a href="https://sqlite.org/index.html"><em>Sqlite</em></a></li>
 </ul>
 <p>returns: an atom holding the started <code>SystemMap</code> <em>object</em> returned from Component.</p>
 <blockquote>

@@ -85,33 +85,34 @@
   "Constructs a system-map, per Stuart Sierra Component. This brings together all the various
   'stateful' Components of the system:
 
-   - _Database_       - durable SQL storage
-   - _Web Server_     - handling URL Endpoints
-   - _Socket Server_  - data Pub/Sub
-   - _nRepl_          - providing a remote Repl for interactive development
-   - _Broadcast_      - a timer-based publication mechanism (temporary)
-   - _Subscription_   - mechanism for managing Client subscriptions to data-sources
+  | component         | description               |
+  |:-----------------:|:-------------------------:|
+  | Database          | durable SQL storage       |
+  | Web Server        | handling URL Endpoints    |
+  | Socket Server     | data Pub/Sub              |
+  | nRepl             | providing a remote Repl for interactive development |
+  | Broadcast         | a timer-based publication mechanism (temporary) |
+  | Subscription      | mechanism for managing Client subscriptions to data-sources |
 
   > These Components form a Directed Acyclic Graph (DAG) based upon their interdependencies.
-  ![DAG](/docs/figures/system-component-dag.png)
+  ![/docs/figures/system-component-dag.png](../figures/system-component-dag.png)
 
   - args - (hash-map) configuration items for the various Components, expects the following keys:
-    1. :host - (string) DNS name for the Web Server, defaults to `localhost`
-    2. :port - (integer) TCP port number for the Web Server, defaults to 8280
-    3. :nrepl - (integer) TCP port for the embedded [nREPL](https://nrepl.org/nrepl/index.html), defaults to 7777
-    4. :dev-mode - (boolean) `true` or `false`. If `true` hen we start _without_ CSRF anti-forgery. Use this when
-                   you want to do development and have the `/api-docs/` (Swagger-UI) page support `POST`
-                   and `PUT` endpoint examples.
-    5. :db-spec - (hash-map) database configuration information. Two are currently provided:
-      1. rccst-postgres - configuration for a locally hosted [Postgres](https://www.postgresql.org) database
-      2. rccst-sqlite - configuration for a locally hosted [SQLite](https://sqlite.org/index.html) database.
-    6. :socket-params - (hash-map) configuration parameters for the [Sente](https://github.com/ptaoussanis/sente)-based websocket.
-    Expected keys are:
-      1. :client-fn - a function to extract the client-id from the incoming HTTP request
-      2. :packer - function to marshall data into /out-of the socket. We currently are using [Transit](https://github.com/cognitect/transit-clj),
-      hence `(sente-transit/get-transit-packer)`
-      3. :csfr-token-fn - function to return the CSRF, if using CSRF Anti-forgery, `nil` of not.
-    7. :broadcast-timeout - (integer) number of seconds between 'publish' events, defaults to 5 seconds
+
+  | keyword       | type     |  description              |
+  |:--------------|:--------:|:--------------------------|
+  | :host         | string   | DNS name for the Web Server, defaults to `localhost` |
+  | :port         | integer  | TCP port number for the Web Server, defaults to 8280 |
+  | :nrepl        | integer  | TCP port for the embedded [nREPL](https://nrepl.org/nrepl/index.html), defaults to 7777 |
+  | :dev-mode     | boolean  | `true` or `false`. If `true` we start _without_ CSRF anti-forgery. Use this when you want to do development and have the `/api-docs/` (Swagger-UI) page support `POST` and `PUT` endpoint examples. |
+  | :db-spec      | hash-map | database configuration information. Two are currently provided: |
+  ||| `rccst-postgres` - configuration for a locally hosted [Postgres](https://www.postgresql.org) database. |
+  ||| `rccst-sqlite`   - configuration for a locally hosted [SQLite](https://sqlite.org/index.html) database. |
+  | :socket-params | hash-map | configuration parameters for the [Sente](https://github.com/ptaoussanis/sente)-based websocket. Expected keys are: |
+  ||| `:client-fn` - function to extract the client-id from the incoming HTTP request |
+  ||| `:packer`    - function to marshall data into /out-of the socket. We currently are using [Transit](https://github.com/cognitect/transit-clj), hence `(sente-transit/get-transit-packer)` |
+  ||| `:csfr-token-fn` - function to return the CSRF, if using CSRF Anti-forgery, `nil` of not. |
+  | :broadcast-timeout | integer | number of seconds between 'publish' events, defaults to 5 seconds. |
 
   > See also:
   >
@@ -134,7 +135,7 @@
 
 
 (defn start!
-  "Starts the system, defined by `(new-system)`. Presumes a _production_-type environment, so
+  "Starts the system, defined by [[(new-system)]]. Presumes a _production_-type environment, so
   it will use CSRF tokens.
 
   > Note: the `/api-docs/` (Swagger-UI) does **NOT** support CSRf on `POST` or `POST` endpoints!
@@ -142,7 +143,7 @@
   > If you want to work with the complete API using `/api-docs/`, you will need to start the server
   > manually at the Repl, so you can access _dev-mode_ (See the Rich Comments).
 
-  - db-type - which database server to use, we support 2: [_Postgres_}(https://www.postgresql.org)
+  - db-type - which database server to use, we support 2: [_Postgres_](https://www.postgresql.org)
   and [_Sqlite_](https://sqlite.org/index.html)
 
   returns: an atom holding the started `SystemMap` _object_ returned from Component.
@@ -172,9 +173,9 @@
 
   - args - a vector of command-line arguments. Currently, ignored.
 
-  calls `start!` to build the Components and start them running
+  calls [[(start!)]] to build the Components and start them running
 
-  > Se also:
+  > See also:
   >
   > [Component](https://github.com/stuartsierra/component)
   "
