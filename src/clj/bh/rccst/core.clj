@@ -135,7 +135,7 @@
 
 
 (defn start!
-  "Starts the system, defined by [[(new-system)]]. Presumes a _production_-type environment, so
+  "Starts the system, defined by ([[new-system]]). Presumes a _production_-type environment, so
   it will use CSRF tokens.
 
   > Note: the `/api-docs/` (Swagger-UI) does **NOT** support CSRf on `POST` or `POST` endpoints!
@@ -173,7 +173,7 @@
 
   - args - a vector of command-line arguments. Currently, ignored.
 
-  calls [[(start!)]] to build the Components and start them running
+  calls ([[start!]]) to build the Components and start them running
 
   > See also:
   >

@@ -4,7 +4,7 @@
 <ul>
 <li>args - a vector of command-line arguments. Currently, ignored.</li>
 </ul>
-<p>calls <a href="null">(start!)</a> to build the Components and start them running</p>
+<p>calls (<a href="bh.rccst.core.html#var-start.21">start!</a>) to build the Components and start them running</p>
 <blockquote>
 <p>See also:</p>
 <p><a href="https://github.com/stuartsierra/component">Component</a></p>
@@ -13,15 +13,15 @@
 </div></div></div><div class="public anchor" id="var-new-system"><h3>new-system</h3><div class="usage"><code>(new-system args _)</code></div><div class="doc"><div class="markdown"><p>Constructs a system-map, per Stuart Sierra Component. This brings together all the various ‘stateful’ Components of the system:</p>
 <table>
 <thead>
-<tr><th align="center"> component         </th><th align="center"> description               </th></tr>
+<tr><th align="center"> component         </th><th align="left"> description               </th></tr>
 </thead>
 <tbody>
-<tr><td align="center"> Database          </td><td align="center"> durable SQL storage       </td></tr>
-<tr><td align="center"> Web Server        </td><td align="center"> handling URL Endpoints    </td></tr>
-<tr><td align="center"> Socket Server     </td><td align="center"> data Pub/Sub              </td></tr>
-<tr><td align="center"> nRepl             </td><td align="center"> providing a remote Repl for interactive development </td></tr>
-<tr><td align="center"> Broadcast         </td><td align="center"> a timer-based publication mechanism (temporary) </td></tr>
-<tr><td align="center"> Subscription      </td><td align="center"> mechanism for managing Client subscriptions to data-sources </td></tr>
+<tr><td align="center"> Database          </td><td align="left"> durable SQL storage       </td></tr>
+<tr><td align="center"> Web Server        </td><td align="left"> handling URL Endpoints    </td></tr>
+<tr><td align="center"> Socket Server     </td><td align="left"> data Pub/Sub              </td></tr>
+<tr><td align="center"> nRepl             </td><td align="left"> providing a remote Repl for interactive development </td></tr>
+<tr><td align="center"> Broadcast         </td><td align="left"> a timer-based publication mechanism (temporary) </td></tr>
+<tr><td align="center"> Subscription      </td><td align="left"> mechanism for managing Client subscriptions to data-sources </td></tr>
 </tbody>
 </table>
 <blockquote>
@@ -55,7 +55,7 @@
 </blockquote>
 </div></div></div><div class="public anchor" id="var-rccst-postgres"><h3>rccst-postgres</h3><div class="usage"></div><div class="doc"><div class="markdown"><p>postgresql database connection spec.</p>
 </div></div></div><div class="public anchor" id="var-rccst-sqlite"><h3>rccst-sqlite</h3><div class="usage"></div><div class="doc"><div class="markdown"><p>sqlite database connection spec.</p>
-</div></div></div><div class="public anchor" id="var-start.21"><h3>start!</h3><div class="usage"><code>(start! db-type)</code></div><div class="doc"><div class="markdown"><p>Starts the system, defined by <a href="null">(new-system)</a>. Presumes a <em>production</em>-type environment, so it will use CSRF tokens.</p>
+</div></div></div><div class="public anchor" id="var-start.21"><h3>start!</h3><div class="usage"><code>(start! db-type)</code></div><div class="doc"><div class="markdown"><p>Starts the system, defined by (<a href="bh.rccst.core.html#var-new-system">new-system</a>). Presumes a <em>production</em>-type environment, so it will use CSRF tokens.</p>
 <blockquote>
 <p>Note: the <code>/api-docs/</code> (Swagger-UI) does <strong>NOT</strong> support CSRf on <code>POST</code> or <code>POST</code> endpoints!</p>
 <p>If you want to work with the complete API using <code>/api-docs/</code>, you will need to start the server manually at the Repl, so you can access <em>dev-mode</em> (See the Rich Comments).</p>
