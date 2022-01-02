@@ -3,6 +3,7 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [bh/rccst](#bhrccst)
+  - [Things We've Already Done](#things-weve-already-done)
   - [Future Plans](#future-plans)
   - [Getting Started](#getting-started)
     - [Client](#client)
@@ -31,9 +32,9 @@ explore and make work together.
 
 Read all about the API [here](/docs/api/index.html).
 
-## Future Plans
+## Things We've Already Done
 
-There are many things we want to learn to do, and we are trying to use this repo to learn them:
+There are lots of things we wanted to learn more about, and we've done that:
 
 1. [X] [Combine back into a single server](/docs/single-server.md)
 2. [X] [Push data from the server](/docs/data-push.md)
@@ -41,13 +42,13 @@ There are many things we want to learn to do, and we are trying to use this repo
 4. [X] [Add Swaggerui using Compojure-api](/docs/swagger-ui.md)
 5. [X] Get logging to work correctly (added ch.qos.logback/logback-classic "1.2.5", see [here](https://spin.atomicobject.com/2015/05/11/clojure-logging/))
 6. [X] [Anti-forgery support](/docs/anti-forgery.md)
-   1. [X] Toggle anti-forgery OFF when doing development
-      2. [X] Server-side
-      3. [X] Do some testing in "production mode"
+    1. [X] Toggle anti-forgery OFF when doing development
+        2. [X] Server-side
+        3. [X] Do some testing in "production mode"
 7. [X] Add :edn format to the swagger-UI to make it easier to work with
 8. [X] [Add a "real" database](/docs/database.md)
-   1. [X] Postgres
-   2. [X] SQLite
+    1. [X] Postgres
+    2. [X] SQLite
 9. [X] Add [reveal](https://vlaaad.github.io/reveal/) tooling
 10. 13. [X] Docstrings
 11. [X] Defaults for system configuration parameters
@@ -58,20 +59,26 @@ There are many things we want to learn to do, and we are trying to use this repo
 13. [X] Get "repl reload" working again
     1. [X] start/stop/reset Component/System
     2. [X] modify URL handlers
-    3. [X] (**FAILED**) add/remove URLs and handlers (requires a server bounce.because Compojure is MACRO-based)
-14. [ ] [Develop a more complex API (paving the way to Rocky-road)](/docs/complex-api.md)
-15. [ ] Implement more of the API:
-    1. [ ] Fix Users
-       1. [ ] [Login]()
-       2. [ ] [Register]()
-    2. [ ] Widgets/Layouts
-    3. [ ] Comms
-    4. [ ] Sensors/Beams
-16. [ ] Remove "Broadcast" (Concept22 doesn't really support this notion of the server publishing on a timer)
-17. [ ] [De-complecting things](/docs/decompleting.md)
-18. [ ] [Re-thinking the UI](/docs/rethinking-ui.md)
-19. [ ] Work out an automated testing approach
-20. [ ] (optional) Consider moving to [Reitit](/docs/routing.md) (see item 13.3)
+    3. [X] (**FAILED**) add/remove URLs and handlers (requires a server bounce because Compojure is MACRO-based)
+
+
+## Future Plans
+
+But there are still many things we want to learn:
+
+1. [ ] [Develop a more complex API (paving the way to Rocky-road)](/docs/complex-api.md)
+2. [ ] Implement more of the API:
+   1. [ ] Fix Users
+      1. [ ] [Login]()
+      2. [ ] [Register]()
+   2. [ ] Widgets/Layouts
+   3. [ ] Comms
+   4. [ ] Sensors/Beams
+3. [ ] Remove "Broadcast" (Concept22 doesn't really support this notion of the server publishing on a timer)
+4. [ ] [De-complect things](/docs/decompleting.md)
+5. [ ] [Re-think the UI](/docs/rethinking-ui.md)
+6. [ ] Work out an automated testing approach
+7. [ ] (optional) Consider moving to [Reitit](/docs/routing.md) (see item 13.3 above)
 
 
 ## Getting Started
