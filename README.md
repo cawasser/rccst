@@ -66,19 +66,22 @@ There are lots of things we wanted to learn more about, and we've done that:
 
 But there are still many things we want to learn:
 
-1. [ ] [Develop a more complex API (paving the way to Rocky-road)](/docs/complex-api.md)
-2. [ ] Implement more of the API:
+1. [X] version support using [metav](https://github.com/jgrodziski/metav)
+2. [ ] [Develop a more complex API (paving the way to Rocky-road)](/docs/complex-api.md)
+3. [ ] Implement more of the API:
    1. [ ] Fix Users
       1. [ ] [Login]()
       2. [ ] [Register]()
    2. [ ] Widgets/Layouts
    3. [ ] Comms
    4. [ ] Sensors/Beams
-3. [ ] Remove "Broadcast" (Concept22 doesn't really support this notion of the server publishing on a timer)
-4. [ ] [De-complect things](/docs/decompleting.md)
-5. [ ] [Re-think the UI](/docs/rethinking-ui.md)
-6. [ ] Work out an automated testing approach
-7. [ ] (optional) Consider moving to [Reitit](/docs/routing.md) (see item 13.3 above)
+4. [ ] Remove "Broadcast" (Concept22 doesn't really support this notion of the server publishing on a timer)
+5. [ ] [De-complect things](/docs/decompleting.md)
+6. [ ] [Re-think the UI](/docs/rethinking-ui.md)
+7. [ ] Work out an automated testing approach
+8. [ ] Add metrics collection to the Server
+   1. [ ] [statsd](https://github.com/statsd/statsd), via [clojure-statsd-client](https://github.com/unbounce/clojure-dogstatsd-client)
+9. [ ] (optional) Consider moving to [Reitit](/docs/routing.md) (see item 13.3 above)
 
 
 ## Getting Started
@@ -94,7 +97,7 @@ at the terminal using:
 
     shadow-cljs watch :app
 
-ONce the Server is running, you can open a browser to:
+Once the Server is running, you can open a browser to:
 
 [http://localhost:8280/](http://localhost:8280/)
 
@@ -108,10 +111,14 @@ The server is build using the [Clojure CLI](https://clojure.org/guides/deps_and_
 
     clojure -M:run
 
-If you prefer, you can start the server at a local repl. Configure you IDE to start a repl; don't
-worry about any aliases, there aren't any at this time.
+If you prefer, you can start the server at a local repl. Configure you IDE to start a repl. You can user the
+`reveal` alias to provide support for `(tap> ...)` using the very nice [reveal]() tool.
 
-Then open src/clj/bh/rccst/core.clj. Load the file into the open repl and then begin evaluating
+Then open 
+
+    src/clj/bh/rccst/core.clj 
+
+Load the file into the open repl and begin evaluating.
 
 ### Swagger-UI
 
@@ -122,8 +129,10 @@ Just open a new browser tab to:
 
 And have a ball.
 
-> Note: You must provide any inputs in "transit over json" [format](https://github.com/cognitect/transit-format#ground-and-extension-types). 
+> Note 1: You must provide any inputs in "transit over json" [format](https://github.com/cognitect/transit-format#ground-and-extension-types). 
 > See [here](https://github.com/cognitect/transit-format) for more details.
+
+> Note 2: You must also be running the server in _dev-mode_, ie.e, _without_ CSRF Anti-forgery support.
 
 ## Project Details 
 

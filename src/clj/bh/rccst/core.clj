@@ -127,7 +127,7 @@
   (let []
     (component/system-map
       :database (db/map->Database args)
-      :server (component/using (server/map->HTTPServer args) [:socket :database])
+      :server (component/using (server/map->HTTPServer args) [:socket :database :subscriptions])
       :nrepl (repl/map->nRepl args)
       :socket (socket/map->WebSocketServer args)
       :broadcast (component/using (broadcast/map->Broadcast args) [:socket])
@@ -243,7 +243,9 @@
   (:broadcast system)
   (:subscriptions system)
 
-  @(get-in system [:subscriptions :subscriptions])
+  (keys (:subscriptions system))
+  (get-in system [:subscriptions :subscriptions])
+  (get-in system [:subscriptions :subscribe])
 
   (start)
   (stop)

@@ -26,6 +26,8 @@
   "csrf-error-handler is needed because we need to be sure anti-forgery only returns TRANSIT,
   not the html that's built-in
 
+  ---
+
   - request - (string) the request that does NOT include the required CSRF token
   "
   [request]
@@ -40,6 +42,8 @@
 (defn render
   "renders the HTML template located relative to resources/html, using Selmer to substitute values
   (given in the params) in place of tags embedded in the html template
+
+  ---
 
   - template - (string) the 'raw' html page, typically with Selmer tags embedded
   - params - (hash-map, optional) the mapping from 'tags' to 'values' for substitution
@@ -63,6 +67,8 @@
 (defn routes
   "'routes' provide the middleware wrappers for all the URL endpoint and their handlers
 
+  ---
+
   - 'socket parameters' - (hash-map)
     1. ring-ajax-post - (function)
     2. ring-ajax-get-or-ws-handshake - (function)
@@ -80,7 +86,7 @@
   > [ring.middleware.cors](https://github.com/r0man/ring-cors)
   "
   [{:keys [ring-ajax-post ring-ajax-get-or-ws-handshake]}
-   database dev-mode]
+   database subscriptions dev-mode]
   (log/info "setting up the routes" dev-mode database)
 
   (if dev-mode
@@ -102,7 +108,7 @@
             (GET "/" _ (render "public/index.html"))
             (route/resources "/")
 
-            (#'api/api database)
+            (#'api/api database subscriptions)
 
             (route/not-found "<h1>Page not found</h1>"))
 

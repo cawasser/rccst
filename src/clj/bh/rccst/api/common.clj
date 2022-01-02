@@ -7,6 +7,8 @@
   " Wraps the http response with the `transit+json` content type. This ensures _ALL_ responses
   will be `transit+json
 
+  ---
+
   - response - (hash-map) the HTTP response being sent back to the requester
 
   > See also:

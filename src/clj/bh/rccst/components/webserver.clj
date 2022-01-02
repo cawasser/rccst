@@ -8,12 +8,12 @@
 
 
 (defrecord HTTPServer
-  [dev-mode port server socket database]
+  [dev-mode port server socket database subscriptions]
   component/Lifecycle
 
   (start [component]
     (let [p (or port default/http-port)
-          server (server/run-server (#'routes/routes socket database dev-mode) {:port p})]
+          server (server/run-server (#'routes/routes socket database subscriptions dev-mode) {:port p})]
       (log/info ";; Starting HTTP server" port server)
       (tap> ["starting server" port server])
 

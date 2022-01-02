@@ -55,7 +55,7 @@
 (s/defschema RegisterResponse
   "data returned when checking to see if the user is already registered.
 
-  - ::registered - `true` if the user is registered , `false` if not
+  - :registered - `true` if the user is registered , `false` if not
   - :uuid - if the login was successful, this key will be present and contain the uuid associated with the user-id
   "
   {:registered            s/Bool
