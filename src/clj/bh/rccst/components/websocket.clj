@@ -11,7 +11,7 @@
   (start [component]
 
     (log/info "starting Socket" socket-params socket)
-    (tap> "starting socket")
+    (tap> ["starting socket" socket-params socket])
 
     (let [{:keys [ch-recv send-fn connected-uids
                   ajax-post-fn ajax-get-or-ws-handshake-fn]}
@@ -26,6 +26,8 @@
 
   (stop [component]
     (log/info "stopping socket" socket)
+    (tap> ["stopping socket" socket])
+
     (assoc component
       :ring-ajax-post nil
       :ring-ajax-get-or-ws-handshake nil

@@ -86,7 +86,7 @@
   'stateful' Components of the system:
 
   | component         | description               |
-  |:-----------------:|:-------------------------:|
+  |:-----------------:|:--------------------------|
   | Database          | durable SQL storage       |
   | Web Server        | handling URL Endpoints    |
   | Socket Server     | data Pub/Sub              |
@@ -184,6 +184,19 @@
   (start! rccst-postgres))
 
 
+
+; work with Reveal
+(comment
+  (require '[vlaaad.reveal :as r])
+
+  (r/tap-log)
+
+  (tap> {:a 1})
+
+
+  ())
+
+
 ; run things from the REPL
 (comment
   ; this will start in PROD-MODE!
@@ -203,7 +216,8 @@
                                      :packer        (sente-transit/get-transit-packer)
                                      :csrf-token-fn nil}}))
     (start)
-    (reset! system/system system))
+    (reset! system/system system)
+    (tap> system))
 
   ; prod-mode!
   (do
@@ -218,7 +232,8 @@
                                      :csrf-token-fn csrf-fn}
                  :broadcast-timeout default/broadcast-timeout}))
     (start)
-    (reset! system/system system))
+    (reset! system/system system)
+    (tap> system))
 
   (def r @last-req)
 

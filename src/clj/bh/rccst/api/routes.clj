@@ -102,7 +102,7 @@
             (GET "/" _ (render "public/index.html"))
             (route/resources "/")
 
-            (api/api database)
+            (#'api/api database)
 
             (route/not-found "<h1>Page not found</h1>"))
 
@@ -135,7 +135,7 @@
             (GET "/" _ (render "public/index.html"))
             (route/resources "/")
 
-            #'api/api
+            (#'api/api database)
 
             (route/not-found "<h1>Page not found</h1>"))
 

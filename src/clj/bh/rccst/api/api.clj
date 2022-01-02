@@ -1,5 +1,6 @@
 (ns bh.rccst.api.api
-  (:require [compojure.api.sweet :as sweet]
+  (:require [clojure.tools.logging :as log]
+            [compojure.api.sweet :as sweet]
 
             [bh.rccst.api.login :as login]
             [bh.rccst.api.subscribe :as subscribe]
@@ -14,7 +15,8 @@
 
   Mixes together the handlers for:
   - [version](/docs/api/bh.rccst.api.verison.html)
-  - [lookup](/docs/api/bh.rccst.data-source.lookup.html) ([schema](/docs/api/bh.rccst.data-source.lookup.schema.html))
+  - [lookup](/docs/api/bh.rccst.data-source.lookup.html)
+    - ([schema](/docs/api/bh.rccst.data-source.lookup.schema.html))
   - [login](/docs/api/bh.rccst.api.login.html)
   - [subscribe](/docs/api/bh.rccst.api.subscripbe.html)
 
@@ -27,13 +29,14 @@
   "
 
   [db]
+  (log/info "generate api")
   (let [database (:database db)]
     (sweet/api
       {:swagger
        {:ui "/api-docs"
         :spec "/swagger.json"
         :data {:info {:title "RCCST API"
-                      :description "Web API for the RCCTS exploratory app"}
+                      :description "Web API for the RCCST exploratory app"}
                :tags [{:name "api", :description "general purpose endpoints"}
                       {:name "user" :description "endpoints for managing and using User accounts"}
                       {:name "subscribe" :description "endpoints for User Pub/Sub to data-sources"}]
@@ -47,7 +50,7 @@
         #'lookup/lookup-handler)
 
       ; "user"
-      (login/login-handlers database)
+      (#'login/login-handlers database)
 
       ; subscription
       #'subscribe/subscription-handlers)))

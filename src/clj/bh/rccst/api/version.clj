@@ -19,7 +19,7 @@
   (sweet/GET "/version" _
     :return VersionResponse
     :summary "get the version number from the server"
-    (c/wrapper (get-version))))
+    (c/wrapper (#'get-version))))
 
 
 ; test schema

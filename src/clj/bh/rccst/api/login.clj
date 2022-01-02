@@ -19,15 +19,16 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn login-handlers [database]
+  (log/info "generate login-handlers")
   (sweet/context "/user" []
     :tags ["user"]
 
     (sweet/GET "/users" _
       :return users/Users
-      :summary "return all the users currently logged in"
+      :summary "return all the users currently logged into the system"
       (do
         (log/info "users")
-        (c/wrapper (users/users database))))
+        (c/wrapper (#'users/users database))))
 
     (sweet/POST "/register" []
       :return users/RegisterResponse
@@ -35,7 +36,7 @@
       :summary "log into the server"
       (do
         (log/info "register" user-id)
-        (c/wrapper (users/register database user-id password))))
+        (c/wrapper (#'users/register database user-id password))))
 
     (sweet/POST "/registered" []
       :return users/RegisterResponse
@@ -43,7 +44,7 @@
       :summary "is the given user-id registered?"
       (do
         (log/info "logged-in" user "////" user-id)
-        (c/wrapper (users/user-registered? database user-id))))
+        (c/wrapper (#'users/user-registered? database user-id))))
 
     (sweet/POST "/login" []
       :return users/LoginResponse
@@ -51,6 +52,6 @@
       :summary "log into the server"
       (do
         (log/info "login" user-id "////" password)
-        (c/wrapper (users/login database user-id password))))))
+        (c/wrapper (#'users/login database user-id password))))))
 
 

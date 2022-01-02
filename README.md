@@ -26,7 +26,7 @@ RCCST stands for ["Ring"](https://github.com/ring-clojure/ring),
 ["Component"](https://github.com/stuartsierra/component), 
 ["Compojure"](https://github.com/weavejester/compojure),
 ["Sente"](https://github.com/ptaoussanis/sente) 
-and ["Transit"](https://github.com/cognitect/transit-clj), all the Clojure technologies we intend to 
+and ["Transit"](https://github.com/cognitect/transit-clj), the major Clojure technologies we intend to 
 explore and make work together.
 
 Read all about the API [here](/docs/api/index.html).
@@ -40,33 +40,39 @@ There are many things we want to learn to do, and we are trying to use this repo
 3. [X] [Use transit (or maybe just EDN?) to exchange ALL data between the Client and the Sever](/docs/transit.md)
 4. [X] [Add Swaggerui using Compojure-api](/docs/swagger-ui.md)
 5. [X] Get logging to work correctly (added ch.qos.logback/logback-classic "1.2.5", see [here](https://spin.atomicobject.com/2015/05/11/clojure-logging/))
-6. [ ] [Develop a more complex API (paving the way to Rocky-road)](/docs/complex-api.md)
-7. [X] [Anti-forgery support](/docs/anti-forgery.md)
+6. [X] [Anti-forgery support](/docs/anti-forgery.md)
    1. [X] Toggle anti-forgery OFF when doing development
       2. [X] Server-side
       3. [X] Do some testing in "production mode"
-8. [X] Add :edn format to the swagger-UI to make it easier to work with
-9. [X] [Add a "real" database](/docs/database.md)
+7. [X] Add :edn format to the swagger-UI to make it easier to work with
+8. [X] [Add a "real" database](/docs/database.md)
    1. [X] Postgres
    2. [X] SQLite
-10. [ ] Implement more of the API:
+9. [X] Add [reveal](https://vlaaad.github.io/reveal/) tooling
+10. 13. [X] Docstrings
+11. [X] Defaults for system configuration parameters
+    1. [X] Webserver port
+    2. [X] nRepl port
+    3. [X] Broadcast timeout
+12. [X] [Codox](https://github.com/weavejester/codox) (weavejester comes through again!)
+13. [X] Get "repl reload" working again
+    1. [X] start/stop/reset Component/System
+    2. [X] modify URL handlers
+    3. [X] (**FAILED**) add/remove URLs and handlers (requires a server bounce.because Compojure is MACRO-based)
+14. [ ] [Develop a more complex API (paving the way to Rocky-road)](/docs/complex-api.md)
+15. [ ] Implement more of the API:
     1. [ ] Fix Users
        1. [ ] [Login]()
        2. [ ] [Register]()
     2. [ ] Widgets/Layouts
     3. [ ] Comms
     4. [ ] Sensors/Beams
-11. [ ] Get "repl reload" working again
-12. [X] Docstrings
-13. [X] Defaults for system configuration parameters
-    1. [X] Webserver port
-    2. [X] nRepl port
-    3. [X] Broadcast timeout
-14. [X] [Codox](https://github.com/weavejester/codox) (weavejester comes through again!)
-15. [ ] Remove the "broadcast" (Concept22 doesn't really support this notion of the server publishing on a timer)
-16. [ ] [De-complecting things](/docs/decompleting.md)
-17. [ ] [Re-thinking the UI](/docs/rethinking-ui.md)
-18. [ ] (optional) Consider moving to [Reitit](/docs/routing.md)
+16. [ ] Remove "Broadcast" (Concept22 doesn't really support this notion of the server publishing on a timer)
+17. [ ] [De-complecting things](/docs/decompleting.md)
+18. [ ] [Re-thinking the UI](/docs/rethinking-ui.md)
+19. [ ] Work out an automated testing approach
+20. [ ] (optional) Consider moving to [Reitit](/docs/routing.md) (see item 13.3)
+
 
 ## Getting Started
 

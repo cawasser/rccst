@@ -11,12 +11,15 @@
   (start [component]
 
     (let [p (or nrepl-port default/nRepl-port)]
-      (log/info "starting rRepl" p)
+      (log/info "starting nrepl" p)
+      (tap> ["starting nrepl" p])
 
       (assoc component :nrepl (nrepl/start-server :port p))))
 
   (stop [component]
     (log/info "stopping nrepl" nrepl)
+    (tap> ["stopping nrepl" nrepl])
+
     (nrepl/stop-server nrepl)
     (assoc component :nrepl nil)))
 

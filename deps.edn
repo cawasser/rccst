@@ -27,6 +27,11 @@
 
  :aliases   {:run      {:main-opts ["-m" "bh.rccst.core"]}
 
+             :reveal {:extra-deps {vlaaad/reveal {:mvn/version "1.3.263"}}
+                      :ns-default vlaaad.reveal
+                      :exec-fn repl
+                      :exec-args {:always-on-top true}}
+
              ; updates deps.edn dependencies
              ; https://github.com/liquidz/antq
              ; to check only:       clojure -M:outdated

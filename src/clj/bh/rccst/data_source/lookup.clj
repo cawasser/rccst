@@ -18,5 +18,5 @@
 (def lookup-handler
   (sweet/GET "/lookup" _
     :return s/Lookup
-    :summary "lookup some data in the server"
+    :summary "returns some static data so we can test transit"
     (c/wrapper response)))
