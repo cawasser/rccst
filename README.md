@@ -50,7 +50,7 @@ There are lots of things we wanted to learn more about, and we've done that:
     1. [X] Postgres
     2. [X] SQLite
 9. [X] Add [reveal](https://vlaaad.github.io/reveal/) tooling
-10. 13. [X] Docstrings
+10. [X] Docstrings
 11. [X] Defaults for system configuration parameters
     1. [X] Webserver port
     2. [X] nRepl port
