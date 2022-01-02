@@ -76,13 +76,14 @@ But there are still many things we want to learn:
    2. [ ] Widgets/Layouts
    3. [ ] Comms
    4. [ ] Sensors/Beams
-3. [ ] Remove "Broadcast" (Concept22 doesn't really support this notion of the server publishing on a timer)
-4. [ ] [De-complect things](/docs/decompleting.md)
-5. [ ] [Re-think the UI](/docs/rethinking-ui.md)
-6. [ ] Work out an automated testing approach
-7. [ ] Add metrics collection to the Server
+3. [ ] [Kafka](/docs/kafka.md) - how should we integrate this with Component?
+4. [ ] Remove "Broadcast" (Concept22 doesn't really support this notion of the server publishing on a timer)
+5. [ ] [De-complect things](/docs/decompleting.md)
+6. [ ] [Re-think the UI](/docs/rethinking-ui.md)
+7. [ ] Work out an automated testing approach
+8. [ ] Add metrics collection to the Server
    1. [ ] [statsd](https://github.com/statsd/statsd), via [clojure-statsd-client](https://github.com/unbounce/clojure-dogstatsd-client)
-8. [ ] (optional) Consider moving to [Reitit](/docs/routing.md) (see item 13.3 above)
+9. [ ] (optional) Consider moving to [Reitit](/docs/routing.md) (see item 13.3 above)
 
 
 ## Getting Started
