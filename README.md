@@ -60,28 +60,29 @@ There are lots of things we wanted to learn more about, and we've done that:
     1. [X] start/stop/reset Component/System
     2. [X] modify URL handlers
     3. [X] (**FAILED**) add/remove URLs and handlers (requires a server bounce because Compojure is MACRO-based)
+14. [X] version support using [metav](https://github.com/jgrodziski/metav)
+
 
 
 ## Future Plans
 
 But there are still many things we want to learn:
 
-1. [X] version support using [metav](https://github.com/jgrodziski/metav)
-2. [ ] [Develop a more complex API (paving the way to Rocky-road)](/docs/complex-api.md)
-3. [ ] Implement more of the API:
+1. [ ] [Develop a more complex API (paving the way to Rocky-road)](/docs/complex-api.md)
+2. [ ] Implement more of the API:
    1. [ ] Fix Users
       1. [ ] [Login]()
       2. [ ] [Register]()
    2. [ ] Widgets/Layouts
    3. [ ] Comms
    4. [ ] Sensors/Beams
-4. [ ] Remove "Broadcast" (Concept22 doesn't really support this notion of the server publishing on a timer)
-5. [ ] [De-complect things](/docs/decompleting.md)
-6. [ ] [Re-think the UI](/docs/rethinking-ui.md)
-7. [ ] Work out an automated testing approach
-8. [ ] Add metrics collection to the Server
+3. [ ] Remove "Broadcast" (Concept22 doesn't really support this notion of the server publishing on a timer)
+4. [ ] [De-complect things](/docs/decompleting.md)
+5. [ ] [Re-think the UI](/docs/rethinking-ui.md)
+6. [ ] Work out an automated testing approach
+7. [ ] Add metrics collection to the Server
    1. [ ] [statsd](https://github.com/statsd/statsd), via [clojure-statsd-client](https://github.com/unbounce/clojure-dogstatsd-client)
-9. [ ] (optional) Consider moving to [Reitit](/docs/routing.md) (see item 13.3 above)
+8. [ ] (optional) Consider moving to [Reitit](/docs/routing.md) (see item 13.3 above)
 
 
 ## Getting Started

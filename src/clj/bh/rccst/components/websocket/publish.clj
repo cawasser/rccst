@@ -3,7 +3,19 @@
             [bh.rccst.components.system :as system]))
 
 
-(defn publish-all! [msg]
+(defn publish-all!
+  "publish the given message (msg) to _all_ connected users. This function uses the socket via
+  the [system]() atom itself which is ***not*** passed as a parameter
+
+  ---
+
+  - msg : (typically a hash-map) the message to send to all connected users/clients
+
+  > See also:
+  >
+  > [Sente](https://github.com/ptaoussanis/sente)
+  "
+  [msg]
   (let [uids (:any @(get-in @system/system [:socket :connected-uids]))]
     (doseq [uid uids]
       (log/info "publish! to user: " uid)

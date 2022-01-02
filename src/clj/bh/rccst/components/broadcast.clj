@@ -6,11 +6,26 @@
             [bh.rccst.defaults :as default]))
 
 
-(defn ->milliseconds [t]
+(defn ->milliseconds
+  "converts seconds to milliseconds (most clojure/clojurescript calls use milliseconds)"
+
+  [t]
   (* t 1000))
 
 
-(defn broadcast! [socket msg]
+(defn broadcast!
+  "transmit the given message to all the users connected to the given socket
+
+  ---
+
+  - socket : the Socket Component
+  - msg : (typically a hash-map) the message content to send
+
+  > See also:
+  >
+  > [Sente](https://github.com/ptaoussanis/sente)
+  "
+  [socket msg]
   (let [uids (:any @(:connected-uids socket))]
     (doseq [uid uids]
       (log/info "broadcast to user: " uid)
