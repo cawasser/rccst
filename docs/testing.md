@@ -116,7 +116,27 @@ More likely are functions that interface with:
 In these cases, other than testing something like a _query_, the result of a call would depend on the state of the external
 source. In other words, these functions are ***not*** pure, or Referentially Transparent. They can, and usually _do_, return
 different values every time they are called. Controlling this variability will be key to writing any meaningful tests for 
-Data Source.
+Data Source. This typically requires a special "test database" containing only known values, or special "test data" mixed
+in with production-type data.
+
+Using a separate test database is fairly straightforward,as most testing libraries provide some mechanism for setting
+program state (like which database to use) prior to executing the test code (called _setup_) and cleaning up these special
+mechanisms when the test is complete (called _teardown_). Mixing test data in with "production data" is easier (no need 
+for testing-specific setup or teardown), but much more error-prone, in that we'd _not_ want end-users to see the test data.
+
+Therefore, for any testing ([example](#example-based-testing), or [generative](#generative-testing)) of Data Sources, we will 
+construct a separate "testing database" that will be used for ***ALL***.
+
+> ***Q: Should we use SQLite as the "testing database" and keep Postgres for production?***
+> 
+> ###### Pros
+> ***
+> - Simple. We already support both, so all the configuration code is written.
+> 
+> ###### Cons
+> ***
+> - We really aren't testing the same thing, since the production system will use Postgres. It has different syntax, semantics and
+> failure modes
 
 ## Example-based Testing
 
@@ -144,10 +164,50 @@ To help guard against these kinds of bug, we can turn to _Generative Testing_.
 
 ## Generative Testing
 
-Rather than requiring developers to hand-craft specific example, what if we could have computer itself generate the test cases?
-That's the basic premise of "generative testing."
+> Also known as "Property-based testing"
+
+Rather than requiring developers to hand-craft specific example, what if we could have computer itself 
+generate the test cases? That's the basic premise of "generative testing", to write test ins such a 
+way that the computer is doing most of the work.
+
+This allows us ot test a much wider space of inputs to a function that would be possible using 
+[example-based testing](#example-based-testing).
+
+Clojure, specifically [clojure.spec](https://clojure.org/guides/spec), as a means of defining the parameters and
+return values of functions, specifications (hence "spec") that can be used by [_generators_](https://clojure.org/guides/spec#_generators)
+ot produce pseudo-random values for use in testing, vis [test.check](https://github.com/clojure/test.check).
+
+Generative testing can be used to test "computational" functions over wide range of inputs, especially of kind that no human
+develop would consider. It is also provides a good mechanism for testing more complex state-managing "subsystems".
+
+### Approach to Testing "Subsystems"
+
+A subsystem, in this case, is typically a single namespace of functions which manage some type of state, such as a database table or
+key/value store. Perhaps even something like a Kafka topic. 
+
+The basic approach is:
+1. Develop the "simple model" for the "subsystem under test" (SUT) (i.e., the function or collection of function in a single namespace)"
+   1. is there some simple, built-in, data structure that mimics to state-management properties
+2. Define the _properties_ of the SUT
+   1. define the properties of the inputs
+   2. define the properties of the outputs
+   3. define the relationship between the inputs and output of each function
+3. Build generator(s) to create sequences of operations
+4. Perform the operations on both the SUT and the model and compare the results
+   1. if they match, SUCCESS
+   2. if not, FAILURE
 
 
+### How Do We 
+
+
+
+> Note: Currently (as of v0.2.1) RCCST does _not_ use clojure.spec. The closest we come is our use of 
+> [plumatic/schema](https://github.com/plumatic/schema) as part of our route handler specifications.
+> 
+> See [database.users](https://github.com/cawasser/rccst/blob/b0fe0ac6ff10a0e2983f811b1ed005234c2dda21/src/clj/bh/rccst/components/database/users.clj#L37) and 
+> [api.login](https://github.com/cawasser/rccst/blob/b0fe0ac6ff10a0e2983f811b1ed005234c2dda21/src/clj/bh/rccst/api/login.clj#L46) 
+> for examples.
 
 ## Testing UI (ClojureScript) Code
 
@@ -158,4 +218,5 @@ That's the basic premise of "generative testing."
 ## Learn More
 
 - [Example-based Unit Testing in Clojure - Eric Normand](https://purelyfunctional.tv/mini-guide/example-based-unit-testing-in-clojure/)
-- [Generative testing in Clojure - James Trunk](https://www.youtube.com/watch?v=u0TkAw8QqrQ)
+- [Generative testing in Clojure - James Trunk](https://www.youtube.com/watch?v=u0TkAw8QqrQ) - this uses a different library [simple-check]()
+but the concepts are similar

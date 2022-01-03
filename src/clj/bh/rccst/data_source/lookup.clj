@@ -15,8 +15,12 @@
                               :hashmaps "and keywords all over the place"}}})
 
 
+(defn lookup []
+  response)
+
+
 (def lookup-handler
   (sweet/GET "/lookup" _
     :return s/Lookup
     :summary "returns some static data so we can test transit"
-    (c/wrapper response)))
+    (c/wrapper (lookup))))

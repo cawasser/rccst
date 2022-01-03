@@ -102,12 +102,13 @@
   (if-let [user (get-user database {:username user-id})]
     {:registered false}
     (do
-      (create-new-user!
-        database
-        {:username user-id
-         :uuid     (str user-id "-uuid")
-         :pass     password})
-      {:registered true})))
+      (let [uuid (str user-id "-uuid")]
+        (create-new-user!
+          database
+          {:username user-id
+           :uuid     uuid
+           :pass     password})
+        {:registered true :uuid uuid}))))
 
 
 (defn login
@@ -228,5 +229,10 @@
   (->>
     (login database "test-user" "test-pwd")
     (s/validate LoginResponse))
+
+
+  (def gold-register-success {:registered true :uuid "dummy-uuid"})
+  (s/validate RegisterResponse gold-register-success)
+
 
   ())
