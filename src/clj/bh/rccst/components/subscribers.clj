@@ -1,15 +1,20 @@
-(ns bh.rccst.data-source.subscribers
+(ns bh.rccst.components.subscribers
   (:require [clojure.tools.logging :as log]
-            [com.stuartsierra.component :as component]
-            [clojure.core.async :as async :refer [go-loop <!]]))
+            [com.stuartsierra.component :as component]))
 
 
-(defn publish! [socket subscribers [data-tag & _ :as message]]
+(defn publish!
+  "
+  "
+  [socket subscribers [data-tag & _ :as message]]
   (doseq [sub (get-in @subscribers [:sources data-tag])]
     ((:chsk-send! socket) sub message)))
 
 
-(defn subscribe [subscriptions uid data-tag]
+(defn subscribe
+  "
+  "
+  [subscriptions uid data-tag]
   (let [current-sources (get-in @subscriptions [:sources data-tag])
         current-subscribers (get-in @subscriptions [:subscribers uid])]
     (log/info "subscribe" uid data-tag)
@@ -19,7 +24,10 @@
         (assoc-in [:subscribers uid] (set (conj current-subscribers data-tag)))))))
 
 
-(defn cancel [subscriptions uid data-tag]
+(defn cancel
+  "
+  "
+  [subscriptions uid data-tag]
   (let [current-sources (get-in @subscriptions [:sources data-tag])
         current-subscribers (get-in @subscriptions [:subscribers uid])]
     (reset! subscriptions
@@ -28,7 +36,10 @@
         (assoc-in [:subscribers uid] (set (disj current-subscribers data-tag)))))))
 
 
-(defn cancel-all [subscriptions uid]
+(defn cancel-all
+  "
+  "
+  [subscriptions uid]
   (let [current-subscriptions (get-in @subscriptions [:subscribers uid])]
     (reset! subscriptions
       (-> @subscriptions

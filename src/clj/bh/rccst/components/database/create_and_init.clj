@@ -1,8 +1,8 @@
-(ns bh.rccst.components.db.create-and-init
+(ns bh.rccst.components.database.create-and-init
   (:require [hugsql.adapter.next-jdbc :as next-adapter]
             [hugsql.core :as hugsql]
 
-            [bh.rccst.components.db.users :as users]))
+            [bh.rccst.components.database.users :as users]))
 
 
 

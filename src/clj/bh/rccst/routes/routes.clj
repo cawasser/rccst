@@ -1,4 +1,4 @@
-(ns bh.rccst.api.routes
+(ns bh.rccst.routes.routes
   (:require [clojure.java.io :as io]
             [clojure.tools.logging :as log]
             [ring.middleware.anti-forgery :refer [wrap-anti-forgery *anti-forgery-token*]]
@@ -22,7 +22,7 @@
 (parser/add-tag! :csrf-field (fn [_ _] (anti-forgery-field)))
 
 
-(defn csrf-error-handler
+(defn- csrf-error-handler
   "csrf-error-handler is needed because we need to be sure anti-forgery only returns TRANSIT,
   not the html that's built-in
 
@@ -39,7 +39,7 @@
     "application/transit+json"))
 
 
-(defn render
+(defn- render
   "renders the HTML template located relative to resources/html, using Selmer to substitute values
   (given in the params) in place of tags embedded in the html template
 
@@ -163,20 +163,14 @@
   (do
     (def dev-mode true)
     (def ring-ajax-get-or-ws-handshake nil)
-    (def ring-ajax-post nil))
+    (def ring-ajax-post nil)
+    (def database {})
+    (def subscriptions {}))
 
-  (dev-mode ring-ajax-get-or-ws-handshake ring-ajax-post)
-  (prod-mode ring-ajax-get-or-ws-handshake ring-ajax-post)
-
-  (if true
-    (dev-mode ring-ajax-get-or-ws-handshake ring-ajax-post)
-    (prod-mode ring-ajax-get-or-ws-handshake ring-ajax-post))
-
-
-  (anti-forgery-field)
 
   (routes {:ring-ajax-post                nil
-           :ring-ajax-get-or-ws-handshake nil} true)
+           :ring-ajax-get-or-ws-handshake nil}
+    database subscriptions true)
 
 
 

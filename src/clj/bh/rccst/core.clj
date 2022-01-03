@@ -5,13 +5,13 @@
             [taoensso.sente.packers.transit :as sente-transit]
 
             [bh.rccst.components.broadcast :as broadcast]
-            [bh.rccst.components.db.db :as db]
+            [bh.rccst.components.database :as db]
             [bh.rccst.components.repl :as repl]
             [bh.rccst.components.system :as system]
             [bh.rccst.components.webserver :as server]
             [bh.rccst.components.websocket :as socket]
             [bh.rccst.components.websocket.publish]
-            [bh.rccst.data-source.subscribers :as subscribers]
+            [bh.rccst.components.subscribers :as subscribers]
             [bh.rccst.defaults :as default]))
 
 
@@ -105,7 +105,7 @@
   | :port         | integer  | TCP port number for the Web Server, defaults to 8280 |
   | :nrepl        | integer  | TCP port for the embedded [nREPL](https://nrepl.org/nrepl/index.html), defaults to 7777 |
   | :dev-mode     | boolean  | `true` or `false`. If `true` we start _without_ CSRF anti-forgery. Use this when you want to do development and have the `/api-docs/` (Swagger-UI) page support `POST` and `PUT` endpoint examples. |
-  | :db-spec      | hash-map | database configuration information. Two are currently provided: |
+  | :bh.rccst.components.database-spec      | hash-map | database configuration information. Two are currently provided: |
   ||| `rccst-postgres` - configuration for a locally hosted [Postgres](https://www.postgresql.org) database. |
   ||| `rccst-sqlite`   - configuration for a locally hosted [SQLite](https://sqlite.org/index.html) database. |
   | :socket-params | hash-map | configuration parameters for the [Sente](https://github.com/ptaoussanis/sente)-based websocket. Expected keys are: |
@@ -143,7 +143,7 @@
   > If you want to work with the complete API using `/api-docs/`, you will need to start the server
   > manually at the Repl, so you can access _dev-mode_ (See the Rich Comments).
 
-  - db-type - which database server to use, we support 2: [_Postgres_](https://www.postgresql.org)
+  - bh.rccst.components.database-type - which database server to use, we support 2: [_Postgres_](https://www.postgresql.org)
   and [_Sqlite_](https://sqlite.org/index.html)
 
   returns: an atom holding the started `SystemMap` _object_ returned from Component.

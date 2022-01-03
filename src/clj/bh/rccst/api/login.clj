@@ -3,7 +3,7 @@
             [compojure.api.sweet :as sweet]
 
             [bh.rccst.api.common :as c]
-            [bh.rccst.components.db.users :as users]))
+            [bh.rccst.components.database.users :as users]))
 
 
 (defn login-handlers

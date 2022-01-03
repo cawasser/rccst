@@ -3,7 +3,7 @@
             [com.stuartsierra.component :as component]
             [org.httpkit.server :as server]
 
-            [bh.rccst.api.routes :as routes]
+            [bh.rccst.routes.routes :as routes]
             [bh.rccst.defaults :as default]))
 
 

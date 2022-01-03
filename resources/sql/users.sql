@@ -30,7 +30,7 @@ WHERE username = :username;
 
 
 -- :name verify-credentials :? :1
--- :doc Take in username and password and verify they are in db
+-- :doc Take in username and password and verify they are in the database
 SELECT * FROM users
 WHERE (username = :username AND
        pass = :pass);

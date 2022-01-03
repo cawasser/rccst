@@ -1,11 +1,7 @@
-(ns bh.rccst.components.db.db
-  (:require ;[clojure.java.io :as jio]
-            [clojure.tools.logging :as log]
+(ns bh.rccst.components.database
+  (:require [clojure.tools.logging :as log]
             [com.stuartsierra.component :as component]
-            ;[hugsql.adapter.next-jdbc :as next-adapter]
-            ;[hugsql.core :as hugsql]
             [next.jdbc :as jdbc]))
-            ;[next.jdbc.sql :as sql]))
 
 
 ;;;;;;;;;;;;;;;;;
@@ -19,9 +15,6 @@
 
 
 
-;;;;;;;;;;;;;;;;;;;;;
-;; Database component
-;;
 (defrecord Database [db-spec database]
   component/Lifecycle
   (start [this]

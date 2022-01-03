@@ -1,4 +1,4 @@
-(ns bh.rccst.components.db.users
+(ns bh.rccst.components.database.users
   (:require [hugsql.adapter.next-jdbc :as next-adapter]
             [hugsql.core :as hugsql]
             [clojure.tools.logging :as log]
@@ -21,7 +21,7 @@
 (defn drop-users-table
   "drop the Users table, regardless of whether it is empty or not
 
-  - db - the database Component
+  - bh.rccst.components.database - the database Component
 
   > See also:
   >
