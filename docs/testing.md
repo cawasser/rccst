@@ -15,24 +15,25 @@ unit testing approach, because large volumes of code tend to harbor large volume
 
 ### Potential Waste in "Test Everything"
 
-In many cases, especially when developing in Clojure, functions are o such simple design and implementation, that _inspection_
+In many cases, especially when developing in Clojure, functions are of such simple design and implementation, that _inspection_
 can be sufficient to ensure bug-free code, at least for those kinds of functions. Adding tests just to have tests for "everything"
 really only adds bulk to the system (every function has a test function, doubling code size - or more). Clojure developed
-can (_should?_) also take advantage of the [Repl]() when developing code in the first place, with the goals of both reducing the
-complexity of the design and implementation, and in handling the _normal_ and _boundary_ conditions typically testing using
-[example-based](#example-based-testing).
+can (_should?_) also take advantage of the [Repl](https://clojure.org/guides/repl/introduction) when developing code in the first 
+place, with the goals of both reducing the complexity of the design and implementation, and in handling the _normal_ and 
+_boundary_ conditions typically testing using [example-based](#example-based-testing) testing.
 
-Another, more subtle,problem with the "Test Everything" mindset is discussed by Stu Halloway in his [Narcissistic Design]()
-presentation, namely the use of test to "expand the scope of functionality." It's a small step from "I expect these values" to 
-"I expect _only_ these values", "I _must_ check for missing values", "I _must_ check or extra values", etc. Each of these
-_"perfectly reasonable"_ extension adds to the test code, and also make the system itself ***less*** flexible. (See Rich
-Hickey's 2016 Clojure/conj presentation [Spec-ulation](https://www.youtube.com/watch?v=oyLBGkS5ICk)). Each of these test codifies
-the implementation in terms of "bug or not", and changing ho the function works requires also changing the tests.
+Another, more subtle problem with the "Test Everything" mindset is discussed by Stu Halloway in his [Narcissistic Design]()
+presentation, namely the use of tests to "expand the scope of functionality." It's a small step from "I expect these values" to 
+"I expect _only_ these values", "I _must_ check for missing values", "I _must_ check for extra values", etc. Each of these
+_"perfectly reasonable"_ enhancements adds to the test code, and also makes the system itself ***less*** flexible. (See Rich
+Hickey's 2016 Clojure/conj presentation [Spec-ulation](https://www.youtube.com/watch?v=oyLBGkS5ICk)). Each of these tests codifies
+the implementation in terms of "bug or not" actually changing the _design_ itself.
 
-Clojure support idiomatic [Nil-punning](https://lispcast.com/nil-punning/), or using `nil` as a marker for a variety of meanings, 
+Clojure also supports idiomatic [Nil-punning](https://lispcast.com/nil-punning/), or using `nil` as a marker for a variety of meanings, 
 while also having many (most?) functions accept `nil` as a valid input and just returning `nil`. Yes, at some point that `nil`
 probably needs to be turned into something meaningful for an end-user of the system, but throughout most of the internal of a system,
-`nil` can just be passed around without raising any error conditions.
+`nil` can just be passed around without raising any error conditions. Nil-punning significantly reduces the number of places
+in the system implementation that can create error, also reducing the amount of testing needed.
 
 
 ### So, What _Should_ We Be Testing?
@@ -56,7 +57,7 @@ Currently, the system has a number of major elements (components, namespaces, et
   - Lookup (for now)
   - etc.
 
-Let's look at the kinds of things each of these categories is supposed to provide, and how they might fail,
+Let's look at the kinds of things each of these categories is supposed to provide, how they might fail,
 and how we might test for these failures.
 
 ### Components
@@ -66,8 +67,12 @@ and dependencies of software components which have runtime state"](https://githu
 A hash-map of configuration is passed in, and that map is then augmented with any internal state or additional configuration
 created by the `start` function.
 
+Since this is mainly taking configuration and executing Component start-up, there are few error-states. The Component gets
+created correctly, or everything fails. Main error scenario is _not_ providing require configuration information to the 
+Component.
+
 Testing could be done at the individual Component level, looking for the additional keys in the hash-map inside the `component/System`
-value returned, as well as at the combine [`system-map`](https://github.com/cawasser/rccst/blob/9ee9df705e28a381053b8456fa3808e330afd65d/src/clj/bh/rccst/core.clj#L128)
+value returned, as well as at the combined [`system-map`](https://github.com/cawasser/rccst/blob/9ee9df705e28a381053b8456fa3808e330afd65d/src/clj/bh/rccst/core.clj#L128)
 level.
 
 ### Routes
@@ -108,7 +113,10 @@ More likely are functions that interface with:
 - the Database, specifically some table or tables inside the database
 - some other state-management system, such as Kafka
 
-In these cases, other than testing something like a _query_
+In these cases, other than testing something like a _query_, the result of a call would depend on the state of the external
+source. In other words, these functions are ***not*** pure, or Referentially Transparent. They can, and usually _do_, return
+different values every time they are called. Controlling this variability will be key to writing any meaningful tests for 
+Data Source.
 
 ## Example-based Testing
 
@@ -149,5 +157,5 @@ That's the basic premise of "generative testing."
 
 ## Learn More
 
-[Example-based Unit Testing in Clojure - Eric Normand](https://purelyfunctional.tv/mini-guide/example-based-unit-testing-in-clojure/)
-[Generative testing in Clojure - James Trunk](https://www.youtube.com/watch?v=u0TkAw8QqrQ)
+- [Example-based Unit Testing in Clojure - Eric Normand](https://purelyfunctional.tv/mini-guide/example-based-unit-testing-in-clojure/)
+- [Generative testing in Clojure - James Trunk](https://www.youtube.com/watch?v=u0TkAw8QqrQ)
