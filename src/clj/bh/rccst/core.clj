@@ -143,8 +143,8 @@
   > If you want to work with the complete API using `/api-docs/`, you will need to start the server
   > manually at the Repl, so you can access _dev-mode_ (See the Rich Comments).
 
-  - bh.rccst.components.database-type - which database server to use, we support 2: [_Postgres_](https://www.postgresql.org)
-  and [_Sqlite_](https://sqlite.org/index.html)
+  - db-type - which database server to use, we support 2: [_Postgres_](https://www.postgresql.org)
+  via [[rccst-postgres]] and [_Sqlite_](https://sqlite.org/index.html) via [[rccts-sqlite]].
 
   returns: an atom holding the started `SystemMap` _object_ returned from Component.
 
