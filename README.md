@@ -43,8 +43,8 @@ There are lots of things we wanted to learn more about, and we've done that:
 5. [X] Get logging to work correctly (added ch.qos.logback/logback-classic "1.2.5", see [here](https://spin.atomicobject.com/2015/05/11/clojure-logging/))
 6. [X] [Anti-forgery support](/docs/anti-forgery.md)
     1. [X] Toggle anti-forgery OFF when doing development
-        2. [X] Server-side
-        3. [X] Do some testing in "production mode"
+       1. [X] Server-side
+       2. [X] Do some testing in "production mode"
 7. [X] Add :edn format to the swagger-UI to make it easier to work with
 8. [X] [Add a "real" database](/docs/database.md)
     1. [X] Postgres
@@ -61,6 +61,8 @@ There are lots of things we wanted to learn more about, and we've done that:
     2. [X] modify URL handlers
     3. [X] (**FAILED**) add/remove URLs and handlers (requires a server bounce because Compojure is MACRO-based)
 14. [X] version support using [metav](https://github.com/jgrodziski/metav)
+15. [X] what does [cloverage](https://github.com/cloverage/cloverage) actually do, and how do we interpret the results?
+    1. see [here](https://blog.jeaye.com/2016/12/29/clojure-test-coverage/)
 
 
 
@@ -71,9 +73,11 @@ But there are still many things we want to do/learn:
 1. [ ] [De-complect (or at least simplify) things](/docs/decompleting.md)
    1. [ ] get rid of `websocket.publish`, since we already have `publish!` in `component.subscribers`
       1. [ ] what is the calling mechanism? (public function wrapping `@(system/system)`?), see rich comments
+      2. [ ] maybe subscribers should _use_ publish?
    2. [ ] why do we have `websocket.handler`?
    3. [ ] Remove "Broadcast" (Concept22 doesn't really support this notion of the server publishing on a timer)
 2. [ ] [Develop a more complex API (paving the way to Rocky-road)](/docs/complex-api.md)
+   1. [ ] should we introduce DataSources as a component (like rocky-road.dashboard-clj.data-source)?
 3. [ ] Implement more of the API:
    1. [ ] Fix Users
       1. [ ] [Login]()

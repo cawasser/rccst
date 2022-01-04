@@ -11,10 +11,10 @@
 We've got most of the things we want for Concept22, so now it's time to expand the API 
 to include the things we'll want in the future:
 
-1. [ ] User Login
+1. [X] User Login
 2. [X] Subscriptions to data sources
-   1. at this time, we are NOT using CSRF tokens, but the basics of this capability exist
-   2. [ ] implement multi-source subscriptions
+   1. [X] using CSRF tokens
+   2. [ ] implement multi-source subscriptions (just pass a vector)
 3. [ ] Wire subscriptions into the data-sources
    1. we need a common mechanism, supported by all data-sources, so we can do an initial "sync" with new clients
 4. [ ] Personalization
