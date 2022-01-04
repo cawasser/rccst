@@ -75,7 +75,11 @@ But there are still many things we want to do/learn:
       1. [ ] what is the calling mechanism? (public function wrapping `@(system/system)`?), see rich comments
       2. [ ] maybe subscribers should _use_ publish?
    2. [ ] why do we have `websocket.handler`?
-   3. [ ] Remove "Broadcast" (Concept22 doesn't really support this notion of the server publishing on a timer)
+   3. [ ] refactor `routes/routes`
+   4. [ ] Remove "Broadcast" (Concept22 doesn't really support this notion of the server publishing on a timer)
+   5. [ ] split into api // data-source
+      1. [ ] version
+      2. [ ] lookup
 2. [ ] [Develop a more complex API (paving the way to Rocky-road)](/docs/complex-api.md)
    1. [ ] should we introduce DataSources as a component (like rocky-road.dashboard-clj.data-source)?
 3. [ ] Implement more of the API:
@@ -90,9 +94,11 @@ But there are still many things we want to do/learn:
    2. component for kafka + "sub"component per topology?
 5. [ ] [Re-think the UI](/docs/rethinking-ui.md)
 6. [ ] Work out an automated [testing approach](/docs/testing.md)
+   1. [ ] open the database in a :once fixture, and the drop!/create! is the :every fixture
 7. [ ] Add metrics collection to the Server
    1. [ ] [statsd](https://github.com/statsd/statsd), via [clojure-statsd-client](https://github.com/unbounce/clojure-dogstatsd-client)
 8. [ ] (optional) Consider moving to [Reitit](/docs/routing.md) (see item 13.3 above)
+9. [ ] do we (can we?) need to stop the database connection using next.jdbc?
 
 
 ## Getting Started

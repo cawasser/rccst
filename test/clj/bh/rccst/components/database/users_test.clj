@@ -18,6 +18,8 @@
 (def gold-users-full {:users ["dummy" "dummy-2" "dummy-3"]})
 
 
+
+
 (defn db-fixture
   "Provides a clean 'users' table in a SQLite database, so we can be sure the only data that
   exists is what each test function puts there. (learn more about [test-fixtures](https://practical.li/clojure/testing/unit-testing/fixtures.html))
@@ -85,6 +87,9 @@
 
 
 (deftest user-registered?
+  (is (= gold-register-failed
+        (sut/user-registered? @database {:user-id "dummy"})))
+
   (sut/register @database "dummy" "pwd")
   (let [result (sut/user-registered? @database "dummy")]
     (is (= gold-register-success result))

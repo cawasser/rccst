@@ -49,12 +49,12 @@
           (log/info "register" user-id)
           (c/wrapper (#'users/register db user-id password))))
 
-      (sweet/POST "/registered" []
+      (sweet/POST "/is-registered" []
         :return users/RegisterResponse
         :body [{:keys [user-id] :as user} users/User]
         :summary "is the given user-id registered?"
         (do
-          (log/info "logged-in" user "////" user-id)
+          (log/info "is-registered" user "////" user-id)
           (c/wrapper (#'users/user-registered? db user-id))))
 
       (sweet/POST "/login" []

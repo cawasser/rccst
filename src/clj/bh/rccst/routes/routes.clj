@@ -168,9 +168,9 @@
     (def subscriptions {}))
 
 
-  (routes {:ring-ajax-post                nil
-           :ring-ajax-get-or-ws-handshake nil}
-    database subscriptions true)
+  (tap> (routes {:ring-ajax-post                nil
+                 :ring-ajax-get-or-ws-handshake nil}
+          database subscriptions true))
 
 
 
