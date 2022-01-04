@@ -1,3 +1,27 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Testing Approach](#testing-approach)
+  - [What to Test](#what-to-test)
+    - [Practicality of "Test Everything"](#practicality-of-test-everything)
+    - [Potential Waste in "Test Everything"](#potential-waste-in-test-everything)
+    - [So, What _Should_ We Be Testing?](#so-what-_should_-we-be-testing)
+    - [Components](#components)
+    - [Routes](#routes)
+    - [API](#api)
+      - [URL Handlers](#url-handlers)
+    - [Data Sources](#data-sources)
+  - [Example-based Testing](#example-based-testing)
+  - [Generative Testing](#generative-testing)
+    - [Approach to Testing "Subsystems"](#approach-to-testing-subsystems)
+    - [How Do We](#how-do-we)
+  - [Testing UI (ClojureScript) Code](#testing-ui-clojurescript-code)
+  - [Test Runners](#test-runners)
+  - [Learn More](#learn-more)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Testing Approach
 
 ## What to Test

@@ -61,7 +61,9 @@ UI components. For example, it would be nice to compose Widgets out of charts, t
 - We'd like for the different _components_ to be able to exchange information with each other
   - what the user has selected 
   - perhaps, just within the bounds of a single _container_
-- We want an "information model" (literal data structure) to define components, containers and such, up to and including 
+  - perhaps across containers, up to and including across widgets
+- We want an "information model" (literal data structure) to define components, containers, and such, up to and including 
 the overall UI
-  - we've done a bunch of work on this already, documented [here](https://github.com/cawasser/rocky-road/blob/master/docs/datt/user-interface.md)
+  - we've done a bunch of thinking on this already, documented [here](https://github.com/cawasser/rocky-road/blob/master/docs/datt/user-interface.md)
   - see also [All the World's a DAG](/docs/world-dag.md)
+  - 

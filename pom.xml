@@ -63,7 +63,7 @@
                   
       <artifactId>shadow-cljs</artifactId>
                   
-      <version>2.16.10</version>
+      <version>2.16.12</version>
               
     </dependency>
             

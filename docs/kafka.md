@@ -1,3 +1,13 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Kafka](#kafka)
+  - [Component](#component)
+    - [rp-jackdaw-clj](#rp-jackdaw-clj)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Kafka
 
 We've been using Kafka as an inter-service communications mechanism for a while now, and

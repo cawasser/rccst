@@ -66,24 +66,29 @@ There are lots of things we wanted to learn more about, and we've done that:
 
 ## Future Plans
 
-But there are still many things we want to learn:
+But there are still many things we want to do/learn:
 
-1. [ ] [Develop a more complex API (paving the way to Rocky-road)](/docs/complex-api.md)
-2. [ ] Implement more of the API:
+1. [ ] [De-complect (or at least simplify) things](/docs/decompleting.md)
+   1. [ ] get rid of `websocket.publish`, since we already have `publish!` in `component.subscribers`
+      1. [ ] what is the calling mechanism? (public function wrapping `@(system/system)`?), see rich comments
+   2. [ ] why do we have `websocket.handler`?
+   3. [ ] Remove "Broadcast" (Concept22 doesn't really support this notion of the server publishing on a timer)
+2. [ ] [Develop a more complex API (paving the way to Rocky-road)](/docs/complex-api.md)
+3. [ ] Implement more of the API:
    1. [ ] Fix Users
       1. [ ] [Login]()
       2. [ ] [Register]()
    2. [ ] Widgets/Layouts
    3. [ ] Comms
    4. [ ] Sensors/Beams
-3. [ ] [Kafka](/docs/kafka.md) - how should we integrate this with Component?
-4. [ ] Remove "Broadcast" (Concept22 doesn't really support this notion of the server publishing on a timer)
-5. [ ] [De-complect things](/docs/decompleting.md)
-6. [ ] [Re-think the UI](/docs/rethinking-ui.md)
-7. [ ] Work out an automated [testing approach](/docs/testing.md)
-8. [ ] Add metrics collection to the Server
+4. [ ] [Kafka](/docs/kafka.md) - how should we integrate this with Component?
+   1. component per topology?
+   2. component for kafka + "sub"component per topology?
+5. [ ] [Re-think the UI](/docs/rethinking-ui.md)
+6. [ ] Work out an automated [testing approach](/docs/testing.md)
+7. [ ] Add metrics collection to the Server
    1. [ ] [statsd](https://github.com/statsd/statsd), via [clojure-statsd-client](https://github.com/unbounce/clojure-dogstatsd-client)
-9. [ ] (optional) Consider moving to [Reitit](/docs/routing.md) (see item 13.3 above)
+8. [ ] (optional) Consider moving to [Reitit](/docs/routing.md) (see item 13.3 above)
 
 
 ## Getting Started
