@@ -31,8 +31,8 @@
   > [Compojure-sweet](https://github.com/metosin/compojure-api)
   "
 
-  [database pub-sub]
-  (log/info "generate api" pub-sub)
+  [{:keys [database]} pub-sub]
+  (log/info "generate api")
   (sweet/api
     {:swagger
      {:ui "/api-docs"

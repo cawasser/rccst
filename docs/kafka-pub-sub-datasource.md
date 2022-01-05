@@ -19,7 +19,7 @@ By default, the DataSource only publishes data via the Scheduler (i.e., _not_ tr
 some asynchronous event such as a Kafka message). It does so by writing the message for 
 publication onto that channel. This causes the "take" (`<!`) inside the `go-loop` in Websocket
 to unblock (it waits for a message on any one of the channels) and publish the message to 
-subscribed client using the Websocket's `send-fn`.
+subscribed clients using the Websocket's `send-fn`.
 
 That's actually a pretty slick mechanism, but it has a few drawbacks
 
@@ -32,18 +32,18 @@ is less flexible that separating these concerns.
 
 ## RCCST Approach
 
-It might be better to flip the DAG and have DataSources depend on Pub-Sub, wchi in turn depends on Websocket. 
+It might be better to flip the DAG and have DataSources depend on Pub-Sub, which in turn depends on Websocket. 
 In this way, Pub-Sub can create just one channel, and any DataSources can grab a reference to it. Then, when there are
-updates (especially asynchronous updates, say form Kafka), the DataSource can still just put the
+updates (especially asynchronous updates, say from Kafka), the DataSource can still just put the
 update message onto the channel (`>!`). Pub-Sub will be blocking on `>!` from the channel, so it 
-will unblock when the message arrives, and it can publish it to its dependency on the Websocket.
+will unblock when the message(s) arrives, and it can publish using its dependency on the Websocket.
 
 This _should_ make it possible to create individual DataSources only when some user first 
 subscribes to each^(1)^.
 
 
 
-> ^(1)^ Currently, we don't track how many times any given client subscribes to the same source, jsut 
+> ^(1)^ Currently, we don't track how many times any given client subscribes to the same source, just 
 > subscriptions across all clients.
 
 

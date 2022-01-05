@@ -29,22 +29,22 @@
 
   ---
 
-  - subscriptions - the Subscriptions Component, which manages subscriptions over the Websocket
+  - subscribe - the pub-sub/subscribe function (extracted from the Subscriptions Component),
+  which manages subscribers and subscriptions
 
   > See also:
   >
   > [Compojure](https://github.com/weavejester/compojure)
   > [compojure.sweet](https://github.com/metosin/compojure-api)
   "
-  [pub-sub]
+  [{:keys [subscribe cancel cancel-all] :as pub-sub}]
   (log/info "subscription-handlers" pub-sub)
-  (let [subscribe (:subscribe pub-sub)] ; we need just the (subscribe) function
-    (sweet/context "/subscribe" []
-      :tags ["subscribe"]
+  (sweet/context "/subscribe" []
+    :tags ["subscribe"]
 
-      (sweet/POST "/data-source" req
-        :body [{:keys [user-id data-sources]} SubscribeRequest]
-        :summary "subscribe to a data-source (by its keyword name)"
-        (do
-          (log/info "/data-source")
-          (c/wrapper (subscribe user-id data-sources)))))))
+    (sweet/POST "/data-source" req
+      :body [{:keys [user-id data-sources]} SubscribeRequest]
+      :summary "subscribe to a data-source (by its keyword name)"
+      (do
+        (log/info "/data-source")
+        (c/wrapper (subscribe user-id data-sources))))))

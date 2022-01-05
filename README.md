@@ -84,12 +84,12 @@ But there are still many things we want to do/learn:
    5. [X] split into api // data-source
       1. [X] version
       2. [X] lookup
-   6. [ ] Destructure hash-map keys out of Components at function boundaries
-      1. [ ] api
-      2. [ ] login
-      3. [ ] lookup
-      4. [ ] subscribe
-      5. [ ] version
+   6. [X] Destructure hash-map keys out of Components at function boundaries
+      1. [X] api
+      2. [X] login
+      3. [X] lookup - n/a
+      4. [X] subscribe
+      5. [X] version - n/a
 2. [ ] [Develop a more complex API (paving the way to Rocky-road)](/docs/complex-api.md)
    1. [ ] should we introduce DataSources as a component (like rocky-road.dashboard-clj.data-source)?
 3. [ ] Implement more of the API:
