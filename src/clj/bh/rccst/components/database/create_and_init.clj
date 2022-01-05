@@ -29,7 +29,8 @@
 (defn init-database
   "loading all the starting data"
   [db]
-  (-> db))
+  (-> db
+    users/init-users-table))
 
 
 (defn create-and-init
