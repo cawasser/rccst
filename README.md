@@ -81,9 +81,9 @@ But there are still many things we want to do/learn:
    2. [ ] why do we have `websocket.handler`?
    3. [ ] refactor `routes/routes`
    4. [X] Remove "Broadcast" (Concept22 doesn't really support this notion of the server publishing on a timer)
-   5. [ ] split into api // data-source
-      1. [ ] version
-      2. [ ] lookup
+   5. [X] split into api // data-source
+      1. [X] version
+      2. [X] lookup
 2. [ ] [Develop a more complex API (paving the way to Rocky-road)](/docs/complex-api.md)
    1. [ ] should we introduce DataSources as a component (like rocky-road.dashboard-clj.data-source)?
 3. [ ] Implement more of the API:

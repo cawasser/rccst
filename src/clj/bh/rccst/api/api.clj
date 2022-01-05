@@ -5,7 +5,7 @@
             [bh.rccst.api.login :as login]
             [bh.rccst.api.subscribe :as subscribe]
             [bh.rccst.api.version :as version]
-            [bh.rccst.data-source.lookup :as lookup]))
+            [bh.rccst.api.lookup :as lookup]))
 
 
 (defn api

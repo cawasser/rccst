@@ -1,10 +1,4 @@
-(ns bh.rccst.data-source.lookup
-  (:require [ring.util.http-response :as http]
-            [ring.util.response :as rr]
-            [compojure.api.sweet :as sweet]
-
-            [bh.rccst.data-source.lookup.schema :as s]
-            [bh.rccst.api.common :as c]))
+(ns bh.rccst.data-source.lookup)
 
 
 (def response {:item     "This is a 'Lookup' response"
@@ -19,8 +13,3 @@
   response)
 
 
-(def lookup-handler
-  (sweet/GET "/lookup" _
-    :return s/Lookup
-    :summary "returns some static data so we can test transit"
-    (c/wrapper (lookup))))
