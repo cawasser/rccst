@@ -63,33 +63,33 @@ There are lots of things we wanted to learn more about, and we've done that:
 14. [X] version support using [metav](https://github.com/jgrodziski/metav)
 15. [X] what does [cloverage](https://github.com/cloverage/cloverage) actually do, and how do we interpret the results?
     1. see [here](https://blog.jeaye.com/2016/12/29/clojure-test-coverage/)
-
-
+    2. 1. [X] [De-complect (or at least simplify) things](/docs/decompleting.md)
+16. [X] get rid of `websocket.publish`, since we already have `publish!` in `component.subscribers` - *** YES!!! ***
+     1. [X] need to hook up Subscribers correctly
+         1. [X] subscribe to multiple things
+         2. [X] and FIX THE NAME!!!
+         3. [X] client must subscribe to  (replacing :dummy, :something-else, and :a-third-thing)
+             1. [X] :number
+             2. [X] :string
+18. [X] refactor `routes/routes`
+19. [X] Remove "Broadcast" (Concept22 doesn't really support this notion of the server publishing on a timer)
+20. [X] split into api // data-source
+     1. [X] version
+     2. [X] lookup
+21. [X] Destructure hash-map keys out of Components at function boundaries
+     1. [X] api
+     2. [X] login
+     3. [X] lookup - n/a
+     4. [X] subscribe
+     5. [X] version - n/a
+     
 
 ## Future Plans
 
 But there are still many things we want to do/learn:
 
-1. [ ] [De-complect (or at least simplify) things](/docs/decompleting.md)
-   1. [X] get rid of `websocket.publish`, since we already have `publish!` in `component.subscribers` - *** YES!!! ***
-      1. [X] need to hook up Subscribers correctly
-         1. [X] subscribe to multiple things 
-         2. [X] and FIX THE NAME!!!
-         3. [X] client must subscribe to  (replacing :dummy, :something-else, and :a-third-thing)
-            1. [X] :number
-            2. [X] :string
-   2. [ ] why do we have `websocket.handler`?
-   3. [ ] refactor `routes/routes`
-   4. [X] Remove "Broadcast" (Concept22 doesn't really support this notion of the server publishing on a timer)
-   5. [X] split into api // data-source
-      1. [X] version
-      2. [X] lookup
-   6. [X] Destructure hash-map keys out of Components at function boundaries
-      1. [X] api
-      2. [X] login
-      3. [X] lookup - n/a
-      4. [X] subscribe
-      5. [X] version - n/a
+1. [ ] Work out an automated [testing approach](/docs/testing.md)
+    1. [X] ***FAILED** fixtures don't work this way - open the database in a :once fixture, and the drop!/create! is the :every fixture
 2. [ ] [Develop a more complex API (paving the way to Rocky-road)](/docs/complex-api.md)
    1. [ ] should we introduce DataSources as a component (like rocky-road.dashboard-clj.data-source)?
 3. [ ] Implement more of the API:
@@ -104,13 +104,12 @@ But there are still many things we want to do/learn:
    2. component for kafka + "sub"component per topology?
    3. how should [Kafka, Pub-Sub and DataSource](/docs/kafka-pub-sub-datasource.md) all work together?
 5. [ ] [Re-think the UI](/docs/rethinking-ui.md)
-6. [ ] Work out an automated [testing approach](/docs/testing.md)
-   1. [ ] open the database in a :once fixture, and the drop!/create! is the :every fixture
-7. [ ] Add metrics collection to the Server
+6. [ ] Add metrics collection to the Server
    1. [ ] [statsd](https://github.com/statsd/statsd), via [clojure-statsd-client](https://github.com/unbounce/clojure-dogstatsd-client)
-8. [ ] (optional) Consider moving to [Reitit](/docs/routing.md) (see item 13.3 above)
-9. [ ] do we (can we?) need to stop the database connection using next.jdbc?
-10. [ ] Client needs to actually "login", so we know when to start the socket
+7. [ ] (optional) Consider moving to [Reitit](/docs/routing.md) (see item 13.3 above)
+8. [ ] do we (can we?) need to stop the database connection using next.jdbc?
+9. [ ] Client needs to actually "login", so we know when to start the socket
+10. [ ] Will we ever need `websocket.handler`? (handles push messages from clients)
 
 
 
