@@ -84,6 +84,12 @@ But there are still many things we want to do/learn:
    5. [X] split into api // data-source
       1. [X] version
       2. [X] lookup
+   6. [ ] Destructure hash-map keys out of Components at function boundaries
+      1. [ ] api
+      2. [ ] login
+      3. [ ] lookup
+      4. [ ] subscribe
+      5. [ ] version
 2. [ ] [Develop a more complex API (paving the way to Rocky-road)](/docs/complex-api.md)
    1. [ ] should we introduce DataSources as a component (like rocky-road.dashboard-clj.data-source)?
 3. [ ] Implement more of the API:
@@ -96,6 +102,7 @@ But there are still many things we want to do/learn:
 4. [ ] [Kafka](/docs/kafka.md) - how should we integrate this with Component?
    1. component per topology?
    2. component for kafka + "sub"component per topology?
+   3. how should [Kafka, Pub-Sub and DataSource](/docs/kafka-pub-sub-datasource.md) all work together?
 5. [ ] [Re-think the UI](/docs/rethinking-ui.md)
 6. [ ] Work out an automated [testing approach](/docs/testing.md)
    1. [ ] open the database in a :once fixture, and the drop!/create! is the :every fixture
