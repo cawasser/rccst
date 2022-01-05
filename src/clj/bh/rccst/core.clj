@@ -11,7 +11,7 @@
             [bh.rccst.components.webserver :as server]
             [bh.rccst.components.websocket :as socket]
             [bh.rccst.components.websocket.publish]
-            [bh.rccst.components.subscribers :as subscribers]
+            [bh.rccst.components.pub-sub :as pub-sub]
             [bh.rccst.defaults :as default]))
 
 
@@ -27,8 +27,8 @@
 
 (def rccst-sqlite
   "sqlite database connection spec."
-  {:dbtype   "sqlite"
-   :dbname   "rccst"})
+  {:dbtype "sqlite"
+   :dbname "rccst"})
 
 
 (def last-req
@@ -124,14 +124,14 @@
   "
 
   [args _]
-  (let []
-    (component/system-map
-      :database (db/map->Database args)
-      :server (component/using (server/map->HTTPServer args) [:socket :database :subscriptions])
-      :nrepl (repl/map->nRepl args)
-      :socket (socket/map->WebSocketServer args)
-      :broadcast (component/using (broadcast/map->Broadcast args) [:socket])
-      :subscriptions (component/using (subscribers/map->Subscribers args) [:socket]))))
+  ;(let []
+  (component/system-map
+    :database (db/map->Database args)
+    :server (component/using (server/map->HTTPServer args) [:socket :database :pub-sub])
+    :nrepl (repl/map->nRepl args)
+    :socket (socket/map->WebSocketServer args)
+    :broadcast (component/using (broadcast/map->Broadcast args) [:socket])
+    :pub-sub (component/using (pub-sub/map->PubSub args) [:socket])))
 
 
 (defn start!
@@ -164,7 +164,7 @@
                    :socket-params     {:user-id-fn    user-fn
                                        :packer        (sente-transit/get-transit-packer)
                                        :csrf-token-fn csrf-fn}
-                   :broadcast-timeout default/broadcast-timeout}                    ; in seconds
+                   :broadcast-timeout default/broadcast-timeout} ; in seconds
         {}))))
 
 
@@ -209,12 +209,12 @@
   (do
     ; leaving a few config params out to we test 'default'
     (set-init (partial new-system
-                {:host              "localhost"
-                 :db-spec           db-type
-                 :dev-mode          true
-                 :socket-params     {:user-id-fn    user-fn
-                                     :packer        (sente-transit/get-transit-packer)
-                                     :csrf-token-fn nil}}))
+                {:host          "localhost"
+                 :db-spec       db-type
+                 :dev-mode      true
+                 :socket-params {:user-id-fn    user-fn
+                                 :packer        (sente-transit/get-transit-packer)
+                                 :csrf-token-fn nil}}))
     (start)
     (reset! system/system system)
     (tap> system))
@@ -239,13 +239,18 @@
 
   (:server system)
   (:nrepl system)
-  (:socket system)
+  (tap> (:socket system))
+  (tap> (get-in system [:socket :publish-all!]))
+  ((get-in system [:socket :publish-all!]) [:publish/data-update
+                                            {:id :number :value 100}])
   (:broadcast system)
-  (:subscriptions system)
+  (:subscribers system)
+  (:pub-sub system)
+  (get-in system [:pub-sub :subscribe])
 
-  (keys (:subscriptions system))
-  (get-in system [:subscriptions :subscriptions])
-  (get-in system [:subscriptions :subscribe])
+  (keys (:subscribers system))
+  (get-in system [:subscribers :subscriptions])
+  (get-in system [:subscribers :subscribe])
 
   (start)
   (stop)
@@ -264,6 +269,6 @@
   (:broadcast @system/system)
 
 
-  (get-in @system/system [:subscriptions :subscriptions])
+  (get-in @system/system [:subscribers :subscriptions])
 
   ())

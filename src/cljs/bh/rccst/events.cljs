@@ -144,14 +144,14 @@
   ::subscribe-to
   (fn-traced [_ [_ source]]
     (log/info "::subscribe-to" source
-      "////" {:user-id "client" :data-sources source}
+      "////" {:user-id "client" :data-sources #{source}}
       "////" ?csrf-token)
     {:http-xhrio (merge default-header
-                   {:method          :post
-                    :uri             "/subscribe/data-source"
-                    :params          {:user-id "client" :data-sources source}
-                    :on-success      [::good-subscribe-result source]
-                    :on-failure      [::bad-subscribe-result source]})}))
+                   {:method     :post
+                    :uri        "/subscribe/data-source"
+                    :params     {:user-id "client" :data-sources #{source}}
+                    :on-success [::good-subscribe-result source]
+                    :on-failure [::bad-subscribe-result source]})}))
 
 
 ; some events to dispatch from the REPL

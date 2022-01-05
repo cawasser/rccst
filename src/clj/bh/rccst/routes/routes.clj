@@ -86,7 +86,7 @@
   > [ring.middleware.cors](https://github.com/r0man/ring-cors)
   "
   [{:keys [ring-ajax-post ring-ajax-get-or-ws-handshake]}
-   database subscriptions dev-mode]
+   database pub-sub dev-mode]
   (log/info "setting up the routes" dev-mode database)
 
   (if dev-mode
@@ -108,7 +108,7 @@
             (GET "/" _ (render "public/index.html"))
             (route/resources "/")
 
-            (#'api/api database subscriptions)
+            (#'api/api database pub-sub)
 
             (route/not-found "<h1>Page not found</h1>"))
 
@@ -141,7 +141,7 @@
             (GET "/" _ (render "public/index.html"))
             (route/resources "/")
 
-            (#'api/api database)
+            (#'api/api database pub-sub)
 
             (route/not-found "<h1>Page not found</h1>"))
 

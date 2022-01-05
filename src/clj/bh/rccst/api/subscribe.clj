@@ -8,11 +8,11 @@
 
 
 (s/defschema DataSources
-  "Clojure [keyword](https://clojure.org/reference/data_structures#Keywords) which uniquely
-  identifies a specific data-source in the system.
+  "vector of Clojure [keyword](https://clojure.org/reference/data_structures#Keywords), each
+   of which uniquely identifies a specific data-source in the system.
 
   "
-  s/Keyword)
+  #{s/Keyword})
 
 
 (s/defschema SubscribeRequest
@@ -36,8 +36,9 @@
   > [Compojure](https://github.com/weavejester/compojure)
   > [compojure.sweet](https://github.com/metosin/compojure-api)
   "
-  [subscriptions]
-  (let [subscribe (:subscribe subscriptions)] ; we need just the (subscribe) function
+  [pub-sub]
+  (log/info "subscription-handlers" pub-sub)
+  (let [subscribe (:subscribe pub-sub)] ; we need just the (subscribe) function
     (sweet/context "/subscribe" []
       :tags ["subscribe"]
 

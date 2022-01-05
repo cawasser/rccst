@@ -16,10 +16,11 @@
   > [Sente](https://github.com/ptaoussanis/sente)
   "
   [msg]
-  (let [uids (:any @(get-in @system/system [:socket :connected-uids]))]
+  (let [uids (:any @(get-in @system/system [:socket :connected-uids]))
+        send-fn (get-in @system/system [:socket :chsk-send!])]
     (doseq [uid uids]
       (log/info "publish! to user: " uid)
-      ((get-in @system/system [:socket :chsk-send!]) uid msg))))
+      (send-fn uid msg))))
 
 
 

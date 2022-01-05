@@ -26,13 +26,13 @@
     [:h3 "String: " @s]))
 
 
-(defn- subscribe-to-control [keyword]
+(defn- subscribe-to-control [keyword child]
   (let [result (re-frame/subscribe [::subs/subscribed keyword])]
     [:div {:style {:margin "10px"}}
      [:button.button.is-primary
       {:on-click #(re-frame/dispatch [::events/subscribe-to keyword])}
       (str keyword)]
-     [:h3 "Result:" (str @result)]]))
+     [:h3 "Result:" (str @result)] child]))
 
 
 (defn- subscription-error-control []
@@ -57,13 +57,12 @@
        [:button.button {:on-click #(re-frame/dispatch [::subscriptions/start])} "Start"]
        [:h3 "Last 3: " (str @s)]
 
-       [number-control]
-       [string-control]
        [lookup-control]
+
        [:div {:style {:display :flex}}
-        [subscribe-to-control :dummy]
-        [subscribe-to-control :something-else]
-        [subscribe-to-control :a-third-thing]]
+        [subscribe-to-control :number [number-control]]
+        [subscribe-to-control :string [string-control]]]
+
        [subscription-error-control]])))
 
 

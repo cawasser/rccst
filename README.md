@@ -71,9 +71,13 @@ There are lots of things we wanted to learn more about, and we've done that:
 But there are still many things we want to do/learn:
 
 1. [ ] [De-complect (or at least simplify) things](/docs/decompleting.md)
-   1. [ ] get rid of `websocket.publish`, since we already have `publish!` in `component.subscribers`
-      1. [ ] what is the calling mechanism? (public function wrapping `@(system/system)`?), see rich comments
-      2. [ ] maybe subscribers should _use_ publish?
+   1. [ ] get rid of `websocket.publish`, since we already have `publish!` in `component.subscribers` - *** YES!!! ***
+      1. [ ] need to hook up Subscribers correctly
+         1. [ ] subscribe to multiple things 
+         2. [ ] and FIX THE NAME!!!
+         3. [ ] client must subscribe to  (replacing :dummy, :something-else, and :a-third-thing)
+            1. [ ] :number
+            2. [ ] :string
    2. [ ] why do we have `websocket.handler`?
    3. [ ] refactor `routes/routes`
    4. [ ] Remove "Broadcast" (Concept22 doesn't really support this notion of the server publishing on a timer)

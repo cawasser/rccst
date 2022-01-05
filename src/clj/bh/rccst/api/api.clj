@@ -31,8 +31,8 @@
   > [Compojure-sweet](https://github.com/metosin/compojure-api)
   "
 
-  [database subscriptions]
-  (log/info "generate api" subscriptions)
+  [database pub-sub]
+  (log/info "generate api" pub-sub)
   (sweet/api
     {:swagger
      {:ui "/api-docs"
@@ -55,7 +55,7 @@
     (#'login/login-handlers database)
 
     ; subscription
-    (#'subscribe/subscription-handlers subscriptions)))
+    (#'subscribe/subscription-handlers pub-sub)))
 
     ; "initialization"
 
