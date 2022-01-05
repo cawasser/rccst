@@ -5,4 +5,3 @@
 
 (def nRepl-port "default port for the hosted nRepl" 7777)
 
-(def broadcast-timeout "default timeout for the 'broadcast' service (in seconds)" 5)

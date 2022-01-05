@@ -140,6 +140,7 @@
     (assoc db
       :subscribe-error result)))
 
+
 (re-frame/reg-event-fx
   ::subscribe-to
   (fn-traced [_ [_ source]]

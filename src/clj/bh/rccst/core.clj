@@ -4,13 +4,11 @@
             [com.stuartsierra.component.repl :refer [reset set-init start stop system]]
             [taoensso.sente.packers.transit :as sente-transit]
 
-            [bh.rccst.components.broadcast :as broadcast]
             [bh.rccst.components.database :as db]
             [bh.rccst.components.repl :as repl]
             [bh.rccst.components.system :as system]
             [bh.rccst.components.webserver :as server]
             [bh.rccst.components.websocket :as socket]
-            [bh.rccst.components.websocket.publish]
             [bh.rccst.components.pub-sub :as pub-sub]
             [bh.rccst.defaults :as default]))
 
@@ -91,7 +89,6 @@
   | Web Server        | handling URL Endpoints    |
   | Socket Server     | data Pub/Sub              |
   | nRepl             | providing a remote Repl for interactive development |
-  | Broadcast         | a timer-based publication mechanism (temporary) |
   | Subscription      | mechanism for managing Client subscriptions to data-sources |
 
   > These Components form a Directed Acyclic Graph (DAG) based upon their interdependencies.
@@ -112,7 +109,6 @@
   ||| `:client-fn` - function to extract the client-id from the incoming HTTP request |
   ||| `:packer`    - function to marshall data into /out-of the socket. We currently are using [Transit](https://github.com/cognitect/transit-clj), hence `(sente-transit/get-transit-packer)` |
   ||| `:csfr-token-fn` - function to return the CSRF, if using CSRF Anti-forgery, `nil` of not. |
-  | :broadcast-timeout | integer | number of seconds between 'publish' events, defaults to 5 seconds. |
 
   > See also:
   >
@@ -130,7 +126,6 @@
     :server (component/using (server/map->HTTPServer args) [:socket :database :pub-sub])
     :nrepl (repl/map->nRepl args)
     :socket (socket/map->WebSocketServer args)
-    :broadcast (component/using (broadcast/map->Broadcast args) [:socket])
     :pub-sub (component/using (pub-sub/map->PubSub args) [:socket])))
 
 
@@ -163,8 +158,7 @@
                    :db-spec           db-type
                    :socket-params     {:user-id-fn    user-fn
                                        :packer        (sente-transit/get-transit-packer)
-                                       :csrf-token-fn csrf-fn}
-                   :broadcast-timeout default/broadcast-timeout} ; in seconds
+                                       :csrf-token-fn csrf-fn}}
         {}))))
 
 
@@ -229,8 +223,7 @@
                  :dev-mode          false
                  :socket-params     {:user-id-fn    user-fn
                                      :packer        (sente-transit/get-transit-packer)
-                                     :csrf-token-fn csrf-fn}
-                 :broadcast-timeout default/broadcast-timeout}))
+                                     :csrf-token-fn csrf-fn}}))
     (start)
     (reset! system/system system)
     (tap> system))

@@ -5,7 +5,8 @@
    [taoensso.timbre :as log]
    [bh.rccst.events :as events]
    [bh.rccst.views :as views]
-   [bh.rccst.config :as config]))
+   [bh.rccst.config :as config]
+   [bh.rccst.subscriptions :as pub-sub]))
 
 
 (defn dev-setup []
@@ -24,6 +25,8 @@
   (log/info "rccts.core/init")
 
   (re-frame/dispatch-sync [::events/initialize-db])
+  (re-frame/dispatch [::pub-sub/start])
+
   (dev-setup)
   (mount-root))
 

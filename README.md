@@ -71,16 +71,16 @@ There are lots of things we wanted to learn more about, and we've done that:
 But there are still many things we want to do/learn:
 
 1. [ ] [De-complect (or at least simplify) things](/docs/decompleting.md)
-   1. [ ] get rid of `websocket.publish`, since we already have `publish!` in `component.subscribers` - *** YES!!! ***
-      1. [ ] need to hook up Subscribers correctly
-         1. [ ] subscribe to multiple things 
-         2. [ ] and FIX THE NAME!!!
-         3. [ ] client must subscribe to  (replacing :dummy, :something-else, and :a-third-thing)
-            1. [ ] :number
-            2. [ ] :string
+   1. [X] get rid of `websocket.publish`, since we already have `publish!` in `component.subscribers` - *** YES!!! ***
+      1. [X] need to hook up Subscribers correctly
+         1. [X] subscribe to multiple things 
+         2. [X] and FIX THE NAME!!!
+         3. [X] client must subscribe to  (replacing :dummy, :something-else, and :a-third-thing)
+            1. [X] :number
+            2. [X] :string
    2. [ ] why do we have `websocket.handler`?
    3. [ ] refactor `routes/routes`
-   4. [ ] Remove "Broadcast" (Concept22 doesn't really support this notion of the server publishing on a timer)
+   4. [X] Remove "Broadcast" (Concept22 doesn't really support this notion of the server publishing on a timer)
    5. [ ] split into api // data-source
       1. [ ] version
       2. [ ] lookup
@@ -103,6 +103,8 @@ But there are still many things we want to do/learn:
    1. [ ] [statsd](https://github.com/statsd/statsd), via [clojure-statsd-client](https://github.com/unbounce/clojure-dogstatsd-client)
 8. [ ] (optional) Consider moving to [Reitit](/docs/routing.md) (see item 13.3 above)
 9. [ ] do we (can we?) need to stop the database connection using next.jdbc?
+10. [ ] Client needs to actually "login", so we know when to start the socket
+
 
 
 ## Getting Started

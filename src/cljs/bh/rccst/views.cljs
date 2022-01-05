@@ -53,9 +53,9 @@
         [:h1 "Hello from " @name]
         [:h3 "version: " @version]]
 
-       [:h3 "Counter: " @counter]
-       [:button.button {:on-click #(re-frame/dispatch [::subscriptions/start])} "Start"]
-       [:h3 "Last 3: " (str @s)]
+       ;[:h3 "Counter: " @counter]
+       ;[:button.button {:on-click #(re-frame/dispatch [::subscriptions/start])} "Start"]
+       ;[:h3 "Last 3: " (str @s)]
 
        [lookup-control]
 
