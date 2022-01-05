@@ -25,7 +25,7 @@
 
   > See also:
   >
-  > [HugSQL]()
+  > [HugSQL](https://www.hugsql.org/)
   "
   [db]
   (drop-users-table! db))
