@@ -28,6 +28,8 @@
         (assoc this :database (jdbc/get-datasource db-spec)))))
 
   (stop [this]
+    (log/info "stopping database" this (:database this))
+    (.. (:database this) getConnection close)
     (assoc this :database nil)))
 
 
@@ -54,5 +56,12 @@
     "sqlite database connection spec."
     {:dbtype   "sqlite"
      :dbname   "rccst"})
+
+  (def ds (jdbc/get-datasource db-spec))
+  (def conn (.getConnection ds))
+  (.close conn)
+
+  (type ds)
+  (.. ds getConnection close)
 
   ())

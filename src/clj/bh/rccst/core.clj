@@ -149,6 +149,7 @@
   "
 
   [db-type]
+  (log/info "SYSTEM START!")
   (reset! system/system
     (component/start
       (new-system {:host              "localhost"
@@ -245,9 +246,13 @@
   (get-in system [:subscribers :subscriptions])
   (get-in system [:subscribers :subscribe])
 
-  (start)
+  (do
+    (start)
+    (reset! system/system system))
   (stop)
-  (reset)
+  (do
+    (reset)
+    (reset! system/system system))
 
   ())
 

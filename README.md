@@ -71,18 +71,19 @@ There are lots of things we wanted to learn more about, and we've done that:
          3. [X] client must subscribe to  (replacing :dummy, :something-else, and :a-third-thing)
              1. [X] :number
              2. [X] :string
-18. [X] refactor `routes/routes`
-19. [X] Remove "Broadcast" (Concept22 doesn't really support this notion of the server publishing on a timer)
-20. [X] split into api // data-source
+17. [X] refactor `routes/routes`
+18. [X] Remove "Broadcast" (Concept22 doesn't really support this notion of the server publishing on a timer)
+19. [X] split into api // data-source
      1. [X] version
      2. [X] lookup
-21. [X] Destructure hash-map keys out of Components at function boundaries
+20. [X] Destructure hash-map keys out of Components at function boundaries
      1. [X] api
      2. [X] login
      3. [X] lookup - n/a
      4. [X] subscribe
      5. [X] version - n/a
-     
+21. [X] do we (can we?) need to stop the database connection using next.jdbc?
+
 
 ## Future Plans
 
@@ -107,9 +108,9 @@ But there are still many things we want to do/learn:
 6. [ ] Add metrics collection to the Server
    1. [ ] [statsd](https://github.com/statsd/statsd), via [clojure-statsd-client](https://github.com/unbounce/clojure-dogstatsd-client)
 7. [ ] (optional) Consider moving to [Reitit](/docs/routing.md) (see item 13.3 above)
-8. [ ] do we (can we?) need to stop the database connection using next.jdbc?
-9. [ ] Client needs to actually "login", so we know when to start the socket
-10. [ ] Will we ever need `websocket.handler`? (handles push messages from clients)
+8. [ ] Client needs to actually "login", so we know when to start the socket
+9. [ ] Will we ever need `websocket.handler`? (handles push messages from clients)
+
 
 
 
