@@ -58,15 +58,9 @@
   and shows the most recent value of each subscribed source.
   "
   []
-  (let [name    (re-frame/subscribe [::subs/name])
-        version (re-frame/subscribe [::subs/version])]
+  (let []
     (fn []
-      [:div {:style {:width "75%"}}
-       [:div {:style {:display :flex
-                      :margin  "10px"}}
-        [:h1 "Hello from " @name]
-        [:h3 "version: " @version]
-        [:button.button {:on-click #(re-frame/dispatch [::events/logoff])} "Log Off"]]
+      [:div {:style {:width "30%" :border "solid" :border-width "2px"}}
 
        [lookup-control]
 

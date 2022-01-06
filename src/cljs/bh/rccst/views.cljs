@@ -6,8 +6,8 @@
 
             [bh.rccst.events :as events]
             [bh.rccst.subs :as subs]
-            [bh.rccst.subscriptions :as subscriptions]
             [bh.rccst.views.login :as login]
+            [bh.rccst.views.header-bar :as header]
             [bh.rccst.views.widget-ish :as widget-ish]))
 
 
@@ -21,7 +21,9 @@
       (log/info @logged-in?)
       [:div
        (if @logged-in?
-         [#'widget-ish/view]
+         [:div
+          [#'header/view]
+          [#'widget-ish/view]]
          [#'login/view])])))
 
 
