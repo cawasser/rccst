@@ -12,7 +12,7 @@
 
 (def gold-register-success {:registered true :uuid "dummy-uuid"})
 (def gold-register-failed {:registered false})
-(def gold-login-success {:logged-in true :uuid "dummy-uuid"})
+(def gold-login-success {:logged-in true :user-id "dummy" :uuid "dummy-uuid"})
 (def gold-login-failed {:logged-in false})
 (def gold-users-empty {:users []})
 (def gold-users-full {:users ["dummy" "dummy-2" "dummy-3"]})
