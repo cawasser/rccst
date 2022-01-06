@@ -51,8 +51,9 @@
   - :logged-in - `true` if the login was successful, `false` if not
   - :uuid - if the login was successful, this key will be present and contain the uuid associated with the user-id
   "
-  {:logged-in             s/Bool
-   (s/optional-key :uuid) s/Str})
+  {:logged-in                s/Bool
+   (s/optional-key :user-id) s/Str
+   (s/optional-key :uuid)    s/Str})
 
 (s/defschema RegisterResponse
   "data returned when checking to see if the user is already registered.
@@ -128,7 +129,9 @@
   [database user-id password]
   (log/info "users/login" user-id "////" password)
   (if-let [user (verify-credentials database {:username user-id :pass password})]
-    {:logged-in true :uuid (:uuid user)}
+    {:logged-in true
+     :user-id user-id
+     :uuid (:uuid user)}
     {:logged-in false}))
 
 

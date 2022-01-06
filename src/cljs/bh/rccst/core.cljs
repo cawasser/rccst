@@ -4,8 +4,9 @@
             [taoensso.timbre :as log]
 
             [bh.rccst.events :as events]
+            [bh.rccst.events.login]
             [bh.rccst.config :as config]
-            [bh.rccst.subscriptions :as pub-sub]
+            [bh.rccst.subscriptions]
             [bh.rccst.views :as views]))
 
 

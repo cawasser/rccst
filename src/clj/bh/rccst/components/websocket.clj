@@ -64,6 +64,7 @@
 
   (def send-fn (get-in @system/system [:socket :publish-all!]))
 
+  @(get-in @system/system [:socket :connected-uids])
 
   (send-fn [:publish/data-update {:id :number :value 100}])
   (send-fn [:publish/data-update {:id :number :value 500}])

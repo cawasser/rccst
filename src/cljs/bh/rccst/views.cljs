@@ -11,7 +11,11 @@
             [bh.rccst.views.widget-ish :as widget-ish]))
 
 
-(defn view []
+(defn view
+  "main view of the SPA. starts with `login`, switches to `widget-ish` after the user actually
+  logs into the system
+  "
+  []
   (let [logged-in? (re-frame/subscribe [::subs/logged-in?])]
     (fn []
       (log/info @logged-in?)

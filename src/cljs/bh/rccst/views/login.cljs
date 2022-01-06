@@ -3,12 +3,19 @@
             [reagent.core :as r]
             [re-frame.core :as re-frame]
 
-            [bh.rccst.events :as events]
-            [bh.rccst.subs :as subs]
             [bh.rccst.ui-component.text-input :as input]))
 
 
-(defn view []
+(defn view
+  "returns a simple 'login' page (id/password). Self-contained.
+
+  ---
+
+  > See also:
+  >
+  > [html input](https://www.w3schools.com/tags/tag_input.asp)
+  "
+  []
   (let [user-id (r/atom "")
         password (r/atom "")]
     [:div
@@ -20,5 +27,5 @@
       [input/input :text "password" password]]
 
      [:div {:style {:display :flex}}
-      [:button.button.is-primary {:on-click #(re-frame/dispatch [::events/register @user-id @password])} "Register"]
-      [:button.button.is-primary {:on-click #(re-frame/dispatch [::events/login @user-id @password])} "Login"]]]))
+      [:button.button.is-primary {:on-click #(re-frame/dispatch [:bh.rccst.events/register @user-id @password])} "Register"]
+      [:button.button.is-primary {:on-click #(re-frame/dispatch [:bh.rccst.events/login @user-id @password])} "Login"]]]))

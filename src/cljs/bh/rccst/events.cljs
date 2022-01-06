@@ -16,9 +16,6 @@
 
 
 
-; we'll need this for the ::login-success handler
-; (re-frame/dispatch [::pub-sub/start])
-
 (re-frame/reg-event-db
   ::track-slow-request
   (fn [db [_ my-id xhrio]]
@@ -30,45 +27,6 @@
   (fn-traced [_ _]
     {:dispatch [::get-version]
      :db       db/default-db}))
-
-(re-frame/reg-event-fx
-  ::register
-  (fn-traced [_ [_ id password]]
-    {:http-xhrio (merge default-header
-                   {:method     :post
-                    :uri        "/user/register"
-                    :params     {:user-id id :password password}
-                    :on-request [::track-slow-request "::register"]
-                    :on-success [::register-success]
-                    :on-failure [::bad-lookup-result]})}))
-
-
-(re-frame/reg-event-db
-  ::register-success
-  (fn-traced [db [_ {:keys [registered uuid]}]]
-    (log/info "::register-success" registered uuid)
-    (assoc db
-      :registered registered
-      :uuid uuid)))
-
-
-(re-frame/reg-event-fx
-  ::login
-  (fn-traced [_ [_ id password]]
-    {:http-xhrio (merge default-header
-                   {:method     :post
-                    :uri        "/user/login"
-                    :params     {:user-id id :password password}
-                    :on-success [::login-success]
-                    :on-failure [::bad-lookup-result]})}))
-
-
-(re-frame/reg-event-db
-  ::login-success
-  (fn-traced [db [_ {:keys [logged-in uuid]}]]
-    (assoc db
-      :logged-in? logged-in
-      :uuid uuid)))
 
 
 (re-frame/reg-event-fx
@@ -192,16 +150,17 @@
 
 (re-frame/reg-event-fx
   ::subscribe-to
-  (fn-traced [_ [_ source]]
-    (log/info "::subscribe-to" source
-      "////" {:user-id "client" :data-sources #{source}}
-      "////" ?csrf-token)
-    {:http-xhrio (merge default-header
-                   {:method     :post
-                    :uri        "/subscribe/data-source"
-                    :params     {:user-id "client" :data-sources #{source}}
-                    :on-success [::good-subscribe-result source]
-                    :on-failure [::bad-subscribe-result source]})}))
+  (fn-traced [{:keys [db]} [_ source]]
+    (let [user-id (:user-id db)]
+      (log/info "::subscribe-to" source
+        "////" {:user-id user-id :data-sources #{source}}
+        "////" ?csrf-token)
+      {:http-xhrio (merge default-header
+                     {:method     :post
+                      :uri        "/subscribe/data-source"
+                      :params     {:user-id user-id :data-sources #{source}}
+                      :on-success [::good-subscribe-result source]
+                      :on-failure [::bad-subscribe-result source]})})))
 
 
 ; some events to dispatch from the REPL
