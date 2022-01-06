@@ -56,6 +56,10 @@
         3. [X] ::register-success event
         4. [ ] ::___-failure events
     2. [X] widget-ish view
+23. [X] update client-side subscription to be more "widget-like"
+    1. [X] events
+    2. [X] subscriptions
+
 
 
 
