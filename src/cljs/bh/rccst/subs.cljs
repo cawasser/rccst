@@ -9,6 +9,12 @@
 
 
 (re-frame/reg-sub
+  ::logged-in?
+  (fn [db]
+    (:logged-in? db)))
+
+
+(re-frame/reg-sub
   ::version
   (fn [db]
     (:version db)))

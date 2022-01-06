@@ -59,8 +59,10 @@ But there are still many things we want to do/learn:
 6. [ ] Add metrics collection to the Server
    1. [ ] [statsd](https://github.com/statsd/statsd), via [clojure-statsd-client](https://github.com/unbounce/clojure-dogstatsd-client)
 7. [ ] (optional) Consider moving to [Reitit](/docs/routing.md) (see item 13.3 above)
-8. [ ] Client needs to actually "login", so we know when to start the socket
-9. [ ] Will we ever need `websocket.handler`? (handles push messages from clients)
+9. [ ] update client-side subscription to be "widget-based"
+   1. [ ] events
+   2. [ ] subscriptions
+10. [ ] Will we ever need `websocket.handler`? (handles push messages from clients)
 
 
 

@@ -47,4 +47,15 @@
     4. [X] subscribe
     5. [X] version - n/a
 21. [X] do we (can we?) need to stop the database connection using next.jdbc?
+22. [X] Client needs to actually "login", so we know when to start the socket
+    1. [X] login
+        1. [X] ::logged-in? sub
+        2. [X] ::login event
+        3. [X] ::login-success event
+        2. [X] ::register event
+        3. [X] ::register-success event
+        4. [ ] ::___-failure events
+    2. [X] widget-ish view
+
+
 

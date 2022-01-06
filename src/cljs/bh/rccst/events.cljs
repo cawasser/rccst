@@ -15,11 +15,60 @@
                      :headers         {"x-csrf-token" ?csrf-token}})
 
 
+
+; we'll need this for the ::login-success handler
+; (re-frame/dispatch [::pub-sub/start])
+
+(re-frame/reg-event-db
+  ::track-slow-request
+  (fn [db [_ my-id xhrio]]
+    (assoc-in db [:requests my-id] xhrio)))
+
+
 (re-frame/reg-event-fx
   ::initialize-db
   (fn-traced [_ _]
     {:dispatch [::get-version]
-     :db db/default-db}))
+     :db       db/default-db}))
+
+(re-frame/reg-event-fx
+  ::register
+  (fn-traced [_ [_ id password]]
+    {:http-xhrio (merge default-header
+                   {:method     :post
+                    :uri        "/user/register"
+                    :params     {:user-id id :password password}
+                    :on-request [::track-slow-request "::register"]
+                    :on-success [::register-success]
+                    :on-failure [::bad-lookup-result]})}))
+
+
+(re-frame/reg-event-db
+  ::register-success
+  (fn-traced [db [_ {:keys [registered uuid]}]]
+    (log/info "::register-success" registered uuid)
+    (assoc db
+      :registered registered
+      :uuid uuid)))
+
+
+(re-frame/reg-event-fx
+  ::login
+  (fn-traced [_ [_ id password]]
+    {:http-xhrio (merge default-header
+                   {:method     :post
+                    :uri        "/user/login"
+                    :params     {:user-id id :password password}
+                    :on-success [::login-success]
+                    :on-failure [::bad-lookup-result]})}))
+
+
+(re-frame/reg-event-db
+  ::login-success
+  (fn-traced [db [_ {:keys [logged-in uuid]}]]
+    (assoc db
+      :logged-in? logged-in
+      :uuid uuid)))
 
 
 (re-frame/reg-event-fx
