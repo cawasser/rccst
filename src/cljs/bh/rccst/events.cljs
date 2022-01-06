@@ -104,29 +104,29 @@
 
 (re-frame/reg-event-db
   ::good-lookup-result
-  (fn-traced [db [_ result]]
-    (assoc db
-      :lookup result
-      :lookup-error "")))
+  (fn-traced [db [_ uuid result]]
+    (-> db
+      (assoc-in [:lookup uuid] result)
+      (assoc-in [:lookup-error uuid] ""))))
 
 
 (re-frame/reg-event-db
   ::bad-lookup-result
-  (fn-traced [db [_ result]]
-    (assoc db
-      :lookup ""
-      :lookup-error result)))
+  (fn-traced [db [_ uuid result]]
+    (-> db
+      (assoc-in [:lookup uuid] "")
+      (assoc-in [:lookup-error uuid] result))))
 
 
 (re-frame/reg-event-fx
   ::lookup
-  (fn-traced [_ _]
+  (fn-traced [_ [_ uuid]]
     (log/info "::lookup")
     {:http-xhrio (merge default-header
                    {:method     :get
                     :uri        "/lookup"
-                    :on-success [::good-lookup-result]
-                    :on-failure [::bad-lookup-result]})}))
+                    :on-success [::good-lookup-result uuid]
+                    :on-failure [::bad-lookup-result uuid]})}))
 
 
 (re-frame/reg-event-db
@@ -136,7 +136,7 @@
       (log/info ":good-subscribe-result" source result
         "////" current)
       (assoc db
-        :subscribed (set (conj current source))
+        :subscribed (set (apply conj current source))
         :subscribe-error ""))))
 
 
@@ -153,12 +153,12 @@
   (fn-traced [{:keys [db]} [_ source]]
     (let [user-id (:user-id db)]
       (log/info "::subscribe-to" source
-        "////" {:user-id user-id :data-sources #{source}}
+        "////" {:user-id user-id :data-sources source}
         "////" ?csrf-token)
       {:http-xhrio (merge default-header
                      {:method     :post
                       :uri        "/subscribe/data-source"
-                      :params     {:user-id user-id :data-sources #{source}}
+                      :params     {:user-id user-id :data-sources source}
                       :on-success [::good-subscribe-result source]
                       :on-failure [::bad-subscribe-result source]})})))
 

@@ -23,7 +23,9 @@
        (if @logged-in?
          [:div
           [#'header/view]
-          [#'widget-ish/view]]
+          [:div {:style {:display :flex}}
+           [#'widget-ish/view "uuid-1"]
+           [#'widget-ish/view "uuid-2"]]]
          [#'login/view])])))
 
 

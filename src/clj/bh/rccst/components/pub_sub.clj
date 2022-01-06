@@ -210,8 +210,9 @@
   (publish-fn [:publish/data-update {:id :number :value 999}])
 
 
-  (publish-fn [:publish/data-update {:id    :string
-                                     :value "a new value for the string"}])
+  (publish-fn [:publish/data-update
+               {:id    :string
+                :value "a new value for the string"}])
 
   ())
 

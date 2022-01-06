@@ -21,6 +21,12 @@
 
 
 (re-frame/reg-sub
+  ::uuid
+  (fn [db]
+    (:uuid db)))
+
+
+(re-frame/reg-sub
   ::counter
   (fn [db]
     (:counter db)))
@@ -34,14 +40,14 @@
 
 (re-frame/reg-sub
   ::lookup
-  (fn [db]
-    (:lookup db)))
+  (fn [db [_ uuid]]
+    (get-in db [:lookup uuid])))
 
 
 (re-frame/reg-sub
   ::lookup-error
-  (fn [db]
-    (:lookup-error db)))
+  (fn [db [_ uuid]]
+    (get-in db [:lookup uuid])))
 
 
 (re-frame/reg-sub
