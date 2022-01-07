@@ -8,9 +8,17 @@
 
 
 
-(defn view []
-  (let [name (re-frame/subscribe [::subs/name])
-        version (re-frame/subscribe [::subs/version])
+(defn view
+  "creates a nice, simple header for the UI, displaying the app title, the server version number,
+  the uuid returned by the server that is assigned to this user, and a button to log out of the
+  server.
+
+  > See also:
+  >
+  > [re-com](https://github.com/Day8/re-com)
+  "
+  []
+  (let [version (re-frame/subscribe [::subs/version])
         uuid (re-frame/subscribe [::subs/uuid])]
     (fn []
       [rc/h-box :src (rc/at)

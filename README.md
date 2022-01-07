@@ -40,22 +40,25 @@ There are lots of things we wanted to learn more about, and we've [done many of 
 
 But there are still many things we want to do/learn:
 
-1. [ ] Work out an automated [testing approach](/docs/testing.md)
+1. [ ] [Re-think the UI](/docs/rethinking-ui.md)
+    1. [X] more composition and better control over layout -> [re-com](https://github.com/Day8/re-com)
+    2. [ ] something to help alignment, grouping, etc., basically FORMS -> [fork?](https://github.com/luciodale/fork)
+        1. [ ] can it be used for simply _displaying_ content, not just editing?
+2. [ ] Work out an automated [testing approach](/docs/testing.md)
     1. [X] ***FAILED** fixtures don't work this way - open the database in a :once fixture, and the drop!/create! is the :every fixture
-2. [ ] [Develop a more complex API (paving the way to Rocky-road)](/docs/complex-api.md)
+3. [ ] [Develop a more complex API (paving the way to Rocky-road)](/docs/complex-api.md)
    1. [ ] should we introduce DataSources as a component (like rocky-road.dashboard-clj.data-source)?
-3. [ ] Implement more of the API:
+4. [ ] Implement more of the API:
    1. [ ] Fix Users
       1. [ ] [Login]()
       2. [ ] [Register]()
    2. [ ] Widgets/Layouts
    3. [ ] Comms
    4. [ ] Sensors/Beams
-4. [ ] [Kafka](/docs/kafka.md) - how should we integrate this with Component?
+5. [ ] [Kafka](/docs/kafka.md) - how should we integrate this with Component?
    1. component per topology?
    2. component for kafka + "sub"component per topology?
    3. how should [Kafka, Pub-Sub and DataSource](/docs/kafka-pub-sub-datasource.md) all work together?
-5. [ ] [Re-think the UI](/docs/rethinking-ui.md)
 6. [ ] Add metrics collection to the Server
    1. [ ] [statsd](https://github.com/statsd/statsd), via [clojure-statsd-client](https://github.com/unbounce/clojure-dogstatsd-client)
 7. [ ] (optional) Consider moving to [Reitit](/docs/routing.md) (see item 13.3 above)

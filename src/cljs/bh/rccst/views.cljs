@@ -19,7 +19,7 @@
   []
   (let [logged-in? (re-frame/subscribe [::subs/logged-in?])]
     (fn []
-      (log/info @logged-in?)
+      (log/info "view" @logged-in?)
       [:div
        (if @logged-in?
 
@@ -38,6 +38,7 @@
 
 ; some things for the repl
 (comment
+  [view]
 
   (re-frame/dispatch [::events/initialize-db])
 

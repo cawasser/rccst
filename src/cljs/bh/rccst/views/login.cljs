@@ -10,11 +10,9 @@
 (defn view
   "returns a simple 'login' page (id/password). Self-contained.
 
-  ---
-
   > See also:
   >
-  > [html input](https://www.w3schools.com/tags/tag_input.asp)
+  > [re-com](https://github.com/Day8/re-com)
   "
   []
   (let [user-id (r/atom "")

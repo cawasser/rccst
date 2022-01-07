@@ -80,7 +80,7 @@ Unfortunately, many (most?) MVC implementations are designed like this:
 
 Figure 7. A Typical MVC Design (geeks for geeks)
 
-As can be seen, the View get data from the Model, but the Controller interacts with _both_ the Model and the View. It is _NOT_ 
+As can be seen, the View gets data from the Model, but the Controller interacts with _both_ the Model and the View. It is _NOT_ 
 a DAG, there is a clear cycle here.
 
 Re-frame is different. It is _functional_ for one thing. It is a _DAG_ for another, as seen here (from the official docs)

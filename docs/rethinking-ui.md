@@ -66,4 +66,20 @@ UI components. For example, it would be nice to compose Widgets out of charts, t
 the overall UI
   - we've done a bunch of thinking on this already, documented [here](https://github.com/cawasser/rocky-road/blob/master/docs/datt/user-interface.md)
   - see also [All the World's a DAG](/docs/world-dag.md)
-  - 
+
+
+## Other Things
+
+We want to be able to:
+
+- Make things _look_ nice
+  - aligning content
+  - consistent spacing
+  - good use of whitespace
+  - clear relationships among UI-components
+- have a clean mechanism for connecting UI-components to each other, for example,
+  - a slider changes the filters on a table or 3D-model
+  - clicking on an entity in a diagram component pulls details into some a table component
+
+
+
