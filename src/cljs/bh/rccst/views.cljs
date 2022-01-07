@@ -3,6 +3,7 @@
             [reagent.dom :as rdom]
             [re-frame.core :as re-frame]
             [taoensso.timbre :as log]
+            [re-com.core :as rc]
 
             [bh.rccst.events :as events]
             [bh.rccst.subs :as subs]
@@ -21,11 +22,16 @@
       (log/info @logged-in?)
       [:div
        (if @logged-in?
-         [:div
-          [#'header/view]
-          [:div {:style {:display :flex}}
-           [#'widget-ish/view "uuid-1"]
-           [#'widget-ish/view "uuid-2"]]]
+
+         [rc/v-box :src (rc/at)
+          :children [[#'header/view]
+                     [rc/gap :size "5px"]
+                     [rc/h-box :src (rc/at)
+                      :gap "15px"
+                      :children [[#'widget-ish/view "uuid-1"]
+                                 [#'widget-ish/view "uuid-2"]
+                                 [#'widget-ish/view "uuid-3"]]]]]
+
          [#'login/view])])))
 
 
