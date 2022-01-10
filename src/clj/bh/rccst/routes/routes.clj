@@ -1,8 +1,6 @@
 (ns bh.rccst.routes.routes
   (:require [clojure.tools.logging :as log]
-            [compojure.route :as route]
 
-            [bh.rccst.api.api :as api]
             [bh.rccst.routes.dev-mode :as dev-mode]
             [bh.rccst.routes.prod-mode :as prod-mode]))
 
@@ -67,75 +65,3 @@
 
 
 
-(comment
-
-  (if dev-mode
-    ; dev-mode
-    (compojure.core/routes
-      ; the websocket routes need minimal processing
-      (-> (compojure.core/routes
-            (GET "/chsk" req (ring-ajax-get-or-ws-handshake req))
-            (POST "/chsk" req (ring-ajax-post req)))
-        ;need to turn "off" the built-in anti-forgery because it returns HTML, and we need transit
-        (wrap-defaults
-          (assoc-in site-defaults [:security :anti-forgery] false))
-        (wrap-cors :access-control-allow-origin [#".*"])
-        (wrap-session {:cookie-attrs {:max-age 3600}
-                       :store        (cookie-store {:key (byte-array (.getBytes "ahY9poQuaghahc7I"))})}))
-
-      ; while the "general" routes need all the transit and parsing support
-      (-> (compojure.core/routes
-            (GET "/" _ (render "public/index.html"))
-            (route/resources "/")
-
-            (#'api/api database pub-sub)
-
-            (route/not-found "<h1>Page not found</h1>"))
-
-        ;need to turn "off" the built-in anti-forgery because it returns HTML, and we need transit
-        (wrap-defaults
-          (assoc-in site-defaults [:security :anti-forgery] false))
-        (wrap-cors :access-control-allow-origin [#".*"])
-        (wrap-restful-format :formats [:transit-json :edn])
-        wrap-keyword-params
-        wrap-params
-        (wrap-session {:cookie-attrs {:max-age 3600}
-                       :store        (cookie-store {:key (byte-array (.getBytes "ahY9poQuaghahc7I"))})}))) ;(do
-
-    ; prod-mode
-    (compojure.core/routes
-      ; the websocket routes need minimal processing
-      (-> (compojure.core/routes
-            (GET "/chsk" req (ring-ajax-get-or-ws-handshake req))
-            (POST "/chsk" req (ring-ajax-post req)))
-        ;need to turn "off" the built-in anti-forgery because it returns HTML, and we need transit
-        (wrap-defaults
-          (assoc-in site-defaults [:security :anti-forgery] false))
-        (wrap-cors :access-control-allow-origin [#".*"])
-        (wrap-anti-forgery {:error-handler csrf-error-handler})
-        (wrap-session {:cookie-attrs {:max-age 3600}
-                       :store        (cookie-store {:key (byte-array (.getBytes "ahY9poQuaghahc7I"))})}))
-
-      ; while the "general" routes need all the transit and parsing support
-      (-> (compojure.core/routes
-            (GET "/" _ (render "public/index.html"))
-            (route/resources "/")
-
-            (#'api/api database pub-sub)
-
-            (route/not-found "<h1>Page not found</h1>"))
-
-        ;need to turn "off" the built-in anti-forgery because it returns HTML, and we need transit
-        (wrap-defaults
-          (assoc-in site-defaults [:security :anti-forgery] false))
-        (wrap-cors :access-control-allow-origin [#".*"])
-        (wrap-restful-format :formats [:transit-json :edn])
-        wrap-keyword-params
-        wrap-params
-        (wrap-anti-forgery {:error-handler csrf-error-handler})
-        (wrap-session {:cookie-attrs {:max-age 3600}
-                       :store        (cookie-store {:key (byte-array (.getBytes "ahY9poQuaghahc7I"))})}))))
-
-
-
-  ())

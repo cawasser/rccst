@@ -7,6 +7,7 @@
     - [Pros](#pros)
     - [Cons](#cons)
   - [What do we want?](#what-do-we-want)
+  - [Other Things](#other-things)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 

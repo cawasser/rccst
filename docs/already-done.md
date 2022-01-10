@@ -1,3 +1,11 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Things We've Already Done](#things-weve-already-done)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Things We've Already Done
 
 1. [X] [Combine back into a single server](/docs/single-server.md)
