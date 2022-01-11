@@ -49,13 +49,18 @@ update message onto the channel (`>!`). Pub-Sub will be blocking on `>!` from th
 will unblock when the message(s) arrives, and it can publish using its dependency on the Websocket.
 
 This _should_ make it possible to create individual DataSources only when some user first 
-subscribes to each^(1)^.
+subscribes to each^1.
 
 
 
-> ^(1)^ Currently, we don't track how many times any given client subscribes to the same source, just 
+> ^1 Currently, we don't track how many times any given client subscribes to the same source, just 
 > subscriptions across all clients.
 
 
+### Topologies
 
+Have the topologies depend on the :pub-sub component, and have it expose `start!` and `stop!` functions
+to start and stop the individual topologies we might want to have.
+
+> like listening to multiple topics to provide data to connected clients.
 

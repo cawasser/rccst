@@ -5,8 +5,15 @@
             [taoensso.timbre :as log]
             [re-com.core :as rc]
 
+            [woolybear.ad.catalog :as catalog]
+            [woolybear.ad.containers :as containers]
+            [woolybear.ad.layout :as layout]
+            [woolybear.packs.flex-panel :as flex]
+            [woolybear.packs.tab-panel :as tab-panel]
+
             [bh.rccst.events :as events]
             [bh.rccst.subs :as subs]
+            [bh.rccst.ui-component.navbar :as navbar]
             [bh.rccst.views.login :as login]
             [bh.rccst.views.header-bar :as header]
             [bh.rccst.views.widget-ish :as widget-ish]))
@@ -20,19 +27,46 @@
   (let [logged-in? (re-frame/subscribe [::subs/logged-in?])]
     (fn []
       (log/info "view" @logged-in?)
-      [:div
-       (if @logged-in?
+      [layout/page {:extra-classes :rccts}
+       [flex/flex-panel {:height "calc(100vh - 2rem)"}
+        [flex/flex-top
+         [navbar/navbar]]
 
-         [rc/v-box :src (rc/at)
-          :children [[#'header/view]
-                     [rc/gap :size "5px"]
-                     [rc/h-box :src (rc/at)
-                      :gap "15px"
-                      :children [[#'widget-ish/view "uuid-1"]
-                                 [#'widget-ish/view "uuid-2"]
-                                 [#'widget-ish/view "uuid-3"]]]]]
+        [layout/page-body {:extra-classes :rccts}
+         [tab-panel/tab-panel {:extra-classes             :rccst
+                               :subscribe-to-selected-tab [:nav-bar/selected-tab]}
 
-         [#'login/view])])))
+          [tab-panel/sub-panel {:panel-id :nav-bar/login}
+           [#'login/view]]
+
+          [tab-panel/sub-panel {:panel-id :nav-bar/widget-ish}
+           [containers/shy-block
+            {:active? @logged-in?}
+            [rc/v-box :src (rc/at)
+             :children [[#'header/view]
+                        [rc/gap :size "5px"]
+                        [rc/h-box :src (rc/at)
+                         :gap "15px"
+                         :children [[#'widget-ish/view "uuid-1"]
+                                    [#'widget-ish/view "uuid-2"]
+                                    [#'widget-ish/view "uuid-3"]]]]]]
+           [containers/shy-block
+            {:active? (not @logged-in?)}
+            [layout/centered
+             {:extra-classes :width-50}
+             [:h2 "Please login first."]]]]
+
+          [tab-panel/sub-panel {:panel-id :nav-bar/catalog}
+           [catalog/page]]]]]])))
+
+
+
+(comment
+  (def logged-in? (atom true))
+  (def logged-in? (atom false))
+
+
+  ())
 
 
 

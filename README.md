@@ -44,12 +44,16 @@ But there are still many things we want to do/learn:
    1. component per topology?
    2. component for kafka + "sub"component per topology?
    3. how should [Kafka, Pub-Sub and DataSource](/docs/kafka-pub-sub-datasource.md) all work together?
+   4. also, can use Component to manage things? (see [rp-jackdaw-cljs](https://github.com/rentpath/rp-jackdaw-clj))
 2. [ ] [Re-think the UI](/docs/rethinking-ui.md)
     1. [X] more composition and better control over layout -> [re-com](https://github.com/Day8/re-com)
     2. [ ] something to help alignment, grouping, etc. ... [fork?](https://github.com/luciodale/fork)
         1. [ ] can it be used for simply _displaying_ content, not just editing?
     3. [ ] is it better to just use CSS-styled Reagent components?
     4. [ ] what about [woolybear](https://github.com/cawasser/woolybear)?
+       1. [ ] catalog page
+       2. [ ] what are atoms?
+       3. [ ] what are the molecules?
 3. [ ] Work out an automated [testing approach](/docs/testing.md)
     1. [X] ***FAILED** fixtures don't work this way - open the database in a :once fixture, and the drop!/create! is the :every fixture
     2. [ ] how do (should we?) we test the UI?
