@@ -14,7 +14,9 @@
   components.
   "
   (:require [woolybear.ad.utils :as adu]
-            [cljs.spec.alpha :as s]))
+            [cljs.spec.alpha :as s]
+            ["react-markdown" :as ReactMarkdown]
+            [taoensso.timbre :as log]))
 
 (defn page
   "
@@ -338,3 +340,33 @@
   Takes no arguments"
   []
   [:div.is-clearfix])
+
+
+(defn markdown-block
+  "
+  Simple container for one or more paragraphs of Markdown. Automatically adds a
+  1.5rem margin between itself and the next child element, unless it is the
+  last child element.
+  "
+  [& args]
+  (let [[{:keys [extra-classes subscribe-to-classes]} _] (adu/extract-args args)
+        classes-sub (adu/subscribe-to subscribe-to-classes)]
+    (fn [& args]
+      (let [[_ children] (adu/extract-args args)
+            dynamic-classes @classes-sub]
+
+        (log/info "markdown-block" children)
+        (into [:div {:class (adu/css->str :content
+                              :wb-text-block
+                              extra-classes
+                              dynamic-classes)}]
+          (map (fn [c]
+                 [:> ReactMarkdown {:source c}])
+            children))))))
+
+
+(comment
+  (def children '("Compojure is a small routing library for [Ring](https://github.com/ring-clojure/ring) that allows web applications to be composed of small, independent parts."))
+
+
+  ())

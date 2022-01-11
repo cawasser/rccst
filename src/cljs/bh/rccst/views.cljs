@@ -5,7 +5,6 @@
             [taoensso.timbre :as log]
             [re-com.core :as rc]
 
-            [woolybear.ad.catalog :as catalog]
             [woolybear.ad.containers :as containers]
             [woolybear.ad.layout :as layout]
             [woolybear.packs.flex-panel :as flex]
@@ -14,9 +13,15 @@
             [bh.rccst.events :as events]
             [bh.rccst.subs :as subs]
             [bh.rccst.ui-component.navbar :as navbar]
+            [bh.rccst.views.catalog :as catalog]
             [bh.rccst.views.login :as login]
             [bh.rccst.views.header-bar :as header]
-            [bh.rccst.views.widget-ish :as widget-ish]))
+            [bh.rccst.views.technologies :as tech]
+            [bh.rccst.views.widget-ish :as widget-ish]
+
+            ["react-markdown" :as ReactMarkdown]))
+
+            
 
 
 (defn view
@@ -27,12 +32,13 @@
   (let [logged-in? (re-frame/subscribe [::subs/logged-in?])]
     (fn []
       (log/info "view" @logged-in?)
-      [layout/page {:extra-classes :rccts}
+
+      [layout/page {:extra-classes :rccst}
        [flex/flex-panel {:height "calc(100vh - 2rem)"}
         [flex/flex-top
          [navbar/navbar]]
 
-        [layout/page-body {:extra-classes :rccts}
+        [layout/page-body {:extra-classes :rccst}
          [tab-panel/tab-panel {:extra-classes             :rccst
                                :subscribe-to-selected-tab [:nav-bar/selected-tab]}
 
@@ -50,7 +56,10 @@
                                    [#'widget-ish/view "uuid-3"]]]]]]
 
           [tab-panel/sub-panel {:panel-id :nav-bar/catalog}
-           [catalog/page]]]]]])))
+           [catalog/page]]
+
+          [tab-panel/sub-panel {:panel-id :nav-bar/tech}
+           [tech/page]]]]]])))
 
 
 

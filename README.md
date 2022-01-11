@@ -4,6 +4,7 @@
 
 - [bh/rccst](#bhrccst)
   - [Things We've Already Done](#things-weve-already-done)
+  - [Current Activities](#current-activities)
   - [Future Plans](#future-plans)
   - [Getting Started](#getting-started)
     - [Client](#client)
@@ -36,6 +37,28 @@ Read all about the API [here](/docs/api/index.html).
 
 There are lots of things we wanted to learn more about, and we've [done many of them](/docs/already-done.md)
 
+
+## Current Activities 
+
+1. [ ] [Re-think the UI](/docs/rethinking-ui.md)
+    1. [X] more composition and better control over layout -> [re-com](https://github.com/Day8/re-com)
+    2. [ ] something to help alignment, grouping, etc. ... [fork?](https://github.com/luciodale/fork)
+        1. [ ] can it be used for simply _displaying_ content, not just editing?
+    3. [ ] is it better to just use CSS-styled Reagent components?
+    4. [ ] how do we handle CSS for everything?
+       1. [ ] [Sass](https://sass-lang.com)?
+       2. [ ] what about conflict between libraries (re-com/bootstrap & wollybear/bulma)?
+    5. [ ] what about [woolybear](https://github.com/cawasser/woolybear)?
+        1. [ ] catalog page
+            1. [X] we should probably migrate the catalog into RCCST (i.e., out of woolybear)
+            2. [ ] make 'examples' namespaces for each example chunk
+            3. [ ] can we add Markdown to the examples for the descriptions?
+        2. [ ] what are atoms?
+        3. [ ] what are the molecules?
+
+
+
+
 ## Future Plans
 
 But there are still many things we want to do/learn:
@@ -45,31 +68,22 @@ But there are still many things we want to do/learn:
    2. component for kafka + "sub"component per topology?
    3. how should [Kafka, Pub-Sub and DataSource](/docs/kafka-pub-sub-datasource.md) all work together?
    4. also, can use Component to manage things? (see [rp-jackdaw-cljs](https://github.com/rentpath/rp-jackdaw-clj))
-2. [ ] [Re-think the UI](/docs/rethinking-ui.md)
-    1. [X] more composition and better control over layout -> [re-com](https://github.com/Day8/re-com)
-    2. [ ] something to help alignment, grouping, etc. ... [fork?](https://github.com/luciodale/fork)
-        1. [ ] can it be used for simply _displaying_ content, not just editing?
-    3. [ ] is it better to just use CSS-styled Reagent components?
-    4. [ ] what about [woolybear](https://github.com/cawasser/woolybear)?
-       1. [ ] catalog page
-       2. [ ] what are atoms?
-       3. [ ] what are the molecules?
-3. [ ] Work out an automated [testing approach](/docs/testing.md)
+2. [ ] Work out an automated [testing approach](/docs/testing.md)
     1. [X] ***FAILED** fixtures don't work this way - open the database in a :once fixture, and the drop!/create! is the :every fixture
     2. [ ] how do (should we?) we test the UI?
-4. [ ] [Develop a more complex API (paving the way to Rocky-road)](/docs/complex-api.md)
+3. [ ] [Develop a more complex API (paving the way to Rocky-road)](/docs/complex-api.md)
    1. [ ] should we introduce DataSources as a component (like rocky-road.dashboard-clj.data-source)?
-5. [ ] Implement more of the API:
+4. [ ] Implement more of the API:
    1. [ ] Fix Users
        1. [ ] [Login]()
        2. [ ] [Register]()
    2. [ ] Widgets/Layouts
    3. [ ] Comms
    4. [ ] Sensors/Beams
-6. [ ] Add metrics collection to the Server
+5. [ ] Add metrics collection to the Server
    1. [ ] [statsd](https://github.com/statsd/statsd), via [clojure-statsd-client](https://github.com/unbounce/clojure-dogstatsd-client)
-7. [ ] (optional) Consider moving to [Reitit](/docs/routing.md) (see item 13.3 above)
-8. [ ] Will we ever need `websocket.handler`? (handles push messages from clients)
+6. [ ] (optional) Consider moving to [Reitit](/docs/routing.md) (see item 13.3 above)
+7. [ ] Will we ever need `websocket.handler`? (handles push messages from clients)
 
 
 

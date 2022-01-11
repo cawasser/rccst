@@ -5,6 +5,7 @@
 - [Kafka, Pub-Subs and DatSources](#kafka-pub-subs-and-datsources)
 - [How Rocky-Road Does It](#how-rocky-road-does-it)
   - [RCCST Approach](#rccst-approach)
+    - [Topologies](#topologies)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 

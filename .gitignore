@@ -21,3 +21,4 @@
 /.lsp/
 /rccst
 /src/clj/bh/rccst/version.clj
+/sass/

@@ -1,14 +1,15 @@
 (ns bh.rccst.db
-  (:require [woolybear.ad.catalog :as catalog]
-
-            [bh.rccst.ui-component.navbar :as nav-bar]))
+  (:require [bh.rccst.ui-component.navbar :as nav-bar]
+            [bh.rccst.views.catalog :as catalog]
+            [bh.rccst.views.technologies :as tech]))
 
 
 (def default-db
-  {:name "re-frame"
-   :version ""
+  {:name       "RCCST"
+   :version    ""
    :logged-in? false
-   :sources {:number 0
-             :string "empty"}
-   :nav-bar nav-bar/init-db
-   :catalog catalog/init-db})
+   :sources    {:number 0
+                :string "empty"}
+   :nav-bar    nav-bar/init-db
+   :catalog    catalog/init-db
+   :tech       tech/init-db})
