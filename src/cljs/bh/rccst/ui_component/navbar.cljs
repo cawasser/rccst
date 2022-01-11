@@ -5,6 +5,11 @@
             [woolybear.ad.buttons :as buttons]))
 
 
+(def data-path [:nav-bar :tab-panel])
+
+(def init-db
+  {:tab-panel (tab-panel/mk-tab-panel-data data-path :nav-bar/login)})
+
 
 (re-frame/reg-sub
   :db/nav-bar

@@ -1,5 +1,8 @@
 (ns bh.rccst.db
-  (:require [woolybear.packs.tab-panel :as tab-panel]))
+  (:require [woolybear.ad.catalog :as catalog]
+
+            [bh.rccst.ui-component.navbar :as nav-bar]))
+
 
 (def default-db
   {:name "re-frame"
@@ -7,4 +10,5 @@
    :logged-in? false
    :sources {:number 0
              :string "empty"}
-   :nav-bar {:tab-panel (tab-panel/mk-tab-panel-data [:nav-bar :tab-panel] :nav-bar/login)}})
+   :nav-bar nav-bar/init-db
+   :catalog catalog/init-db})

@@ -40,21 +40,14 @@
            [#'login/view]]
 
           [tab-panel/sub-panel {:panel-id :nav-bar/widget-ish}
-           [containers/shy-block
-            {:active? @logged-in?}
-            [rc/v-box :src (rc/at)
-             :children [[#'header/view]
-                        [rc/gap :size "5px"]
-                        [rc/h-box :src (rc/at)
-                         :gap "15px"
-                         :children [[#'widget-ish/view "uuid-1"]
-                                    [#'widget-ish/view "uuid-2"]
-                                    [#'widget-ish/view "uuid-3"]]]]]]
-           [containers/shy-block
-            {:active? (not @logged-in?)}
-            [layout/centered
-             {:extra-classes :width-50}
-             [:h2 "Please login first."]]]]
+           [rc/v-box :src (rc/at)
+            :children [[#'header/view]
+                       [rc/gap :size "5px"]
+                       [rc/h-box :src (rc/at)
+                        :gap "15px"
+                        :children [[#'widget-ish/view "uuid-1"]
+                                   [#'widget-ish/view "uuid-2"]
+                                   [#'widget-ish/view "uuid-3"]]]]]]
 
           [tab-panel/sub-panel {:panel-id :nav-bar/catalog}
            [catalog/page]]]]]])))

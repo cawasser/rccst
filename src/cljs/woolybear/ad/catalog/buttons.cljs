@@ -38,15 +38,15 @@
       [buttons/save-button {:on-click (tattle [:button-demo/click :save-button])}]
       [buttons/cancel-button {:on-click (tattle [:button-demo/click :cancel-button])}]
       [buttons/delete-button {:on-click (tattle [:button-demo/click :delete-button])}]
-      [buttons/close-button {:on-click (tattle [:button-demo/click :close-button])}]
-      ]
+      [buttons/close-button {:on-click (tattle [:button-demo/click :close-button])}]]
+
      '[layout/padded {:extra-classes :level}
        [buttons/ok-button {:on-click (tattle [:button-demo/click :ok-button])}]
        [buttons/save-button {:on-click (tattle [:button-demo/click :save-button])}]
        [buttons/cancel-button {:on-click (tattle [:button-demo/click :cancel-button])}]
        [buttons/delete-button {:on-click (tattle [:button-demo/click :delete-button])}]
-       [buttons/close-button {:on-click (tattle [:button-demo/click :close-button])}]
-       ])
+       [buttons/close-button {:on-click (tattle [:button-demo/click :close-button])}]])
+
 
    (acu/demo "Buttons with icons"
      "By default, buttons take simple strings as child elements, which are rendered
@@ -98,6 +98,6 @@
          [buttons/toggle-button {:subscribe-to-on? [:toggle-demo/button 2]
                                  :class-for-on :is-primary
                                  :on-click [:toggle-demo/click 2]}
-          "Click to toggle 2"]]))
+          "Click to toggle 2"]]))])
 
-   ])
+
