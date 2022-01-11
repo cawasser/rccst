@@ -9,15 +9,70 @@
     (acu/demo "Markdown-Block"
       "Use Markdown blocks for [Markdown](https://en.wikipedia.org/wiki/Markdown) content."
       [layout/frame
-       [layout/markdown-block "## here is some markdown
+       [layout/markdown-block "## You can make titles
 
-  > a note/quote
+  > or notes/quotes
 
-  and a hyperlink: [ring](https://github.com/ring-clojure/ring)"]]
+  - even
+  - bulleted
+  - lists
+
+  1. or
+  2. numbered
+  3. lists
+
+  what about checkboxes:
+  - [ ] one
+  - [ ] two
+  - [X] three (which is checked)
+
+  and a hyperlinks: [ring](https://github.com/ring-clojure/ring)
+
+
+  tables?
+
+  | thing     | description (right-justified)     |
+  |:----------|----------------------------------:|
+  | `thing-1` | a description for thing-1         |
+  | `thing-2` | and for thing-2                   |
+
+  even code-blocks:
+
+  ``` clojure
+  (defn func [a b]
+     (+ a b))
+  ```"]]
 
       '[layout/frame
-        [layout/markdown-block "## here is some markdown
+        [layout/markdown-block "## You can make titles
 
-  > a note/quote
+  > or notes/quotes
 
-  and a hyperlink: [ring](https://github.com/ring-clojure/ring)"]])))
+  - even
+  - bulleted
+  - lists
+
+  1. or
+  2. numbered
+  3. lists
+
+  what about checkboxes:
+  - [ ] one
+  - [ ] two
+  - [X] three (which is checked)
+
+  and a hyperlinks: [ring](https://github.com/ring-clojure/ring)
+
+  tables?
+
+  | thing     | description (right-justified)     |
+  |:----------|----------------------------------:|
+  | `thing-1` | a description for thing-1         |
+  | `thing-2` | and for thing-2                   |
+
+  even code-blocks:
+
+  ``` clojure
+  (defn func [a b]
+     (+ a b))
+  ```"]])))
