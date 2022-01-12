@@ -25,7 +25,7 @@
         [:> Tooltip]
         [:> Legend]
         [:> Line {:type "monotone" :dataKey "uv" :stroke "#8884d8" :fill "#8884d8"}]
-        [:> Line {:type "monotone" :dataKey "pv" :stroke "#040408" :fill "#040408"}]]]
+        [:> Line {:type "monotone" :dataKey "pv" :stroke "#82ca9d" :fill "#82ca9d"}]]]
       '[layout/centered {:extra-classes :width-50}
         [:> LineChart {:width 400 :height 400 :data @data}
          [:> CartesianGrid {:strokeDasharray "3 3"}]
@@ -34,4 +34,4 @@
          [:> Tooltip]
          [:> Legend]
          [:> Line {:type "monotone" :dataKey "uv" :stroke "#8884d8" :fill "#8884d8"}]
-         [:> Line {:type "monotone" :dataKey "pv" :stroke "#040408" :fill "#040408"}]]])))
+         [:> Line {:type "monotone" :dataKey "pv" :stroke "#82ca9d" :fill "#82ca9d"}]]])))

@@ -26,7 +26,7 @@
         [:> Tooltip]
         [:> Legend]
         [:> Bar {:type "monotone" :dataKey "uv" :fill "#8884d8"}]
-        [:> Bar {:type "monotone" :dataKey "pv" :fill "#040408"}]]]
+        [:> Bar {:type "monotone" :dataKey "pv" :fill "#82ca9d"}]]]
       '[layout/centered {:extra-classes :width-50}
         [:> BarChart {:width 400 :height 400 :data @data}
          [:> CartesianGrid {:strokeDasharray "3 3"}]
@@ -35,5 +35,5 @@
          [:> Tooltip]
          [:> Legend]
          [:> Bar {:type "monotone" :dataKey "uv" :fill "#8884d8"}]
-         [:> Bar {:type "monotone" :dataKey "pv" :fill "#040408"}]]])))
+         [:> Bar {:type "monotone" :dataKey "pv" :fill "#82ca9d"}]]])))
 
