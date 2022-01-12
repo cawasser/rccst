@@ -1,5 +1,16 @@
-(ns bh.rccst.views.catalog.charts)
+(ns bh.rccst.views.catalog.charts
+  (:require [bh.rccst.views.catalog.example.line-chart :as line-chart]
+            [bh.rccst.views.catalog.example.bar-chart :as bar-chart]
+            [bh.rccst.views.catalog.example.pie-chart :as pie-chart]))
 
 
 (defn catalog []
-  [:div "Charts"])
+  [:div
+
+   [line-chart/example]
+
+   [bar-chart/example]
+
+   [pie-chart/example]])
+
+

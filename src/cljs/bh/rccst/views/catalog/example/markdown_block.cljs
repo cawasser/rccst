@@ -22,9 +22,9 @@
   3. lists
 
   what about checkboxes:
-  - [ ] one
-  - [ ] two
-  - [X] three (which is checked)
+  - [ ]  one
+  - [ ]  two
+  - [X]  three (which is checked)
 
   and a hyperlinks: [ring](https://github.com/ring-clojure/ring)
 
@@ -57,9 +57,9 @@
   3. lists
 
   what about checkboxes:
-  - [ ] one
-  - [ ] two
-  - [X] three (which is checked)
+  - [ ]  one
+  - [ ]  two
+  - [X]  three (which is checked)
 
   and a hyperlinks: [ring](https://github.com/ring-clojure/ring)
 
