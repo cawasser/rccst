@@ -13,6 +13,7 @@
             [bh.rccst.views.catalog.icons :as icons-demo]
             [bh.rccst.views.catalog.buttons :as buttons-demo]
             [bh.rccst.views.catalog.forms :as forms-demo]
+            [bh.rccst.views.catalog.re-com :as re-com-demo]
             [bh.rccst.views.catalog.all :as all-demo]))
 
 
@@ -57,6 +58,7 @@
       [buttons/tab-button {:panel-id :demo/icons} "Icons / Images"]
       [buttons/tab-button {:panel-id :demo/buttons} "Buttons"]
       [buttons/tab-button {:panel-id :demo/forms} "Forms"]
+      [buttons/tab-button {:panel-id :demo/re-com} "Re-com"]
       [buttons/tab-button {:panel-id :demo/all} "All"]]]
 
 
@@ -87,6 +89,9 @@
 
       [tab-panel/sub-panel {:panel-id :demo/forms}
        [forms-demo/catalog]]
+
+      [tab-panel/sub-panel {:panel-id :demo/re-com}
+       [re-com-demo/catalog]]
 
       [tab-panel/sub-panel {:panel-id :demo/all}
        [all-demo/catalog]]]]]])

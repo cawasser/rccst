@@ -4,7 +4,8 @@
   a utility for pop-up source code blocks.
   "
   (:require [clojure.string :as string]
-            [woolybear.ad.containers :as containers]))
+            [woolybear.ad.containers :as containers]
+            ["react-markdown" :as ReactMarkdown]))
 
 ;; normally we'd define code-block as a layout component, but
 ;; we're putting it here because it's only used in the AD
@@ -55,7 +56,7 @@
     [:div.demo-container
      [:div.demo-name name]
      (if notes
-       [:div.demo-notes notes]
+       [:> ReactMarkdown {:source notes}]
        "")
      [:div.demo-display component]
      [containers/spoiler {:show-label "Show Code"

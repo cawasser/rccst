@@ -17,9 +17,7 @@
             [bh.rccst.views.login :as login]
             [bh.rccst.views.header-bar :as header]
             [bh.rccst.views.technologies :as tech]
-            [bh.rccst.views.widget-ish :as widget-ish]
-
-            ["react-markdown" :as ReactMarkdown]))
+            [bh.rccst.views.widget-ish :as widget-ish]))
 
             
 

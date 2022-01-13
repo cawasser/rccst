@@ -355,7 +355,6 @@
       (let [[_ children] (adu/extract-args args)
             dynamic-classes @classes-sub]
 
-        (log/info "markdown-block" children)
         (into [:div {:class (adu/css->str :content
                               :wb-text-block
                               extra-classes
@@ -366,7 +365,7 @@
 
 
 (comment
-  (def children '("Compojure is a small routing library for [Ring](https://github.com/ring-clojure/ring) that allows web applications to be composed of small, independent parts."))
+  (def children '("[Ring](https://github.com/ring-clojure/ring)"))
 
 
   ())
