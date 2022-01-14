@@ -46,7 +46,8 @@
    [flex/flex-panel {:height "calc(100vh - 2rem)"}
     [flex/flex-top
      [layout/page-header {:extra-classes :rccst}
-      [layout/page-title "UI Catalog"]]
+      [layout/page-title "'Atom' Catalog"]
+      [layout/markdown-block "Based upon [_Atomic Design_](https://bradfrost.com/blog/post/atomic-web-design/) by Brad Frost"]]
 
      [tab-panel/tab-bar {:extra-classes               :rccst
                          :subscribe-to-component-data [:catalog/tab-panel]}

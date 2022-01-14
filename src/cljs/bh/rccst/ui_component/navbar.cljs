@@ -35,8 +35,8 @@
   [tab-panel/tab-bar {:extra-classes               :rccst
                       :subscribe-to-component-data [:nav-bar/tab-panel]}
    [buttons/tab-button {:panel-id :nav-bar/login} "Login"]
-   [buttons/tab-button {:panel-id :nav-bar/widget-ish} "Widget-ish"]
-   [buttons/tab-button {:panel-id :nav-bar/catalog} "UI Catalog"]
+   [buttons/tab-button {:panel-id :nav-bar/catalog} "'Atoms'"]
+   [buttons/tab-button {:panel-id :nav-bar/widget-ish} "'Molecules'"]
    [buttons/tab-button {:panel-id :nav-bar/tech} "Technologies"]])
 
 

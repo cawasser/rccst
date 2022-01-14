@@ -1,8 +1,15 @@
 (ns bh.rccst.views.technologies.overview.ring
-  (:require [woolybear.ad.layout :as layout]))
+  (:require [bh.rccst.views.technologies.overview.overview :as o]))
 
 
 (defn overview []
-  [layout/frame
-   [:h2 "Ring"]
-   [layout/text-block "Discuss Ring here"]])
+  [o/overview
+   "Ring"
+   "Discuss [Ring](https://github.com/ring-clojure/ring) here
+
+   some other text
+
+> See also:
+>
+> [thing]()
+> [thing]()"])
