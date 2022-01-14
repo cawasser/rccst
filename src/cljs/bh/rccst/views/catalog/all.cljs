@@ -10,6 +10,15 @@
             [bh.rccst.views.catalog.example.markdown-block :as markdown-block]
             [bh.rccst.views.catalog.example.frame :as frame]
             [bh.rccst.views.catalog.example.section :as section]
+            [bh.rccst.views.catalog.example.simple-image :as simple-image]
+            [bh.rccst.views.catalog.example.standard-icon :as standard-icon]
+            [bh.rccst.views.catalog.example.colored-icon :as colored-icon]
+            [bh.rccst.views.catalog.example.small-icon :as small-icon]
+            [bh.rccst.views.catalog.example.medium-icon :as medium-icon]
+            [bh.rccst.views.catalog.example.large-icon :as large-icon]
+            [bh.rccst.views.catalog.example.brand-icon :as brand-icon]
+            [bh.rccst.views.catalog.example.clickable-icon :as clickable-icon]
+            [bh.rccst.views.catalog.example.section :as section]
 
 
 
@@ -78,8 +87,23 @@
 
    [table/example]
    [alert-box/example]
-   [line/example]])
+   [line/example]
 
+   [simple-image/example]
+
+   [standard-icon/example]
+
+   [colored-icon/example]
+
+   [small-icon/example]
+
+   [medium-icon/example]
+
+   [large-icon/example]
+
+   [brand-icon/example]
+
+   [clickable-icon/example]])
 
 
 
