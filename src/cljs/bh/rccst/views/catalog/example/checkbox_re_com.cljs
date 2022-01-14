@@ -9,6 +9,6 @@
            (acu/demo "Checkbox"
                      [checkbox
                       :src       (at)
-                      :label     "click me  "
+                      :label     "click me"
                       :model     clicked?
                       :on-change #(reset! clicked? %)])))
