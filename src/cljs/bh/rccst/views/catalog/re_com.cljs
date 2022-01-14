@@ -4,6 +4,7 @@
             [bh.rccst.views.catalog.example.progress-bar :as progress-bar]
             [bh.rccst.views.catalog.example.throbber :as throbber]
             [bh.rccst.views.catalog.example.date-picker :as date-picker]
+            [bh.rccst.views.catalog.example.input-time :as input-time]
             [bh.rccst.views.catalog.example.alert-box :as alert-box]
             [bh.rccst.views.catalog.example.line :as line]
             [bh.rccst.views.catalog.example.radio-button :as radio-button]
@@ -23,4 +24,5 @@
    [line/example]
    [progress-bar/example]
    [throbber/example]
-   [date-picker/example]])
+   [date-picker/example]
+   [input-time/example]])
