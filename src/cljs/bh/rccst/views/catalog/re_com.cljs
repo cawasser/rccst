@@ -1,5 +1,7 @@
 (ns bh.rccst.views.catalog.re-com
-  (:require [bh.rccst.views.catalog.example.table :as table]))
+  (:require [bh.rccst.views.catalog.example.table :as table]
+            [bh.rccst.views.catalog.example.checkbox-re-com :as checkbox]))
+
 
 
 
@@ -7,4 +9,6 @@
   []
   [:div
 
-   [table/example]])
+   [table/example]
+
+   [checkbox/example]])
