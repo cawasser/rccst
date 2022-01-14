@@ -4,7 +4,6 @@
             [re-com.core   :refer [at v-box gap checkbox title radio-button p]]))
 
 
-
 (defn example []
       (let [disabled?   (ratom/atom false)
             color (ratom/atom "green")]
@@ -12,8 +11,8 @@
                (acu/demo "Radio Button"
                            [v-box :src (at)
                             :gap      "10px"
-                            :children [(doall (for [c ["red" "green" "blue"]]    ;; Notice the ugly "doall"
-                                                   ^{:key c}                        ;; key should be unique among siblings
+                            :children [(doall (for [c ["red" "green" "blue"]]
+                                                   ^{:key c}
                                                    [radio-button :src (at)
                                                     :disabled? disabled?
                                                     :label       c
