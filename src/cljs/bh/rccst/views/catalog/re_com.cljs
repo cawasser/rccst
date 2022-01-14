@@ -1,7 +1,10 @@
-(ns bh.rccst.views.catalog.re-com)
+(ns bh.rccst.views.catalog.re-com
+  (:require [bh.rccst.views.catalog.example.progress-bar :as pb]))
 
 
 
 (defn catalog
   []
-  [:div "Re-com Examples"])
+  [:div
+
+       [pb/example]])
