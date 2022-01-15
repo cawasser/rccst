@@ -44,16 +44,18 @@ There are lots of things we wanted to learn more about, and we've [done many of 
     1. [X] more composition and better control over layout -> [re-com](https://github.com/Day8/re-com)
     2. [ ] something to help alignment, grouping, etc. ... [fork?](https://github.com/luciodale/fork)
         1. [ ] can it be used for simply _displaying_ content, not just editing?
-    3. [ ] is it better to just use CSS-styled Reagent components?
+    3. [X] is it better to just use CSS-styled Reagent components?
     4. [ ] how do we handle CSS for everything?
        1. [ ] [Sass](https://sass-lang.com)?
        2. [ ] what about conflict between libraries (re-com/bootstrap & wollybear/bulma)?
     5. [ ] what about [woolybear](https://github.com/cawasser/woolybear)?
-        1. [ ] catalog page
+        1. [X] catalog page
             1. [X] we should probably migrate the catalog into RCCST (i.e., out of woolybear)
-            2. [ ] make 'examples' namespaces for each example chunk
-            3. [ ] can we add Markdown to the examples for the descriptions?
+            2. [X] make 'examples' namespaces for each example chunk
+            3. [X] can we add Markdown to the examples for the descriptions?
         2. [ ] what are atoms?
+           1. [ ] Re-com
+           2. [ ] Woolybear
         3. [ ] what are the molecules?
 
 

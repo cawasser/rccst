@@ -6,7 +6,7 @@
 
 (defn example []
   (acu/demo "Standard Icons"
-            "Simple, FontAwesome-based icons. These examples also show off grouping small icons
+            "Simple, [FontAwesome](https://fontawesome.com/v5.15/icons?d=gallery&p=1)-based icons. These examples also show off grouping small icons
             in a 'bar'"
             [containers/bar
              [icons/icon {:icon "check"}]

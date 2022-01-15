@@ -6,7 +6,7 @@
 
 (defn example []
   (acu/demo "Brand Icons"
-            "Brand icons from the (free) FontAwesome collection."
+            "[Brand icons](https://fontawesome.com/v5.15/icons?d=gallery&p=1&s=brands) from the (free) FontAwesome collection."
             [containers/bar
              [icons/icon {:icon "google" :brand? true}]
              [icons/icon {:icon "jenkins" :brand? true}]
