@@ -72,6 +72,18 @@
 
     [layout/frame
      [:h2 "Thomas Heller"]
+     [layout/markdown-block "Discuss various works and presentations"]]
+
+    [layout/frame
+     [:h2 "Eric Normand"]
+     [layout/markdown-block "Discuss various works and presentations"]]
+
+    [layout/frame
+     [:h2 "Will Byrd"]
+     [layout/markdown-block "Discuss various works and presentations"]]
+
+    [layout/frame
+     [:h2 "Paul deGrandis"]
      [layout/markdown-block "Discuss various works and presentations"]]]])
 
 
