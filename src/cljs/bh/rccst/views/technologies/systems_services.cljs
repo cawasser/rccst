@@ -1,6 +1,7 @@
 (ns bh.rccst.views.technologies.systems-services
   (:require [woolybear.ad.layout :as layout]
-            [woolybear.packs.flex-panel :as flex]))
+            [woolybear.packs.flex-panel :as flex]
+            [bh.rccst.views.technologies.overview.kafka :as kafka]))
 
 
 (defn page []
@@ -14,8 +15,7 @@
       [layout/text-block "Discuss Systems and Services here"]
       [layout/section "We use a number of technologies to provide critical system-level functionality:"]]]
     [layout/frame
-     [:h2 "Kafka"]
-     [layout/text-block "Discuss Kafka here"]]
+     [kafka/overview]]
     [layout/frame
      [:h2 "Swagger-UI"]
      [layout/text-block "Discuss Swagger-UI here"]]]])
