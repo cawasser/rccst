@@ -47,7 +47,8 @@
     [flex/flex-top
      [layout/page-header {:extra-classes :rccst}
       [layout/page-title "'Atom' Catalog"]
-      [layout/markdown-block "Based upon [_Atomic Design_](https://bradfrost.com/blog/post/atomic-web-design/) by Brad Frost"]]
+      [layout/markdown-block "Based upon [_Atomic Design_](https://bradfrost.com/blog/post/atomic-web-design/) by Brad Frost"]
+      [layout/text-block ""]]
 
      [tab-panel/tab-bar {:extra-classes               :rccst
                          :subscribe-to-component-data [:catalog/tab-panel]}

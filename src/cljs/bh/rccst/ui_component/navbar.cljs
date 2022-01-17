@@ -37,7 +37,8 @@
    [buttons/tab-button {:panel-id :nav-bar/login} "Login"]
    [buttons/tab-button {:panel-id :nav-bar/catalog} "'Atoms'"]
    [buttons/tab-button {:panel-id :nav-bar/widget-ish} "'Molecules'"]
-   [buttons/tab-button {:panel-id :nav-bar/tech} "Technologies"]])
+   [buttons/tab-button {:panel-id :nav-bar/tech} "Technologies"]
+   [buttons/tab-button {:panel-id :nav-bar/giants} "'Giants'"]])
 
 
 (comment

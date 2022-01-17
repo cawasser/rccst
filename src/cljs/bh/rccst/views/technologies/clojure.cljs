@@ -15,8 +15,7 @@
      [:div
       [:h2.has-text-info "Clojure"]
       [layout/markdown-block "Discuss [Clojure](https://clojure.org) here"]
-      [layout/text-block "We use a number of libraries to provide critical server-side functionality:"]]]
-
+      [layout/section "We use a number of libraries to provide critical server-side functionality:"]]]
 
     [ring-overview/overview]
     [compojure-overview/overview]
@@ -32,4 +31,7 @@
      [layout/markdown-block "Discuss [Transit](https://github.com/cognitect/transit-clj) here"]]
     [layout/frame
      [:h2 "next.jdbc"]
-     [layout/markdown-block "Discuss [next.jdbc](https://github.com/seancorfield/next-jdbc) here"]]]])
+     [layout/markdown-block "Discuss [next.jdbc](https://github.com/seancorfield/next-jdbc) here"]]
+    [layout/frame
+     [:h2 "Jacdaw"]
+     [layout/markdown-block "Discuss [Jackdaw](https://github.com/FundingCircle/jackdaw) here"]]]])

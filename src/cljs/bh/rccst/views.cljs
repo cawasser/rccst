@@ -17,9 +17,8 @@
             [bh.rccst.views.login :as login]
             [bh.rccst.views.header-bar :as header]
             [bh.rccst.views.technologies :as tech]
-            [bh.rccst.views.widget-ish :as widget-ish]))
-
-            
+            [bh.rccst.views.widget-ish :as widget-ish]
+            [bh.rccst.views.giants :as giants]))
 
 
 (defn view
@@ -57,7 +56,11 @@
            [catalog/page]]
 
           [tab-panel/sub-panel {:panel-id :nav-bar/tech}
-           [tech/page]]]]]])))
+           [tech/page]]
+
+          [tab-panel/sub-panel {:panel-id :nav-bar/giants}
+           [#'giants/view]]]]]])))
+
 
 
 

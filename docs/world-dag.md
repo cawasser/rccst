@@ -33,6 +33,8 @@ and even [entire systems](#system-composition).
 
 See also [Loom](https://github.com/aysylu/loom) and [Onyx](http://www.onyxplatform.org).
 
+There is also a long discussion of this topic [here](https://softwareengineering.stackexchange.com/questions/171671/when-to-use-dag-directed-acyclic-graph-in-programming). 
+
 ## Functions
 
 We program in Clojure, a functional programming language. As such, functions themselves (the "pure" functions
