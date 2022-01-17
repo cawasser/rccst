@@ -3,6 +3,6 @@
 
 (defn overview []
       [o/overview
-       "Compojure"
-       "Discuss [Compojure](https://github.com/weavejester/compojure) here."])
+       "Transit"
+       "Discuss [Transit](https://github.com/cognitect/transit-clj) here."])
 

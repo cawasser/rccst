@@ -3,6 +3,6 @@
 
 (defn overview []
       [o/overview
-       "Compojure"
-       "Discuss [Compojure](https://github.com/weavejester/compojure) here."])
+       "next.jdbc"
+       "Discuss [next.jdbc](https://github.com/seancorfield/next-jdbc) here."])
 
