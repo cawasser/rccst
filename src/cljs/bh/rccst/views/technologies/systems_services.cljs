@@ -1,7 +1,8 @@
 (ns bh.rccst.views.technologies.systems-services
   (:require [woolybear.ad.layout :as layout]
             [woolybear.packs.flex-panel :as flex]
-            [bh.rccst.views.technologies.overview.kafka :as kafka]))
+            [bh.rccst.views.technologies.overview.kafka :as kafka]
+            [bh.rccst.views.technologies.overview.swagger :as swagger]))
 
 
 (defn page []
@@ -17,5 +18,4 @@
     [layout/frame
      [kafka/overview]]
     [layout/frame
-     [:h2 "Swagger-UI"]
-     [layout/text-block "Discuss Swagger-UI here"]]]])
+     [swagger/overview]]]])
