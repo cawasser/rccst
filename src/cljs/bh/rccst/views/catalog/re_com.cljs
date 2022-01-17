@@ -19,10 +19,10 @@
    [checkbox/example]
    [radio-button/example]
    [input-text/example]
-   [radio-button/example]
    [alert-box/example]
    [line/example]
    [progress-bar/example]
    [throbber/example]
    [date-picker/example]
-   [input-time/example]])
+   [input-time/example]
+   [slider/example]])
