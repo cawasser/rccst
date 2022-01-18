@@ -2,7 +2,10 @@
   (:require [woolybear.ad.layout :as layout]
             [woolybear.packs.flex-panel :as flex]
             [bh.rccst.views.technologies.overview.reagent :as reagent]
-            [bh.rccst.views.technologies.overview.re-frame :as re-frame]))
+            [bh.rccst.views.technologies.overview.re-frame :as re-frame]
+            [bh.rccst.views.technologies.overview.re-com :as re-com]
+            [bh.rccst.views.technologies.overview.woolybear :as woolybear]
+            [bh.rccst.views.technologies.overview.recharts :as recharts]))
 
 
 (defn page []
@@ -18,15 +21,10 @@
     [layout/frame
      [reagent/overview]]
     [layout/frame
-     [re-frame/overview]
-     [:h2 "Re-frame"]
-     [layout/markdown-block "Discuss [Re-frame](https://day8.github.io/re-frame/) here"]]
+     [re-frame/overview]]
     [layout/frame
-     [:h2 "Re-com"]
-     [layout/markdown-block "Discuss [Re-com](https://github.com/Day8/re-com) here"]]
+     [re-com/overview]]
     [layout/frame
-     [:h2 "Woolybear"]
-     [layout/markdown-block "Discuss [Woolybear](https://github.com/manutter51/woolybear) here"]]
+     [woolybear/overview]]
     [layout/frame
-     [:h2 "Recharts"]
-     [layout/markdown-block "Discuss [Recharts](https://recharts.org/en-US) here"]]]])
+     [recharts/overview]]]])

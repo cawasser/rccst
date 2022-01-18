@@ -5,7 +5,6 @@
       (o/overview "Reagent"
 
 "#### A simple [ClojureScript](https://github.com/clojure/clojurescript) interface to [React](https://reactjs.org/).\n
-
 Reagent provides a way to write efficient React components using (almost) nothing but plain ClojureScript functions.\n\n
 Reagent uses Hiccup-like markup instead of React's sort-of html. The goal of Reagent is to make it possible to define
 arbitrarily complex UIs using just a couple of basic concepts, and to be fast enough by default that you rarely have to
@@ -15,6 +14,7 @@ Another important feature of reagent is that a component function can return ano
 This function is called with the same arguments as the first one.\n\n
 
 See also:
->[Reagent:Minimalistic React for Clojurescipt](https://reagent-project.github.io/) \n\n
+>[Reagent:Minimalistic React for Clojurescipt](https://reagent-project.github.io/)\n
 >[reagent-project/reagent](https://github.com/reagent-project/reagent)"
+
 "/imgs/reagent-logo.png"))
