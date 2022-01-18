@@ -9,6 +9,7 @@
             [bh.rccst.views.catalog.example.centered-block :as centered-block]
             [bh.rccst.views.catalog.example.markdown-block :as markdown-block]
             [bh.rccst.views.catalog.example.frame :as frame]
+            [bh.rccst.views.catalog.example.navbar :as navbar]
             [bh.rccst.views.catalog.example.section :as section]
             [bh.rccst.views.catalog.example.simple-image :as simple-image]
             [bh.rccst.views.catalog.example.standard-icon :as standard-icon]
@@ -59,6 +60,7 @@
    [centered-block/example]
    [markdown-block/example]
    [frame/example]
+   [navbar/example]
 
    [rc/line :size "5px" :color "orange"]
 
@@ -88,21 +90,13 @@
    [table/example]
    [alert-box/example]
    [line/example]
-
    [simple-image/example]
-
    [standard-icon/example]
-
    [colored-icon/example]
-
    [small-icon/example]
-
    [medium-icon/example]
-
    [large-icon/example]
-
    [brand-icon/example]
-
    [clickable-icon/example]])
 
 
