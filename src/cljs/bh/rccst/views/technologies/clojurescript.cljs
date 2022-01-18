@@ -1,6 +1,8 @@
 (ns bh.rccst.views.technologies.clojurescript
   (:require [woolybear.ad.layout :as layout]
-            [woolybear.packs.flex-panel :as flex]))
+            [woolybear.packs.flex-panel :as flex]
+            [bh.rccst.views.technologies.overview.reagent :as reagent]
+            [bh.rccst.views.technologies.overview.re-frame :as re-frame]))
 
 
 (defn page []
@@ -14,9 +16,9 @@
       [layout/markdown-block "Discuss [Clojurescript]() here"]
       [layout/section "We use a number of libraries to provide critical client-side functionality:"]]]
     [layout/frame
-     [:h2 "Reagent"]
-     [layout/markdown-block "Discuss [Reagent](https://reagent-project.github.io) here"]]
+     [reagent/overview]]
     [layout/frame
+     [re-frame/overview]
      [:h2 "Re-frame"]
      [layout/markdown-block "Discuss [Re-frame](https://day8.github.io/re-frame/) here"]]
     [layout/frame
