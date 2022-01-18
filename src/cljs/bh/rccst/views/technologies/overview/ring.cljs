@@ -5,11 +5,4 @@
 (defn overview []
   [o/overview
    "Ring"
-   "Discuss [Ring](https://github.com/ring-clojure/ring) here
-
-   some other text
-
-> See also:
->
-> [thing]()
-> [thing]()"])
+   "Visit the Ring Git repository [here.](https://github.com/ring-clojure/ring)"])

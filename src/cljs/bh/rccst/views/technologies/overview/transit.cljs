@@ -4,5 +4,5 @@
 (defn overview []
       [o/overview
        "Transit"
-       "Discuss [Transit](https://github.com/cognitect/transit-clj) here."])
+       "Visit the Transit Git repository [here.](https://github.com/cognitect/transit-clj)"])
 

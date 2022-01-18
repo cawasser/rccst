@@ -4,6 +4,6 @@
 (defn overview []
       [o/overview
        "Jackdaw"
-       "Discuss [Jackdaw](https://github.com/FundingCircle/jackdaw) here."])
+       "Visit the Jackdaw Git repository [here.](https://github.com/FundingCircle/jackdaw)"])
 
 

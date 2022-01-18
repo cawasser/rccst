@@ -6,4 +6,4 @@
 (defn overview []
   [o/overview
    "Compojure"
-   "Discuss [Compojure](https://github.com/weavejester/compojure) here."])
+   "Visit the Compojure Git repository [here.](https://github.com/weavejester/compojure)"])

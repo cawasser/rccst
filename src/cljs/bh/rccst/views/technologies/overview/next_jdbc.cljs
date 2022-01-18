@@ -4,5 +4,5 @@
 (defn overview []
       [o/overview
        "next.jdbc"
-       "Discuss [next.jdbc](https://github.com/seancorfield/next-jdbc) here."])
+       "Visit the next.jdbc Git repository [here.](https://github.com/seancorfield/next-jdbc)"])
 

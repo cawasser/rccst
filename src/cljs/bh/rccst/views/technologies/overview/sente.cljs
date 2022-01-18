@@ -4,5 +4,5 @@
 (defn overview []
       [o/overview
        "Sente"
-       "Discuss [Sente](https://github.com/ptaoussanis/sente) here."])
+       "Visit the Sente Git repository [here.](https://github.com/ptaoussanis/sente)"])
 
