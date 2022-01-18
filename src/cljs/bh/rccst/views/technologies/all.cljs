@@ -27,7 +27,8 @@
     [flex/flex-top
      [:div
       [:h2.has-text-info "All"]
-      [layout/text-block "An overview of many of the technologies we use in RCCST"]]]
+      [layout/text-block "An overview of many of the technologies we use in RCCST"]
+      [layout/section]]]
 
     [ring-overview/overview]
     [compojure-overview/overview]
