@@ -5,11 +5,8 @@
 (defn overview []
   [o/overview
    "Ring"
-   "Discuss [Ring](https://github.com/ring-clojure/ring) here
+   "Ring is used by the SEGS team to handle HTTP requests and responses between server and web client.
 
-   some other text
+ Visit the Ring Git repository [here.](https://github.com/ring-clojure/ring)
 
-> See also:
->
-> [thing]()
-> [thing]()"])
+ Additional documentation can be found at the [wiki](https://github.com/ring-clojure/ring/wiki) as well as this [site.](https://ring-clojure.github.io/ring/)"])

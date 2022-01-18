@@ -4,5 +4,10 @@
 (defn overview []
       [o/overview
        "Component"
-       "Discuss [Component](https://github.com/stuartsierra/component) here."])
+       "
+The Component library allows the team to manage the lifecycle and dependencies of stateful software components.
+An example would be a component built around database access.
+Component is more of a design pattern with some supporting functions rather than a full blown library.
+
+Visit the Component Git repository [here.](https://github.com/stuartsierra/component)"])
 
