@@ -38,6 +38,7 @@
 > See also:
 >
 > [Woolybear/tab-bar](https://github.com/cawasser/woolybear/blob/a7f820dfb2f51636122d56d1500baefe5733eb25/src/cljs/woolybear/packs/tab_panel.cljs#L61)
+>
 > [Woolybear/tab-panel](https://github.com/cawasser/woolybear/blob/a7f820dfb2f51636122d56d1500baefe5733eb25/src/cljs/woolybear/packs/tab_panel.cljs#L133)
     "
     [layout/centered {:extra-classes :width-50}

@@ -7,7 +7,8 @@
             [bh.rccst.views.catalog.example.centered-block :as centered-block]
             [bh.rccst.views.catalog.example.markdown-block :as markdown-block]
             [bh.rccst.views.catalog.example.frame :as frame]
-            [bh.rccst.views.catalog.example.section :as section]))
+            [bh.rccst.views.catalog.example.section :as section]
+            [bh.rccst.views.catalog.example.layout-grid :as layout-grid]))
 
 
 (defn catalog
@@ -28,4 +29,6 @@
 
    [markdown-block/example]
 
-   [frame/example]])
+   [frame/example]
+
+   [layout-grid/example]])
