@@ -30,7 +30,6 @@ stages are: \n\n
   previous stage, are actioned. The browser DOM nodes are mutated.\n\n
 
 See also:
->[re-frame](https://day8.github.io/re-frame/) \n\n"
-"/imgs/re-frame-logo.png"))
+>[Re-frame](https://day8.github.io/re-frame/)"
 
-
+"/imgs/re-frame-colour.png"))
