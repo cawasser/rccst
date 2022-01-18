@@ -5,7 +5,6 @@
             [day8.re-frame.http-fx]
             [ajax.core :as ajax]
 
-            [bh.rccst.db :as db]
             [bh.rccst.csrf :refer [?csrf-token]]))
 
 
@@ -20,13 +19,6 @@
   ::track-slow-request
   (fn [db [_ my-id xhrio]]
     (assoc-in db [:requests my-id] xhrio)))
-
-
-(re-frame/reg-event-fx
-  ::initialize-db
-  (fn-traced [_ _]
-    {:dispatch [::get-version]
-     :db       db/default-db}))
 
 
 (re-frame/reg-event-fx

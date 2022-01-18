@@ -3,7 +3,7 @@
             [re-frame.core :as re-frame]
             [taoensso.timbre :as log]
 
-            [bh.rccst.events :as events]
+            [bh.rccst.db :as db]
             [bh.rccst.events.login]
             [bh.rccst.config :as config]
             [bh.rccst.subscriptions]
@@ -25,7 +25,7 @@
 (defn init []
   (log/info "rccts.core/init")
 
-  (re-frame/dispatch-sync [::events/initialize-db])
+  (re-frame/dispatch-sync [::db/initialize-db])
 
   (dev-setup)
   (mount-root))

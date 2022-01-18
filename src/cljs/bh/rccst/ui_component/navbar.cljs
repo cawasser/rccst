@@ -5,29 +5,6 @@
             [woolybear.ad.buttons :as buttons]))
 
 
-(def data-path [:nav-bar :tab-panel])
-
-(def init-db
-  {:tab-panel (tab-panel/mk-tab-panel-data data-path :nav-bar/login)})
-
-
-(re-frame/reg-sub
-  :db/nav-bar
-  (fn [db _]
-    (:nav-bar db)))
-
-(re-frame/reg-sub
-  :nav-bar/tab-panel
-  :<- [:db/nav-bar]
-  (fn [n]
-    (:tab-panel n)))
-
-(re-frame/reg-sub
-  :nav-bar/selected-tab
-  :<- [:nav-bar/tab-panel]
-  (fn [tab-panel]
-    (:value tab-panel)))
-
 
 (defn navbar
   "uses woolybear/tab-bar to put controls on the UI that activate different

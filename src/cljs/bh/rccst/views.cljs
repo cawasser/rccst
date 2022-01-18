@@ -21,11 +21,34 @@
             [bh.rccst.views.giants :as giants]))
 
 
+(def data-path [:nav-bar :tab-panel])
+
+(def init-db
+  {:tab-panel (tab-panel/mk-tab-panel-data data-path :nav-bar/login)})
+
+
 (def main-navbar [[:nav-bar/login "Login"]
                   [:nav-bar/catalog "'Atoms'"]
                   [:nav-bar/widget-ish "'Molecules'"]
                   [:nav-bar/tech "Technologies"]
                   [:nav-bar/giants "'Giants'"]])
+
+(re-frame/reg-sub
+  :db/nav-bar
+  (fn [db _]
+    (:nav-bar db)))
+
+(re-frame/reg-sub
+  :nav-bar/tab-panel
+  :<- [:db/nav-bar]
+  (fn [n]
+    (:tab-panel n)))
+
+(re-frame/reg-sub
+  :nav-bar/selected-tab
+  :<- [:nav-bar/tab-panel]
+  (fn [tab-panel]
+    (:value tab-panel)))
 
 
 (defn view
@@ -69,24 +92,3 @@
            [#'giants/view]]]]]])))
 
 
-
-
-(comment
-  (def logged-in? (atom true))
-  (def logged-in? (atom false))
-
-
-  ())
-
-
-; some things for the repl
-(comment
-  [view]
-
-  (re-frame/dispatch [::events/initialize-db])
-
-  @re-frame.db/app-db
-
-  (re-frame/dispatch [::events/add-to-set 7])
-
-  ())
