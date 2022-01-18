@@ -40,15 +40,10 @@
 (def btns-style {:font-size   "12px"
                  :line-height "20px"
                  :padding     "6px 8px"})
-
-
 (def x-axis-btns [{:id :bottom   :label ":bottom"}
                   {:id :top     :label ":top"}])
 (def y-axis-btns [{:id :left   :label ":left"}
                   {:id :right     :label ":right"}])
-
-
-(defn string-editor [])
 
 
 (defn- boolean-config [config label path]

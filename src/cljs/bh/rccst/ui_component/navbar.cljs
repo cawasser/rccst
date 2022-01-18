@@ -29,20 +29,24 @@
     (:value tab-panel)))
 
 
+(defn navbar
+  "uses woolybear/tab-bar to put controls on the UI that activate different
+  pages of the UI.
 
-(defn navbar []
+  ---
+
+  - children : (vector of pairs) each pair consists of: `[ panel-id label ]`
+  - subscirption : (re-frame subscription vector) subscription to the correct state for this tabb-panel collection
+
+  > See also:
+  >
+  > [Woolybear/tab-bar](https://github.com/cawasser/woolybear/blob/a7f820dfb2f51636122d56d1500baefe5733eb25/src/cljs/woolybear/packs/tab_panel.cljs#L61)
+  "
+  [children subcription]
   (log/info "nav-bar")
-  [tab-panel/tab-bar {:extra-classes               :rccst
-                      :subscribe-to-component-data [:nav-bar/tab-panel]}
-   [buttons/tab-button {:panel-id :nav-bar/login} "Login"]
-   [buttons/tab-button {:panel-id :nav-bar/catalog} "'Atoms'"]
-   [buttons/tab-button {:panel-id :nav-bar/widget-ish} "'Molecules'"]
-   [buttons/tab-button {:panel-id :nav-bar/tech} "Technologies"]
-   [buttons/tab-button {:panel-id :nav-bar/giants} "'Giants'"]])
+  (->> children
+    (map (fn [[id label]]
+           [buttons/tab-button {:panel-id id} label]))
+    (into [tab-panel/tab-bar {:extra-classes               :rccst
+                              :subscribe-to-component-data subcription}])))
 
-
-(comment
-  (def db @re-frame.db/app-db)
-
-
-  ())

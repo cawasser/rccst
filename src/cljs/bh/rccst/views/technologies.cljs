@@ -5,6 +5,7 @@
             [woolybear.packs.flex-panel :as flex]
             [woolybear.packs.tab-panel :as tab-panel]
 
+            [bh.rccst.ui-component.navbar :as navbar]
             [bh.rccst.views.technologies.clojure :as tech-clj]
             [bh.rccst.views.technologies.clojurescript :as tech-cljs]
             [bh.rccst.views.technologies.systems-services :as s-s]
@@ -34,6 +35,13 @@
     (:value tab-panel)))
 
 
+(def tech-navbar [[:tech/server "Server-side"]
+                  [:tech/client "Client-side"]
+                  [:tech/system "System / Services"]
+                  [:tech/all "All"]])
+
+
+
 (defn page
   "Some background on the various technologies we are using"
   []
@@ -43,12 +51,7 @@
      [layout/page-header {:extra-classes :rccst}
       [layout/page-title "Technology Overview"]]
 
-     [tab-panel/tab-bar {:extra-classes               :rccst
-                         :subscribe-to-component-data [:tech/tab-panel]}
-      [buttons/tab-button {:panel-id :tech/server} "Server-side"]
-      [buttons/tab-button {:panel-id :tech/client} "Client-side"]
-      [buttons/tab-button {:panel-id :tech/system} "System / Services"]
-      [buttons/tab-button {:panel-id :tech/all} "All"]]]
+     [navbar/navbar tech-navbar [:tech/tab-panel]]]
 
     [layout/page-body {:extra-classes :rccst}
      [tab-panel/tab-panel {:extra-classes             :rccst

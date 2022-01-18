@@ -5,6 +5,7 @@
             [woolybear.packs.flex-panel :as flex]
             [woolybear.packs.tab-panel :as tab-panel]
 
+            [bh.rccst.ui-component.navbar :as navbar]
             [bh.rccst.views.catalog.layouts :as layout-demo]
             [bh.rccst.views.catalog.containers :as containers-demo]
             [bh.rccst.views.catalog.cards :as cards-demo]
@@ -39,6 +40,19 @@
   (fn [tab-panel]
     (:value tab-panel)))
 
+
+(def catalog-navbar [[:demo/layouts "Layout"]
+                     [:demo/containers "Containers"]
+                     [:demo/cards "Cards"]
+                     [:demo/charts "Charts"]
+                     [:demo/diagrams "Diagrams"]
+                     [:demo/icons "Icons / Images"]
+                     [:demo/buttons "Buttons"]
+                     [:demo/forms "Forms"]
+                     [:demo/re-com "Re-com"]
+                     [:demo/all "All"]])
+
+
 (defn page
   "Top-level AD Catalog page"
   []
@@ -49,20 +63,7 @@
       [layout/page-title "'Atom' Catalog"]
       [layout/markdown-block "Based upon [_Atomic Design_](https://bradfrost.com/blog/post/atomic-web-design/) by Brad Frost"]
       [layout/text-block ""]]
-
-     [tab-panel/tab-bar {:extra-classes               :rccst
-                         :subscribe-to-component-data [:catalog/tab-panel]}
-      [buttons/tab-button {:panel-id :demo/layouts} "Layout"]
-      [buttons/tab-button {:panel-id :demo/containers} "Containers"]
-      [buttons/tab-button {:panel-id :demo/cards} "Cards"]
-      [buttons/tab-button {:panel-id :demo/charts} "Charts"]
-      [buttons/tab-button {:panel-id :demo/diagrams} "Diagrams"]
-      [buttons/tab-button {:panel-id :demo/icons} "Icons / Images"]
-      [buttons/tab-button {:panel-id :demo/buttons} "Buttons"]
-      [buttons/tab-button {:panel-id :demo/forms} "Forms"]
-      [buttons/tab-button {:panel-id :demo/re-com} "Re-com"]
-      [buttons/tab-button {:panel-id :demo/all} "All"]]]
-
+     [navbar/navbar catalog-navbar [:catalog/tab-panel]]]
 
     [layout/page-body {:extra-classes :rccst}
      [tab-panel/tab-panel {:extra-classes             :rccst

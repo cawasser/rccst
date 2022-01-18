@@ -21,6 +21,13 @@
             [bh.rccst.views.giants :as giants]))
 
 
+(def main-navbar [[:nav-bar/login "Login"]
+                  [:nav-bar/catalog "'Atoms'"]
+                  [:nav-bar/widget-ish "'Molecules'"]
+                  [:nav-bar/tech "Technologies"]
+                  [:nav-bar/giants "'Giants'"]])
+
+
 (defn view
   "main view of the SPA. starts with `login`, switches to `widget-ish` after the user actually
   logs into the system
@@ -33,7 +40,7 @@
       [layout/page {:extra-classes :rccst}
        [flex/flex-panel {:height "calc(100vh - 2rem)"}
         [flex/flex-top
-         [navbar/navbar]]
+         [navbar/navbar main-navbar [:nav-bar/tab-panel]]]
 
         [layout/page-body {:extra-classes :rccst}
          [tab-panel/tab-panel {:extra-classes             :rccst
@@ -70,7 +77,6 @@
 
 
   ())
-
 
 
 ; some things for the repl
