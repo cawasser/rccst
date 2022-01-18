@@ -8,7 +8,8 @@
             [bh.rccst.views.catalog.example.alert-box :as alert-box]
             [bh.rccst.views.catalog.example.line :as line]
             [bh.rccst.views.catalog.example.radio-button :as radio-button]
-            [bh.rccst.views.catalog.example.text-input-re-com :as input-text]))
+            [bh.rccst.views.catalog.example.text-input-re-com :as input-text]
+            [bh.rccst.views.catalog.example.slider :as slider]))
 
 
 
@@ -19,10 +20,10 @@
    [checkbox/example]
    [radio-button/example]
    [input-text/example]
-   [radio-button/example]
    [alert-box/example]
    [line/example]
    [progress-bar/example]
    [throbber/example]
    [date-picker/example]
-   [input-time/example]])
+   [input-time/example]
+   [slider/example]])

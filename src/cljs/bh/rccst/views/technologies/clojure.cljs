@@ -3,8 +3,12 @@
             [woolybear.packs.flex-panel :as flex]
 
             [bh.rccst.views.technologies.overview.ring :as ring-overview]
-            [bh.rccst.views.technologies.overview.compojure :as compojure-overview]))
-
+            [bh.rccst.views.technologies.overview.compojure :as compojure-overview]
+            [bh.rccst.views.technologies.overview.component :as component-overview]
+            [bh.rccst.views.technologies.overview.sente :as sente-overview]
+            [bh.rccst.views.technologies.overview.transit :as transit-overview]
+            [bh.rccst.views.technologies.overview.next-jdbc :as next-jdbc-overview]
+            [bh.rccst.views.technologies.overview.jackdaw :as jackdaw-overview]))
 
 (defn page []
 
@@ -19,19 +23,8 @@
 
     [ring-overview/overview]
     [compojure-overview/overview]
-
-    [layout/frame
-     [:h2 "Component"]
-     [layout/markdown-block "Discuss [Component](https://github.com/stuartsierra/component) here"]]
-    [layout/frame
-     [:h2 "Sente"]
-     [layout/markdown-block "Discuss [Sente](https://github.com/ptaoussanis/sente) here"]]
-    [layout/frame
-     [:h2 "Transit"]
-     [layout/markdown-block "Discuss [Transit](https://github.com/cognitect/transit-clj) here"]]
-    [layout/frame
-     [:h2 "next.jdbc"]
-     [layout/markdown-block "Discuss [next.jdbc](https://github.com/seancorfield/next-jdbc) here"]]
-    [layout/frame
-     [:h2 "Jacdaw"]
-     [layout/markdown-block "Discuss [Jackdaw](https://github.com/FundingCircle/jackdaw) here"]]]])
+    [component-overview/overview]
+    [sente-overview/overview]
+    [transit-overview/overview]
+    [next-jdbc-overview/overview]
+    [jackdaw-overview/overview]]])
