@@ -12,66 +12,94 @@
             [bh.rccst.ui-component.table :as table]))
 
 
-(defonce data (r/atom [{:name "Page A" :uv 4000 :pv 2400 :amt 2400}
-                       {:name "Page B" :uv 3000 :pv 1398 :amt 2210}
-                       {:name "Page C" :uv 2000 :pv 9800 :amt 2290}
-                       {:name "Page D" :uv 2780 :pv 3908 :amt 2000}
-                       {:name "Page E" :uv 1890 :pv 4800 :amt 2181}
-                       {:name "Page F" :uv 2390 :pv 3800 :amt 2500}
-                       {:name "Page G" :uv 3490 :pv 4300 :amt 2100}]))
+(def data (r/atom [{:name "Page A" :uv 4000 :pv 2400 :amt 2400}
+                   {:name "Page B" :uv 3000 :pv 1398 :amt 2210}
+                   {:name "Page C" :uv 2000 :pv 9800 :amt 2290}
+                   {:name "Page D" :uv 2780 :pv 3908 :amt 2000}
+                   {:name "Page E" :uv 1890 :pv 4800 :amt 2181}
+                   {:name "Page F" :uv 2390 :pv 3800 :amt 2500}
+                   {:name "Page G" :uv 3490 :pv 4300 :amt 2100}]))
 
 
-(defonce config (r/atom {:isAnimationActive true
-                         :grid              {:over?           false
-                                             :include         true
-                                             :strokeDasharray {:value "3 3" :omit? false :editing? (atom false) :type :text}}
-                         :x-axis            {:over?       false
-                                             :include     true
-                                             :orientation {:value :bottom :omit? false :editing? (atom false) :type :text :text "Box1"}
-                                             :scale       {:value "auto" :omit? false :editing? (atom false) :type :auto :px "50px" :ratio "3" :gsb "1 1 0px"}}
-                         :y-axis            {:over?   false
-                                             :include true}
-                         :tooltip           {:over?   false
-                                             :include true}
-                         :legend            {:over?   false
-                                             :include true}
-                         :line-uv           {:over?   false
-                                             :include true}
-                         :line-pv           {:over?   false
-                                             :include true}
-                         :line-amt          {:over?   false
-                                             :include false
-                                             :isAnimationActive true}}))
+(def config (r/atom {:isAnimationActive true
+                     :grid              {:include         true
+                                         :strokeDasharray {:dash "3" :space "3"}}
+                     :x-axis            {:include     true
+                                         :orientation :bottom
+                                         :scale       "auto"}
+                     :y-axis            {:include     true
+                                         :orientation :left
+                                         :scale       "auto"}
+                     :tooltip           {:include true}
+                     :legend            {:include true}
+                     :line-uv           {:include true}
+                     :line-pv           {:include true}
+                     :line-amt          {:include false}}))
 
 
-
-(comment
-  (swap! config assoc-in [:grid :include] false)
-  (swap! config assoc-in [:grid :include] true)
-
-
-  (swap! config assoc-in [:y-axis :include] true)
-  (swap! config assoc-in [:y-axis :include] false)
-
-  (swap! config assoc-in [:line-uv :include] true)
-  (swap! config assoc-in [:line-uv :include] false)
-
-  (swap! config assoc-in [:line-pv :include] true)
-  (swap! config assoc-in [:line-pv :include] false)
+(def btns-style {:font-size   "12px"
+                 :line-height "20px"
+                 :padding     "6px 8px"})
 
 
-  (swap! config assoc-in [:line-amt :include] true)
-  (swap! config assoc-in [:line-amt :include] false)
-
-
-  (swap! config assoc :isAnimationActive true)
-  (swap! config assoc :isAnimationActive false)
-
-
-  ())
+(def x-axis-btns [{:id :bottom   :label ":bottom"}
+                  {:id :top     :label ":top"}])
+(def y-axis-btns [{:id :left   :label ":left"}
+                  {:id :right     :label ":right"}])
 
 
 (defn string-editor [])
+
+
+(defn- boolean-config [config label path]
+  [rc/checkbox :src (rc/at)
+   :label [rc/box :src (rc/at) :align :start :child [:code label]]
+   :model (get-in @config path)
+   :on-change #(swap! config assoc-in path %)])
+
+
+(defn- dashArray-config [config label min max path]
+  [rc/h-box :src (rc/at)
+   :children [[rc/box :src (rc/at) :align :start :child [:code label]]
+              [rc/v-box :src (rc/at)
+               :gap "5px"
+               :children [[rc/slider :src (rc/at)
+                           :model (get-in @config (conj path :dash))
+                           :width "100px"
+                           :min min :max max
+                           :on-change #(swap! config assoc-in (conj path :dash) %)]
+                          [rc/slider :src (rc/at)
+                           :model (get-in @config (conj path :space))
+                           :width "100px"
+                           :min min :max max
+                           :on-change #(swap! config assoc-in (conj path :space) %)]]]]])
+
+
+(defn- orientation-config [config btns label path]
+  [rc/h-box :src (rc/at)
+   :children [[rc/box :src (rc/at) :align :start :child [:code label]]
+              [rc/horizontal-bar-tabs
+               :src (rc/at)
+               :model (get-in @config path)
+               :tabs btns
+               :style btns-style
+               :on-change #(swap! config assoc-in path %)]]])
+
+
+(defn- scale-config [config label path]
+  (let [btns [{:id "auto" :label "auto"}
+              {:id "linear" :label "linear"}
+              {:id "pow" :label "pow"}
+              {:id "sqrt" :label "sqrt"}
+              {:id "log" :label "log"}]]
+    [rc/h-box :src (rc/at)
+     :children [[rc/box :src (rc/at) :align :start :child [:code label]]
+                [rc/horizontal-bar-tabs
+                 :src (rc/at)
+                 :model (get-in @config path)
+                 :tabs btns
+                 :style btns-style
+                 :on-change #(swap! config assoc-in path %)]]]))
 
 
 (defn- config-panel
@@ -84,9 +112,41 @@
   [config]
 
   [rc/v-box :src (rc/at)
-   :children [;[boolean-config config "animate?" [:isAnimationActive]]
-              [:div "grid (bool strokeDasharray)"]
-              [:div "x-axis (bool orientation scale)"]]])
+   :gap "10px"
+   :style {:min-width        "150px"
+           :padding          "15px"
+           :border-top       "1px solid #DDD"
+           :background-color "#f7f7f7"}
+   :children [[rc/v-box
+               :children [[boolean-config config ":grid" [:grid :include]]
+                          [dashArray-config config ":strokeDasharray" 1 10 [:grid :strokeDasharray]]]]
+
+              [rc/v-box
+               :children [[boolean-config config ":x-axis" [:x-axis :include]]
+                          [orientation-config config x-axis-btns ":orientation" [:x-axis :orientation]]
+                          [scale-config config ":scale" [:x-axis :scale]]]]
+
+              [rc/v-box
+               :children [[boolean-config config ":y-axis" [:y-axis :include]]
+                          [orientation-config config y-axis-btns ":orientation" [:y-axis :orientation]]
+                          [scale-config config ":scale" [:y-axis :scale]]]]
+
+              [rc/h-box :src (rc/at)
+               :gap "10px"
+               :children [[boolean-config config ":tooltip" [:tooltip :include]]
+                          [boolean-config config ":legend" [:legend :include]]]]
+
+              [rc/h-box :src (rc/at)
+               :gap "10px"
+               :children [[boolean-config config "line (uv)" [:line-uv :include]]
+                          [boolean-config config "line (pv)" [:line-pv :include]]
+                          [boolean-config config "line (amt)" [:line-amt :include]]]]]])
+
+
+(defn- strokeDasharray [config]
+  (str (get-in @config [:grid :strokeDasharray :dash])
+    " "
+    (get-in @config [:grid :strokeDasharray :space])))
 
 
 (defn- configurable-chart
@@ -113,30 +173,31 @@
 
       [:> LineChart {:width 400 :height 400 :data @data}
 
-       (if @grid? [:> CartesianGrid {:strokeDasharray "3 3"}])
+       (when @grid? [:> CartesianGrid {:strokeDasharray (strokeDasharray config)}])
 
-       (if @x-axis? [:> XAxis {:dataKey :name}])
+       (when @x-axis? [:> XAxis {:dataKey     :name
+                                 :orientation (get-in @config [:x-axis :orientation])
+                                 :scale       (get-in @config [:x-axis :scale])}])
 
-       (if @y-axis? [:> YAxis])
+       (when @y-axis? [:> YAxis {:orientation (get-in @config [:y-axis :orientation])
+                                 :scale       (get-in @config [:y-axis :scale])}])
 
-       (if @tooltip? [:> Tooltip])
+       (when @tooltip? [:> Tooltip])
 
-       (if @legend? [:> Legend])
+       (when @legend? [:> Legend])
 
-       (if @line-uv? [:> Line {:type "monotone" :dataKey :uv
-                               :isAnimationActive @isAnimationActive?
-                               :stroke "#8884d8" :fill "#8884d8"}])
+       (when @line-uv? [:> Line {:type              "monotone" :dataKey :uv
+                                 :isAnimationActive @isAnimationActive?
+                                 :stroke            "#8884d8" :fill "#8884d8"}])
 
-       (if @line-pv? [:> Line {:type "monotone" :dataKey :pv
-                               :isAnimationActive @isAnimationActive?
-                               :stroke "#82ca9d" :fill "#82ca9d"}])
+       (when @line-pv? [:> Line {:type              "monotone" :dataKey :pv
+                                 :isAnimationActive @isAnimationActive?
+                                 :stroke            "#82ca9d" :fill "#82ca9d"}])
 
-       (if @line-amt? [:> Line {:type "monotone" :dataKey :amt
-                                :isAnimationActive @isAnimationActive?
-                                :stroke "#ff00ff"
-                                :fill "#ff00ff"}])])))
-
-
+       (when @line-amt? [:> Line {:type              "monotone" :dataKey :amt
+                                  :isAnimationActive @isAnimationActive?
+                                  :stroke            "#ff00ff"
+                                  :fill              "#ff00ff"}])])))
 
 
 (defn- data-editor [data]
@@ -146,37 +207,11 @@
    :width 300])
 
 
-
 (defn example []
   (bcu/configurable-demo "Line Chart"
     "Line Charts (working on adding a configuration tool for this)"
-    [data-editor data]
+    ;[data-editor data]
     [config-panel config]
     [configurable-chart data config]
     '[layout/centered {:extra-classes :width-50}]))
 
-
-
-(comment
-  @data
-
-  (reset! data [{:name "Page A" :uv 4000 :pv 2400 :amt 2400}
-                {:name "Page B" :uv 3000 :pv 1598 :amt 2210}
-                {:name "Page C" :uv 2000 :pv 9800 :amt 2290}
-                {:name "Page D" :uv 2780 :pv 3908 :amt 2000}
-                {:name "Page E" :uv 1890 :pv 4800 :amt 2181}
-                {:name "Page F" :uv 2390 :pv 3800 :amt 2500}
-                {:name "Page G" :uv 3490 :pv 4300 :amt 2100}])
-
-
-
-
-  ; original value
-  (reset! data [{:name "Page A" :uv 4000 :pv 2400 :amt 2400}
-                {:name "Page B" :uv 3000 :pv 1398 :amt 2210}
-                {:name "Page C" :uv 2000 :pv 9800 :amt 2290}
-                {:name "Page D" :uv 2780 :pv 3908 :amt 2000}
-                {:name "Page E" :uv 1890 :pv 4800 :amt 2181}
-                {:name "Page F" :uv 2390 :pv 3800 :amt 2500}
-                {:name "Page G" :uv 3490 :pv 4300 :amt 2100}])
-  ())

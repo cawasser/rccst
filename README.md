@@ -57,6 +57,12 @@ There are lots of things we wanted to learn more about, and we've [done many of 
            1. [ ] Re-com
            2. [ ] Woolybear
         3. [ ] what are the molecules?
+           1. [ ] sidebar
+           2. [ ] toolbar
+           3. [ ] color picker?
+           4. [ ] login/settings
+           5. [ ] hamburger menu
+           6. [ ] widget-maker (or is this a template? or template builder?)
 
 
 
