@@ -5,7 +5,8 @@
             [day8.re-frame.http-fx]
             [ajax.core :as ajax]
 
-            [bh.rccst.csrf :refer [?csrf-token]]))
+            [bh.rccst.csrf :refer [?csrf-token]]
+            [bh.rccst.db :as db]))
 
 
 (def default-header {:timeout         8000
@@ -13,6 +14,25 @@
                      :response-format (ajax/transit-response-format)
                      :headers         {"x-csrf-token" ?csrf-token}})
 
+
+(re-frame/reg-event-fx
+  ::initialize-db
+  (fn [_ _]
+    {:dispatch [::get-version]
+     :db       db/default-db}))
+
+
+(re-frame/reg-event-db
+  ::init-locals
+  (fn-traced [db [_ container init-vals]]
+    (log/info "::init-locals" container init-vals)
+    (if (get db container)
+      (do
+        (log/info "::init-locals // already exists")
+        db)
+      (do
+        (log/info "::init-locals // adding")
+        (assoc db container init-vals)))))
 
 
 (re-frame/reg-event-db

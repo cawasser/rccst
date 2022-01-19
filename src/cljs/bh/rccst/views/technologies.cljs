@@ -5,6 +5,7 @@
             [woolybear.packs.flex-panel :as flex]
             [woolybear.packs.tab-panel :as tab-panel]
 
+            [bh.rccst.events :as events]
             [bh.rccst.ui-component.navbar :as navbar]
             [bh.rccst.views.technologies.clojure :as tech-clj]
             [bh.rccst.views.technologies.clojurescript :as tech-cljs]
@@ -41,10 +42,11 @@
                   [:tech/all "All"]])
 
 
-
 (defn page
   "Some background on the various technologies we are using"
   []
+  (re-frame/dispatch-sync [::events/init-locals :tech init-db])
+
   [layout/page {:extra-classes :rccst}
    [flex/flex-panel {:height "calc(100vh - 2rem)"}
     [flex/flex-top

@@ -56,6 +56,8 @@
   logs into the system
   "
   []
+  (re-frame/dispatch-sync [::events/init-locals :nav-bar init-db])
+
   (let [logged-in? (re-frame/subscribe [::subs/logged-in?])]
     (fn []
       (log/info "view" @logged-in?)

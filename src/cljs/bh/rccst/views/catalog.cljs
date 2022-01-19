@@ -5,6 +5,7 @@
             [woolybear.packs.flex-panel :as flex]
             [woolybear.packs.tab-panel :as tab-panel]
 
+            [bh.rccst.events :as events]
             [bh.rccst.ui-component.navbar :as navbar]
             [bh.rccst.views.catalog.layouts :as layout-demo]
             [bh.rccst.views.catalog.containers :as containers-demo]
@@ -56,6 +57,9 @@
 (defn page
   "Top-level AD Catalog page"
   []
+
+  (re-frame/dispatch-sync [::events/init-locals :catalog init-db])
+
   [layout/page {:extra-classes :rccst}
    [flex/flex-panel {:height "calc(100vh - 2rem)"}
     [flex/flex-top

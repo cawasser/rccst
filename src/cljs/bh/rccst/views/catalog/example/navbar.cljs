@@ -2,8 +2,9 @@
   (:require [woolybear.ad.catalog.utils :as acu]
             [woolybear.ad.layout :as layout]
             [woolybear.packs.tab-panel :as tab-panel]
-
             [re-frame.core :as re-frame]
+
+            [bh.rccst.events :as events]
             [bh.rccst.ui-component.navbar :as navbar]))
 
 
@@ -11,7 +12,6 @@
 
 (def init-db
   {:tab-panel (tab-panel/mk-tab-panel-data data-path :demo-navbar/one)})
-
 
 (re-frame/reg-sub
   :db/navbar-example
@@ -32,6 +32,8 @@
 
 
 (defn example []
+  (re-frame/dispatch-sync [::events/init-locals :navbar-example init-db])
+
   (acu/demo "Navbar"
     "A Navbar, composed of individual buttons that dispatch events for controlling tab-panels
 
