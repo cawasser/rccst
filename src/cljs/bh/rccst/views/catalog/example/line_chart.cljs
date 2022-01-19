@@ -120,7 +120,8 @@
            :padding          "15px"
            :border-top       "1px solid #DDD"
            :background-color "#f7f7f7"}
-   :children [[rc/v-box
+   :children [[boolean-config config ":isAnimationActive" [:isAnimationActive]]
+              [rc/v-box
                :children [[boolean-config config ":grid" [:grid :include]]
                           [dashArray-config config ":strokeDasharray" 1 10 [:grid :strokeDasharray]]]]
 
