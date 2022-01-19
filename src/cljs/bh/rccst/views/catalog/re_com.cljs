@@ -10,7 +10,8 @@
             [bh.rccst.views.catalog.example.radio-button :as radio-button]
             [bh.rccst.views.catalog.example.text-input-re-com :as input-text]
             [bh.rccst.views.catalog.example.slider :as slider]
-            [bh.rccst.views.catalog.example.popover :as popover]))
+            [bh.rccst.views.catalog.example.popover :as popover]
+            [bh.rccst.views.catalog.example.splitter :as splitter]))
 
 
 
@@ -30,4 +31,7 @@
    [slider/example]
    [popover/button-anchor-example]
    [popover/link-anchor-example]
-   [popover/chart-example]])
+   [popover/chart-example]
+   [splitter/horizontal-example]
+   [splitter/example]
+   [splitter/vertical-example]])
