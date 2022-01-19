@@ -1,14 +1,17 @@
 (ns bh.rccst.views.catalog.example.line-chart
   (:require [taoensso.timbre :as log]
-            [woolybear.ad.layout :as layout]
+            [woolybear.packs.tab-panel :as tab-panel]
             ["recharts" :refer [LineChart Line
                                 XAxis YAxis CartesianGrid
                                 Tooltip Legend]]
             [reagent.core :as r]
             [reagent.ratom :refer-macros [reaction]]
             [re-com.core :as rc]
+            [re-frame.core :as re-frame]
 
+            [bh.rccst.events :as events]
             [bh.rccst.views.catalog.utils :as bcu]
+            [bh.rccst.ui-component.navbar :as navbar]
             [bh.rccst.ui-component.table :as table]))
 
 
@@ -19,6 +22,13 @@
                    {:name "Page E" :uv 1890 :pv 4800 :amt 2181}
                    {:name "Page F" :uv 2390 :pv 3800 :amt 2500}
                    {:name "Page G" :uv 3490 :pv 4300 :amt 2100}]))
+
+
+(defn- data-panel [data]
+  [table/table
+   :data data
+   :width "100%"
+   :max-rows 5])
 
 
 (def config (r/atom {:isAnimationActive true
@@ -35,8 +45,6 @@
                      :line-uv           {:include true}
                      :line-pv           {:include true}
                      :line-amt          {:include false}}))
-
-
 (def btns-style {:font-size   "12px"
                  :line-height "20px"
                  :padding     "6px 8px"})
@@ -138,6 +146,46 @@
                           [boolean-config config "line (amt)" [:line-amt :include]]]]]])
 
 
+(def data-path [:line-chart :tab-panel])
+
+(def init-db
+  {:tab-panel (tab-panel/mk-tab-panel-data data-path :line-chart/config)})
+
+
+(re-frame/reg-sub
+  :db/line-chart
+  (fn [db _]
+    (:line-chart db)))
+
+(re-frame/reg-sub
+  :line-chart/tab-panel
+  :<- [:db/line-chart]
+  (fn [navbar]
+    (:tab-panel navbar)))
+
+(re-frame/reg-sub
+  :line-chart/selected-tab
+  :<- [:line-chart/tab-panel]
+  (fn [tab-panel]
+    (:value tab-panel)))
+
+
+(defn- controls [data config]
+  (let [data-or-config [[:line-chart/config "config"]
+                        [:line-chart/data "data"]]]
+    [:div
+     [navbar/navbar data-or-config [:line-chart/tab-panel]]
+
+     [tab-panel/tab-panel {:extra-classes             :rccst
+                           :subscribe-to-selected-tab [:line-chart/selected-tab]}
+
+      [tab-panel/sub-panel {:panel-id :line-chart/config}
+       [config-panel config]]
+
+      [tab-panel/sub-panel {:panel-id :line-chart/data}
+       [data-panel data]]]]))
+
+
 (defn- strokeDasharray [config]
   (str (get-in @config [:grid :strokeDasharray :dash])
     " "
@@ -195,18 +243,12 @@
                                   :fill              "#ff00ff"}])])))
 
 
-(defn- data-editor [data]
-  [table/table
-   :data data
-   :max-rows 5
-   :width 300])
-
-
 (defn example []
+  (re-frame/dispatch-sync [::events/init-locals :line-chart init-db])
+
   (bcu/configurable-demo "Line Chart"
     "Line Charts (working on adding a configuration tool for this)"
-    ;[data-editor data]
-    [config-panel config]
+    [controls data config]
     [configurable-chart data config]
     '[layout/centered {:extra-classes :width-50}]))
 
