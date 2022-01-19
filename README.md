@@ -62,10 +62,11 @@ There are lots of things we wanted to learn more about, and we've [done many of 
            3. [ ] color picker?
            4. [ ] login/settings
            5. [ ] hamburger menu
-           6. [ ] widget
+           6. [X] charts inside popup/popover (see [here](http://worrydream.com/#!/MediaForThinkingTheUnthinkable))
+           7. [ ] widget
               1. [ ] title-bar
               2. [ ] frame w/resizer
-           7. [ ] widget-maker (or is this a template? or template builder?)
+           8. [ ] widget-maker (or is this a template? or template builder?)
 
 
 
