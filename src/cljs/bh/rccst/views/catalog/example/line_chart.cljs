@@ -47,23 +47,10 @@
                    {:name "Page G" :uv 3490 :pv 4300 :amt 2100}]))
 
 
-(def config (r/atom {:isAnimationActive true
-                     :grid              {:include         true
-                                         :strokeDasharray {:dash "3" :space "3"}}
-                     :x-axis            {:include     true
-                                         :orientation :bottom
-                                         :scale       "auto"}
-                     :y-axis            {:include     true
-                                         :orientation :left
-                                         :scale       "auto"}
-                     :tooltip           {:include true}
-                     :legend            {:include       true
-                                         :layout        "horizontal"
-                                         :align         "center"
-                                         :verticalAlign "bottom"}
-                     :line-uv           {:include true}
-                     :line-pv           {:include true}
-                     :line-amt          {:include false}}))
+(def config (r/atom (merge utils/default-config
+                     {:line-uv           {:include true}
+                      :line-pv           {:include true}
+                      :line-amt          {:include false}})))
 
 
 (defn- config-panel

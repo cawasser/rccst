@@ -31,6 +31,20 @@
                   {:id :top :label ":top"}])
 (def y-axis-btns [{:id :left :label ":left"}
                   {:id :right :label ":right"}])
+(def default-config {:isAnimationActive true
+                     :grid              {:include         true
+                                         :strokeDasharray {:dash "3" :space "3"}}
+                     :x-axis            {:include     true
+                                         :orientation :bottom
+                                         :scale       "auto"}
+                     :y-axis            {:include     true
+                                         :orientation :left
+                                         :scale       "auto"}
+                     :tooltip           {:include true}
+                     :legend            {:include       true
+                                         :layout        "horizontal"
+                                         :align         "center"
+                                         :verticalAlign "bottom"}})
 
 
 (defn data-panel
