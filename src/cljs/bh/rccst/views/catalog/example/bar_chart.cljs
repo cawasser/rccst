@@ -7,12 +7,9 @@
             [re-com.core :as rc]
 
             [bh.rccst.events :as events]
-            [bh.rccst.ui-component.table :as table]
             [bh.rccst.views.catalog.utils :as bcu]
             [bh.rccst.views.catalog.example.chart.utils :as utils]
-            ["recharts" :refer [BarChart Bar
-                                XAxis YAxis CartesianGrid
-                                Tooltip Legend]]))
+            ["recharts" :refer [BarChart Bar]]))
 
 
 ;; region ; support for the tabs/panels

@@ -32,7 +32,6 @@
        data-panel]]]))
 
 
-
 (defn- config-display
   "this is the workhorse function. It build a side-by-side UI with the config to the left
   and the component to the right. The user can change values in the config (checkboxes,
@@ -55,6 +54,7 @@
   [:div.demo-display
    [rc/h-box :src (rc/at)
     :size "auto"
+    :align :center
     :children [[layout/centered {:extra-classes :is-one-third}
                 [chart-config chart-events data-panel config-panel]]
                [layout/centered {:extra-classes :is-one-third}

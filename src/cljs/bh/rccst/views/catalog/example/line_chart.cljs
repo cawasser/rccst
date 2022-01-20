@@ -1,9 +1,7 @@
 (ns bh.rccst.views.catalog.example.line-chart
   (:require [taoensso.timbre :as log]
             [woolybear.packs.tab-panel :as tab-panel]
-            ["recharts" :refer [LineChart Line
-                                XAxis YAxis CartesianGrid
-                                Tooltip Legend]]
+            ["recharts" :refer [ResponsiveContainer LineChart Line]]
             [reagent.core :as r]
             [reagent.ratom :refer-macros [reaction]]
             [re-com.core :as rc]
@@ -11,7 +9,6 @@
 
             [bh.rccst.events :as events]
             [bh.rccst.views.catalog.utils :as bcu]
-            [bh.rccst.ui-component.table :as table]
 
             [bh.rccst.views.catalog.example.chart.utils :as utils]))
 
@@ -53,9 +50,9 @@
 
 
 (def config (r/atom (merge utils/default-config
-                     {:line-uv           {:include true}
-                      :line-pv           {:include true}
-                      :line-amt          {:include false}})))
+                      {:line-uv  {:include true}
+                       :line-pv  {:include true}
+                       :line-amt {:include false}})))
 
 ;; endregion
 
@@ -95,12 +92,7 @@
   - config : (atom) configuration settings made by the user using the config-panel, see [[config]].
   "
   [data config]
-  (let [;grid? (reaction (get-in @config [:grid :include]))
-        ;x-axis? (reaction (get-in @config [:x-axis :include]))
-        ;y-axis? (reaction (get-in @config [:y-axis :include]))
-        ;tooltip? (reaction (get-in @config [:tooltip :include]))
-        ;legend? (reaction (get-in @config [:legend :include]))
-        line-uv? (reaction (get-in @config [:line-uv :include]))
+  (let [line-uv? (reaction (get-in @config [:line-uv :include]))
         line-pv? (reaction (get-in @config [:line-pv :include]))
         line-amt? (reaction (get-in @config [:line-amt :include]))
         isAnimationActive? (reaction (:isAnimationActive @config))]
