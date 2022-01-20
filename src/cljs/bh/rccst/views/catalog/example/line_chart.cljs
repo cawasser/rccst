@@ -45,7 +45,17 @@
                    {:name "Page G" :uv 3490 :pv 4300 :amt 2100}]))
 
 
-(defn- data-panel [data]
+(defn- data-panel
+  "provides a simple tabular component (via `bh.rccst.ui-component.table`) to show the data presented
+  in the Chart.
+
+> Note: `table` uses the keys of the first hash-map in `@data` as the header label for the columns
+
+  ---
+
+  - data : (atom) vector of content hash-maps."
+
+  [data]
   [table/table
    :width 500
    :data data
@@ -75,20 +85,50 @@
                   {:id :right :label ":right"}])
 
 
-(defn- boolean-config [config label path]
+(defn- boolean-config
+  "lets the user turn on/of some component of the Chart
+
+  ---
+
+  - config : (atom) holds a hash-map of the actual configuration properties, see [[config]].
+  - label : (string) tell the user which subcomponent this control is manipulating
+  - path : (vector) path into `config` where the subcomponent 'inclusion' value is stored
+  "
+  [config label path]
   [rc/checkbox :src (rc/at)
    :label [rc/box :src (rc/at) :align :start :child [:code label]]
    :model (get-in @config path)
    :on-change #(swap! config assoc-in path %)])
 
 
-(defn- strokeDasharray [config]
+(defn- strokeDasharray
+  "reconstitutes the 2-part string value required by `:strokeDasharray` from the
+  2 values in the [[config]] atom.
+
+  ---
+
+  - config : (atom) holds a hash-map of the actual configuration properties, see [[config]].
+  "
+  [config]
   (str (get-in @config [:grid :strokeDasharray :dash])
     " "
     (get-in @config [:grid :strokeDasharray :space])))
 
 
-(defn- dashArray-config [config label min max path]
+(defn- dashArray-config
+  "provides the user with 2 sliders to control the 2 parts of the `:strokeDasharray`
+  property of a chart's [`CartesianGrid`](https://recharts.org/en-US/api/CartesianGrid)
+
+  ---
+
+  - config : (atom) holds a hash-map of the actual configuration properties, see [[config]].
+  - label : (string) tell the user which axis this control is manipulating
+  - min : (integer) minimum value for the slider
+  - max : (integer) maximum value for the slider
+  - path : (vector) path into `config` where the :strokeDasharray is stored
+  "
+
+  [config label min max path]
   [rc/h-box :src (rc/at)
    :children [[rc/box :src (rc/at) :align :start :child [:code label]]
               [rc/v-box :src (rc/at)
@@ -105,7 +145,30 @@
                            :on-change #(swap! config assoc-in (conj path :space) %)]]]]])
 
 
-(defn- orientation-config [config btns label path]
+(defn- orientation-config
+  "lets the user configure the orientation of an axis. Which axis is defined by the arguments.
+
+  ---
+
+  - config : (atom) holds a hash-map of the actual configuration properties, see [[config]].
+  - btns : (vector) define the button that set the value(s).
+
+  | key       | description                                                          |
+  |:----------|:---------------------------------------------------------------------|
+  | `:id`     | the value to set when the use click the corresponding button control |
+  | `:label`  | the label to put on the button                                       |
+
+  Each axis support a different set of possible orientations:
+
+  | axis      | allowed orientations   |
+  |:----------|:-----------------------|
+  | X Axis    | `:top` , `:bottom`     |
+  | Y Axis    | `:left` , `:right`     |
+
+  - label : (string) tell the user which axis this control is manipulating
+  - path : (vector) path into `config` where the orientation for the correct axis is stored
+  "
+  [config btns label path]
   [rc/h-box :src (rc/at)
    :children [[rc/box :src (rc/at) :align :start :child [:code label]]
               [rc/horizontal-bar-tabs
@@ -116,7 +179,21 @@
                :on-change #(swap! config assoc-in path %)]]])
 
 
-(defn- scale-config [config label path]
+(defn- scale-config
+  "lets the user change the scale of an 'axis'. Which axis is defined by the arguments.
+  Supports only:
+
+    `auto` , `linear` , `pow` , `sqrt` , `log`
+
+  scale types. Recharts supports many more. See [here](https://recharts.org/en-US/api/XAxis#scale)
+
+  ---
+
+  - config : (atom) holds a hash-map of the actual configuration properties, see [[config]].
+  - label : (string) tell the user which axis this control is manipulating
+  - path : (vector) path into `config` where the scale for the correct axis is stored
+  "
+  [config label path]
   (let [btns [{:id "auto" :label "auto"}
               {:id "linear" :label "linear"}
               {:id "pow" :label "pow"}
@@ -179,8 +256,8 @@
 
   ---
 
-  - data : (atom) any data used by the component's ui
-  - config : (atom) configuration settings made by the user using the config-panel
+  - data : (atom) any data shown by the component's ui
+  - config : (atom) configuration settings made by the user using the config-panel, see [[config]].
   "
   [data config]
   (let [grid? (reaction (get-in @config [:grid :include]))
