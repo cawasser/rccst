@@ -287,6 +287,5 @@
    [rc/line :src (rc/at) :size "2px"]
    [tooltip config]
    [rc/line :src (rc/at) :size "2px"]
-   [legend config]
-   [rc/line :src (rc/at) :size "2px"]])
+   [legend config]])
 

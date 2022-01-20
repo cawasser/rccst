@@ -152,6 +152,7 @@
            :border-top       "1px solid #DDD"
            :background-color "#f7f7f7"}
    :children [[utils/standard-chart-config config]
+              [rc/line :src (rc/at) :size "2px"]
               [rc/h-box :src (rc/at)
                :gap "10px"
                :children [[boolean-config config "bar (uv)" [:bar-uv :include]]
