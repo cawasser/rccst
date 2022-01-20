@@ -66,7 +66,7 @@
                      :legend            {:include       true
                                          :layout        "horizontal"
                                          :align         "center"
-                                         :verticalAlign "middle"}
+                                         :verticalAlign "bottom"}
                      :bar-uv            {:include true}
                      :bar-pv            {:include true}
                      :bar-amt           {:include false}}))
