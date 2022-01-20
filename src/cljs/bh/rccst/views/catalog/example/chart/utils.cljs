@@ -1,19 +1,34 @@
 (ns bh.rccst.views.catalog.example.chart.utils
   (:require [taoensso.timbre :as log]
-            [woolybear.packs.tab-panel :as tab-panel]
-            ["recharts" :refer [LineChart Line
-                                XAxis YAxis CartesianGrid
+            ["recharts" :refer [XAxis YAxis CartesianGrid
                                 Tooltip Legend]]
+            ["react-colorful" :refer [HexColorPicker]]
+
             [reagent.core :as r]
             [reagent.ratom :refer-macros [reaction]]
             [re-com.core :as rc]
-            [re-frame.core :as re-frame]
 
-            [bh.rccst.events :as events]
-            [bh.rccst.views.catalog.utils :as bcu]
             [bh.rccst.ui-component.table :as table]))
 
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;
+; SOME EXAMPLE DATA
+;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; region
+
+(def tabular-data [{:name "Page A" :uv 4000 :pv 2400 :amt 2400}
+                   {:name "Page B" :uv 3000 :pv 1398 :amt 2210}
+                   {:name "Page C" :uv 2000 :pv 9800 :amt 2290}
+                   {:name "Page D" :uv 2780 :pv 3908 :amt 2000}
+                   {:name "Page E" :uv 1890 :pv 4800 :amt 2181}
+                   {:name "Page F" :uv 2390 :pv 3800 :amt 2500}
+                   {:name "Page G" :uv 3490 :pv 4300 :amt 2100}])
+
+;; endregion
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -33,7 +48,8 @@
                   {:id :right :label ":right"}])
 (def default-config {:isAnimationActive true
                      :grid              {:include         true
-                                         :strokeDasharray {:dash "3" :space "3"}}
+                                         :strokeDasharray {:dash "3" :space "3"}
+                                         :stroke          "#a9a9a9"}
                      :x-axis            {:include     true
                                          :orientation :bottom
                                          :scale       "auto"}
@@ -261,6 +277,28 @@
                  :style btns-style
                  :on-change #(swap! config assoc-in path %)]]]))
 
+
+(defn color-config [config label path]
+  (let [showing? (r/atom false)]
+    (fn []
+      [rc/h-box :src (rc/at)
+       :gap "5px"
+       :children [[rc/popover-anchor-wrapper :src (rc/at)
+                   :showing? showing?
+                   :position :right-center
+                   :anchor [rc/button :src (rc/at)
+                            :label label
+                            :on-click #(swap! showing? not)]
+                   :popover [rc/popover-content-wrapper :src (rc/at)
+                             :close-button? true
+                             :body [:> HexColorPicker {:color     (get-in @config path)
+                                                       :on-change #(swap! config assoc-in path %)}]]]
+                  [rc/input-text :src (rc/at)
+                   :model (get-in @config path)
+                   :on-change #(swap! config assoc-in path %)]]])))
+
+
+
 ;; endregion
 
 
@@ -281,7 +319,8 @@
   [rc/v-box :src (rc/at)
    :children [[boolean-config config ":grid" [:grid :include]]
               [dashArray-config config
-               ":strokeDasharray" 1 10 [:grid :strokeDasharray]]]])
+               ":strokeDasharray" 1 10 [:grid :strokeDasharray]]
+              [color-config config ":stroke" [:grid :stroke]]]])
 
 
 (defn x-axis [config]
@@ -335,3 +374,40 @@
    [rc/line :src (rc/at) :size "2px"]
    [legend config]])
 
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;
+; HIGH-LEVEL COMPONENT 'MOLECULES'
+;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; region
+
+(defn standard-chart-components [config]
+  (let [grid? (reaction (get-in @config [:grid :include]))
+        x-axis? (reaction (get-in @config [:x-axis :include]))
+        y-axis? (reaction (get-in @config [:y-axis :include]))
+        tooltip? (reaction (get-in @config [:tooltip :include]))
+        legend? (reaction (get-in @config [:legend :include]))]
+
+    [:<>
+     (when @grid? [:> CartesianGrid {:strokeDasharray (strokeDasharray config)
+                                     :stroke (get-in @config [:grid :stroke])}])
+
+     (when @x-axis? [:> XAxis {:dataKey     :name
+                               :orientation (get-in @config [:x-axis :orientation])
+                               :scale       (get-in @config [:x-axis :scale])}])
+
+     (when @y-axis? [:> YAxis {:orientation (get-in @config [:y-axis :orientation])
+                               :scale       (get-in @config [:y-axis :scale])}])
+
+     (when @tooltip? [:> Tooltip])
+
+     (when @legend? [:> Legend {:layout        (get-in @config [:legend :layout])
+                                :align         (get-in @config [:legend :align])
+                                :verticalAlign (get-in @config [:legend :verticalAlign])}])]))
+
+
+;; endregion

@@ -28,7 +28,8 @@
     panel. Takes standard `:extra-classes` and `:subscribe-to-classes` options."
     [shy-block-demo]
 
-    '[layout/frame
-      [buttons/button {:on-click click-dispatcher} "Toggle Visibility"]
-      [containers/shy-block {:active? active?}
-       [layout/text-block acu/lorem]]]))
+    '(let [active? (reagent/atom false)]
+       [layout/frame
+        [buttons/button {:on-click (swap! active? not)} "Toggle Visibility"]
+        [containers/shy-block {:active? active?}
+         [layout/text-block acu/lorem]]])))

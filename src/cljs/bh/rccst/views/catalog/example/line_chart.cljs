@@ -95,11 +95,11 @@
   - config : (atom) configuration settings made by the user using the config-panel, see [[config]].
   "
   [data config]
-  (let [grid? (reaction (get-in @config [:grid :include]))
-        x-axis? (reaction (get-in @config [:x-axis :include]))
-        y-axis? (reaction (get-in @config [:y-axis :include]))
-        tooltip? (reaction (get-in @config [:tooltip :include]))
-        legend? (reaction (get-in @config [:legend :include]))
+  (let [;grid? (reaction (get-in @config [:grid :include]))
+        ;x-axis? (reaction (get-in @config [:x-axis :include]))
+        ;y-axis? (reaction (get-in @config [:y-axis :include]))
+        ;tooltip? (reaction (get-in @config [:tooltip :include]))
+        ;legend? (reaction (get-in @config [:legend :include]))
         line-uv? (reaction (get-in @config [:line-uv :include]))
         line-pv? (reaction (get-in @config [:line-pv :include]))
         line-amt? (reaction (get-in @config [:line-amt :include]))
@@ -110,20 +110,7 @@
 
       [:> LineChart {:width 400 :height 400 :data @data}
 
-       (when @grid? [:> CartesianGrid {:strokeDasharray (utils/strokeDasharray config)}])
-
-       (when @x-axis? [:> XAxis {:dataKey     :name
-                                 :orientation (get-in @config [:x-axis :orientation])
-                                 :scale       (get-in @config [:x-axis :scale])}])
-
-       (when @y-axis? [:> YAxis {:orientation (get-in @config [:y-axis :orientation])
-                                 :scale       (get-in @config [:y-axis :scale])}])
-
-       (when @tooltip? [:> Tooltip])
-
-       (when @legend? [:> Legend {:layout        (get-in @config [:legend :layout])
-                                  :align         (get-in @config [:legend :align])
-                                  :verticalAlign (get-in @config [:legend :verticalAlign])}])
+       (utils/standard-chart-components config)
 
        (when @line-uv? [:> Line {:type              "monotone" :dataKey :uv
                                  :isAnimationActive @isAnimationActive?

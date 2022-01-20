@@ -1,72 +1,58 @@
 (ns bh.rccst.views.catalog.example.progress-bar
   (:require [reagent.core :as r]
             [woolybear.ad.catalog.utils :as acu]
-            [re-com.core :as core]
-            [re-com.progress-bar :as pb]))
+            [re-com.core :as rc]))
+
 
 (def progress (r/atom 75))
 (def striped? (r/atom false))
 
+
+(defn config-panel []
+  [rc/v-box :src (rc/at)
+   :gap "10px"
+   :style {:min-width        "200px"
+           :padding          "15px"
+           :border-top       "1px solid #DDD"
+           :background-color "#f7f7f7"}
+   :children [[rc/h-box :src (rc/at)
+               :gap "10px"
+               :children [[rc/box :src (rc/at) :align :start :child [:code ":model"]]
+                          [rc/slider :src (rc/at)
+                           :model progress
+                           :min 0
+                           :max 100
+                           :width "200px"
+                           :on-change #(reset! progress %)]
+                          [rc/label :src (rc/at) :label @progress]]]
+              [rc/checkbox :src (rc/at)
+               :label [rc/box :src (rc/at) :align :start :child [:code ":striped?"]]
+               :model striped?
+               :on-change #(reset! striped? %)]]])
+
+
+(defn- component-panel []
+  [rc/v-box :src (rc/at)
+   :align-self :center
+   :children [[rc/progress-bar :src (rc/at)
+               :model progress
+               :width "400px"
+               :striped? @striped?]]])
+
+
 (defn example []
       (acu/demo "Progress Bar"
-                [core/v-box :src (core/at)
+                [rc/v-box :src (rc/at)
                  :gap "20px"
-                 :children [[core/h-box :src (core/at)
+                 :children [[rc/h-box :src (rc/at)
                              :justify :between
-                             :children [[core/v-box :src (core/at)
-                                         :align-self :center
-                                         :children [[pb/progress-bar :src (core/at)
-                                                     :model progress
-                                                     :width "400px"
-                                                     :striped? @striped?]]]
-                                        [core/v-box :src (core/at)
-                                         :gap "10px"
-                                         :style {:min-width        "200px"
-                                                 :padding          "15px"
-                                                 :border-top       "1px solid #DDD"
-                                                 :background-color "#f7f7f7"}
-                                         :children [
-                                                    [core/title :src (core/at) :level :level3 :label "Interactive Parameters" :style {:margin-top "0"}]
-                                                    [core/h-box :src (core/at)
-                                                     :gap "10px"
-                                                     :children [[core/box :src (core/at) :align :start :child [:code ":model"]]
-                                                                [core/slider :src (core/at)
-                                                                 :model progress
-                                                                 :min 0
-                                                                 :max 100
-                                                                 :width "200px"
-                                                                 :on-change #(reset! progress %)]
-                                                                [core/label :src (core/at) :label @progress]]]
-                                                    [core/checkbox :src (core/at)
-                                                     :label [core/box :src (core/at) :align :start :child [:code ":striped?"]]
-                                                     :model striped?
-                                                     :on-change #(reset! striped? %)]]]]]]]
+                             :children [[config-panel]
+                                        [component-panel]]]]]
 
-                '[core/v-box :src (core/at)
-                  :gap "20px"
-                  :children [[pb/progress-bar :src (core/at)
-                              :model progress
-                              :width "350px"
-                              :striped? @striped?]
-                             [core/v-box :src (core/at)
-                              :gap "10px"
-                              :style {:min-width        "150px"
-                                      :padding          "15px"
-                                      :border-top       "1px solid #DDD"
-                                      :background-color "#f7f7f7"}
-                              :children [
-                                         [core/title :src (core/at) :level :level3 :label "Interactive Parameters" :style {:margin-top "0"}]
-                                         [core/h-box :src (core/at)
-                                          :gap "10px"
-                                          :children [[core/box :src (core/at) :align :start :child [:code ":model"]]
-                                                     [core/slider :src (core/at)
-                                                      :model progress
-                                                      :min 0
-                                                      :max 100
-                                                      :width "200px"
-                                                      :on-change #(reset! progress %)]
-                                                     [core/label :src (core/at) :label @progress]]]
-                                         [core/checkbox :src (core/at)
-                                          :label [core/box :src (core/at) :align :start :child [:code ":striped?"]]
-                                          :model striped?
-                                          :on-change #(reset! striped? %)]]]]]))
+                '(let [striped? (reagent/atom false)
+                       progress (reagent/atom 75)]
+                   [re-com/progress-bar :src (re-com/at)
+                    :model progress
+                    :width "350px"
+                    :striped? @striped?])))
+

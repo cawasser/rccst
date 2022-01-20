@@ -42,8 +42,9 @@ There are lots of things we wanted to learn more about, and we've [done many of 
 
 1. [ ] [Re-think the UI](/docs/rethinking-ui.md)
     1. [X] more composition and better control over layout -> [re-com](https://github.com/Day8/re-com)
-    2. [ ] something to help alignment, grouping, etc. ... [fork?](https://github.com/luciodale/fork)
+    2. [X] something to help alignment, grouping, etc. ... [fork?](https://github.com/luciodale/fork)
         1. [ ] can it be used for simply _displaying_ content, not just editing?
+        2. [X] re-com??
     3. [X] is it better to just use CSS-styled Reagent components?
     4. [ ] how do we handle CSS for everything?
        1. [ ] [Sass](https://sass-lang.com)?
@@ -56,7 +57,7 @@ There are lots of things we wanted to learn more about, and we've [done many of 
         2. [ ] what are atoms?
            1. [ ] Re-com
            2. [ ] Woolybear
-        3. [ ] what are the molecules?
+        3. [ ] what are the molecules? (or they still just atoms?)
            1. [ ] sidebar
            2. [ ] toolbar
            3. [ ] color picker?
@@ -67,6 +68,11 @@ There are lots of things we wanted to learn more about, and we've [done many of 
               1. [ ] title-bar
               2. [ ] frame w/resizer
            8. [ ] widget-maker (or is this a template? or template builder?)
+2. [ ] complete/clean-up catalog example "show code"
+   1. [ ] Layout / Layout Grid
+   2. [ ] Cards /  Card
+   3. [ ] Cards / Flippable Card
+3. [ ] build a better "source code" tool so it actually shows the code as the component is actually configured in the catalog
 
 
 
