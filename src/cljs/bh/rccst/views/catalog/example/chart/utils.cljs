@@ -33,6 +33,23 @@
                   {:id :right :label ":right"}])
 
 
+(defn data-panel
+  "provides a simple tabular component (via `bh.rccst.ui-component.table`) to show the data presented
+  in the Chart.
+
+> Note: `table` uses the keys of the first hash-map in `@data` as the header label for the columns
+
+  ---
+
+  - data : (atom) vector of content hash-maps."
+
+  [data]
+  [table/table
+   :width 500
+   :data data
+   :max-rows 5])
+
+
 (defn boolean-config
   "lets the user turn on/of some component of the Chart
 

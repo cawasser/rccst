@@ -46,13 +46,6 @@
                    {:name "Page G" :uv 3490 :pv 4300 :amt 2100}]))
 
 
-(defn- data-panel [data]
-  [table/table
-   :width 500
-   :data data
-   :max-rows 5])
-
-
 (def config (r/atom {:isAnimationActive true
                      :grid              {:include         true
                                          :strokeDasharray {:dash "3" :space "3"}}
@@ -70,70 +63,6 @@
                      :bar-uv            {:include true}
                      :bar-pv            {:include true}
                      :bar-amt           {:include false}}))
-(def btns-style {:font-size   "12px"
-                 :line-height "20px"
-                 :padding     "6px 8px"})
-(def x-axis-btns [{:id :bottom :label ":bottom"}
-                  {:id :top :label ":top"}])
-(def y-axis-btns [{:id :left :label ":left"}
-                  {:id :right :label ":right"}])
-
-
-(defn- boolean-config [config label path]
-  [rc/checkbox :src (rc/at)
-   :label [rc/box :src (rc/at) :align :start :child [:code label]]
-   :model (get-in @config path)
-   :on-change #(swap! config assoc-in path %)])
-
-
-(defn- strokeDasharray [config]
-  (str (get-in @config [:grid :strokeDasharray :dash])
-    " "
-    (get-in @config [:grid :strokeDasharray :space])))
-
-
-(defn- dashArray-config [config label min max path]
-  [rc/h-box :src (rc/at)
-   :children [[rc/box :src (rc/at) :align :start :child [:code label]]
-              [rc/v-box :src (rc/at)
-               :gap "5px"
-               :children [[rc/slider :src (rc/at)
-                           :model (get-in @config (conj path :dash))
-                           :width "100px"
-                           :min min :max max
-                           :on-change #(swap! config assoc-in (conj path :dash) %)]
-                          [rc/slider :src (rc/at)
-                           :model (get-in @config (conj path :space))
-                           :width "100px"
-                           :min min :max max
-                           :on-change #(swap! config assoc-in (conj path :space) %)]]]]])
-
-
-(defn- orientation-config [config btns label path]
-  [rc/h-box :src (rc/at)
-   :children [[rc/box :src (rc/at) :align :start :child [:code label]]
-              [rc/horizontal-bar-tabs
-               :src (rc/at)
-               :model (get-in @config path)
-               :tabs btns
-               :style btns-style
-               :on-change #(swap! config assoc-in path %)]]])
-
-
-(defn- scale-config [config label path]
-  (let [btns [{:id "auto" :label "auto"}
-              {:id "linear" :label "linear"}
-              {:id "pow" :label "pow"}
-              {:id "sqrt" :label "sqrt"}
-              {:id "log" :label "log"}]]
-    [rc/h-box :src (rc/at)
-     :children [[rc/box :src (rc/at) :align :start :child [:code label]]
-                [rc/horizontal-bar-tabs
-                 :src (rc/at)
-                 :model (get-in @config path)
-                 :tabs btns
-                 :style btns-style
-                 :on-change #(swap! config assoc-in path %)]]]))
 
 
 (defn- config-panel
@@ -155,9 +84,9 @@
               [rc/line :src (rc/at) :size "2px"]
               [rc/h-box :src (rc/at)
                :gap "10px"
-               :children [[boolean-config config "bar (uv)" [:bar-uv :include]]
-                          [boolean-config config "bar (pv)" [:bar-pv :include]]
-                          [boolean-config config "bar (amt)" [:bar-amt :include]]]]]])
+               :children [[utils/boolean-config config "bar (uv)" [:bar-uv :include]]
+                          [utils/boolean-config config "bar (pv)" [:bar-pv :include]]
+                          [utils/boolean-config config "bar (amt)" [:bar-amt :include]]]]]])
 
 
 (defn- component
@@ -182,7 +111,7 @@
     (fn []
       [:> BarChart {:width 400 :height 400 :data @data}
 
-       (when @grid? [:> CartesianGrid {:strokeDasharray (strokeDasharray config)}])
+       (when @grid? [:> CartesianGrid {:strokeDasharray (utils/strokeDasharray config)}])
 
        (when @x-axis? [:> XAxis {:dataKey     :name
                                  :orientation (get-in @config [:x-axis :orientation])
@@ -216,7 +145,7 @@
   (bcu/configurable-demo "Bar Chart"
     "Bar Charts (this would be really cool with support for changing options live)"
     [:bar-chart/config :bar-chart/data :bar-chart/tab-panel :bar-chart/selected-tab]
-    [data-panel data]
+    [utils/data-panel data]
     [config-panel config]
     [component data config]
     '[layout/centered {:extra-classes :width-50}
