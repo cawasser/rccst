@@ -214,6 +214,7 @@
 
   (bcu/configurable-demo "Bar Chart"
     "Bar Charts (this would be really cool with support for changing options live)"
+    [:bar-chart/config :bar-chart/data :bar-chart/tab-panel :bar-chart/selected-tab]
     [data-panel data]
     [config-panel config]
     [component data config]

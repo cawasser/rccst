@@ -296,6 +296,7 @@
   (bcu/configurable-demo
     "Line Chart"
     "A simple Line Chart built using [Recharts]()"
+    [:line-chart/config :line-chart/data :line-chart/tab-panel :line-chart/selected-tab]
     [data-panel data]
     [config-panel config]
     [component data config]

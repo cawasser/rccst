@@ -15,19 +15,20 @@
             [bh.rccst.ui-component.navbar :as navbar]))
 
 
-(defn- chart-config [data-panel config-panel]
-  (let [data-or-config [[:line-chart/config "config"]
-                        [:line-chart/data "data"]]]
+(defn- chart-config [[config data panel tab] data-panel config-panel]
+  (log/info "chart-config" config data panel tab)
+  (let [data-or-config [[config "config"]
+                        [data "data"]]]
     [:div.chart-config {:style {:width "100%"}}
-     [navbar/navbar data-or-config [:line-chart/tab-panel]]
+     [navbar/navbar data-or-config [panel]]
 
      [tab-panel/tab-panel {:extra-classes             :rccst
-                           :subscribe-to-selected-tab [:line-chart/selected-tab]}
+                           :subscribe-to-selected-tab [tab]}
 
-      [tab-panel/sub-panel {:panel-id :line-chart/config}
+      [tab-panel/sub-panel {:panel-id config}
        config-panel]
 
-      [tab-panel/sub-panel {:panel-id :line-chart/data}
+      [tab-panel/sub-panel {:panel-id data}
        data-panel]]]))
 
 
@@ -49,13 +50,13 @@
   > [re-com demo](https://re-com.day8.com.au/#/h-box)
   > [demo source](https://github.com/day8/re-com/blob/master/src/re_demo/h_box.cljs)
   "
-  [data-panel config-panel component]
+  [chart-events data-panel config-panel component]
   ;(log/info "config-display" data)
   [:div.demo-display
    [rc/h-box :src (rc/at)
     :size "auto"
     :children [[layout/centered {:extra-classes :is-one-third}
-                [chart-config data-panel config-panel]]
+                [chart-config chart-events data-panel config-panel]]
                [layout/centered {:extra-classes :is-one-third}
                 component]]]])
 
@@ -67,14 +68,14 @@
   (let [[notes children] (if (string? (first children))
                            [(first children) (rest children)]
                            [nil children])
-        [data-panel config-panel component src] children]
+        [chart-events data-panel config-panel component src] children]
 
     [:div.demo-container
      [:div.demo-name name]
      (if notes
        [:> ReactMarkdown {:source notes}]
        "")
-     [config-display data-panel config-panel component]
+     [config-display chart-events data-panel config-panel component]
      [containers/spoiler {:show-label "Show Code"
                           :hide-label "Hide Code"}
       [ad-utils/code-block (string/triml (ad-utils/pps src))]]]))
