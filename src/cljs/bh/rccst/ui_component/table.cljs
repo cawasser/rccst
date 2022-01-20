@@ -6,7 +6,7 @@
 (defn table-column-headers [data rows width height]
   (let [d (apply set (map keys data))
         col-count (count d)
-        col-width (max 60 (/ (or width 400) col-count))
+        col-width (max 80 (/ (or width 400) col-count))
         row-height (max 50 (/ (or height 400) (+ 2 (or rows 5))))]
     (->> d
       (map (fn [k]

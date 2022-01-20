@@ -11,8 +11,29 @@
 
             [bh.rccst.events :as events]
             [bh.rccst.views.catalog.utils :as bcu]
-            [bh.rccst.ui-component.navbar :as navbar]
             [bh.rccst.ui-component.table :as table]))
+
+
+(def data-path [:line-chart :tab-panel])
+(def init-db
+  {:tab-panel (tab-panel/mk-tab-panel-data data-path :line-chart/config)})
+
+(re-frame/reg-sub
+  :db/line-chart
+  (fn [db _]
+    (:line-chart db)))
+
+(re-frame/reg-sub
+  :line-chart/tab-panel
+  :<- [:db/line-chart]
+  (fn [navbar]
+    (:tab-panel navbar)))
+
+(re-frame/reg-sub
+  :line-chart/selected-tab
+  :<- [:line-chart/tab-panel]
+  (fn [tab-panel]
+    (:value tab-panel)))
 
 
 (def data (r/atom [{:name "Page A" :uv 4000 :pv 2400 :amt 2400}
@@ -26,8 +47,8 @@
 
 (defn- data-panel [data]
   [table/table
+   :width 500
    :data data
-   :width "100%"
    :max-rows 5])
 
 
@@ -48,10 +69,10 @@
 (def btns-style {:font-size   "12px"
                  :line-height "20px"
                  :padding     "6px 8px"})
-(def x-axis-btns [{:id :bottom   :label ":bottom"}
-                  {:id :top     :label ":top"}])
-(def y-axis-btns [{:id :left   :label ":left"}
-                  {:id :right     :label ":right"}])
+(def x-axis-btns [{:id :bottom :label ":bottom"}
+                  {:id :top :label ":top"}])
+(def y-axis-btns [{:id :left :label ":left"}
+                  {:id :right :label ":right"}])
 
 
 (defn- boolean-config [config label path]
@@ -59,6 +80,12 @@
    :label [rc/box :src (rc/at) :align :start :child [:code label]]
    :model (get-in @config path)
    :on-change #(swap! config assoc-in path %)])
+
+
+(defn- strokeDasharray [config]
+  (str (get-in @config [:grid :strokeDasharray :dash])
+    " "
+    (get-in @config [:grid :strokeDasharray :space])))
 
 
 (defn- dashArray-config [config label min max path]
@@ -116,8 +143,8 @@
 
   [rc/v-box :src (rc/at)
    :gap "10px"
-   :style {:min-width        "150px"
-           :padding          "15px"
+   :width "100%"
+   :style {:padding          "15px"
            :border-top       "1px solid #DDD"
            :background-color "#f7f7f7"}
    :children [[boolean-config config ":isAnimationActive" [:isAnimationActive]]
@@ -147,53 +174,7 @@
                           [boolean-config config "line (amt)" [:line-amt :include]]]]]])
 
 
-(def data-path [:line-chart :tab-panel])
-
-(def init-db
-  {:tab-panel (tab-panel/mk-tab-panel-data data-path :line-chart/config)})
-
-
-(re-frame/reg-sub
-  :db/line-chart
-  (fn [db _]
-    (:line-chart db)))
-
-(re-frame/reg-sub
-  :line-chart/tab-panel
-  :<- [:db/line-chart]
-  (fn [navbar]
-    (:tab-panel navbar)))
-
-(re-frame/reg-sub
-  :line-chart/selected-tab
-  :<- [:line-chart/tab-panel]
-  (fn [tab-panel]
-    (:value tab-panel)))
-
-
-(defn- controls [data config]
-  (let [data-or-config [[:line-chart/config "config"]
-                        [:line-chart/data "data"]]]
-    [:div
-     [navbar/navbar data-or-config [:line-chart/tab-panel]]
-
-     [tab-panel/tab-panel {:extra-classes             :rccst
-                           :subscribe-to-selected-tab [:line-chart/selected-tab]}
-
-      [tab-panel/sub-panel {:panel-id :line-chart/config}
-       [config-panel config]]
-
-      [tab-panel/sub-panel {:panel-id :line-chart/data}
-       [data-panel data]]]]))
-
-
-(defn- strokeDasharray [config]
-  (str (get-in @config [:grid :strokeDasharray :dash])
-    " "
-    (get-in @config [:grid :strokeDasharray :space])))
-
-
-(defn- configurable-chart
+(defn- component
   "the chart to draw, taking cues from the settings of the configuration panel
 
   ---
@@ -247,9 +228,26 @@
 (defn example []
   (re-frame/dispatch-sync [::events/init-locals :line-chart init-db])
 
-  (bcu/configurable-demo "Line Chart"
-    "Line Charts (working on adding a configuration tool for this)"
-    [controls data config]
-    [configurable-chart data config]
-    '[layout/centered {:extra-classes :width-50}]))
+  (bcu/configurable-demo
+    "Line Chart"
+    "A simple Line Chart built using [Recharts]()"
+    [data-panel data]
+    [config-panel config]
+    [component data config]
+    '[:> LineChart {:width 400 :height 400 :data @data}
+      [:> CartesianGrid {:strokeDasharray (strokeDasharray config)}]
+      [:> XAxis {:dataKey :name :orientation :bottom :scale "auto"}]
+      [:> YAxis {:orientation :left :scale "auto"}]
+      [:> Tooltip]
+      [:> Legend]
+      [:> Line {:type              "monotone" :dataKey :uv
+                :isAnimationActive true
+                :stroke            "#8884d8" :fill "#8884d8"}]
+      [:> Line {:type              "monotone" :dataKey :pv
+                :isAnimationActive true
+                :stroke            "#82ca9d" :fill "#82ca9d"}]
+      [:> Line {:type              "monotone" :dataKey :amt
+                :isAnimationActive true
+                :stroke            "#ff00ff"
+                :fill              "#ff00ff"}]]))
 

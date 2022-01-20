@@ -7,9 +7,28 @@
             [taoensso.timbre :as log]
             [woolybear.ad.containers :as containers]
             [woolybear.ad.layout :as layout]
+            [woolybear.packs.tab-panel :as tab-panel]
             [woolybear.ad.catalog.utils :as ad-utils]
             ["react-markdown" :as ReactMarkdown]
-            [re-com.core :as rc]))
+            [re-com.core :as rc]
+
+            [bh.rccst.ui-component.navbar :as navbar]))
+
+
+(defn- chart-config [data-panel config-panel]
+  (let [data-or-config [[:line-chart/config "config"]
+                        [:line-chart/data "data"]]]
+    [:div.chart-config {:style {:width "100%"}}
+     [navbar/navbar data-or-config [:line-chart/tab-panel]]
+
+     [tab-panel/tab-panel {:extra-classes             :rccst
+                           :subscribe-to-selected-tab [:line-chart/selected-tab]}
+
+      [tab-panel/sub-panel {:panel-id :line-chart/config}
+       config-panel]
+
+      [tab-panel/sub-panel {:panel-id :line-chart/data}
+       data-panel]]]))
 
 
 
@@ -30,15 +49,13 @@
   > [re-com demo](https://re-com.day8.com.au/#/h-box)
   > [demo source](https://github.com/day8/re-com/blob/master/src/re_demo/h_box.cljs)
   "
-  [data config component]
-  (log/info "config-display" data)
+  [data-panel config-panel component]
+  ;(log/info "config-display" data)
   [:div.demo-display
    [rc/h-box :src (rc/at)
     :size "auto"
     :children [[layout/centered {:extra-classes :is-one-third}
-                data]
-               [layout/centered {:extra-classes :is-one-third}
-                config]
+                [chart-config data-panel config-panel]]
                [layout/centered {:extra-classes :is-one-third}
                 component]]]])
 
@@ -50,13 +67,14 @@
   (let [[notes children] (if (string? (first children))
                            [(first children) (rest children)]
                            [nil children])
-        [data config component-ui config-ui src] children]
+        [data-panel config-panel component src] children]
+
     [:div.demo-container
      [:div.demo-name name]
      (if notes
        [:> ReactMarkdown {:source notes}]
        "")
-     [config-display data config component-ui config-ui]
+     [config-display data-panel config-panel component]
      [containers/spoiler {:show-label "Show Code"
                           :hide-label "Hide Code"}
       [ad-utils/code-block (string/triml (ad-utils/pps src))]]]))
