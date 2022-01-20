@@ -43,9 +43,9 @@
        "Toggle controls for some parameters."
        [content enabled-days as-days disabled? show-today? show-weeks? start-of-week-choices start-of-week]
 
-       [core/v-box :src (core/at)
+       [core/h-box :src (core/at)
         :gap      "15px"
-        :align    :start
+        :justify :between
         :children [content
                    [core/v-box
                     :src   (core/at)
@@ -265,4 +265,28 @@
 
 
 (defn example []
-      (acu/demo "Date Picker" [datepicker-examples]))
+      (acu/demo "Date Picker" [datepicker-examples]
+                '[core/v-box :src (core/at)
+                  :size     "auto"
+                  :gap      "10px"
+                  :children [[core/h-box
+                              :src      (core/at)
+                              :gap      "100px"
+                              :children [[core/v-box
+                                          :src      (core/at)
+                                          :gap       "20px"
+                                          :size      "auto"
+                                          :children  [[core/h-box
+                                                       :src      (core/at)
+                                                       :gap      "10px"
+                                                       :align    :center
+                                                       :children [[core/label
+                                                                   :src   (core/at)
+                                                                   :label "Select a demo"]
+                                                                  [core/single-dropdown
+                                                                   :src      (core/at)
+                                                                   :choices   variations
+                                                                   :model     selected-variation
+                                                                   :width     "200px"
+                                                                   :on-change #(reset! selected-variation %)]]]
+                                                      [show-variant @selected-variation]]]]]]]))

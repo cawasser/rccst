@@ -95,4 +95,45 @@
 
 
 (defn example []
-      (acu/demo "Input Time" [basics-demo]))
+      (acu/demo "Input Time" [basics-demo]
+                '[core/v-box :src (core/at)
+                  :gap      "10px"
+                  :style {:min-width        "550px"
+                          :padding          "15px"
+                          :border-top       "1px solid #DDD"
+                          :background-color "#f7f7f7"}
+                  :children [[core/title :src (core/at) :level :level3 :label "Interactive Parameters" :style {:margin-top "0"}]
+                             [simulated-bools disabled? hide-border? show-icon?]
+                             [core/gap :src (core/at) :size "20px"]
+                             [core/title :src (core/at) :level :level3 :label "Model resets"]
+                             [core/h-box :src (core/at)
+                              :gap "10px"
+                              :align :center
+                              :children [[core/button :src (core/at)
+                                          :label    "11am"
+                                          :class    "btn btn-default"
+                                          :on-click #(reset! an-int-time 1100)]
+                                         [core/button :src (core/at)
+                                          :label    "5pm"
+                                          :class    "btn btn-default"
+                                          :on-click #(reset! an-int-time 1700)]]]
+                             [core/gap :src (core/at) :size "20px"]
+                             [core/title :src (core/at) :level :level3 :label "Simulated minimum & maximum changes"]
+                             [core/h-box :src (core/at)
+                              :gap      "10px"
+                              :align    :center
+                              :children [[core/label :src (core/at) :label ":minimum"]
+                                         [core/label :src (core/at) :label @minimum :style {:width "40px" :font-size "11px" :text-align "center"}]
+                                         [core/label :src (core/at) :label ":maximum"]
+                                         [core/label :src (core/at) :label @maximum :style {:width "40px" :font-size "11px" :text-align "center"}]]]
+                             [core/h-box :src (core/at)
+                              :gap      "10px"
+                              :align    :center
+                              :children [[core/checkbox :src (core/at)
+                                          :label     [core/box :src (core/at) :align :start :child [:code ":minimum 10am"]]
+                                          :model     (not= @minimum init-minimum)
+                                          :on-change #(reset! minimum (if % 1000 init-minimum))]
+                                         [core/checkbox :src (core/at)
+                                          :label     [core/box :src (core/at) :align :start :child [:code ":maximum 2pm"]]
+                                          :model     (not= @maximum init-maximum)
+                                          :on-change #(reset! maximum (if % 1400 init-maximum))]]]]]))

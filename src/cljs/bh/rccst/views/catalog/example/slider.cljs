@@ -11,17 +11,19 @@
             disabled?   (ratom/atom false)]
            (fn []
                (acu/demo "Slider"
-                         [rc/v-box
+                         [rc/h-box
                           :src      (rc/at)
-                          :gap      "20px"
-                          :children [[rc/slider
-                                      :src       (rc/at)
-                                      :model     slider-val
-                                      :min       slider-min
-                                      :max       slider-max
-                                      :width     "300px"
-                                      :on-change #(reset! slider-val (str %))
-                                      :disabled? disabled?]
+                          :justify :between
+                          :children [[rc/v-box :src (rc/at)
+                                      :align-self :center
+                                      :children [[rc/slider
+                                                  :src       (rc/at)
+                                                  :model     slider-val
+                                                  :min       slider-min
+                                                  :max       slider-max
+                                                  :width     "300px"
+                                                  :on-change #(reset! slider-val (str %))
+                                                  :disabled? disabled?]]]
                                      [rc/gap :src (rc/at) :size "0px"]
                                      [rc/v-box
                                       :src      (rc/at)
@@ -87,4 +89,13 @@
                                                           :align :start :child [:code ":disabled?"]]
                                                   :model disabled?
                                                   :on-change (fn [val]
-                                                                 (reset! disabled? val))]]]]]))))
+                                                                 (reset! disabled? val))]]]]]
+
+                         '[rc/slider
+                           :src       (rc/at)
+                           :model     slider-val
+                           :min       slider-min
+                           :max       slider-max
+                           :width     "300px"
+                           :on-change #(reset! slider-val (str %))
+                           :disabled? disabled?]))))
