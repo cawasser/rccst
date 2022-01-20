@@ -14,6 +14,16 @@
             [bh.rccst.ui-component.table :as table]))
 
 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;
+; LOW-LEVEL CONFIGURATION 'ATOMS' & 'MOLECULES'
+;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
 (def btns-style {:font-size   "12px"
                  :line-height "20px"
                  :padding     "6px 8px"})
@@ -220,6 +230,7 @@
                  :style btns-style
                  :on-change #(swap! config assoc-in path %)]]]))
 
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;
@@ -227,6 +238,7 @@
 ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 
 (defn isAnimationActive [config]
   [boolean-config config ":isAnimationActive" [:isAnimationActive]])
@@ -263,7 +275,6 @@
               [layout-config config [:legend :layout]]
               [align-config config [:legend :align]]
               [verticalAlign-config config [:legend :verticalAlign]]]])
-
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
