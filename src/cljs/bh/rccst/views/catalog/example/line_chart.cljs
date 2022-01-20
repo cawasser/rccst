@@ -11,7 +11,9 @@
 
             [bh.rccst.events :as events]
             [bh.rccst.views.catalog.utils :as bcu]
-            [bh.rccst.ui-component.table :as table]))
+            [bh.rccst.ui-component.table :as table]
+
+            [bh.rccst.views.catalog.example.chart.utils :as utils]))
 
 
 (def data-path [:line-chart :tab-panel])
@@ -72,7 +74,10 @@
                                          :orientation :left
                                          :scale       "auto"}
                      :tooltip           {:include true}
-                     :legend            {:include true}
+                     :legend            {:include       true
+                                         :layout        "horizontal"
+                                         :align         "center"
+                                         :verticalAlign "middle"}
                      :line-uv           {:include true}
                      :line-pv           {:include true}
                      :line-amt          {:include false}}))
@@ -224,26 +229,7 @@
    :style {:padding          "15px"
            :border-top       "1px solid #DDD"
            :background-color "#f7f7f7"}
-   :children [[boolean-config config ":isAnimationActive" [:isAnimationActive]]
-              [rc/v-box
-               :children [[boolean-config config ":grid" [:grid :include]]
-                          [dashArray-config config ":strokeDasharray" 1 10 [:grid :strokeDasharray]]]]
-
-              [rc/v-box
-               :children [[boolean-config config ":x-axis" [:x-axis :include]]
-                          [orientation-config config x-axis-btns ":orientation" [:x-axis :orientation]]
-                          [scale-config config ":scale" [:x-axis :scale]]]]
-
-              [rc/v-box
-               :children [[boolean-config config ":y-axis" [:y-axis :include]]
-                          [orientation-config config y-axis-btns ":orientation" [:y-axis :orientation]]
-                          [scale-config config ":scale" [:y-axis :scale]]]]
-
-              [rc/h-box :src (rc/at)
-               :gap "10px"
-               :children [[boolean-config config ":tooltip" [:tooltip :include]]
-                          [boolean-config config ":legend" [:legend :include]]]]
-
+   :children [[utils/standard-chart-config config]
               [rc/h-box :src (rc/at)
                :gap "10px"
                :children [[boolean-config config "line (uv)" [:line-uv :include]]
@@ -286,7 +272,9 @@
 
        (when @tooltip? [:> Tooltip])
 
-       (when @legend? [:> Legend])
+       (when @legend? [:> Legend {:layout        (get-in @config [:legend :layout])
+                                  :align         (get-in @config [:legend :align])
+                                  :verticalAlign (get-in @config [:legend :verticalAlign])}])
 
        (when @line-uv? [:> Line {:type              "monotone" :dataKey :uv
                                  :isAnimationActive @isAnimationActive?
