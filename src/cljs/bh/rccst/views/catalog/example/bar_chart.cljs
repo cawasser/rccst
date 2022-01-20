@@ -15,6 +15,8 @@
                                 Tooltip Legend]]))
 
 
+;; region ; support for the tabs/panels
+
 (def data-path [:bar-chart :tab-panel])
 (def init-db
   {:tab-panel (tab-panel/mk-tab-panel-data data-path :bar-chart/config)})
@@ -36,6 +38,10 @@
   (fn [tab-panel]
     (:value tab-panel)))
 
+;; endregion
+
+
+;; region ; data and configuration params
 
 (def data (r/atom [{:name "Page A" :uv 4000 :pv 2400 :amt 2400}
                    {:name "Page B" :uv 3000 :pv 1398 :amt 2210}
@@ -51,6 +57,10 @@
                        :bar-pv            {:include true}
                        :bar-amt           {:include false}})))
 
+;; endregion
+
+
+;; region ; config and component panels
 
 (defn- config-panel
   "the panel of configuration controls
@@ -124,6 +134,8 @@
        (when @bar-amt? [:> Bar {:type              "monotone" :dataKey :amt
                                 :isAnimationActive @isAnimationActive?
                                 :fill              "#ff00ff"}])])))
+
+;; endregion
 
 
 (defn example []

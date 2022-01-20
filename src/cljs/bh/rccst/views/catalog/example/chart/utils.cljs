@@ -22,7 +22,7 @@
 ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
+;; region
 
 (def btns-style {:font-size   "12px"
                  :line-height "20px"
@@ -261,6 +261,8 @@
                  :style btns-style
                  :on-change #(swap! config assoc-in path %)]]]))
 
+;; endregion
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -269,7 +271,7 @@
 ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
+;; region
 
 (defn isAnimationActive [config]
   [boolean-config config ":isAnimationActive" [:isAnimationActive]])
@@ -306,6 +308,8 @@
               [layout-config config [:legend :layout]]
               [align-config config [:legend :align]]
               [verticalAlign-config config [:legend :verticalAlign]]]])
+
+;; endregion
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

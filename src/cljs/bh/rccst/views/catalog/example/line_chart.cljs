@@ -15,6 +15,7 @@
 
             [bh.rccst.views.catalog.example.chart.utils :as utils]))
 
+;; region ; support for the tabs/panels
 
 (def data-path [:line-chart :tab-panel])
 (def init-db
@@ -37,6 +38,10 @@
   (fn [tab-panel]
     (:value tab-panel)))
 
+;; endregion
+
+
+; region ; data and configuration params
 
 (def data (r/atom [{:name "Page A" :uv 4000 :pv 2400 :amt 2400}
                    {:name "Page B" :uv 3000 :pv 1398 :amt 2210}
@@ -52,6 +57,10 @@
                       :line-pv           {:include true}
                       :line-amt          {:include false}})))
 
+;; endregion
+
+
+;; region ; config and component panels
 
 (defn- config-panel
   "the panel of configuration controls
@@ -128,6 +137,8 @@
                                   :isAnimationActive @isAnimationActive?
                                   :stroke            "#ff00ff"
                                   :fill              "#ff00ff"}])])))
+
+;; endregion
 
 
 (defn example []
