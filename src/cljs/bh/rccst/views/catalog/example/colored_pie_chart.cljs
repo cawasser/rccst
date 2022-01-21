@@ -1,37 +1,90 @@
 (ns bh.rccst.views.catalog.example.colored-pie-chart
-  (:require [woolybear.ad.catalog.utils :as acu]
-            [woolybear.ad.layout :as layout]
-            ["recharts" :refer [PieChart Pie Cell
-                                Tooltip Legend]]))
+  (:require [reagent.core :as r]
+            [reagent.ratom :refer-macros [reaction]]
+            [re-com.core :as rc]
+
+            [bh.rccst.views.catalog.utils :as bcu]
+            [bh.rccst.views.catalog.example.chart.utils :as utils]
+
+            ["recharts" :refer [PieChart Pie Cell]]))
+
+
+(def config (r/atom (merge utils/default-config
+                      {:colors (zipmap (map :name utils/paired-data)
+                                 ["#ffff00" "#ff0000" "#00ff00"
+                                  "#0000ff" "#009999" "#ff00ff"])})))
+
+
+(defn- color-anchors [config]
+  [:<>
+   (map (fn [[id c]]
+          [utils/color-config config id [:colors id]])
+     (:colors @config))])
+
+
+(defn- config-panel
+  "the panel of configuration controls
+
+  ---
+
+  - config : (atom) holds all the configuration settings made by the user
+  "
+  [config]
+
+  [rc/v-box :src (rc/at)
+   :gap "10px"
+   :width "100%"
+   :style {:padding          "15px"
+           :border-top       "1px solid #DDD"
+           :background-color "#f7f7f7"}
+   :children [[utils/non-gridded-chart-config config]
+              [rc/line :src (rc/at) :size "2px"]
+              [rc/v-box :src (rc/at)
+               :gap "5px"
+               :children [[rc/label :src (rc/at) :label "Pie Colors"]
+                          (color-anchors config)]]]])
+
+
+(defn- component-panel
+  "the chart to draw, taking cues from the settings of the configuration panel
+
+  ---
+
+  - data : (atom) any data used by the component's ui
+  - config : (atom) configuration settings made by the user using the config-panel
+  "
+  [data config]
+  (let [isAnimationActive? (reaction (:isAnimationActive @config))]
+
+    (fn []
+      [:> PieChart {:width 400 :height 400 :label true}
+       (utils/non-gridded-chart-components config)
+       [:> Pie {:data @data :label true :isAnimationActive @isAnimationActive?}
+        (map-indexed (fn [idx {name :name}]
+                       [:> Cell {:key (str "cell-" idx) :fill (get-in @config [:colors name])}])
+          @data)]])))
+
 
 (defn example []
-  (let [data (atom [{:name "Group A" :value 400}
-                    {:name "Group B" :value 300}
-                    {:name "Group C" :value 300}
-                    {:name "Group D" :value 200}
-                    {:name "Group E" :value 278}
-                    {:name "Group F" :value 189}])
-        colors ["#ffff00" "#ff0000" "#00ff00" "#0000ff" "#009999" "#ff00ff"]]
+  (utils/init-config-panel "colored-pie-chart-demo")
 
-    (acu/demo "Colored Pie Chart"
+  (let [data (r/atom utils/paired-data)]
+    (bcu/configurable-demo "Colored Pie Chart"
       "Pie Chart with different colors for each slice. This requires embedding `Cell` elements
 inside the `Pie` element.
 
 > Note: Recharts supports embedding `Cell` in a variety of other chart types, for example BarChart"
-      [layout/centered {:extra-classes :width-50}
-       [:> PieChart {:width 400 :height 400 :label true}
+
+      [:pie-chart-demo/config :pie-chart-demo/data :pie-chart-demo/tab-panel :pie-chart-demo/selected-tab]
+      [utils/data-panel data]
+      [config-panel config]
+      [component-panel data config]
+
+      '[:> PieChart {:width 400 :height 400 :label true}
         [:> Tooltip]
         [:> Legend]
         [:> Pie {:data @data :label true}
          (map-indexed (fn [idx _]
-                        [:> Cell {:key (str "cell-" idx) :fill (get colors idx)}])
-           @data)]]]
-      '[layout/centered {:extra-classes :width-50}
-        [:> PieChart {:width 400 :height 400 :label true}
-         [:> Tooltip]
-         [:> Legend]
-         [:> Pie {:data @data :label true}
-          (map-indexed (fn [idx _]
-                         [:> Cell {:key (str "cell-" idx) :fill (get colors idx)}])
-            @data)]]])))
+                        [:> Cell {:key (str "cell-" idx) :fill (get @colors idx)}])
+           @data)]])))
 

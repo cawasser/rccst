@@ -87,13 +87,13 @@
 
 
 (defn example []
-  (utils/init-config-panel "line-chart")
+  (utils/init-config-panel "line-chart-demo")
 
   (let [data (r/atom utils/tabular-data)]
     (bcu/configurable-demo
       "Line Chart"
       "A simple Line Chart built using [Recharts]()"
-      [:line-chart/config :line-chart/data :line-chart/tab-panel :line-chart/selected-tab]
+      [:line-chart-demo/config :line-chart-demo/data :line-chart-demo/tab-panel :line-chart-demo/selected-tab]
       [utils/data-panel data]
       [config-panel config]
       [component data config]

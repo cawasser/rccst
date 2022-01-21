@@ -1,30 +1,75 @@
 (ns bh.rccst.views.catalog.example.pie-chart
-  (:require [woolybear.ad.catalog.utils :as acu]
-            [woolybear.ad.layout :as layout]
-            ["recharts" :refer [PieChart Pie
-                                Tooltip Legend]]))
+  (:require [reagent.core :as r]
+            [reagent.ratom :refer-macros [reaction]]
+            [re-com.core :as rc]
+
+            [bh.rccst.views.catalog.utils :as bcu]
+            [bh.rccst.views.catalog.example.chart.utils :as utils]
+
+            ["recharts" :refer [PieChart Pie]]))
+
+
+
+(def config (r/atom (merge utils/default-config
+                      {})))
+
+
+(defn- config-panel
+  "the panel of configuration controls
+
+  ---
+
+  - config : (atom) holds all the configuration settings made by the user
+  "
+  [config]
+
+  [rc/v-box :src (rc/at)
+   :gap "10px"
+   :width "100%"
+   :style {:padding          "15px"
+           :border-top       "1px solid #DDD"
+           :background-color "#f7f7f7"}
+   :children [[utils/non-gridded-chart-config config]
+              [rc/line :src (rc/at) :size "2px"]
+              [rc/h-box :src (rc/at)
+               :gap "10px"
+               :children []]]])
+
+
+(defn- component-panel
+  "the chart to draw, taking cues from the settings of the configuration panel
+
+  ---
+
+  - data : (atom) any data used by the component's ui
+  - config : (atom) configuration settings made by the user using the config-panel
+  "
+  [data config]
+  (let [isAnimationActive? (reaction (:isAnimationActive @config))]
+
+    (fn []
+      [:> PieChart {:width 400 :height 400 :label true}
+       (utils/non-gridded-chart-components config)
+
+       [:> Pie {:dataKey "value" :data @data :fill "#8884d8" :label true
+                :isAnimationActive @isAnimationActive?}]])))
 
 
 (defn example []
-  (let [data (atom [{:name "Group A" :value 400}
-                    {:name "Group B" :value 300}
-                    {:name "Group C" :value 300}
-                    {:name "Group D" :value 200}
-                    {:name "Group E" :value 278}
-                    {:name "Group F" :value 189}])]
+  (utils/init-config-panel "pie-chart-demo")
 
-    (acu/demo "Pie Chart"
+  (let [data (r/atom utils/paired-data)]
+
+    (bcu/configurable-demo "Pie Chart"
       "Pie Chart with a default fill for each slice. Each slice is sized correctly and labeled with the value, but
       they are all the same color.
 
 > See `Colored Pie Chart` for an example of how to get the slices to be different colors."
-      [layout/centered {:extra-classes :width-50}
-       [:> PieChart {:width 400 :height 400 :label true}
+      [:pie-chart-demo/config :pie-chart-demo/data :pie-chart-demo/tab-panel :pie-chart-demo/selected-tab]
+      [utils/data-panel data]
+      [config-panel config]
+      [component-panel data config]
+      '[:> PieChart {:width 400 :height 400}
         [:> Tooltip]
         [:> Legend]
-        [:> Pie {:dataKey "value" :data @data :fill "#8884d8" :label true}]]]
-      '[layout/centered {:extra-classes :width-50}
-        [:> PieChart {:width 400 :height 400}
-         [:> Tooltip]
-         [:> Legend]
-         [:> Pie {:dataKey "value" :data @data :fill "#8884d8"}]]])))
+        [:> Pie {:dataKey "value" :data @data :fill "#8884d8"}]])))

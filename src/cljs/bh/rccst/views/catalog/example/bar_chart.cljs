@@ -46,7 +46,7 @@
                           [utils/boolean-config config "bar (d)" [:bar-d :include]]]]]])
 
 
-(defn- component
+(defn- component-panel
   "the chart to draw, taking cues from the settings of the configuration panel
 
   ---
@@ -86,15 +86,15 @@
 
 
 (defn example []
-  (utils/init-config-panel "bar-chart")
+  (utils/init-config-panel "bar-chart-demo")
 
   (let [data (r/atom (mapv (fn [d] (assoc d :d (rand-int 5000))) utils/tabular-data))]
     (bcu/configurable-demo "Bar Chart"
       "Bar Charts (this would be really cool with support for changing options live)"
-      [:bar-chart/config :bar-chart/data :bar-chart/tab-panel :bar-chart/selected-tab]
+      [:bar-chart-demo/config :bar-chart-demo/data :bar-chart-demo/tab-panel :bar-chart-demo/selected-tab]
       [utils/data-panel data]
       [config-panel config]
-      [component data config]
+      [component-panel data config]
       '[:> BarChart {:width 400 :height 400 :data @data}
         [:> CartesianGrid {:strokeDasharray "3 3"}]
         [:> XAxis {:dataKey "title"}]

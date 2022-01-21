@@ -14,47 +14,6 @@
             [bh.rccst.ui-component.table :as table]))
 
 
-(comment
-
-  (do
-    (def base-id "line-chart")
-    (def formal-id (keyword base-id))
-    (def data-path [formal-id :tab-panel])
-    (def config-id (keyword (str base-id "/config")))
-    (def data-id (keyword (str base-id "/data")))
-    (def db-id (keyword (str "db/" base-id)))
-    (def tab-id (keyword base-id "tab-panel"))
-    (def selected-id (keyword base-id "selected-tab"))
-    (def init-db {:tab-panel (tab-panel/mk-tab-panel-data
-                               data-path config-id)}))
-
-
-  (re-frame/reg-sub
-    db-id
-    (fn [db _]
-      (formal-id db)))
-
-  (re-frame/reg-sub
-    tab-id
-    :<- [db-id]
-    (fn [navbar]
-      (:tab-panel navbar)))
-
-  (re-frame/reg-sub
-    selected-id
-    :<- [tab-id]
-    (fn [tab-panel]
-      (:value tab-panel)))
-
-  (re-frame/dispatch-sync [::events/init-locals formal-id init-db])
-
-  @(re-frame/subscribe [:db/line-chart])
-  @(re-frame/subscribe [:line-chart/tab-panel])
-  @(re-frame/subscribe [:line-chart/selected-tab])
-
-  ())
-
-
 (defn init-config-panel [base-id]
   (log/info "init-config-panel" base-id)
   (let [formal-id (keyword base-id)
@@ -103,6 +62,13 @@
                    {:name "Page E" :uv 1890 :pv 4800 :amt 2181}
                    {:name "Page F" :uv 2390 :pv 3800 :amt 2500}
                    {:name "Page G" :uv 3490 :pv 4300 :amt 2100}])
+
+(def paired-data [{:name "Group A" :value 400}
+                  {:name "Group B" :value 300}
+                  {:name "Group C" :value 300}
+                  {:name "Group D" :value 200}
+                  {:name "Group E" :value 278}
+                  {:name "Group F" :value 189}])
 
 ;; endregion
 
@@ -434,7 +400,7 @@
 ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
+;; region
 
 (defn standard-chart-config [config]
   [:<>
@@ -451,6 +417,16 @@
    [legend config]])
 
 
+(defn non-gridded-chart-config [config]
+  [:<>
+   [isAnimationActive config]
+   [rc/line :src (rc/at) :size "2px"]
+   [tooltip config]
+   [rc/line :src (rc/at) :size "2px"]
+   [legend config]])
+
+
+;; endregion
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -485,5 +461,16 @@
                                 :align         (get-in @config [:legend :align])
                                 :verticalAlign (get-in @config [:legend :verticalAlign])}])]))
 
+
+(defn non-gridded-chart-components [config]
+  (let [tooltip? (reaction (get-in @config [:tooltip :include]))
+        legend? (reaction (get-in @config [:legend :include]))]
+
+    [:<>
+     (when @tooltip? [:> Tooltip])
+
+     (when @legend? [:> Legend {:layout        (get-in @config [:legend :layout])
+                                :align         (get-in @config [:legend :align])
+                                :verticalAlign (get-in @config [:legend :verticalAlign])}])]))
 
 ;; endregion
