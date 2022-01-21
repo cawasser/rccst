@@ -57,22 +57,27 @@ There are lots of things we wanted to learn more about, and we've [done many of 
         2. [ ] what are atoms?
            1. [ ] Re-com
            2. [ ] Woolybear
+           3. [X] color picker?
         3. [ ] what are the molecules? (or they still just atoms?)
            1. [ ] sidebar
            2. [ ] toolbar
-           3. [ ] color picker?
-           4. [ ] login/settings
-           5. [ ] hamburger menu
-           6. [X] charts inside popup/popover (see [here](http://worrydream.com/#!/MediaForThinkingTheUnthinkable))
-           7. [ ] widget
+           
+           4. [X] login
+           5. [ ] user/app settings
+           6. [ ] hamburger menu
+           7. [X] charts inside popup/popover (see [here](http://worrydream.com/#!/MediaForThinkingTheUnthinkable))
+           8. [ ] widget
               1. [ ] title-bar
               2. [ ] frame w/resizer
-           8. [ ] widget-maker (or is this a template? or template builder?)
+           9. [ ] widget-maker (or is this a template? or template builder?)
 2. [ ] complete/clean-up catalog example "show code"
    1. [ ] Layout / Layout Grid
-   2. [ ] Cards /  Card
+   2. [ ] Cards / Card
    3. [ ] Cards / Flippable Card
-3. [ ] build a better "source code" tool so it actually shows the code as the component is actually configured in the catalog
+3. [ ] complete/cleanup molecule exmaple 'code'
+   1. [ ] general / header-bar
+   2. [ ] general / login
+4. [ ] build a better "source code" tool so it actually shows the code as the component is actually configured in the catalog
 
 
 

@@ -1,4 +1,4 @@
-(ns bh.rccst.views.login
+(ns bh.rccst.ui-component.login
   (:require [taoensso.timbre :as log]
             [reagent.core :as r]
             [re-com.core :as rc]
@@ -7,7 +7,7 @@
             [bh.rccst.ui-component.button :as button]))
 
 
-(defn view
+(defn login
   "returns a simple 'login' page (id/password). Self-contained.
 
   > See also:
@@ -19,11 +19,13 @@
         password (r/atom "")]
     [rc/v-box
      :src (rc/at)
-     :children [
-                [rc/h-box :src (rc/at)
+     :margin "10px" :width "400px" :padding "10px"
+     :style {:border "solid 1px" :border-radius "5px"}
+     :children [[rc/h-box :src (rc/at)
                  :gap "10px"
                  :align :center
-                 :children [[:h4 {:style {:width "5%"}} "User"]
+                 :justify :between
+                 :children [[:h4 "User"]
                             [rc/input-text :src (rc/at)
                              :placeholder "user name"
                              :on-change #(reset! user-id %)
@@ -31,15 +33,14 @@
                 [rc/h-box :src (rc/at)
                  :gap "10px"
                  :align :center
-                 :children [[:h4 {:style {:width "5%"}} "Password"]
+                 :justify :between
+                 :children [[:h4 "Password"]
                             [rc/input-password :src (rc/at)
                              :placeholder "password"
                              :on-change #(reset! password %)
                              :model password]]]
                 [rc/gap :size "20px"]
-
                 [rc/h-box
-                 :align :center
                  :children [[button/button "Register"
                              #(re-frame/dispatch
                                 [:bh.rccst.events/register @user-id @password])]

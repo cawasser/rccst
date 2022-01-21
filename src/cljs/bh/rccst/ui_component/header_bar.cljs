@@ -1,4 +1,4 @@
-(ns bh.rccst.views.header-bar
+(ns bh.rccst.ui-component.header-bar
   (:require [re-frame.core :as re-frame]
             [re-com.core :as rc]
 
@@ -8,7 +8,7 @@
 
 
 
-(defn view
+(defn header-bar
   "creates a nice, simple header for the UI, displaying the app title, the server version number,
   the uuid returned by the server that is assigned to this user, and a button to log out of the
   server.
