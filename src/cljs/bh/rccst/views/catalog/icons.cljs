@@ -7,9 +7,7 @@
             [bh.rccst.views.catalog.example.medium-icon :as medium-icon]
             [bh.rccst.views.catalog.example.large-icon :as large-icon]
             [bh.rccst.views.catalog.example.brand-icon :as brand-icon]
-            [bh.rccst.views.catalog.example.clickable-icon :as clickable-icon]
-
-            [bh.rccst.views.catalog.example.color-picker :as picker]))
+            [bh.rccst.views.catalog.example.clickable-icon :as clickable-icon]))
 
 
 (defn catalog
@@ -23,9 +21,7 @@
    [medium-icon/example]
    [large-icon/example]
    [brand-icon/example]
-   [clickable-icon/example]
-
-   [picker/example]])
+   [clickable-icon/example]])
 
 
 

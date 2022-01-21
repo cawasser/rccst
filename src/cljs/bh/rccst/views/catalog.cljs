@@ -16,6 +16,7 @@
             [bh.rccst.views.catalog.buttons :as buttons-demo]
             [bh.rccst.views.catalog.forms :as forms-demo]
             [bh.rccst.views.catalog.re-com :as re-com-demo]
+            [bh.rccst.views.catalog.miscellaneous :as misc]
             [bh.rccst.views.catalog.all :as all-demo]))
 
 
@@ -51,6 +52,7 @@
                      [:demo/buttons "Buttons"]
                      [:demo/forms "Forms"]
                      [:demo/re-com "Re-com"]
+                     [:demo/misc "Misc."]
                      [:demo/all "All"]])
 
 
@@ -99,6 +101,9 @@
 
       [tab-panel/sub-panel {:panel-id :demo/re-com}
        [re-com-demo/catalog]]
+
+      [tab-panel/sub-panel {:panel-id :demo/misc}
+       [misc/catalog]]
 
       [tab-panel/sub-panel {:panel-id :demo/all}
        [all-demo/catalog]]]]]])
