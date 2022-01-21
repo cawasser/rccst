@@ -6,9 +6,85 @@
 
             [reagent.core :as r]
             [reagent.ratom :refer-macros [reaction]]
+            [re-frame.core :as re-frame]
             [re-com.core :as rc]
+            [woolybear.packs.tab-panel :as tab-panel]
 
+            [bh.rccst.events :as events]
             [bh.rccst.ui-component.table :as table]))
+
+
+(comment
+
+  (do
+    (def base-id "line-chart")
+    (def formal-id (keyword base-id))
+    (def data-path [formal-id :tab-panel])
+    (def config-id (keyword (str base-id "/config")))
+    (def data-id (keyword (str base-id "/data")))
+    (def db-id (keyword (str "db/" base-id)))
+    (def tab-id (keyword base-id "tab-panel"))
+    (def selected-id (keyword base-id "selected-tab"))
+    (def init-db {:tab-panel (tab-panel/mk-tab-panel-data
+                               data-path config-id)}))
+
+
+  (re-frame/reg-sub
+    db-id
+    (fn [db _]
+      (formal-id db)))
+
+  (re-frame/reg-sub
+    tab-id
+    :<- [db-id]
+    (fn [navbar]
+      (:tab-panel navbar)))
+
+  (re-frame/reg-sub
+    selected-id
+    :<- [tab-id]
+    (fn [tab-panel]
+      (:value tab-panel)))
+
+  (re-frame/dispatch-sync [::events/init-locals formal-id init-db])
+
+  @(re-frame/subscribe [:db/line-chart])
+  @(re-frame/subscribe [:line-chart/tab-panel])
+  @(re-frame/subscribe [:line-chart/selected-tab])
+
+  ())
+
+
+(defn init-config-panel [base-id]
+  (log/info "init-config-panel" base-id)
+  (let [formal-id (keyword base-id)
+        data-path [formal-id :tab-panel]
+        config-id (keyword base-id "config")
+        data-id (keyword base-id "data")
+        db-id (keyword "db" base-id)
+        tab-id (keyword base-id "tab-panel")
+        selected-id (keyword base-id "selected-tab")
+        init-db {:tab-panel (tab-panel/mk-tab-panel-data
+                              data-path config-id)}]
+
+    (re-frame/reg-sub
+      db-id
+      (fn [db _]
+        (formal-id db)))
+
+    (re-frame/reg-sub
+      tab-id
+      :<- [db-id]
+      (fn [navbar]
+        (:tab-panel navbar)))
+
+    (re-frame/reg-sub
+      selected-id
+      :<- [tab-id]
+      (fn [tab-panel]
+        (:value tab-panel)))
+
+    (re-frame/dispatch-sync [::events/init-locals formal-id init-db])))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -394,7 +470,7 @@
 
     [:<>
      (when @grid? [:> CartesianGrid {:strokeDasharray (strokeDasharray config)
-                                     :stroke (get-in @config [:grid :stroke])}])
+                                     :stroke          (get-in @config [:grid :stroke])}])
 
      (when @x-axis? [:> XAxis {:dataKey     :name
                                :orientation (get-in @config [:x-axis :orientation])

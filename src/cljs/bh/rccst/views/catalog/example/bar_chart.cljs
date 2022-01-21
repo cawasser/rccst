@@ -1,41 +1,11 @@
 (ns bh.rccst.views.catalog.example.bar-chart
-  (:require [woolybear.ad.layout :as layout]
-            [woolybear.packs.tab-panel :as tab-panel]
-            [reagent.core :as r]
+  (:require [reagent.core :as r]
             [reagent.ratom :refer-macros [reaction]]
-            [re-frame.core :as re-frame]
             [re-com.core :as rc]
 
-            [bh.rccst.events :as events]
             [bh.rccst.views.catalog.utils :as bcu]
             [bh.rccst.views.catalog.example.chart.utils :as utils]
             ["recharts" :refer [BarChart Bar]]))
-
-
-;; region ; support for the tabs/panels
-
-(def data-path [:bar-chart :tab-panel])
-(def init-db
-  {:tab-panel (tab-panel/mk-tab-panel-data data-path :bar-chart/config)})
-
-(re-frame/reg-sub
-  :db/bar-chart
-  (fn [db _]
-    (:bar-chart db)))
-
-(re-frame/reg-sub
-  :bar-chart/tab-panel
-  :<- [:db/bar-chart]
-  (fn [navbar]
-    (:tab-panel navbar)))
-
-(re-frame/reg-sub
-  :bar-chart/selected-tab
-  :<- [:bar-chart/tab-panel]
-  (fn [tab-panel]
-    (:value tab-panel)))
-
-;; endregion
 
 
 ;; region ; configuration params
@@ -110,13 +80,13 @@
 
        (when @bar-d? [:> Bar {:type              "monotone" :dataKey :d
                               :isAnimationActive @isAnimationActive?
-                              :fill              "#ff00ff"}])])))
+                              :fill              "#DC143C"}])])))
 
 ;; endregion
 
 
 (defn example []
-  (re-frame/dispatch-sync [::events/init-locals :bar-chart init-db])
+  (utils/init-config-panel "bar-chart")
 
   (let [data (r/atom (mapv (fn [d] (assoc d :d (rand-int 5000))) utils/tabular-data))]
     (bcu/configurable-demo "Bar Chart"

@@ -12,42 +12,8 @@
 
             [bh.rccst.views.catalog.example.chart.utils :as utils]))
 
-;; region ; support for the tabs/panels
 
-(def data-path [:line-chart :tab-panel])
-(def init-db
-  {:tab-panel (tab-panel/mk-tab-panel-data data-path :line-chart/config)})
-
-(re-frame/reg-sub
-  :db/line-chart
-  (fn [db _]
-    (:line-chart db)))
-
-(re-frame/reg-sub
-  :line-chart/tab-panel
-  :<- [:db/line-chart]
-  (fn [navbar]
-    (:tab-panel navbar)))
-
-(re-frame/reg-sub
-  :line-chart/selected-tab
-  :<- [:line-chart/tab-panel]
-  (fn [tab-panel]
-    (:value tab-panel)))
-
-;; endregion
-
-
-; region ; data and configuration params
-
-(def data (r/atom [{:name "Page A" :uv 4000 :pv 2400 :amt 2400}
-                   {:name "Page B" :uv 3000 :pv 1398 :amt 2210}
-                   {:name "Page C" :uv 2000 :pv 9800 :amt 2290}
-                   {:name "Page D" :uv 2780 :pv 3908 :amt 2000}
-                   {:name "Page E" :uv 1890 :pv 4800 :amt 2181}
-                   {:name "Page F" :uv 2390 :pv 3800 :amt 2500}
-                   {:name "Page G" :uv 3490 :pv 4300 :amt 2100}]))
-
+; region ; configuration params
 
 (def config (r/atom (merge utils/default-config
                       {:line-uv  {:include true}
@@ -121,29 +87,30 @@
 
 
 (defn example []
-  (re-frame/dispatch-sync [::events/init-locals :line-chart init-db])
+  (utils/init-config-panel "line-chart")
 
-  (bcu/configurable-demo
-    "Line Chart"
-    "A simple Line Chart built using [Recharts]()"
-    [:line-chart/config :line-chart/data :line-chart/tab-panel :line-chart/selected-tab]
-    [utils/data-panel data]
-    [config-panel config]
-    [component data config]
-    '[:> LineChart {:width 400 :height 400 :data @data}
-      [:> CartesianGrid {:strokeDasharray (strokeDasharray config)}]
-      [:> XAxis {:dataKey :name :orientation :bottom :scale "auto"}]
-      [:> YAxis {:orientation :left :scale "auto"}]
-      [:> Tooltip]
-      [:> Legend]
-      [:> Line {:type              "monotone" :dataKey :uv
-                :isAnimationActive true
-                :stroke            "#8884d8" :fill "#8884d8"}]
-      [:> Line {:type              "monotone" :dataKey :pv
-                :isAnimationActive true
-                :stroke            "#82ca9d" :fill "#82ca9d"}]
-      [:> Line {:type              "monotone" :dataKey :amt
-                :isAnimationActive true
-                :stroke            "#ff00ff"
-                :fill              "#ff00ff"}]]))
+  (let [data (r/atom utils/tabular-data)]
+    (bcu/configurable-demo
+      "Line Chart"
+      "A simple Line Chart built using [Recharts]()"
+      [:line-chart/config :line-chart/data :line-chart/tab-panel :line-chart/selected-tab]
+      [utils/data-panel data]
+      [config-panel config]
+      [component data config]
+      '[:> LineChart {:width 400 :height 400 :data @data}
+        [:> CartesianGrid {:strokeDasharray (strokeDasharray config)}]
+        [:> XAxis {:dataKey :name :orientation :bottom :scale "auto"}]
+        [:> YAxis {:orientation :left :scale "auto"}]
+        [:> Tooltip]
+        [:> Legend]
+        [:> Line {:type              "monotone" :dataKey :uv
+                  :isAnimationActive true
+                  :stroke            "#8884d8" :fill "#8884d8"}]
+        [:> Line {:type              "monotone" :dataKey :pv
+                  :isAnimationActive true
+                  :stroke            "#82ca9d" :fill "#82ca9d"}]
+        [:> Line {:type              "monotone" :dataKey :amt
+                  :isAnimationActive true
+                  :stroke            "#ff00ff"
+                  :fill              "#ff00ff"}]])))
 
