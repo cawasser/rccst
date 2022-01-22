@@ -58,26 +58,36 @@ There are lots of things we wanted to learn more about, and we've [done many of 
            1. [ ] Re-com
            2. [ ] Woolybear
            3. [X] color picker?
+              1. [ ] [algorithm](https://ux.stackexchange.com/questions/107318/formula-for-color-contrast-between-text-and-background) to set text-color based on picker-color
+           4. [ ] 3d & 2d globes
         3. [ ] what are the molecules? (or they still just atoms?)
-           1. [ ] sidebar
-           2. [ ] toolbar
-           
-           4. [X] login
-           5. [ ] user/app settings
-           6. [ ] hamburger menu
-           7. [X] charts inside popup/popover (see [here](http://worrydream.com/#!/MediaForThinkingTheUnthinkable))
+           1. [X] login
+           2. [X] charts inside popup/popover (see [here](http://worrydream.com/#!/MediaForThinkingTheUnthinkable))
+           3. [ ] sidebar
+           4. [ ] diagram
+           5. [ ] toolbar
+           6. [ ] user/app settings
+           7. [ ] hamburger menu
            8. [ ] widget
               1. [ ] title-bar
               2. [ ] frame w/resizer
            9. [ ] widget-maker (or is this a template? or template builder?)
-2. [ ] complete/clean-up catalog example "show code"
+2. [ ] refactor
+   1. [ ] rccst -> black-hammer for all UI components
+      1. [ ] catalog -> atoms
+      2. [ ] woolybear
+      3. [ ] 3d-globe
+      4. [ ] 2d-globe
+3. [ ] complete/clean-up catalog example "show code"
    1. [ ] Layout / Layout Grid
    2. [ ] Cards / Card
    3. [ ] Cards / Flippable Card
-3. [ ] complete/cleanup molecule exmaple 'code'
+   4. [ ] Misc / 3d globe
+   5. [ ] Misc / 2d globe
+4. [ ] complete/cleanup molecule example 'code'
    1. [ ] general / header-bar
    2. [ ] general / login
-4. [ ] build a better "source code" tool so it actually shows the code as the component is actually configured in the catalog
+5. [ ] build a better "source code" tool so it actually shows the code as the component is actually configured in the catalog
 
 
 

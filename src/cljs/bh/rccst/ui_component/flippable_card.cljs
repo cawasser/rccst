@@ -33,7 +33,7 @@
   | `:style`  | hash-map | hash-map of any html/css style properties (minus the `:style` part itself, i.e., just the content part), typically used to specify the `:width` and `:height` of the card |
 
 > Note: this library does NOT work properly on Webkit/Safari due to problems with the CSS. It
-> should be possible ot replace this library with just some `divs` and the proper CSS.
+> should be possible to replace this library with just some `divs` and the proper CSS.
 >
 > See [here](https://line25.com/articles/super-cool-css-flip-effect-with-webkit-animation/) for an approach.
   "

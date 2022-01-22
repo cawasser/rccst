@@ -6,10 +6,8 @@
             [re-com.core :as rc]
 
             ["react-colorful" :refer [RgbaColorPicker]]
-            [bh.rccst.views.catalog.example.utils :as utils]))
-
-
-
+            [bh.rccst.views.catalog.example.utils :as utils]
+            [bh.rccst.ui-component.utils :as ui-utils]))
 
 
 (def config (r/atom {:r 200 :g 150 :b 35 :a 0.5}))
@@ -25,7 +23,21 @@
    :children [[utils/value-slider config :r 0 255 1]
               [utils/value-slider config :g 0 255 1]
               [utils/value-slider config :b 0 255]
-              [utils/value-slider config :a 0 1 0.01]]])
+              [utils/value-slider config :a 0 1 0.01]
+              [rc/h-box :src (rc/at)
+               :gap "5px"
+               :children [[rc/button :src (rc/at)
+                           :label "Button"
+                           :style {:background-color (ui-utils/rgba->hex @config)
+                                   :color            (ui-utils/best-text-color @config)}]
+                          [:div
+                           {:style {:width "100px"
+                                    :text-align :center
+                                    :margin :auto
+                                    :padding "5px"
+                                    :background-color (ui-utils/hash->rgba @config)
+                                    :color            (ui-utils/best-text-color-alpha @config)}}
+                           "div w/alpha"]]]]])
 
 
 (defn- component-panel [config]
