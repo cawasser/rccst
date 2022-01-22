@@ -1,4 +1,4 @@
-(ns bh.rccst.views.catalog.example.color-picker
+(ns bh.rccst.views.catalog.example.hex-color-picker
   (:require [reagent.core :as r]
             [woolybear.ad.layout :as layout]
             [woolybear.ad.catalog.utils :as acu]
@@ -22,8 +22,8 @@
 
 
 (defn example []
-  (acu/demo "Color Picker"
-    "Use the [react-colors]() component to provide simple, yet powerful color picker control"
+  (acu/demo "Hex Color Picker"
+    "Use the [react-colorful](https://github.com/omgovich/react-colorful) component to provide simple, yet powerful color picker control"
     [layout/centered {:extra-classes :width-50}
      [rc/h-box :src (rc/at)
       :gap "10px"

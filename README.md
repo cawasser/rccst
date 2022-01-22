@@ -91,22 +91,27 @@ But there are still many things we want to do/learn:
    2. component for kafka + "sub"component per topology?
    3. how should [Kafka, Pub-Sub and DataSource](/docs/kafka-pub-sub-datasource.md) all work together?
    4. also, can use Component to manage things? (see [rp-jackdaw-cljs](https://github.com/rentpath/rp-jackdaw-clj))
-2. [ ] Work out an automated [testing approach](/docs/testing.md)
-    1. [X] ***FAILED** fixtures don't work this way - open the database in a :once fixture, and the drop!/create! is the :every fixture
-    2. [ ] how do (should we?) we test the UI?
-3. [ ] [Develop a more complex API (paving the way to Rocky-road)](/docs/complex-api.md)
+2. [ ] How do DataSources communicate with the:
+   1. [ ] Client?
+      1. [ ] core.async channel(s)? possible as a separate Component
+   2. [ ] Kafka?
+      1. [ ] core.async which looks/acts like an output `topic`?
+3. [ ] Work out an automated [testing approach](/docs/testing.md)
+    1. [X] ***FAILED** (fixtures don't work this way) -> open the database in a :once fixture, and the drop!/create! is the :every fixture
+    2. [ ] how do (should we?) we test the UI? Can we take advantage of the Catalog?
+4. [ ] [Develop a more complex API (paving the way to Rocky-road)](/docs/complex-api.md)
    1. [ ] should we introduce DataSources as a component (like rocky-road.dashboard-clj.data-source)?
-4. [ ] Implement more of the API:
+5. [ ] Implement more of the API:
    1. [ ] Fix Users
        1. [ ] [Login]()
        2. [ ] [Register]()
    2. [ ] Widgets/Layouts
    3. [ ] Comms
    4. [ ] Sensors/Beams
-5. [ ] Add metrics collection to the Server
+6. [ ] Add metrics collection to the Server
    1. [ ] [statsd](https://github.com/statsd/statsd), via [clojure-statsd-client](https://github.com/unbounce/clojure-dogstatsd-client)
-6. [ ] (optional) Consider moving to [Reitit](/docs/routing.md) (see item 13.3 above)
-7. [ ] Will we ever need `websocket.handler`? (handles push messages from clients)
+7. [ ] (optional) Consider moving to [Reitit](/docs/routing.md) (see item 13.3 above)
+8. [ ] Will we ever need `websocket.handler`? (handles push messages from clients)
 
 
 

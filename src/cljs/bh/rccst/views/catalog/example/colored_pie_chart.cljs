@@ -17,9 +17,10 @@
 
 (defn- color-anchors [config]
   [:<>
-   (map (fn [[id c]]
-          [utils/color-config config id [:colors id]])
-     (:colors @config))])
+   (doall
+     (map (fn [[id _]]
+            ^{:key id}[utils/color-config config id [:colors id]])
+       (:colors @config)))])
 
 
 (defn- config-panel
