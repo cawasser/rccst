@@ -5,7 +5,8 @@
             [woolybear.ad.catalog.utils :as acu]
             [re-com.core :as rc]
 
-            ["react-colorful" :refer [RgbaColorPicker]]))
+            ["react-colorful" :refer [RgbaColorPicker]]
+            [bh.rccst.views.catalog.example.utils :as utils]))
 
 
 
@@ -18,29 +19,13 @@
   (swap! config assoc :r r :g g :b b :a a))
 
 
-(defn- value-slider [config path min max step]
-  [rc/h-box :src (rc/at)
-   :gap "5px"
-   :children [[rc/label :width "20px" :label (str path)]
-              [rc/input-text :src (rc/at)
-               :model (str (get @config path))
-               :width "50px"
-               :on-change #(swap! config assoc path %)]
-              [rc/slider :src (rc/at)
-               :model (get @config path)
-               :min min :max max
-               :width "100px"
-               :step step
-               :on-change #(swap! config assoc path %)]]])
-
-
 (defn- config-panel [config]
   [rc/v-box :src (rc/at)
    :gap "5px"
-   :children [[value-slider config :r 0 255 1]
-              [value-slider config :g 0 255 1]
-              [value-slider config :b 0 255]
-              [value-slider config :a 0 1 0.01]]])
+   :children [[utils/value-slider config :r 0 255 1]
+              [utils/value-slider config :g 0 255 1]
+              [utils/value-slider config :b 0 255]
+              [utils/value-slider config :a 0 1 0.01]]])
 
 
 (defn- component-panel [config]
