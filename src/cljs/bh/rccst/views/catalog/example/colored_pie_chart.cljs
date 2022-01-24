@@ -19,7 +19,7 @@
   [:<>
    (doall
      (map (fn [[id _]]
-            ^{:key id}[utils/color-config config id [:colors id]])
+            ^{:key id}[utils/color-config-text config id [:colors id]])
        (:colors @config)))])
 
 

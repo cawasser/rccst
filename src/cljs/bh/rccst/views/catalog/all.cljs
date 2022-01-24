@@ -65,7 +65,7 @@
    [rc/line :size "5px" :color "orange"]
 
    [bar-chart/example]
-   [line-chart/example]
+   [line-chart/simple-example]
    [pie-chart/example]
    [colored-piechart/example]
 

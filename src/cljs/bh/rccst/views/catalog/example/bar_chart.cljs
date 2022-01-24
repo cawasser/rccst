@@ -11,15 +11,22 @@
 ;; region ; configuration params
 
 (def config (r/atom (merge utils/default-config
-                      {:bar-uv  {:include true}
-                       :bar-pv  {:include true}
-                       :bar-amt {:include false}
-                       :bar-d   {:include false}})))
+                      {:bar-uv  {:include true :fill "#ff0000"}
+                       :bar-pv  {:include true :fill "#00ff00"}
+                       :bar-amt {:include false :fill "#0000ff"}
+                       :bar-d   {:include false :fill "#0f0f0f"}})))
 
 ;; endregion
 
 
 ;; region ; config and component panels
+
+(defn- bar-config [config label path]
+  [rc/v-box :src (rc/at)
+   :gap "5px"
+   :children [[utils/boolean-config config label (conj path :include)]
+              [utils/color-config config ":fill" (conj path :fill)]]])
+
 
 (defn- config-panel
   "the panel of configuration controls
@@ -40,10 +47,10 @@
               [rc/line :src (rc/at) :size "2px"]
               [rc/h-box :src (rc/at)
                :gap "10px"
-               :children [[utils/boolean-config config "bar (uv)" [:bar-uv :include]]
-                          [utils/boolean-config config "bar (pv)" [:bar-pv :include]]
-                          [utils/boolean-config config "bar (amt)" [:bar-amt :include]]
-                          [utils/boolean-config config "bar (d)" [:bar-d :include]]]]]])
+               :children [[bar-config config "bar (uv)" [:bar-uv]]
+                          [bar-config config "bar (pv)" [:bar-pv]]
+                          [bar-config config "bar (amt)" [:bar-amt]]
+                          [bar-config config "bar (d)" [:bar-d]]]]]])
 
 
 (defn- component-panel
@@ -68,19 +75,19 @@
 
        (when @bar-uv? [:> Bar {:type              "monotone" :dataKey :uv
                                :isAnimationActive @isAnimationActive?
-                               :fill              "#8884d8"}])
+                               :fill              (get-in @config [:bar-uv :fill])}])
 
        (when @bar-pv? [:> Bar {:type              "monotone" :dataKey :pv
                                :isAnimationActive @isAnimationActive?
-                               :fill              "#82ca9d"}])
+                               :fill              (get-in @config [:bar-pv :fill])}])
 
        (when @bar-amt? [:> Bar {:type              "monotone" :dataKey :amt
                                 :isAnimationActive @isAnimationActive?
-                                :fill              "#ff00ff"}])
+                                :fill              (get-in @config [:bar-amt :fill])}])
 
        (when @bar-d? [:> Bar {:type              "monotone" :dataKey :d
                               :isAnimationActive @isAnimationActive?
-                              :fill              "#DC143C"}])])))
+                              :fill              (get-in @config [:bar-d :fill])}])])))
 
 ;; endregion
 

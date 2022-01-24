@@ -16,14 +16,24 @@
 ; region ; configuration params
 
 (def config (r/atom (merge utils/default-config
-                      {:line-uv  {:include true}
-                       :line-pv  {:include true}
-                       :line-amt {:include false}})))
+                      {:line-uv  {:include true :stroke "#8884d8" :fill "#8884d8"}
+                       :line-pv  {:include true :stroke "#82ca9d" :fill "#82ca9d"}
+                       :line-amt {:include false :stroke "#ff00ff" :fill "#ff00ff"}})))
 
 ;; endregion
 
 
 ;; region ; config and component panels
+
+(defn- line-config [config label path]
+  [rc/v-box :src (rc/at)
+   :gap "5px"
+   :children [[utils/boolean-config config label (conj path :include)]
+              [rc/h-box :src (rc/at)
+               :gap "5px"
+               :children [[utils/color-config config ":stroke" (conj path :stroke)]
+                          [utils/color-config config ":fill" (conj path :fill)]]]]])
+
 
 (defn- config-panel
   "the panel of configuration controls
@@ -44,9 +54,9 @@
               [rc/line :src (rc/at) :size "2px"]
               [rc/h-box :src (rc/at)
                :gap "10px"
-               :children [[utils/boolean-config config "line (uv)" [:line-uv :include]]
-                          [utils/boolean-config config "line (pv)" [:line-pv :include]]
-                          [utils/boolean-config config "line (amt)" [:line-amt :include]]]]]])
+               :children [[line-config config "line (uv)" [:line-uv]]
+                          [line-config config "line (pv)" [:line-pv]]
+                          [line-config config "line (amt)" [:line-amt]]]]]])
 
 
 (defn- component
@@ -72,21 +82,53 @@
 
        (when @line-uv? [:> Line {:type              "monotone" :dataKey :uv
                                  :isAnimationActive @isAnimationActive?
-                                 :stroke            "#8884d8" :fill "#8884d8"}])
+                                 :stroke            (get-in @config [:line-uv :stroke])
+                                 :fill              (get-in @config [:line-uv :fill])}])
 
        (when @line-pv? [:> Line {:type              "monotone" :dataKey :pv
                                  :isAnimationActive @isAnimationActive?
-                                 :stroke            "#82ca9d" :fill "#82ca9d"}])
+                                 :stroke            (get-in @config [:line-pv :stroke])
+                                 :fill              (get-in @config [:line-pv :fill])}])
 
        (when @line-amt? [:> Line {:type              "monotone" :dataKey :amt
                                   :isAnimationActive @isAnimationActive?
-                                  :stroke            "#ff00ff"
-                                  :fill              "#ff00ff"}])])))
+                                  :stroke            (get-in @config [:line-amt :stroke])
+                                  :fill              (get-in @config [:line-amt :fill])}])])))
 
 ;; endregion
 
 
-(defn example []
+(defn simple-example []
+  (utils/init-config-panel "line-chart-demo")
+
+  (let [data (r/atom utils/tabular-data)]
+    (bcu/configurable-demo
+      "Line Chart"
+      "A simple Line Chart built using [Recharts]()"
+      [:line-chart-demo/config :line-chart-demo/data :line-chart-demo/tab-panel :line-chart-demo/selected-tab]
+      [utils/data-panel data]
+      [config-panel config]
+      [component data config]
+      '[:> LineChart {:width 400 :height 400 :data @data}
+        [:> CartesianGrid {:strokeDasharray (strokeDasharray config)}]
+        [:> XAxis {:dataKey :name :orientation :bottom :scale "auto"}]
+        [:> YAxis {:orientation :left :scale "auto"}]
+        [:> Tooltip]
+        [:> Legend]
+        [:> Line {:type              "monotone" :dataKey :uv
+                  :isAnimationActive true
+                  :stroke            "#8884d8" :fill "#8884d8"}]
+        [:> Line {:type              "monotone" :dataKey :pv
+                  :isAnimationActive true
+                  :stroke            "#82ca9d" :fill "#82ca9d"}]
+        [:> Line {:type              "monotone" :dataKey :amt
+                  :isAnimationActive true
+                  :stroke            "#ff00ff"
+                  :fill              "#ff00ff"}]])))
+
+
+
+(defn stacked-example []
   (utils/init-config-panel "line-chart-demo")
 
   (let [data (r/atom utils/tabular-data)]

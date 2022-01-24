@@ -419,25 +419,29 @@
 (defn color-config [config label path]
   (let [showing? (r/atom false)]
     (fn []
-      [rc/h-box :src (rc/at)
-       :gap "5px"
-       :children [[rc/popover-anchor-wrapper :src (rc/at)
-                   :showing? showing?
-                   :position :right-center
-                   :anchor [rc/button :src (rc/at)
-                            :label label
-                            :style {:background-color (get-in @config path)
-                                    :color            (ui-utils/best-text-color
-                                                        (ui-utils/hex->rgba (get-in @config path)))}
-                            :on-click #(swap! showing? not)]
-                   :popover [rc/popover-content-wrapper :src (rc/at)
-                             :close-button? true
-                             :no-clip? true
-                             :body [:> HexColorPicker {:color     (get-in @config path)
-                                                       :on-change #(swap! config assoc-in path %)}]]]
-                  [rc/input-text :src (rc/at)
-                   :model (get-in @config path)
-                   :on-change #(swap! config assoc-in path %)]]])))
+      [rc/popover-anchor-wrapper :src (rc/at)
+       :showing? showing?
+       :position :right-center
+       :anchor [rc/button :src (rc/at)
+                :label label
+                :style {:background-color (get-in @config path)
+                        :color            (ui-utils/best-text-color
+                                            (ui-utils/hex->rgba (get-in @config path)))}
+                :on-click #(swap! showing? not)]
+       :popover [rc/popover-content-wrapper :src (rc/at)
+                 :close-button? true
+                 :no-clip? true
+                 :body [:> HexColorPicker {:color     (get-in @config path)
+                                           :on-change #(swap! config assoc-in path %)}]]])))
+
+
+(defn color-config-text [config label path]
+  [rc/h-box :src (rc/at)
+   :gap "5px"
+   :children [[color-config config label path]
+              [rc/input-text :src (rc/at)
+               :model (get-in @config path)
+               :on-change #(swap! config assoc-in path %)]]])
 
 
 ;; endregion
@@ -461,7 +465,7 @@
    :children [[boolean-config config ":grid" [:grid :include]]
               [dashArray-config config
                ":strokeDasharray" 1 10 [:grid :strokeDasharray]]
-              [color-config config ":stroke" [:grid :stroke]]]])
+              [color-config-text config ":stroke" [:grid :stroke]]]])
 
 
 (defn x-axis [config]
