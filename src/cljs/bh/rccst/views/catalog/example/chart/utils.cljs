@@ -11,7 +11,8 @@
             [woolybear.packs.tab-panel :as tab-panel]
 
             [bh.rccst.events :as events]
-            [bh.rccst.ui-component.table :as table]))
+            [bh.rccst.ui-component.table :as table]
+            [bh.rccst.ui-component.utils :as ui-utils]))
 
 
 (defn init-config-panel [base-id]
@@ -425,6 +426,9 @@
                    :position :right-center
                    :anchor [rc/button :src (rc/at)
                             :label label
+                            :style {:background-color (get-in @config path)
+                                    :color            (ui-utils/best-text-color
+                                                        (ui-utils/hex->rgba (get-in @config path)))}
                             :on-click #(swap! showing? not)]
                    :popover [rc/popover-content-wrapper :src (rc/at)
                              :close-button? true
