@@ -14,7 +14,8 @@
 
 (def config (r/atom (-> utils/default-config
                       (assoc-in [:x-axis :dataKey] :x)
-                      (assoc-in [:y-axis :dataKey] :y))))
+                      (assoc-in [:y-axis :dataKey] :y)
+                      (assoc-in [:fill :color] "#8884d8"))))
 
 ;; endregion
 
@@ -34,7 +35,8 @@
         :style {:padding          "15px"
                 :border-top       "1px solid #DDD"
                 :background-color "#f7f7f7"}
-        :children [[utils/standard-chart-config data config]]])
+        :children [[utils/standard-chart-config data config]
+                   [utils/color-config-text config ":fill" [:fill :color]]]])
 
 
 (defn- component
@@ -60,7 +62,9 @@
                  (when @x-axis? [:> XAxis {:type "number" :dataKey (get-in @config [:x-axis :dataKey]) :name "stature" :unit "cm"}])
                  (when @y-axis? [:> YAxis {:type "number" :dataKey (get-in @config [:y-axis :dataKey]) :name "weight" :unit "kg"}])
                  (when @tooltip? [:> Tooltip])
-                 [:> Scatter {:name "tempScatter" :data @data :fill "#8884d8"}]])))
+                 [:> Scatter {:name "tempScatter" :data @data
+                              :isAnimationActive @isAnimationActive?
+                              :fill (get-in @config [:fill :color])}]])))
 
 ;; endregion
 
