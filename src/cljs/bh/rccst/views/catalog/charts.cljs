@@ -3,7 +3,8 @@
             [bh.rccst.views.catalog.example.colored-pie-chart :as colored-pie-chart]
             [bh.rccst.views.catalog.example.line-chart :as line-chart]
             [bh.rccst.views.catalog.example.pie-chart :as pie-chart]
-            [bh.rccst.views.catalog.example.scatter-chart :as scatter-chart]))
+            [bh.rccst.views.catalog.example.scatter-chart :as scatter-chart]
+            [bh.rccst.views.catalog.example.treemap-chart :as treemap-chart]))
 
 
 
@@ -13,6 +14,7 @@
    [line-chart/example]
    [pie-chart/example]
    [colored-pie-chart/example]
-   [scatter-chart/example]])
+   [scatter-chart/example]
+   [treemap-chart/example]])
 
 
