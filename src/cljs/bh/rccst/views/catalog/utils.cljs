@@ -22,14 +22,17 @@
     [:div.chart-config {:style {:width "100%"}}
      [navbar/navbar data-or-config [panel]]
 
-     [tab-panel/tab-panel {:extra-classes             :rccst
-                           :subscribe-to-selected-tab [tab]}
+     [rc/scroller
+      :v-scroll :auto
+      :height   "500px"
+      :child    [tab-panel/tab-panel {:extra-classes             :rccst
+                                      :subscribe-to-selected-tab [tab]}
 
-      [tab-panel/sub-panel {:panel-id config}
-       config-panel]
+                 [tab-panel/sub-panel {:panel-id config}
+                  config-panel]
 
-      [tab-panel/sub-panel {:panel-id data}
-       data-panel]]]))
+                 [tab-panel/sub-panel {:panel-id data}
+                  data-panel]]]]))
 
 
 (defn- config-display

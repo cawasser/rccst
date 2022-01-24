@@ -66,7 +66,7 @@
 
 > See `Colored Pie Chart` for an example of how to get the slices to be different colors."
       [:pie-chart-demo/config :pie-chart-demo/data :pie-chart-demo/tab-panel :pie-chart-demo/selected-tab]
-      [utils/data-panel data]
+      [utils/tabular-data-panel data]
       [config-panel config]
       [component-panel data config]
       '[:> PieChart {:width 400 :height 400}

@@ -15,7 +15,9 @@
             [bh.rccst.ui-component.utils :as ui-utils]))
 
 
-(defn init-config-panel [base-id]
+(defn init-config-panel
+  "this need some REALLY GOOD documentation!"
+  [base-id]
   (log/info "init-config-panel" base-id)
   (let [formal-id (keyword base-id)
         data-path [formal-id :tab-panel]
@@ -189,9 +191,11 @@
                                          :strokeDasharray {:dash "3" :space "3"}
                                          :stroke          "#a9a9a9"}
                      :x-axis            {:include     true
+                                         :dataKey     ""
                                          :orientation :bottom
                                          :scale       "auto"}
                      :y-axis            {:include     true
+                                         :dataKey     ""
                                          :orientation :left
                                          :scale       "auto"}
                      :tooltip           {:include true}
@@ -201,7 +205,7 @@
                                          :verticalAlign "bottom"}})
 
 
-(defn data-panel
+(defn tabular-data-panel
   "provides a simple tabular component (via `bh.rccst.ui-component.table`) to show the data presented
   in the Chart.
 
@@ -216,6 +220,20 @@
    :width 500
    :data data
    :max-rows 5])
+
+
+(defn column-picker [data config label path]
+  (let [headings (apply set (map keys @data))
+        btns (mapv (fn [h] {:id h :label h}) headings)]
+    [rc/h-box :src (rc/at)
+     :gap "5px"
+     :children [[rc/box :src (rc/at) :align :start :child [:code label]]
+                [rc/horizontal-bar-tabs
+                 :src (rc/at)
+                 :model (get-in @config path)
+                 :tabs btns
+                 :style btns-style
+                 :on-change #(swap! config assoc-in path %)]]]))
 
 
 (defn boolean-config
@@ -468,16 +486,18 @@
               [color-config-text config ":stroke" [:grid :stroke]]]])
 
 
-(defn x-axis [config]
+(defn x-axis [data config]
   [rc/v-box :src (rc/at)
    :children [[boolean-config config ":x-axis" [:x-axis :include]]
+              [column-picker data config ":dataKey" [:x-axis :dataKey]]
               [orientation-config config x-axis-btns ":orientation" [:x-axis :orientation]]
               [scale-config config ":scale" [:x-axis :scale]]]])
 
 
-(defn y-axis [config]
+(defn y-axis [data config]
   [rc/v-box :src (rc/at)
    :children [[boolean-config config ":y-axis" [:y-axis :include]]
+              [column-picker data config ":dataKey" [:y-axis :dataKey]]
               [orientation-config config y-axis-btns ":orientation" [:y-axis :orientation]]
               [scale-config config ":scale" [:y-axis :scale]]]])
 
@@ -505,15 +525,15 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; region
 
-(defn standard-chart-config [config]
+(defn standard-chart-config [data config]
   [:<>
    [isAnimationActive config]
    [rc/line :src (rc/at) :size "2px"]
    [grid config]
    [rc/line :src (rc/at) :size "2px"]
-   [x-axis config]
+   [x-axis data config]
    [rc/line :src (rc/at) :size "2px"]
-   [y-axis config]
+   [y-axis data config]
    [rc/line :src (rc/at) :size "2px"]
    [tooltip config]
    [rc/line :src (rc/at) :size "2px"]
@@ -551,11 +571,12 @@
      (when @grid? [:> CartesianGrid {:strokeDasharray (strokeDasharray config)
                                      :stroke          (get-in @config [:grid :stroke])}])
 
-     (when @x-axis? [:> XAxis {:dataKey     :name
+     (when @x-axis? [:> XAxis {:dataKey     (get-in @config [:x-axis :dataKey])
                                :orientation (get-in @config [:x-axis :orientation])
                                :scale       (get-in @config [:x-axis :scale])}])
 
-     (when @y-axis? [:> YAxis {:orientation (get-in @config [:y-axis :orientation])
+     (when @y-axis? [:> YAxis {:dataKey     (get-in @config [:y-axis :dataKey])
+                               :orientation (get-in @config [:y-axis :orientation])
                                :scale       (get-in @config [:y-axis :scale])}])
 
      (when @tooltip? [:> Tooltip])

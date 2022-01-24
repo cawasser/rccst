@@ -80,7 +80,6 @@
         ratio-val (reaction (/ (get-in @config [:ratio :n]) (get-in @config [:ratio :d])))]
 
     (fn []
-      (log/info "treemap component" @ratio-val)
       [:> Treemap
        {:width 400 :height 400
         :data @data
@@ -102,7 +101,7 @@
       "Treemap Chart"
       "A simple Treemap Chart built using [Recharts](https://recharts.org/en-US/api/Treemap)"
       [:treemap-chart-demo/config :treemap-chart-demo/data :treemap-chart-demo/tab-panel :treemap-chart-demo/selected-tab]
-      [:div "Dummy Data here"]                              ;[utils/data-panel data]
+      [:div "Dummy Data here"]                              ;[utils/tabular-data-panel data]
       [config-panel config]
       [component data config]
       '[:> Treemap

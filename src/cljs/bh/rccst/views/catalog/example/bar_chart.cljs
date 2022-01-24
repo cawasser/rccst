@@ -10,11 +10,14 @@
 
 ;; region ; configuration params
 
-(def config (r/atom (merge utils/default-config
-                      {:bar-uv  {:include true :fill "#ff0000"}
-                       :bar-pv  {:include true :fill "#00ff00"}
-                       :bar-amt {:include false :fill "#0000ff"}
-                       :bar-d   {:include false :fill "#0f0f0f"}})))
+(def config (r/atom (-> utils/default-config
+                      (merge
+                        {:bar-uv  {:include true :fill "#ff0000"}
+                         :bar-pv  {:include true :fill "#00ff00"}
+                         :bar-amt {:include false :fill "#0000ff"}
+                         :bar-d   {:include false :fill "#0f0f0f"}})
+                      (assoc-in [:x-axis :dataKey] :name))))
+
 
 ;; endregion
 
@@ -35,7 +38,7 @@
 
   - config : (atom) holds all the configuration settings made by the user
   "
-  [config]
+  [data config]
 
   [rc/v-box :src (rc/at)
    :gap "10px"
@@ -43,7 +46,7 @@
    :style {:padding          "15px"
            :border-top       "1px solid #DDD"
            :background-color "#f7f7f7"}
-   :children [[utils/standard-chart-config config]
+   :children [[utils/standard-chart-config data config]
               [rc/line :src (rc/at) :size "2px"]
               [rc/h-box :src (rc/at)
                :gap "10px"
@@ -99,8 +102,8 @@
     (bcu/configurable-demo "Bar Chart"
       "Bar Charts (this would be really cool with support for changing options live)"
       [:bar-chart-demo/config :bar-chart-demo/data :bar-chart-demo/tab-panel :bar-chart-demo/selected-tab]
-      [utils/data-panel data]
-      [config-panel config]
+      [utils/tabular-data-panel data]
+      [config-panel data config]
       [component-panel data config]
       '[:> BarChart {:width 400 :height 400 :data @data}
         [:> CartesianGrid {:strokeDasharray "3 3"}]

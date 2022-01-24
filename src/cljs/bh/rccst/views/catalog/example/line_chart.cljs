@@ -15,10 +15,12 @@
 
 ; region ; configuration params
 
-(def config (r/atom (merge utils/default-config
-                      {:line-uv  {:include true :stroke "#8884d8" :fill "#8884d8"}
-                       :line-pv  {:include true :stroke "#82ca9d" :fill "#82ca9d"}
-                       :line-amt {:include false :stroke "#ff00ff" :fill "#ff00ff"}})))
+(def config (r/atom (-> utils/default-config
+                      (merge
+                        {:line-uv  {:include true :stroke "#8884d8" :fill "#8884d8"}
+                         :line-pv  {:include true :stroke "#82ca9d" :fill "#82ca9d"}
+                         :line-amt {:include false :stroke "#ff00ff" :fill "#ff00ff"}})
+                      (assoc-in [:x-axis :dataKey] :name))))
 
 ;; endregion
 
@@ -106,7 +108,7 @@
       "Line Chart"
       "A simple Line Chart built using [Recharts]()"
       [:line-chart-demo/config :line-chart-demo/data :line-chart-demo/tab-panel :line-chart-demo/selected-tab]
-      [utils/data-panel data]
+      [utils/tabular-data-panel data]
       [config-panel config]
       [component data config]
       '[:> LineChart {:width 400 :height 400 :data @data}
@@ -127,7 +129,6 @@
                   :fill              "#ff00ff"}]])))
 
 
-
 (defn stacked-example []
   (utils/init-config-panel "line-chart-demo")
 
@@ -136,7 +137,7 @@
       "Line Chart"
       "A simple Line Chart built using [Recharts]()"
       [:line-chart-demo/config :line-chart-demo/data :line-chart-demo/tab-panel :line-chart-demo/selected-tab]
-      [utils/data-panel data]
+      [utils/tabular-data-panel data]
       [config-panel config]
       [component data config]
       '[:> LineChart {:width 400 :height 400 :data @data}
