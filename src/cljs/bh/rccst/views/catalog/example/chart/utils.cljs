@@ -70,6 +70,101 @@
                   {:name "Group E" :value 278}
                   {:name "Group F" :value 189}])
 
+(def hierarchy-data [{:name     "axis"
+                      :children [{:name "Axis" :size 24593}
+                                 {:name "Axes" :size 1302}
+                                 {:name "AxisGridLine" :size 652}
+                                 {:name "AxisLabel" :size 636}
+                                 {:name "CartesianAxes" :size 6703}]}
+                     {:name     "controls"
+                      :children [{:name "TooltipControl" :size 8435}
+                                 {:name "SelectionControl" :size 7862}
+                                 {:name "PanZoomControl" :size 5222}
+                                 {:name "HoverControl" :size 4896}
+                                 {:name "ControlList" :size 4665}
+                                 {:name "ClickControl" :size 3824}
+                                 {:name "ExpandControl" :size 2832}
+                                 {:name "DragControl" :size 2649}
+                                 {:name "AnchorControl" :size 2138}
+                                 {:name "Control" :size 1353}
+                                 {:name "IControl" :size 763}]}
+                     {:name     "data"
+                      :children [{:name "Data" :size 20544}
+                                 {:name "NodeSprite" :size 19382}
+                                 {:name "DataList" :size 19788}
+                                 {:name "DataSprite" :size 10349}
+                                 {:name "EdgeSprite" :size 3301}
+                                 {:name     "render"
+                                  :children [{:name "EdgeRenderer" :size 5569}
+                                             {:name "ShapeRenderer" :size 2247}
+                                             {:name "ArrowType" :size 698}
+                                             {:name "IRenderer" :size 353}]}
+                                 {:name "ScaleBinding" :size 11275}
+                                 {:name "TreeBuilder" :size 9930}
+                                 {:name "Tree" :size 7147}]}
+                     {:name     "events"
+                      :children [{:name "DataEvent" :size 7313}
+                                 {:name "SelectionEvent" :size 6880}
+                                 {:name "TooltipEvent" :size 3701}
+                                 {:name "VisualizationEvent" :size 2117}]}
+                     {:name     "legend"
+                      :children [{:name "Legend" :size 20859}
+                                 {:name "LegendRange" :size 10530}
+                                 {:name "LegendItem" :size 4614}]}
+                     {:name     "operator"
+                      :children [{:name     "distortion"
+                                  :children [{:name "Distortion" :size 6314}
+                                             {:name "BifocalDistortion" :size 4461}
+                                             {:name "FisheyeDistortion" :size 3444}]}
+                                 {:name     "encoder"
+                                  :children [{:name "PropertyEncoder" :size 4138}
+                                             {:name "Encoder" :size 4060}
+                                             {:name "ColorEncoder" :size 3179}
+                                             {:name "SizeEncoder" :size 1830}
+                                             {:name "ShapeEncoder" :size 1690}]}
+                                 {:name     "filter"
+                                  :children [{:name "FisheyeTreeFilter" :size 5219}
+                                             {:name "VisibilityFilter" :size 3509}
+                                             {:name "GraphDistanceFilter" :size 3165}]}
+                                 {:name "IOperator" :size 1286}
+                                 {:name     "label"
+                                  :children [{:name "Labeler" :size 9956}
+                                             {:name "RadialLabeler" :size 3899}
+                                             {:name "StackedAreaLabeler" :size 3202}]}
+                                 {:name     "layout"
+                                  :children [{:name "RadialTreeLayout" :size 12348}
+                                             {:name "NodeLinkTreeLayout" :size 12870}
+                                             {:name "CirclePackingLayout" :size 12003}
+                                             {:name "CircleLayout" :size 9317}
+                                             {:name "TreeMapLayout" :size 9191}
+                                             {:name "StackedAreaLayout" :size 9121}
+                                             {:name "Layout" :size 7881}
+                                             {:name "AxisLayout" :size 6725}
+                                             {:name "IcicleTreeLayout" :size 4864}
+                                             {:name "DendrogramLayout" :size 4853}
+                                             {:name "ForceDirectedLayout" :size 8411}
+                                             {:name "BundledEdgeRouter" :size 3727}
+                                             {:name "IndentedTreeLayout" :size 3174}
+                                             {:name "PieLayout" :size 2728}
+                                             {:name "RandomLayout" :size 870}]}
+                                 {:name "OperatorList" :size 5248}
+                                 {:name "OperatorSequence" :size 4190}
+                                 {:name "OperatorSwitch" :size 2581}
+                                 {:name "Operator" :size 2490}
+                                 {:name "SortOperator" :size 2023}]}])
+
+(def dag-data {:nodes [{:name "Visit"}
+                       {:name "Direct-Favourite"}
+                       {:name "Page-Click"}
+                       {:name "Detail-Favourite"}
+                       {:name "Lost"}]
+               :links [
+                       {:source 0 :target 1 :value 3728.3}
+                       {:source 0 :target 2 :value 354170}
+                       {:source 2 :target 3 :value 62429}
+                       {:source 2 :target 4 :value 291741}]})
+
+
 ;; endregion
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -127,7 +222,7 @@
 
   ---
 
-  - config : (atom) holds a hash-map of the actual configuration properties, see [[config]].
+  - config : (atom) holds a hash-map of the actual configuration properties see [[config]].
   - label : (string) tell the user which subcomponent this control is manipulating
   - path : (vector) path into `config` where the subcomponent 'inclusion' value is stored
   "
@@ -138,13 +233,21 @@
    :on-change #(swap! config assoc-in path %)])
 
 
+(defn slider-config [config min max path]
+  [rc/slider :src (rc/at)
+   :model (get-in @config path)
+   :width "100px"
+   :min min :max max
+   :on-change #(swap! config assoc-in path %)])
+
+
 (defn strokeDasharray
   "reconstitutes the 2-part string value required by `:strokeDasharray` from the
   2 values in the [[config]] atom.
 
   ---
 
-  - config : (atom) holds a hash-map of the actual configuration properties, see [[config]].
+  - config : (atom) holds a hash-map of the actual configuration properties see [[config]].
   "
   [config]
   (str (get-in @config [:grid :strokeDasharray :dash])
@@ -158,7 +261,7 @@
 
   ---
 
-  - config : (atom) holds a hash-map of the actual configuration properties, see [[config]].
+  - config : (atom) holds a hash-map of the actual configuration properties see [[config]].
   - label : (string) tell the user which axis this control is manipulating
   - min : (integer) minimum value for the slider
   - max : (integer) maximum value for the slider
@@ -170,16 +273,8 @@
    :children [[rc/box :src (rc/at) :align :start :child [:code label]]
               [rc/v-box :src (rc/at)
                :gap "5px"
-               :children [[rc/slider :src (rc/at)
-                           :model (get-in @config (conj path :dash))
-                           :width "100px"
-                           :min min :max max
-                           :on-change #(swap! config assoc-in (conj path :dash) %)]
-                          [rc/slider :src (rc/at)
-                           :model (get-in @config (conj path :space))
-                           :width "100px"
-                           :min min :max max
-                           :on-change #(swap! config assoc-in (conj path :space) %)]]]]])
+               :children [[slider-config config min max (conj path :dash)]
+                          [slider-config config min max (conj path :space)]]]]])
 
 
 (defn orientation-config
@@ -187,7 +282,7 @@
 
   ---
 
-  - config : (atom) holds a hash-map of the actual configuration properties, see [[config]].
+  - config : (atom) holds a hash-map of the actual configuration properties see [[config]].
   - btns : (vector) define the button that set the value(s).
 
   | key       | description                                                          |
@@ -199,8 +294,8 @@
 
   | axis      | allowed orientations   |
   |:----------|:-----------------------|
-  | X Axis    | `:top` , `:bottom`     |
-  | Y Axis    | `:left` , `:right`     |
+  | X Axis    | `:top`  `:bottom`     |
+  | Y Axis    | `:left`  `:right`     |
 
   - label : (string) tell the user which axis this control is manipulating
   - path : (vector) path into `config` where the orientation for the correct axis is stored
@@ -220,13 +315,13 @@
   "lets the user change the scale of an 'axis'. Which axis is defined by the arguments.
   Supports only:
 
-    `auto` , `linear` , `pow` , `sqrt` , `log`
+    `auto`  `linear`  `pow`  `sqrt`  `log`
 
   scale types. Recharts supports many more. See [here](https://recharts.org/en-US/api/XAxis#scale)
 
   ---
 
-  - config : (atom) holds a hash-map of the actual configuration properties, see [[config]].
+  - config : (atom) holds a hash-map of the actual configuration properties see [[config]].
   - label : (string) tell the user which axis this control is manipulating
   - path : (vector) path into `config` where the scale for the correct axis is stored
   "
@@ -254,7 +349,7 @@
 
   ---
 
-  - config : (atom) holds a hash-map of the actual configuration properties, see [[config]].
+  - config : (atom) holds a hash-map of the actual configuration properties see [[config]].
   - path : (vector) path into `config` where the scale for the layout is stored
   "
   [config path]
@@ -274,11 +369,11 @@
   "lets the user change the alignment of a 'legend'.
   Supports:
 
-    `left` , `center` , `right`
+    `left`  `center`  `right`
 
   ---
 
-  - config : (atom) holds a hash-map of the actual configuration properties, see [[config]].
+  - config : (atom) holds a hash-map of the actual configuration properties see [[config]].
   - path : (vector) path into `config` where the scale for the layout is stored
   "
   [config path]
@@ -299,11 +394,11 @@
   "lets the user change the vetical alignment of a 'legend'.
   Supports:
 
-    `top` , `middle` , `bottom`
+    `top`  `middle`  `bottom`
 
   ---
 
-  - config : (atom) holds a hash-map of the actual configuration properties, see [[config]].
+  - config : (atom) holds a hash-map of the actual configuration properties see [[config]].
   - path : (vector) path into `config` where the scale for the layout is stored
   "
   [config path]
@@ -333,12 +428,12 @@
                             :on-click #(swap! showing? not)]
                    :popover [rc/popover-content-wrapper :src (rc/at)
                              :close-button? true
+                             :no-clip? true
                              :body [:> HexColorPicker {:color     (get-in @config path)
                                                        :on-change #(swap! config assoc-in path %)}]]]
                   [rc/input-text :src (rc/at)
                    :model (get-in @config path)
                    :on-change #(swap! config assoc-in path %)]]])))
-
 
 
 ;; endregion
