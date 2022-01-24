@@ -12,9 +12,12 @@
 
 ; region ; configuration params
 
-(def config (r/atom (merge utils/default-config)))
+(def config (r/atom (-> utils/default-config
+                      (assoc-in [:x-axis :dataKey] :x)
+                      (assoc-in [:y-axis :dataKey] :y))))
 
 ;; endregion
+
 
 (defn- config-panel
        "the panel of configuration controls
@@ -23,7 +26,7 @@
 
        - config : (atom) holds all the configuration settings made by the user
        "
-       [config]
+       [data config]
 
        [rc/v-box :src (rc/at)
         :gap "10px"
@@ -31,7 +34,7 @@
         :style {:padding          "15px"
                 :border-top       "1px solid #DDD"
                 :background-color "#f7f7f7"}
-        :children [[utils/standard-chart-config config]]])
+        :children [[utils/standard-chart-config data config]]])
 
 
 (defn- component
@@ -44,6 +47,8 @@
        "
        [data config]
        (let [tooltip? (reaction (:tooltip @config))
+             x-axis? (reaction (get-in @config [:x-axis :include]))
+             y-axis? (reaction (get-in @config [:y-axis :include]))
              isAnimationActive? (reaction (:isAnimationActive @config))]
 
             (fn []
@@ -52,8 +57,8 @@
                 [:> ScatterChart {:width 400 :height 400}
                  [:> CartesianGrid {:strokeDasharray (utils/strokeDasharray config)
                                     :stroke          (get-in @config [:grid :stroke])}]
-                 [:> XAxis {:type "number" :dataKey :x :name "stature" :unit "cm"}]
-                 [:> YAxis {:type "number" :dataKey :y :name "weight" :unit "kg"}]
+                 (when @x-axis? [:> XAxis {:type "number" :dataKey (get-in @config [:x-axis :dataKey]) :name "stature" :unit "cm"}])
+                 (when @y-axis? [:> YAxis {:type "number" :dataKey (get-in @config [:y-axis :dataKey]) :name "weight" :unit "kg"}])
                  (when @tooltip? [:> Tooltip])
                  [:> Scatter {:name "tempScatter" :data @data :fill "#8884d8"}]])))
 
@@ -67,10 +72,10 @@
              "Scatter Chart"
              "Basic scatter chart"
              [:scatter-chart-demo/config :scatter-chart-demo/data :scatter-chart-demo/tab-panel :scatter-chart-demo/selected-tab]
-             [utils/data-panel data]
-             [config-panel config]
+             [utils/tabular-data-panel data]
+             [config-panel data config]
              [component data config]
-             '[:> ScatterChart {:width 400 :height 400 }
+             '[:> ScatterChart {:width 400 :height 400}
                [:> CartesianGrid {:strokeDashArray (strokeDashArray config)}]
                [:> XAxis {:type :dataKey :name :unit}]
                [:> YAxis {:type :dataKey :name :unit}]
