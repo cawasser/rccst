@@ -33,7 +33,13 @@
 
 (defn example []
   (acu/demo "Hex Color Picker"
-    "Use the [react-colorful](https://github.com/omgovich/react-colorful) component to provide simple, yet powerful color picker control"
+    "Use the [react-colorful](https://github.com/omgovich/react-colorful) component to provide simple, yet powerful color picker control.
+
+This example also includes use of a support function
+`bh.rccst.ui-component.utils/best-text-color` to determine the best text color to place 'over' the given
+color choice. You can see this in the example `Button` and`div` shown under the text-field that shows the
+actual hex-encoded string for the chosen color.
+    "
     [layout/centered {:extra-classes :width-50}
      [rc/h-box :src (rc/at)
       :gap "10px"

@@ -47,7 +47,17 @@
 
 (defn example []
   (acu/demo "RGBA Color Picker"
-    "Use the [react-colorful](https://github.com/omgovich/react-colorful) component to provide simple, yet powerful color picker control"
+    "Use the [react-colorful](https://github.com/omgovich/react-colorful) component to provide simple, yet powerful color picker control
+
+This example also includes use of a support function
+`bh.rccst.ui-component.utils/best-text-color-alpha` to determine the best text color to place 'over' the given
+color choice. You can see this in the example `Button` shown under the text-field that shows the
+actual hex-encoded string for the chosen color.
+
+
+> Note: `buttons` do _NOT_ support alpha-channel colors, but `divs` do, so you may see
+> a difference in the color choices between the two components.
+    "
     [layout/centered {:extra-classes :width-50}
      [rc/h-box :src (rc/at)
       :gap "10px"

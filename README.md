@@ -58,7 +58,7 @@ There are lots of things we wanted to learn more about, and we've [done many of 
            1. [ ] Re-com
            2. [ ] Woolybear
            3. [X] color picker?
-              1. [ ] [algorithm](https://ux.stackexchange.com/questions/107318/formula-for-color-contrast-between-text-and-background) to set text-color based on picker-color
+              1. [X] [algorithm](https://ux.stackexchange.com/questions/107318/formula-for-color-contrast-between-text-and-background) to set text-color based on picker-color
            4. [ ] 3d & 2d globes
         3. [ ] what are the molecules? (or they still just atoms?)
            1. [X] login
@@ -78,6 +78,11 @@ There are lots of things we wanted to learn more about, and we've [done many of 
       2. [ ] woolybear
       3. [ ] 3d-globe
       4. [ ] 2d-globe
+   2. [ ] ui-component wrappers in re-com style
+      1. [ ] woolybear components
+      2. [ ] color-pickers
+      3. [ ] diagrams
+      4. [ ] cards
 3. [ ] complete/clean-up catalog example "show code"
    1. [ ] Layout / Layout Grid
    2. [ ] Cards / Card
@@ -87,7 +92,7 @@ There are lots of things we wanted to learn more about, and we've [done many of 
 4. [ ] complete/cleanup molecule example 'code'
    1. [ ] general / header-bar
    2. [ ] general / login
-5. [ ] build a better "source code" tool so it actually shows the code as the component is actually configured in the catalog
+5. [ ] build a better "source code" tool, so it shows the exact code as the component is actually configured in the catalog example
 
 
 
