@@ -18,7 +18,7 @@
 (defn init-config-panel
   "this need some REALLY GOOD documentation!"
   [base-id]
-  (log/info "init-config-panel" base-id)
+  ;(log/info "init-config-panel" base-id)
   (let [formal-id (keyword base-id)
         data-path [formal-id :tab-panel]
         config-id (keyword base-id "config")
@@ -260,12 +260,30 @@
    :on-change #(swap! config assoc-in path %)])
 
 
-(defn slider-config [config min max path]
-  [rc/slider :src (rc/at)
-   :model (get-in @config path)
-   :width "100px"
-   :min min :max max
-   :on-change #(swap! config assoc-in path %)])
+(defn slider-config
+  ([config min max step path]
+   [rc/slider :src (rc/at)
+    :model (get-in @config path)
+    :width "100px"
+    :min min :max max :step step
+    :on-change #(swap! config assoc-in path %)])
+
+  ([config min max path]
+   [rc/slider :src (rc/at)
+    :model (get-in @config path)
+    :width "100px"
+    :min min :max max
+    :on-change #(swap! config assoc-in path %)]))
+
+
+(defn text-config [config label path]
+  [rc/h-box :src (rc/at)
+   :gap "5px"
+   :children [[rc/label :src (rc/at) :label label]
+              [rc/input-text :src (rc/at)
+               :model (str (get-in @config path))
+               :width "50px"
+               :on-change #(swap! config assoc-in path %)]]])
 
 
 (defn strokeDasharray

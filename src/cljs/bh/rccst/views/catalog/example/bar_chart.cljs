@@ -28,7 +28,8 @@
   [rc/v-box :src (rc/at)
    :gap "5px"
    :children [[utils/boolean-config config label (conj path :include)]
-              [utils/color-config config ":fill" (conj path :fill) position]]])
+              [utils/color-config config ":fill" (conj path :fill) position]
+              [utils/text-config config ":stackId" (conj path :stackId)]]])
 
 
 (defn- config-panel
@@ -78,18 +79,22 @@
 
        (when @bar-uv? [:> Bar {:type              "monotone" :dataKey :uv
                                :isAnimationActive @isAnimationActive?
+                               :stackId           (get-in @config [:bar-uv :stackId])
                                :fill              (get-in @config [:bar-uv :fill])}])
 
        (when @bar-pv? [:> Bar {:type              "monotone" :dataKey :pv
                                :isAnimationActive @isAnimationActive?
+                               :stackId           (get-in @config [:bar-pv :stackId])
                                :fill              (get-in @config [:bar-pv :fill])}])
 
        (when @bar-amt? [:> Bar {:type              "monotone" :dataKey :amt
                                 :isAnimationActive @isAnimationActive?
+                                :stackId           (get-in @config [:bar-amt :stackId])
                                 :fill              (get-in @config [:bar-amt :fill])}])
 
        (when @bar-d? [:> Bar {:type              "monotone" :dataKey :d
                               :isAnimationActive @isAnimationActive?
+                              :stackId           (get-in @config [:bar-d :stackId])
                               :fill              (get-in @config [:bar-d :fill])}])])))
 
 ;; endregion

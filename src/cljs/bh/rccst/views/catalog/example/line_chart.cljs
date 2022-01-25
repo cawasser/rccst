@@ -76,7 +76,7 @@
         isAnimationActive? (reaction (:isAnimationActive @config))]
 
     (fn []
-      (log/info "configurable-chart" @config)
+      ;(log/info "configurable-chart" @config)
 
       [:> LineChart {:width 400 :height 400 :data @data}
 
