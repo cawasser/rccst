@@ -1,7 +1,7 @@
 (ns bh.rccst.views.catalog.example.sankey-chart
   (:require [taoensso.timbre :as log]
             [woolybear.packs.tab-panel :as tab-panel]
-            ["recharts" :refer [Sankey Tooltip Rectangle]]
+            ["recharts" :refer [Sankey Tooltip Layer Rectangle]]
             [reagent.core :as r]
             [reagent.ratom :refer-macros [reaction]]
             [re-com.core :as rc]
@@ -14,7 +14,7 @@
 
 
 (def config (r/atom {:tooltip {:include true}
-                     :link {:stroke "#77c878"}}))
+                     :link    {:stroke "#77c878"}}))
 
 
 (defn- config-panel [config]
@@ -26,33 +26,30 @@
               [utils/color-config-text config "link stroke" [:link :stroke]]]])
 
 
-(defn- custom-node [props]
-  (log/info "sankey node" (js->clj props))
+(defn- complex-node [props]
+  (let [{x                           "x" y "y"
+         width                       "width" height "height"
+         index                       "index"
+         {name "name" value "value"} "payload"
+         containerWidth              "containerWidth"} (js->clj props)
+        isOut (< containerWidth (+ x width 6))]
+    (r/as-element
+      [:> Layer {:key (str "CustomNode$" index)}
+       [:> Rectangle {:x x :y y :width width :height height :fill "#77c878"}]
+       [:text {:textAnchor (if isOut "end" "start")
+               :x          (if isOut (- x 6) (+ x width 6))
+               :y          (+ y (/ height 2))
+               :fontSize   14
+               :stroke     "#333"}
+        name]
+       [:text {:textAnchor    (if isOut "end" "start")
+               :x             (if isOut (- x 6) (+ x width 6))
+               :y             (+ y 13 (/ height 2))
+               :fontSize      12
+               :stroke        "#333"
+               :strokeOpacity 0.5}
+        (str value "k")]])))
 
-  (let [{x "x" y "y" width "width" height "height"} (js->clj props)]
-    [:> Rectangle {:x x :y y :width width :height height :fill "#0089DD"}]))
-
-
-(comment
-  (def props {"x" 385, "y" 4.9999999999999325,
-              "width" 10, "height" 301.60570754317644,
-              "index" 4,
-              "payload" {"targetNodes" [],
-                         "sourceNodes" [2],
-                         "x" 380, "dx" 10,
-                         "sourceLinks" [3],
-                         "name" "Lost",
-                         "value" 291741,
-                         "targetLinks" [],
-                         "y" -6.750155989720952e-14,
-                         "depth" 2,
-                         "dy" 301.60570754317644}})
-
-  (let [{x "x" y "y" width "width" height "height"} (js->clj props)]
-    {:x x :y y :width width :height height})
-
-
-  ())
 
 (defn- component [data config]
   (let [tooltip? (reaction (get-in @config [:tooltip :include]))
@@ -60,9 +57,9 @@
     (fn []
       [:> Sankey
        {:width 400 :height 400
-        ;:node custom-node
-        :data @data
-        :link {:stroke @stroke}}
+        :node  complex-node
+        :data  @data
+        :link  {:stroke @stroke}}
        (when @tooltip? [:> Tooltip])])))
 
 

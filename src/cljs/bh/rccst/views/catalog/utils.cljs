@@ -16,7 +16,7 @@
 
 
 (defn- chart-config [[config data panel tab] data-panel config-panel]
-  (log/info "chart-config" config data panel tab)
+  ;(log/info "chart-config" config data panel tab)
   (let [data-or-config [[config "config"]
                         [data "data"]]]
     [:div.chart-config {:style {:width "100%"}}

@@ -18,7 +18,7 @@
 (defn init-config-panel
   "this need some REALLY GOOD documentation!"
   [base-id]
-  (log/info "init-config-panel" base-id)
+  ;(log/info "init-config-panel" base-id)
   (let [formal-id (keyword base-id)
         data-path [formal-id :tab-panel]
         config-id (keyword base-id "config")

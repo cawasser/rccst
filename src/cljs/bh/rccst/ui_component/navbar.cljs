@@ -20,7 +20,7 @@
   > [Woolybear/tab-bar](https://github.com/cawasser/woolybear/blob/a7f820dfb2f51636122d56d1500baefe5733eb25/src/cljs/woolybear/packs/tab_panel.cljs#L61)
   "
   [children subcription]
-  (log/info "nav-bar")
+  ;(log/info "nav-bar")
   (->> children
     (map (fn [[id label]]
            [buttons/tab-button {:panel-id id} label]))
