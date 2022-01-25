@@ -71,6 +71,13 @@
                   {:name "Group E" :value 278}
                   {:name "Group F" :value 189}])
 
+(def paired-filled-data [{:name "Group A" :value 400 :fill "#8884d8"}
+                         {:name "Group B" :value 300 :fill "#83a6ed"}
+                         {:name "Group C" :value 300 :fill "#8dd1e1"}
+                         {:name "Group D" :value 200 :fill "#82ca9d"}
+                         {:name "Group E" :value 278 :fill "#a4de6c"}
+                         {:name "Group F" :value 189 :fill "#d7e62b"}])
+
 (def triplet-data [{:x 100 :y 200 :z 200}
                    {:x 120 :y 100 :z 260}
                    {:x 170 :y 300 :z 400}
