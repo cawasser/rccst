@@ -58,13 +58,13 @@
             (fn []
                 (log/info "configurable-funnel-chart" @config)
 
-                [:> FunnelChart {:height 400 :width 400}
+                [:> FunnelChart {:height 400 :width 500}
                  (when @tooltip? [:> Tooltip])
                  [:> Funnel {:dataKey :value :data @data :isAnimationActive @isAnimationActive?}
                   (map-indexed (fn [idx {name :name}]
                                    [:> Cell {:key (str "cell-" idx) :fill (get-in @config [:colors name])}])
                                @data)
-                  [:> LabelList :position :right :fill "#000" :dataKey :name]]])))
+                  [:> LabelList {:position :right :fill "#000000" :stroke "none" :dataKey :name}]]])))
 
 ;; endregion
 
