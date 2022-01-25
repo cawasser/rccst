@@ -56,7 +56,7 @@
              isAnimationActive? (reaction (:isAnimationActive @config))]
 
             (fn []
-                (log/info "configurable-funnel-chart" @config)
+                ;(log/info "configurable-funnel-chart" @config)
 
                 [:> FunnelChart {:height 400 :width 500}
                  (when @tooltip? [:> Tooltip])

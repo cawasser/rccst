@@ -18,7 +18,8 @@
                 [day8.re-frame/http-fx "0.2.3"]
                 [day8.re-frame/re-frame-10x "1.2.1"]
                 [day8.re-frame/tracing "0.6.2"]
-                [re-com "2.13.2"]]
+                [re-com "2.13.2"]
+                [org.clojars.ertucetin/re-frame-flow "0.1.4"]]
 
  :builds       {:app
                 {:target       :browser
@@ -28,7 +29,8 @@
                  :pretty-print true,
                  :modules      {:app {:entries [rccst.app]
                                       :init-fn bh.rccst.core/init}}
-                 :devtools     {:preloads [day8.re-frame-10x.preload]}
+                 :devtools     {:preloads [re-frame-flow.preload
+                                           day8.re-frame-10x.preload]}
                  :dev          {:compiler-options
                                 {:output-feature-set :es-next
                                  :closure-defines {re-frame.trace.trace-enabled?              true
