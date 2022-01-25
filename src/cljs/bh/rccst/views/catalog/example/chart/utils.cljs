@@ -275,6 +275,16 @@
    :on-change #(swap! config assoc-in path %)])
 
 
+(defn text-config [config label path]
+  [rc/h-box :src (rc/at)
+   :gap "5px"
+   :children [[rc/label :src (rc/at) :label label]
+              [rc/input-text :src (rc/at)
+               :model (get-in @config path)
+               :width "50px"
+               :on-change #(swap! config assoc-in path %)]]])
+
+
 (defn strokeDasharray
   "reconstitutes the 2-part string value required by `:strokeDasharray` from the
   2 values in the [[config]] atom.
