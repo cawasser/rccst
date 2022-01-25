@@ -8,11 +8,14 @@
             [bh.rccst.views.catalog.utils :as bcu]
             [bh.rccst.views.catalog.example.chart.utils :as utils]
 
-            ["recharts" :refer [FunnelChart Funnel LabelList XAxis YAxis CartesianGrid Tooltip]]))
+            ["recharts" :refer [FunnelChart Funnel Cell LabelList XAxis YAxis CartesianGrid Tooltip]]))
 
 ; region ; configuration params
 
 (def config (r/atom (-> utils/default-config
+                        (merge {:colors (zipmap (map :name utils/paired-data)
+                                         ["#8884d8" "#83a6ed" "#8dd1e1"
+                                          "#82ca9d" "#a4de6c" "#d7e62b"])})
                         (assoc-in [:x-axis :dataKey] :x)
                         (assoc-in [:y-axis :dataKey] :y)
                         (assoc-in [:fill :color] "#8884d8"))))
@@ -57,15 +60,18 @@
 
                 [:> FunnelChart {:height 400 :width 400}
                  [:> Tooltip]  ;(when @tooltip? [:> Tooltip])
-                 [:> Funnel :dataKey :value :data @data :isAnimationActive isAnimationActive?
-                  [:> LabelList :position :right :fill "#000000" :dataKey :name]]])))
+                 [:> Funnel {:dataKey :value :data @data :isAnimationActive isAnimationActive?}
+                  (map-indexed (fn [idx {name :name}]
+                                   [:> Cell {:key (str "cell-" idx) :fill (get-in @config [:colors name])}])
+                               @data)
+                  [:> LabelList :position :right :fill "#000" :dataKey :name]]])))
 
 ;; endregion
 
 (defn example []
       (utils/init-config-panel "funnel-chart-demo")
 
-      (let [data (r/atom utils/paired-filled-data)]
+      (let [data (r/atom utils/paired-data)]
            (bcu/configurable-demo
              "Funnel Chart"
              "Basic Funnel Chart"
