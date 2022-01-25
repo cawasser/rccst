@@ -96,4 +96,13 @@
       [:div "Dummy Data here"]                              ;[utils/tabular-data-panel data]
       [config-panel config]
       [component data config]
-      '[])))
+      '[:> Sankey
+        {:width         500 :height 400
+         :node          (partial complex-node 500 @fill)
+         :data          @data
+         :margin        {:top 20 :bottom 20 :left 20 :right 20}
+         :nodeWidth     10 :nodePadding 60
+         :linkCurvature @curve
+         :iterations    64
+         :link          {:stroke @stroke}}
+        (when @tooltip? [:> Tooltip])])))
