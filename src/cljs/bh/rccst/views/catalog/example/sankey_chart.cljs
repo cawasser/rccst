@@ -14,9 +14,10 @@
 
 
 (def config (r/atom {:tooltip {:include true}
-                     :node    {:fill "#77c878"}
+                     :node    {:fill "#77c878"
+                               :stroke "#000000"}
                      :link    {:stroke "#77c878"
-                               :curve 0.5}}))
+                               :curve  0.5}}))
 
 
 (defn- config-panel [config]
@@ -25,7 +26,10 @@
    :gap "5px"
    :children [[utils/tooltip config]
               [rc/line :size "2px"]
-              [utils/color-config-text config "node fill" [:node :fill] :right-below]
+              [rc/v-box :src (rc/at)
+               :gap "5px"
+               :children [[utils/color-config-text config "node fill" [:node :fill] :right-below]
+                          [utils/color-config-text config "node stroke" [:node :stroke] :right-below]]]
               [rc/line :size "2px"]
               [utils/color-config-text config "link stroke" [:link :stroke] :right-below]
               [rc/h-box :src (rc/at)
@@ -39,15 +43,17 @@
 > See [here](https://cljdoc.org/d/reagent/reagent/1.1.0/doc/tutorials/react-features#hooks)
 > for details on how the Reagent/React interop work for this
 "
-  [containerWidth fill props]
-  (let [{x                           "x" y "y"
-         width                       "width" height "height"
+  [containerWidth fill stroke props]
+  (let [{x                           "x"
+         y                           "y"
+         width                       "width"
+         height                      "height"
          index                       "index"
          {name "name" value "value"} "payload"} (js->clj props)
         isOut (< containerWidth (+ x width 30 6))]
     (r/as-element
       [:> Layer {:key (str "CustomNode$" index)}
-       [:> Rectangle {:x x :y y :width width :height height :fill fill}]
+       [:> Rectangle {:x x :y y :width width :height height :fill fill :stroke stroke}]
        [:text {:textAnchor (if isOut "end" "start")
                :x          (if isOut (- x 6) (+ x width 6))
                :y          (+ y (/ height 2))
@@ -65,19 +71,22 @@
 
 (defn- component [data config]
   (let [tooltip? (reaction (get-in @config [:tooltip :include]))
-        stroke (reaction (get-in @config [:link :stroke]))
-        fill (reaction (get-in @config [:node :fill]))
+        link-stroke (reaction (get-in @config [:link :stroke]))
+        node-stroke (reaction (get-in @config [:node :stroke]))
+        node-fill (reaction (get-in @config [:node :fill]))
         curve (reaction (get-in @config [:link :curve]))]
+
     (fn []
       [:> Sankey
        {:width         500 :height 400
-        :node          (partial complex-node 500 @fill)
+        :node          (partial complex-node 500 @node-fill @node-stroke)
         :data          @data
         :margin        {:top 20 :bottom 20 :left 20 :right 20}
-        :nodeWidth     10 :nodePadding 60
+        :nodeWidth     10
+        :nodePadding 60
         :linkCurvature @curve
         :iterations    64
-        :link          {:stroke @stroke}}
+        :link          {:stroke @link-stroke}}
        (when @tooltip? [:> Tooltip])])))
 
 
@@ -101,7 +110,8 @@
          :node          (partial complex-node 500 @fill)
          :data          @data
          :margin        {:top 20 :bottom 20 :left 20 :right 20}
-         :nodeWidth     10 :nodePadding 60
+         :nodeWidth     10
+         :nodePadding 60
          :linkCurvature @curve
          :iterations    64
          :link          {:stroke @stroke}}

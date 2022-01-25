@@ -5,14 +5,15 @@
 
             [bh.rccst.views.catalog.utils :as bcu]
             [bh.rccst.views.catalog.example.chart.utils :as utils]
-            ["recharts" :refer [BarChart Bar]]))
+            ["recharts" :refer [BarChart Bar Brush]]))
 
 
 ;; region ; configuration params
 
 (def config (r/atom (-> utils/default-config
                       (merge
-                        {:bar-uv  {:include true :fill "#ff0000"}
+                        {:brush   false
+                         :bar-uv  {:include true :fill "#ff0000"}
                          :bar-pv  {:include true :fill "#00ff00"}
                          :bar-amt {:include false :fill "#0000ff"}
                          :bar-d   {:include false :fill "#0f0f0f"}})
@@ -54,7 +55,9 @@
                :children [[bar-config config "bar (uv)" [:bar-uv] :above-right]
                           [bar-config config "bar (pv)" [:bar-pv] :above-center]
                           [bar-config config "bar (amt)" [:bar-amt] :above-center]
-                          [bar-config config "bar (d)" [:bar-d] :above-left]]]]])
+                          [bar-config config "bar (d)" [:bar-d] :above-left]]]
+              [rc/line :src (rc/at) :size "2px"]
+              [utils/boolean-config config ":brush?" [:brush]]]])
 
 
 (defn- component-panel
@@ -70,35 +73,53 @@
         bar-pv? (reaction (get-in @config [:bar-pv :include]))
         bar-amt? (reaction (get-in @config [:bar-amt :include]))
         bar-d? (reaction (get-in @config [:bar-d :include]))
-        isAnimationActive? (reaction (:isAnimationActive @config))]
+        isAnimationActive? (reaction (:isAnimationActive @config))
+        brush? (reaction (:brush @config))]
 
     (fn []
       [:> BarChart {:width 400 :height 400 :data @data}
 
        (utils/standard-chart-components config)
 
-       (when @bar-uv? [:> Bar {:type              "monotone" :dataKey :uv
-                               :isAnimationActive @isAnimationActive?
-                               :stackId           (get-in @config [:bar-uv :stackId])
-                               :fill              (get-in @config [:bar-uv :fill])}])
+       (when @brush? [:> Brush])
 
-       (when @bar-pv? [:> Bar {:type              "monotone" :dataKey :pv
-                               :isAnimationActive @isAnimationActive?
-                               :stackId           (get-in @config [:bar-pv :stackId])
-                               :fill              (get-in @config [:bar-pv :fill])}])
+       (when @bar-uv? [:> Bar (merge {:type              "monotone" :dataKey :uv
+                                      :isAnimationActive @isAnimationActive?
+                                      :fill              (get-in @config [:bar-uv :fill])}
+                                (when (not (empty? (get-in @config [:bar-uv :stackId])))
+                                  {:stackId (get-in @config [:bar-uv :stackId])}))])
 
-       (when @bar-amt? [:> Bar {:type              "monotone" :dataKey :amt
-                                :isAnimationActive @isAnimationActive?
-                                :stackId           (get-in @config [:bar-amt :stackId])
-                                :fill              (get-in @config [:bar-amt :fill])}])
+       (when @bar-pv? [:> Bar (merge {:type              "monotone" :dataKey :pv
+                                      :isAnimationActive @isAnimationActive?
+                                      :fill              (get-in @config [:bar-pv :fill])}
+                                (when (not (empty? (get-in @config [:bar-pv :stackId])))
+                                  {:stackId (get-in @config [:bar-pv :stackId])}))])
 
-       (when @bar-d? [:> Bar {:type              "monotone" :dataKey :d
-                              :isAnimationActive @isAnimationActive?
-                              :stackId           (get-in @config [:bar-d :stackId])
-                              :fill              (get-in @config [:bar-d :fill])}])])))
+       (when @bar-amt? [:> Bar (merge {:type              "monotone" :dataKey :amt
+                                       :isAnimationActive @isAnimationActive?
+                                       :fill              (get-in @config [:bar-amt :fill])}
+                                 (when (not (empty? (get-in @config [:bar-amt :stackId])))
+                                   {:stackId (get-in @config [:bar-amt :stackId])}))])
+
+       (when @bar-d? [:> Bar (merge {:type              "monotone" :dataKey :d
+                                     :isAnimationActive @isAnimationActive?
+                                     :fill              (get-in @config [:bar-d :fill])}
+                               (when (not (empty? (get-in @config [:bar-d :stackId])))
+                                 {:stackId (get-in @config [:bar-d :stackId])}))])])))
 
 ;; endregion
 
+
+(comment
+  (def config {:bar-d {:stackId "a"}})
+
+  (merge {:type              "monotone" :dataKey :d
+          :isAnimationActive @isAnimationActive?
+          :fill              (get-in @config [:bar-d :fill])}
+    (when (not (empty? (get-in config [:bar-d :stackId])))
+      {:stackId (get-in @config [:bar-d :stackId])}))
+
+  ())
 
 (defn example []
   (utils/init-config-panel "bar-chart-demo")
