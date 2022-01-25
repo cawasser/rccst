@@ -61,9 +61,10 @@
                 [:> FunnelChart {:height 400 :width 500}
                  (when @tooltip? [:> Tooltip])
                  [:> Funnel {:dataKey :value :data @data :isAnimationActive @isAnimationActive?}
-                  (map-indexed (fn [idx {name :name}]
-                                   [:> Cell {:key (str "cell-" idx) :fill (get-in @config [:colors name])}])
-                               @data)
+                  (doall
+                    (map-indexed (fn [idx {name :name}]
+                                     [:> Cell {:key (str "cell-" idx) :fill (get-in @config [:colors name])}])
+                                 @data))
                   [:> LabelList {:position :right :fill "#000000" :stroke "none" :dataKey :name}]]])))
 
 ;; endregion

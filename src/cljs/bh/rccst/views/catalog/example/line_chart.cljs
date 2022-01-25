@@ -1,7 +1,7 @@
 (ns bh.rccst.views.catalog.example.line-chart
   (:require [taoensso.timbre :as log]
             [woolybear.packs.tab-panel :as tab-panel]
-            ["recharts" :refer [ResponsiveContainer LineChart Line]]
+            ["recharts" :refer [ResponsiveContainer LineChart Line Brush]]
             [reagent.core :as r]
             [reagent.ratom :refer-macros [reaction]]
             [re-com.core :as rc]
@@ -17,7 +17,8 @@
 
 (def config (r/atom (-> utils/default-config
                       (merge
-                        {:line-uv  {:include true :stroke "#8884d8" :fill "#8884d8"}
+                        {:brush   false
+                         :line-uv  {:include true :stroke "#8884d8" :fill "#8884d8"}
                          :line-pv  {:include true :stroke "#82ca9d" :fill "#82ca9d"}
                          :line-amt {:include false :stroke "#ff00ff" :fill "#ff00ff"}})
                       (assoc-in [:x-axis :dataKey] :name))))
@@ -58,7 +59,8 @@
                :gap "10px"
                :children [[line-config config "line (uv)" [:line-uv] :above-right]
                           [line-config config "line (pv)" [:line-pv] :above-right]
-                          [line-config config "line (amt)" [:line-amt] :above-center]]]]])
+                          [line-config config "line (amt)" [:line-amt] :above-center]]]
+              [utils/boolean-config config ":brush?" [:brush]]]])
 
 
 (defn- component
@@ -73,7 +75,8 @@
   (let [line-uv? (reaction (get-in @config [:line-uv :include]))
         line-pv? (reaction (get-in @config [:line-pv :include]))
         line-amt? (reaction (get-in @config [:line-amt :include]))
-        isAnimationActive? (reaction (:isAnimationActive @config))]
+        isAnimationActive? (reaction (:isAnimationActive @config))
+        brush? (reaction (:brush @config))]
 
     (fn []
       ;(log/info "configurable-chart" @config)
@@ -81,6 +84,8 @@
       [:> LineChart {:width 400 :height 400 :data @data}
 
        (utils/standard-chart-components config)
+
+       (when @brush? [:> Brush])
 
        (when @line-uv? [:> Line {:type              "monotone" :dataKey :uv
                                  :isAnimationActive @isAnimationActive?

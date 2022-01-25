@@ -8,7 +8,7 @@
             [bh.rccst.views.catalog.utils :as bcu]
             [bh.rccst.views.catalog.example.chart.utils :as utils]
 
-            ["recharts" :refer [ScatterChart Scatter XAxis YAxis CartesianGrid Tooltip]]))
+            ["recharts" :refer [ScatterChart Scatter XAxis YAxis CartesianGrid Legend Tooltip]]))
 
 ; region ; configuration params
 
@@ -50,19 +50,25 @@
        "
        [data config]
        (let [tooltip? (reaction (:tooltip @config))
+             grid? (reaction (get-in @config [:grid :include]))
              x-axis? (reaction (get-in @config [:x-axis :include]))
              y-axis? (reaction (get-in @config [:y-axis :include]))
+             legend? (reaction (get-in @config [:legend :include]))
              isAnimationActive? (reaction (:isAnimationActive @config))]
 
             (fn []
-                (log/info "configurable-Scatter-chart" @config @data)
+                ;(log/info "configurable-Scatter-chart" @config @data)
 
                 [:> ScatterChart {:width 400 :height 400}
-                 [:> CartesianGrid {:strokeDasharray (utils/strokeDasharray config)
-                                    :stroke          (get-in @config [:grid :stroke])}]
+
+                 (when @grid? [:> CartesianGrid {:strokeDasharray (utils/strokeDasharray config)
+                                                 :stroke          (get-in @config [:grid :stroke])}])
                  (when @x-axis? [:> XAxis {:type "number" :dataKey (get-in @config [:x-axis :dataKey]) :name "stature" :unit "cm"}])
                  (when @y-axis? [:> YAxis {:type "number" :dataKey (get-in @config [:y-axis :dataKey]) :name "weight" :unit "kg"}])
                  (when @tooltip? [:> Tooltip])
+                 (when @legend? [:> Legend {:layout        (get-in @config [:legend :layout])
+                                            :align         (get-in @config [:legend :align])
+                                            :verticalAlign (get-in @config [:legend :verticalAlign])}])
                  [:> Scatter {:name "tempScatter" :data @data
                               :isAnimationActive @isAnimationActive?
                               :fill (get-in @config [:fill :color])}]])))
