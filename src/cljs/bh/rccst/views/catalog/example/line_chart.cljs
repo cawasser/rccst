@@ -27,14 +27,14 @@
 
 ;; region ; config and component panels
 
-(defn- line-config [config label path]
+(defn- line-config [config label path position]
   [rc/v-box :src (rc/at)
    :gap "5px"
    :children [[utils/boolean-config config label (conj path :include)]
               [rc/h-box :src (rc/at)
                :gap "5px"
-               :children [[utils/color-config config ":stroke" (conj path :stroke)]
-                          [utils/color-config config ":fill" (conj path :fill)]]]]])
+               :children [[utils/color-config config ":stroke" (conj path :stroke) position]
+                          [utils/color-config config ":fill" (conj path :fill) position]]]]])
 
 
 (defn- config-panel
@@ -56,9 +56,9 @@
               [rc/line :src (rc/at) :size "2px"]
               [rc/h-box :src (rc/at)
                :gap "10px"
-               :children [[line-config config "line (uv)" [:line-uv]]
-                          [line-config config "line (pv)" [:line-pv]]
-                          [line-config config "line (amt)" [:line-amt]]]]]])
+               :children [[line-config config "line (uv)" [:line-uv] :above-right]
+                          [line-config config "line (pv)" [:line-pv] :above-right]
+                          [line-config config "line (amt)" [:line-amt] :above-center]]]]])
 
 
 (defn- component

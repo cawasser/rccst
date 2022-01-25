@@ -449,12 +449,13 @@
                  :on-change #(swap! config assoc-in path %)]]]))
 
 
-(defn color-config [config label path]
-  (let [showing? (r/atom false)]
+(defn color-config [config label path & [position]]
+  (let [showing? (r/atom false)
+        p (or position :right-center)]
     (fn []
       [rc/popover-anchor-wrapper :src (rc/at)
-       :showing? showing?
-       :position :right-center
+       :showing? @showing?
+       :position p
        :anchor [rc/button :src (rc/at)
                 :label label
                 :style {:background-color (get-in @config path)
@@ -468,10 +469,10 @@
                                            :on-change #(swap! config assoc-in path %)}]]])))
 
 
-(defn color-config-text [config label path]
+(defn color-config-text [config label path & [position]]
   [rc/h-box :src (rc/at)
    :gap "5px"
-   :children [[color-config config label path]
+   :children [[color-config config label path position]
               [rc/input-text :src (rc/at)
                :model (get-in @config path)
                :on-change #(swap! config assoc-in path %)]]])
