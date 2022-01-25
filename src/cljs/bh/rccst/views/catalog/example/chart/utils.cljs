@@ -267,12 +267,20 @@
    :on-change #(swap! config assoc-in path %)])
 
 
-(defn slider-config [config min max path]
-  [rc/slider :src (rc/at)
-   :model (get-in @config path)
-   :width "100px"
-   :min min :max max
-   :on-change #(swap! config assoc-in path %)])
+(defn slider-config
+  ([config min max step path]
+   [rc/slider :src (rc/at)
+    :model (get-in @config path)
+    :width "100px"
+    :min min :max max :step step
+    :on-change #(swap! config assoc-in path %)])
+
+  ([config min max path]
+   [rc/slider :src (rc/at)
+    :model (get-in @config path)
+    :width "100px"
+    :min min :max max
+    :on-change #(swap! config assoc-in path %)]))
 
 
 (defn text-config [config label path]
@@ -280,7 +288,7 @@
    :gap "5px"
    :children [[rc/label :src (rc/at) :label label]
               [rc/input-text :src (rc/at)
-               :model (get-in @config path)
+               :model (str (get-in @config path))
                :width "50px"
                :on-change #(swap! config assoc-in path %)]]])
 
