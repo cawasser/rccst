@@ -19,6 +19,7 @@
 
 ;; endregion
 
+;; region ; config and component panels
 
 (defn- config-panel
        "the panel of configuration controls
