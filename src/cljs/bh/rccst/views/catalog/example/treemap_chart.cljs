@@ -19,7 +19,8 @@
 (def default-stroke "#ffffff")
 (def default-fill "#8884d8")
 
-(def config (r/atom {:ratio  {:include true
+(def config (r/atom {:isAnimationActive true
+                     :ratio  {:include true
                               :n 4
                               :d 3}
                      :stroke  {:color "#ffffff"}
@@ -83,9 +84,9 @@
       [:> Treemap
        {:width 400 :height 400
         :data @data
-        :dataKey :size
+        :dataKey "size"
         :isAnimationActive @isAnimationActive?
-        :ratio (if @ratio @ratio-val default-ratio)
+        :ratio default-ratio
         :stroke (get-in @config [:stroke :color])
         :fill (get-in @config [:fill :color])}])))
 

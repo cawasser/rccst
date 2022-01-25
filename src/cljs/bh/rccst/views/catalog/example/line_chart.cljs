@@ -44,7 +44,7 @@
 
   - config : (atom) holds all the configuration settings made by the user
   "
-  [config]
+  [data config]
 
   [rc/v-box :src (rc/at)
    :gap "10px"
@@ -52,7 +52,7 @@
    :style {:padding          "15px"
            :border-top       "1px solid #DDD"
            :background-color "#f7f7f7"}
-   :children [[utils/standard-chart-config config]
+   :children [[utils/standard-chart-config data config]
               [rc/line :src (rc/at) :size "2px"]
               [rc/h-box :src (rc/at)
                :gap "10px"
@@ -109,7 +109,7 @@
       "A simple Line Chart built using [Recharts]()"
       [:line-chart-demo/config :line-chart-demo/data :line-chart-demo/tab-panel :line-chart-demo/selected-tab]
       [utils/tabular-data-panel data]
-      [config-panel config]
+      [config-panel data config]
       [component data config]
       '[:> LineChart {:width 400 :height 400 :data @data}
         [:> CartesianGrid {:strokeDasharray (strokeDasharray config)}]
