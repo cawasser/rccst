@@ -19,7 +19,7 @@
   [:<>
    (doall
      (map (fn [[id _]]
-            ^{:key id}[utils/color-config config id [:colors id]])
+            ^{:key id}[utils/color-config-text config id [:colors id]])
        (:colors @config)))])
 
 
@@ -77,7 +77,7 @@ inside the `Pie` element.
 > Note: Recharts supports embedding `Cell` in a variety of other chart types, for example BarChart"
 
       [:pie-chart-demo/config :pie-chart-demo/data :pie-chart-demo/tab-panel :pie-chart-demo/selected-tab]
-      [utils/data-panel data]
+      [utils/tabular-data-panel data]
       [config-panel config]
       [component-panel data config]
 

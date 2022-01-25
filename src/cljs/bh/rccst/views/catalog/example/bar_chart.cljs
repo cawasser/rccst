@@ -10,16 +10,26 @@
 
 ;; region ; configuration params
 
-(def config (r/atom (merge utils/default-config
-                      {:bar-uv  {:include true}
-                       :bar-pv  {:include true}
-                       :bar-amt {:include false}
-                       :bar-d   {:include false}})))
+(def config (r/atom (-> utils/default-config
+                      (merge
+                        {:bar-uv  {:include true :fill "#ff0000"}
+                         :bar-pv  {:include true :fill "#00ff00"}
+                         :bar-amt {:include false :fill "#0000ff"}
+                         :bar-d   {:include false :fill "#0f0f0f"}})
+                      (assoc-in [:x-axis :dataKey] :name))))
+
 
 ;; endregion
 
 
 ;; region ; config and component panels
+
+(defn- bar-config [config label path]
+  [rc/v-box :src (rc/at)
+   :gap "5px"
+   :children [[utils/boolean-config config label (conj path :include)]
+              [utils/color-config config ":fill" (conj path :fill)]]])
+
 
 (defn- config-panel
   "the panel of configuration controls
@@ -28,7 +38,7 @@
 
   - config : (atom) holds all the configuration settings made by the user
   "
-  [config]
+  [data config]
 
   [rc/v-box :src (rc/at)
    :gap "10px"
@@ -36,14 +46,14 @@
    :style {:padding          "15px"
            :border-top       "1px solid #DDD"
            :background-color "#f7f7f7"}
-   :children [[utils/standard-chart-config config]
+   :children [[utils/standard-chart-config data config]
               [rc/line :src (rc/at) :size "2px"]
               [rc/h-box :src (rc/at)
                :gap "10px"
-               :children [[utils/boolean-config config "bar (uv)" [:bar-uv :include]]
-                          [utils/boolean-config config "bar (pv)" [:bar-pv :include]]
-                          [utils/boolean-config config "bar (amt)" [:bar-amt :include]]
-                          [utils/boolean-config config "bar (d)" [:bar-d :include]]]]]])
+               :children [[bar-config config "bar (uv)" [:bar-uv]]
+                          [bar-config config "bar (pv)" [:bar-pv]]
+                          [bar-config config "bar (amt)" [:bar-amt]]
+                          [bar-config config "bar (d)" [:bar-d]]]]]])
 
 
 (defn- component-panel
@@ -68,19 +78,19 @@
 
        (when @bar-uv? [:> Bar {:type              "monotone" :dataKey :uv
                                :isAnimationActive @isAnimationActive?
-                               :fill              "#8884d8"}])
+                               :fill              (get-in @config [:bar-uv :fill])}])
 
        (when @bar-pv? [:> Bar {:type              "monotone" :dataKey :pv
                                :isAnimationActive @isAnimationActive?
-                               :fill              "#82ca9d"}])
+                               :fill              (get-in @config [:bar-pv :fill])}])
 
        (when @bar-amt? [:> Bar {:type              "monotone" :dataKey :amt
                                 :isAnimationActive @isAnimationActive?
-                                :fill              "#ff00ff"}])
+                                :fill              (get-in @config [:bar-amt :fill])}])
 
        (when @bar-d? [:> Bar {:type              "monotone" :dataKey :d
                               :isAnimationActive @isAnimationActive?
-                              :fill              "#DC143C"}])])))
+                              :fill              (get-in @config [:bar-d :fill])}])])))
 
 ;; endregion
 
@@ -92,8 +102,8 @@
     (bcu/configurable-demo "Bar Chart"
       "Bar Charts (this would be really cool with support for changing options live)"
       [:bar-chart-demo/config :bar-chart-demo/data :bar-chart-demo/tab-panel :bar-chart-demo/selected-tab]
-      [utils/data-panel data]
-      [config-panel config]
+      [utils/tabular-data-panel data]
+      [config-panel data config]
       [component-panel data config]
       '[:> BarChart {:width 400 :height 400 :data @data}
         [:> CartesianGrid {:strokeDasharray "3 3"}]

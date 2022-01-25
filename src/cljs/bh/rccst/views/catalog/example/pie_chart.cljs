@@ -11,7 +11,7 @@
 
 
 (def config (r/atom (merge utils/default-config
-                      {})))
+                      {:fill "#8884d8"})))
 
 
 (defn- config-panel
@@ -33,7 +33,7 @@
               [rc/line :src (rc/at) :size "2px"]
               [rc/h-box :src (rc/at)
                :gap "10px"
-               :children []]]])
+               :children [[utils/color-config-text config ":fill" [:fill]]]]]])
 
 
 (defn- component-panel
@@ -51,7 +51,7 @@
       [:> PieChart {:width 400 :height 400 :label true}
        (utils/non-gridded-chart-components config)
 
-       [:> Pie {:dataKey "value" :data @data :fill "#8884d8" :label true
+       [:> Pie {:dataKey "value" :data @data :fill (:fill @config) :label true
                 :isAnimationActive @isAnimationActive?}]])))
 
 
@@ -66,7 +66,7 @@
 
 > See `Colored Pie Chart` for an example of how to get the slices to be different colors."
       [:pie-chart-demo/config :pie-chart-demo/data :pie-chart-demo/tab-panel :pie-chart-demo/selected-tab]
-      [utils/data-panel data]
+      [utils/tabular-data-panel data]
       [config-panel config]
       [component-panel data config]
       '[:> PieChart {:width 400 :height 400}

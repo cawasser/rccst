@@ -12,7 +12,10 @@
 
 ; region ; configuration params
 
-(def config (r/atom (merge utils/default-config)))
+(def config (r/atom (-> utils/default-config
+                        (assoc-in [:x-axis :dataKey] :x)
+                        (assoc-in [:y-axis :dataKey] :y)
+                        (assoc-in [:fill :color] "#8884d8"))))
 
 ;; endregion
 
@@ -25,7 +28,7 @@
 
        - config : (atom) holds all the configuration settings made by the user
        "
-       [config]
+       [data config]
 
        [rc/v-box :src (rc/at)
         :gap "10px"
@@ -33,7 +36,8 @@
         :style {:padding          "15px"
                 :border-top       "1px solid #DDD"
                 :background-color "#f7f7f7"}
-        :children [[utils/standard-chart-config config]]])
+        :children [[utils/standard-chart-config data config]
+                   [utils/color-config-text config ":fill" [:fill :color]]]])
 
 
 (defn- component
@@ -54,7 +58,7 @@
                 [:> FunnelChart {:height 400 :width 400}
                  [:> Tooltip]  ;(when @tooltip? [:> Tooltip])
                  [:> Funnel :dataKey :value :data @data :isAnimationActive isAnimationActive?
-                  [:> LabelList :position :right :fill "#000" :stroke "none" :dataKey :name]]])))
+                  [:> LabelList :position :right :fill "#000000" :dataKey :name]]])))
 
 ;; endregion
 
@@ -66,7 +70,7 @@
              "Funnel Chart"
              "Basic Funnel Chart"
              [:funnel-chart-demo/config :funnel-chart-demo/data :funnel-chart-demo/tab-panel :funnel-chart-demo/selected-tab]
-             [utils/data-panel data]
-             [config-panel config]
+             [utils/tabular-data-panel data]
+             [config-panel data config]
              [component data config]
              '[:> Funnel {:stuff :things}])))
