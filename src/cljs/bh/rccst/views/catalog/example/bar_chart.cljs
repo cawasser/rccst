@@ -24,11 +24,11 @@
 
 ;; region ; config and component panels
 
-(defn- bar-config [config label path]
+(defn- bar-config [config label path position]
   [rc/v-box :src (rc/at)
    :gap "5px"
    :children [[utils/boolean-config config label (conj path :include)]
-              [utils/color-config config ":fill" (conj path :fill)]]])
+              [utils/color-config config ":fill" (conj path :fill) position]]])
 
 
 (defn- config-panel
@@ -50,10 +50,10 @@
               [rc/line :src (rc/at) :size "2px"]
               [rc/h-box :src (rc/at)
                :gap "10px"
-               :children [[bar-config config "bar (uv)" [:bar-uv]]
-                          [bar-config config "bar (pv)" [:bar-pv]]
-                          [bar-config config "bar (amt)" [:bar-amt]]
-                          [bar-config config "bar (d)" [:bar-d]]]]]])
+               :children [[bar-config config "bar (uv)" [:bar-uv] :above-right]
+                          [bar-config config "bar (pv)" [:bar-pv] :above-center]
+                          [bar-config config "bar (amt)" [:bar-amt] :above-center]
+                          [bar-config config "bar (d)" [:bar-d] :above-left]]]]])
 
 
 (defn- component-panel

@@ -26,6 +26,7 @@
   [rc/v-box :src (rc/at)
    :gap "10px"
    :width "100%"
+   :height "500px"
    :style {:padding          "15px"
            :border-top       "1px solid #DDD"
            :background-color "#f7f7f7"}
@@ -48,10 +49,14 @@
   (let [isAnimationActive? (reaction (:isAnimationActive @config))]
 
     (fn []
-      [:> PieChart {:width 400 :height 400 :label true}
+      [:> PieChart {:width 400 :height 400
+                    :label true}
        (utils/non-gridded-chart-components config)
 
-       [:> Pie {:dataKey "value" :data @data :fill (:fill @config) :label true
+       [:> Pie {:dataKey "value" :name-Key "name"
+                :data @data
+                :fill (:fill @config)
+                :label true
                 :isAnimationActive @isAnimationActive?}]])))
 
 

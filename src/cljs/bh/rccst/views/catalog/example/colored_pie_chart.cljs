@@ -19,7 +19,7 @@
   [:<>
    (doall
      (map (fn [[id _]]
-            ^{:key id}[utils/color-config-text config id [:colors id]])
+            ^{:key id}[utils/color-config-text config id [:colors id] :right-above])
        (:colors @config)))])
 
 
@@ -60,10 +60,17 @@
     (fn []
       [:> PieChart {:width 400 :height 400 :label true}
        (utils/non-gridded-chart-components config)
-       [:> Pie {:data @data :label true :isAnimationActive @isAnimationActive?}
-        (map-indexed (fn [idx {name :name}]
-                       [:> Cell {:key (str "cell-" idx) :fill (get-in @config [:colors name])}])
-          @data)]])))
+       [:> Pie {:data @data
+                :dataKey "value" :nameKey "name"
+                :label true
+                :isAnimationActive @isAnimationActive?}
+        (doall
+          (map-indexed
+            (fn [idx {name :name}]
+              ^{:key (str idx name)}
+              [:> Cell {:key (str "cell-" idx)
+                        :fill (get-in @config [:colors name])}])
+            @data))]])))
 
 
 (defn example []

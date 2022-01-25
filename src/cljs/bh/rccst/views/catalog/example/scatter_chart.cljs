@@ -36,7 +36,7 @@
                 :border-top       "1px solid #DDD"
                 :background-color "#f7f7f7"}
         :children [[utils/standard-chart-config data config]
-                   [utils/color-config-text config ":fill" [:fill :color]]]])
+                   [utils/color-config-text config ":fill" [:fill :color] :above-right]]])
 
 
 (defn- component

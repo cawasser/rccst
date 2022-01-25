@@ -77,8 +77,8 @@
   "
   [data config]
   (let [ratio (reaction (get-in @config [:ratio :include]))
-        isAnimationActive? (reaction (:isAnimationActive @config))
-        ratio-val (reaction (/ (get-in @config [:ratio :n]) (get-in @config [:ratio :d])))]
+        isAnimationActive? (reaction (:isAnimationActive @config))]
+        ;ratio-val (reaction (/ (get-in @config [:ratio :n]) (get-in @config [:ratio :d])))]
 
     (fn []
       [:> Treemap
