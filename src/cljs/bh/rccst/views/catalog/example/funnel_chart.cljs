@@ -59,8 +59,8 @@
                 (log/info "configurable-funnel-chart" @config)
 
                 [:> FunnelChart {:height 400 :width 400}
-                 [:> Tooltip]  ;(when @tooltip? [:> Tooltip])
-                 [:> Funnel {:dataKey :value :data @data :isAnimationActive isAnimationActive?}
+                 (when @tooltip? [:> Tooltip])
+                 [:> Funnel {:dataKey :value :data @data :isAnimationActive @isAnimationActive?}
                   (map-indexed (fn [idx {name :name}]
                                    [:> Cell {:key (str "cell-" idx) :fill (get-in @config [:colors name])}])
                                @data)
