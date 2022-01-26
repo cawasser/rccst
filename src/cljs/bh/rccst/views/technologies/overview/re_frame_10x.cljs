@@ -4,7 +4,7 @@
 
 (defn overview []
   (o/overview "Re-frame-10x"
-    "### Re-frame-10x is a tool for developers
+    "### _Developer Dashboard for Re-frame SPAs_
 
 Re-frame-10x lets developers instrument and inspect the inner workings of
 a running re-frame application. It presents a programmer's dashboard, delivering

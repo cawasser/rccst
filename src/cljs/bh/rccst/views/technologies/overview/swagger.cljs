@@ -3,7 +3,8 @@
 
 (defn overview []
       (o/overview "Swagger"
-"### Swagger is an API development & documentation tool\n
+        "### _API Development & Documentation_
+
 Swagger helps developers build more robust and expressive API's, quickly and easily using their
 set of open-source tools.  **Swagger UI** is just one of the many tools Swagger offers.
 It provides an interactive web page for your applications API, that allows you to visualize, manipulate,

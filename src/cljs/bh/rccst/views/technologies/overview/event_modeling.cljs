@@ -4,7 +4,9 @@
 
 (defn overview []
   (o/overview "Event Modeling"
-    "Event Modeling is a method of describing systems using an example of how information has changed within them
+    "### _Your System Over Time_
+
+Event Modeling is a method of describing systems using an example of how information has changed within them
 over time.  Specifically, this omits unimportant details, and looks at what is durable stored and what the user
 sees at any particular point in time.  These moments are the 'events' on the timeline that form the description
 of the system.  The real benefit of event modeling however, is that its able to describe the entire system at a
