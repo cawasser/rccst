@@ -30,12 +30,31 @@
                         {:i "three" :x 4 :y 0 :w 4 :h 2}])
         cols (r/atom 12)]
     (acu/demo "Layout Grid"
-      "Provides a grid-based layout manager for other content (`:div`)"
+      "Provides a grid-based layout manager, using [react-grid-layout](https://github.com/react-grid-layout/react-grid-layout)
+for other content (something like a `:div`).
+
+In this example, Box-2 and Box-3 can be resized and dragged around the frame, but
+Box-1 is fixed in size and position. This is determined by the `:layout` property passed
+into the `grid`.
+
+> See [react-grid-layout](https://github.com/react-grid-layout/react-grid-layout)
+> for details on the [Grid Item Props](https://github.com/react-grid-layout/react-grid-layout#grid-item-props)
+ data structure."
       [layout/frame
        [layout-grid/grid :id "layout-grid-example"
-        :children (map make-widget widgets)
+        :children (doall (map make-widget widgets))
         :cols cols
         :layout layout]]
 
       '[layout/frame
-        [layout/text-block "Here is a text block"]])))
+        (let [widgets [["one" "anchor" :green :white]
+                       ["two" "globe-americas" :blue :white]
+                       ["three" "helicopter" :yellow :black]]
+              layout (r/atom [{:i "one" :x 0 :y 0 :w 2 :h 3 :static true}
+                              {:i "two" :x 1 :y 0 :w 3 :h 2}
+                              {:i "three" :x 4 :y 0 :w 4 :h 2}])
+              cols (r/atom 12)]
+          [layout-grid/grid :id "layout-grid-example"
+           :children (doall (map make-widget widgets))
+           :cols cols
+           :layout layout])])))
