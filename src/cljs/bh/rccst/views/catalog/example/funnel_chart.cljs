@@ -12,13 +12,21 @@
 
 ; region ; configuration params
 
-(def config (r/atom (-> utils/default-config
-                        (merge {:colors (zipmap (map :name utils/paired-data)
+(def config (r/atom (merge utils/default-config
+                        {:legend            {:include       false}
+                         :colors (zipmap (map :name utils/paired-data)
                                          ["#8884d8" "#83a6ed" "#8dd1e1"
-                                          "#82ca9d" "#a4de6c" "#d7e62b"])})
-                        (assoc-in [:x-axis :dataKey] :x)
-                        (assoc-in [:y-axis :dataKey] :y)
-                        (assoc-in [:fill :color] "#8884d8"))))
+                                          "#82ca9d" "#a4de6c" "#d7e62b"])})))
+                        ;(assoc-in [:x-axis :dataKey] :x)
+                        ;(assoc-in [:y-axis :dataKey] :y)
+                        ;(assoc-in [:fill :color] "#8884d8"))))
+
+(defn- color-anchors [config]
+       [:<>
+        (doall
+          (map (fn [[id _]]
+                   ^{:key id}[utils/color-config-text config id [:colors id] :right-above])
+               (:colors @config)))])
 
 ;; endregion
 
@@ -39,8 +47,12 @@
         :style {:padding          "15px"
                 :border-top       "1px solid #DDD"
                 :background-color "#f7f7f7"}
-        :children [[utils/standard-chart-config data config]
-                   [utils/color-config-text config ":fill" [:fill :color]]]])
+        :children [[utils/non-gridded-chart-config config]
+                   [rc/line :src (rc/at) :size "2px"]
+                   [rc/v-box :src (rc/at)
+                    :gap "5px"
+                    :children [[rc/label :src (rc/at) :label "Funnel Colors"]
+                               (color-anchors config)]]]])
 
 
 (defn- component
@@ -59,7 +71,7 @@
                 ;(log/info "configurable-funnel-chart" @config)
 
                 [:> FunnelChart {:height 400 :width 500}
-                 (when @tooltip? [:> Tooltip])
+                 (utils/non-gridded-chart-components config)
                  [:> Funnel {:dataKey :value :data @data :isAnimationActive @isAnimationActive?}
                   (doall
                     (map-indexed (fn [idx {name :name}]
@@ -75,9 +87,16 @@
       (let [data (r/atom utils/paired-data)]
            (bcu/configurable-demo
              "Funnel Chart"
-             "Basic Funnel Chart"
+             "Funnel Chart with different colors for each chunk.  This requires embedding `Cell` elements inside the `Funnel` element"
              [:funnel-chart-demo/config :funnel-chart-demo/data :funnel-chart-demo/tab-panel :funnel-chart-demo/selected-tab]
              [utils/tabular-data-panel data]
              [config-panel data config]
              [component data config]
-             '[:> Funnel {:stuff :things}])))
+             '[:> FunnelChart {:height 400 :width 500}
+               (utils/non-gridded-chart-components config)
+               [:> Funnel {:dataKey :value :data @data :isAnimationActive @isAnimationActive?}
+                (doall
+                  (map-indexed (fn [idx {name :name}]
+                                   [:> Cell {:key (str "cell-" idx) :fill (get-in @config [:colors name])}])
+                               @data))
+                [:> LabelList {:position :right :fill "#000000" :stroke "none" :dataKey :name}]]])))
