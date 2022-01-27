@@ -36,6 +36,19 @@
 
 
 (re-frame/reg-event-db
+  ::init-widget-locals
+  (fn-traced [db [_ container init-vals]]
+    (log/info "::init-widget-locals" container init-vals)
+    (if (get-in db [:widgets container])
+      (do
+        (log/info "::init-widget-locals // already exists")
+        db)
+      (do
+        (log/info "::init-widget-locals // adding")
+        (assoc-in db [:widgets container] init-vals)))))
+
+
+(re-frame/reg-event-db
   ::track-slow-request
   (fn [db [_ my-id xhrio]]
     (assoc-in db [:requests my-id] xhrio)))
