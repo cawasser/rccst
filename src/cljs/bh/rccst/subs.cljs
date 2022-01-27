@@ -9,6 +9,12 @@
 
 
 (re-frame/reg-sub
+  :widgets
+  (fn [db]
+    (:widgets db)))
+
+
+(re-frame/reg-sub
   ::logged-in?
   (fn [db]
     (:logged-in? db)))
