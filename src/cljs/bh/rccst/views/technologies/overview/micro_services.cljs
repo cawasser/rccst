@@ -15,11 +15,11 @@ greater overall flexibility, while making development and maintenance easier and
 
 > For more information on Event Modeling, please see:
 >
-> [EventModeling.org](https://eventmodeling.org)
+> [Event Sourcing Microservices with Kafka](https://medium.com/kontenainc/event-sourcing-microservices-with-kafka-2568801527d8)
 >
-> [EventModeling.org](https://eventmodeling.org)
+> [Event-Driven Microservices - not (just) about Events!](https://www.youtube.com/watch?v=DzGuDNHsOQ0)
 >
-> [EventModeling.org](https://eventmodeling.org)
+> [Distributed Systems, Microservices and Interstellar Travel](https://www.youtube.com/watch?v=IRrh4VUHhNY)
 >
-> [EventModeling.org](https://eventmodeling.org)
+> [Microservices Architecture](https://microservices.io)
     "))
