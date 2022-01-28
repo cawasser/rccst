@@ -15,14 +15,15 @@
 		"react-flow-renderer": "9.7.3",
 		"react-grid-layout": "^1.3.1",
 		"react-markdown": "^4.0.6",
+        "react-split-pane": "^0.1.92",
 		"react-ui-cards": "^3.0.0",
 		"recharts": "^2.1.8",
-
-        "mobx": "^4.15.6",
-        "mobx-react": "^5.4.4",
-        "reactstrap": "^8.5.1",
-        "worldwind-react-globe-bs4": "1.0.3",
-        "worldwindjs": "^1.7.2"
+        "@fortawesome/fontawesome-svg-core": "^1.2.36",
+        "@fortawesome/free-brands-svg-icons": "^5.15.4",
+        "@fortawesome/free-regular-svg-icons": "^5.15.4",
+        "@fortawesome/free-solid-svg-icons": "^5.15.4",
+        "@fortawesome/react-fontawesome": "^0.1.16",
+        "worldwindjs": "^1.8.0"
 	},
 	"devDependencies": {
 		"shadow-cljs": "2.16.12"
