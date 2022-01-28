@@ -1,5 +1,18 @@
-(ns bh.rccst.ui-component.utils)
+(ns bh.rccst.ui-component.utils
+  (:require [taoensso.timbre :as log]
+            [re-frame.core :as re-frame]
+            [day8.re-frame.tracing :refer-macros [fn-traced]]))
 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;
+; Color Support
+;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; region
 
 (defn hex->rgba
   "convert a color in hexidcemial (stirng) into a hash-map of RGBA
@@ -151,6 +164,271 @@
     "black"))
 
 
+;; endregion
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;
+; Widget Locals Support
+;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; region
+
+(re-frame/reg-event-db
+  :events/init-widget-locals
+  (fn-traced [db [_ container init-vals]]
+    (log/info "::init-widget-locals" container init-vals)
+    (if (get-in db [:widgets container])
+      (do
+        (log/info "::init-widget-locals // already exists")
+        db)
+      (do
+        (log/info "::init-widget-locals // adding")
+        (assoc-in db [:widgets container] init-vals)))))
+
+
+(defn load-local-values
+  "add the given 'tree' of values into the app-db under the `[:widgets <widget-id as a keyword>] path
+
+  `widget-id` is automatically converted into a `keyword`
+
+  In cases where there are multiple widgets of the same 'type', using 'locals' keeps each
+  instance's local state away form all the others, so changing the state of one does _not_ change
+  them all.
+
+  ---
+
+  - `widget-id` : (string) id of the widget, passed as a string so we can use generated values (like guids)
+  - `values` : (hash-map) hash-map (tree) of values specific to _this_ widget.
+
+  "
+  [widget-id values]
+  (let [target (keyword widget-id)
+        path [:events/init-widget-locals target values]]
+    (re-frame/dispatch-sync path)))
+
+
+(defn- process-locals
+  "recursively walks through the 'tree' of values and computes the 'path vector' to reach each
+  value.
+
+  For example:
+
+  `{:value-1 \"dummy\" :value-2 {:nested-value \"dummy\"}}`
+
+  would have paths:
+
+  `[[:value-1] [:value-2] [:value-2 :nested-value]]`
+
+  This is a preparation step for creating and registering the re-frame
+  [subscription handlers](https://day8.github.io/re-frame/subscriptions/), so we must
+  create a vector for each value in the 'tree' so other code, like a UI 'widget', can subscribe to
+  the value and automatically 'update and render'.
+
+  ---
+
+  - a : (vector) the starting value to accumulate the result into, typically `[]`
+  - r : (any) the initial value of the 'root' item, typically `()`
+  - t : (hash-map) the 'tree' of values to process
+
+  Returns a `vector` of `vector`s of `keyword`s, where each is the path (relative to the initial `r`^*^) to
+  the specific value of interest.
+
+> Note: ^*^ typically we sort out the 'base' for the relative paths separately, using
+> [[create-widget-local-sub]]
+
+  "
+  [a r t]
+  (loop [accum a root r tree t]
+    ;(println "process" tree root accum)
+    (if (empty? tree)
+      (do
+        ;(println "result" accum)
+        accum)
+      (let [[k v] (first tree)]
+        ;(println "let" k v)
+        (recur (if (map? v)
+                 (do
+                   ;(println "branch" v [root k] accum)
+                   (as-> accum x
+                     (conj x (if root
+                               (if (vector? root)
+                                 (conj root k)
+                                 [root k])
+                               [k]))
+                     (apply conj x (process-locals []
+                                     (if root
+                                       (if (vector? root)
+                                         (conj root k)
+                                         [root k])
+                                       k)
+                                     v))))
+                 (do
+                   ;(println "leaf" root k accum)
+                   (conj accum (if root
+                                 (if (vector? root)
+                                   (conj root k)
+                                   [root k])
+                                 [k]))))
+          root
+          (rest tree))))))
+
+
+(defn- create-widget-sub
+  "create and registers a re-frame [subscription handler](https://day8.github.io/re-frame/subscriptions/)
+  for the `widget-id` (as a keyword) inside the `:widgets` top-level key in the `app-db`.
+
+  ---
+
+  - `widget-id` : (string) id for the widget, using a string means we can use generated values, like a guid, for the id
+
+  "
+  [widget-id]
+  (let [id (keyword widget-id)
+        w (keyword :widgets widget-id)]
+    (re-frame/reg-sub
+      w
+      :<- [:widgets]
+      (fn [widgets _]
+        (log/info w id)
+        (get widgets id)))))
+
+
+(defn- create-widget-local-sub
+  "create and registers a re-frame [subscription handler](https://day8.github.io/re-frame/subscriptions/)
+  for the value at the path inside the [`:widgets` `widget-id as a keyword`] key in the `app-db`.
+
+  ---
+
+  - `widget-id` : (string) id for the widget, using a string means we can use generated values, like a guid, for the id
+  - `value-path : (vector of keywords) the path into the widget values to locate the specific one for this subscription
+
+  `value-path` functions exactly like any other re-frame subscription, but relative to the
+  `[:widgets <widget-id>]` in the overall `app-db`
+
+  It is destructured as follows:
+
+  | var        | type       | description                         |
+  |:-----------|:----------:|:------------------------------------|
+  | `a`        | keyword    | the (primary) value to subscribe to |
+  | `& more`   | keyword(s) | any additional parts to the path    |
+
+  We use 'cascading subscriptions', i.e., [`Layer-3` subscriptions](https://day8.github.io/re-frame/subscriptions/),
+  to organize things. In order to generate unique ids for each subscription, we concatenate the
+  path into a single value:
+
+  assuming: `(def widget-wid \"some-guid\")` then path `[:value-2 :nested-value]` would be converted into the subscrption named
+  `:some-guid/value-2.nested.value`
+
+> Note: so developer don't need to understand or even remember this encoding scheme, use the [[subscribe-local]] helper function
+> in place of standard re-frame subscription calls. It provides the same result, and does all the encoding for you.
+  "
+  [widget-id [a & more :as value-path]]
+  (let [p (keyword widget-id (str (name a)
+                               (when more
+                                 (str "." (clojure.string/join "." (map name more))))))
+        dep (if more
+              (keyword widget-id
+                (str (name a)
+                  (when (seq (drop-last [:value]))
+                    (str "." (clojure.string/join "." (map name (drop 1 more)))))))
+              (keyword :widgets widget-id))]
+    (log/info "create-widget-local-sub" p dep more (if more (last more) a))
+    (re-frame/reg-sub
+      p
+      :<- [dep]
+      (fn [widget _]
+        (log/info p dep widget (last more))
+        (get widget (if more (last more) a))))))
+
+
+(defn init-widget
+  "1. adds the `locals-and`defaults` into the `app-db` in the correct location
+  2. creates and registers a subscription to `:widgets/<widget-id>`
+  3. creates and registers a subscription (cascaded off `:widgets/<widget-id>`) for each relative path in `locals-and-defaults`
+
+  `locals-and-defaults` provides both the structure used to create the subscriptions and the default values when a new widget is
+  created
+
+  ---
+
+  - `widget-id` : (string) id for the widget, using a string means we can use generated values, like a guid, for the id
+  - `locals-and-defaults` : (hash-map) hash-map (tree) of values specific to _this_ widget.
+
+  "
+  [widget-id locals-and-defaults]
+  (let [paths (process-locals [] nil locals-and-defaults)]
+    (load-local-values widget-id locals-and-defaults)
+    (create-widget-sub widget-id)
+    (doall
+      (map #(create-widget-local-sub widget-id %) paths))))
+
+
+(defn subscribe-local
+  "constructs a Re-frame subscription to a local value since the given
+  widget's 'locals' in the `app-db`. This way yhe developer isn't concerned about the
+  exact location of the data in the `app-db`.
+
+  The widget-id string will be converted into a keyword as appropriate to access the
+  registered subscription, so you can freely use generated values as widget identifiers
+
+> NOTE: the re-frame subscriptions ***MUST*** be created beforehand, using [[init-widget]]
+
+  ---
+
+  - `widget-id` : (string) name of the widget, typically a guid, but it can be any string you'd like
+  - `value-path : (vector of keywords) the path into the widget values to locate the specific one for this subscription
+
+  `value-path` functions exactly like any other re-frame subscription, but relative to the
+  `[:widgets <widget-id>]` in the overall `app-db`
+
+  It is destructured as follows:
+
+  | var        | type       | description                         |
+  |:-----------|:----------:|:------------------------------------|
+  | `a`        | keyword    | the (primary) value to subscribe to |
+  | `& more`   | keyword(s) | any additional parts to the path    |
+
+  Returns a `reagent/reaction` which can be used exactly like any other re-frame subscription
+
+   ---
+
+   #### EXAMPLES
+
+   Assume
+
+   `(def widget-id \"some-guid\")`
+
+   and
+
+   `(def some-guid-locals {:value-1 \"default\" :value-2 {:nested-value \"default\"}})`
+
+   | desired subscription | call                                         |
+   |:--------------------:| :--------------------------------------------|
+   | `:value-1`           | `(subscribe-local \"some-guid\" [:value-1])` |
+   | `:value-2`           | `(subscribe-local \"some-guid\" [:value-2])` |
+   | `:nested-value`      | `(subscribe-local \"some-guid\" [:value-2 :nested-value])` |
+  "
+  [widget-id [a & more :as value-path]]
+  (let [p (keyword widget-id (str (name a)
+                               (when more
+                                 (str "." (clojure.string/join "." (map name more))))))]
+    p))
+
+
+;; endregion
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;
+; Rich Comments
+;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; region
 
 ; how well does relative-luminance work?
 (comment
@@ -186,3 +464,320 @@
   (best-text-color blue)
 
   ())
+
+
+; need to mix the widget-id in with the path "inside" the widget's hash-map
+(comment
+  (def app-db
+    {:widgets {:<guid-1>   {:tab-panel  {:value     :<guid-1>/dummy
+                                         :data-path [:<guid-1> :tab-panel]}
+                            :some-value "value"
+                            :grid       {:include false}
+                            :x-axis     {:include false}}
+               :catalog    {:tab-panel {:value     :catalog/atoms
+                                        :data-path [:catalog :tab-panel]}}
+               :line-chart {:tab-panel {:value     :line-chart/config
+                                        :data-path [:line-chart :tab-panel]}
+                            :grid      {:include true :strokeDasharray {:d 3 :g 3}
+                                        :stroke  "#ffffff"}
+                            :x-axis    {:include     true :dataKey ""
+                                        :orientation :bottom :scale "auto"}
+                            :y-axis    {:include       true :dataKey "" :orientation
+                                        :bottom :scale "auto"}
+                            :legend    {:include true :layout :horizontal
+                                        :align   :center :verticalAlign :bottom}
+                            :tooltip   {:include true}}}})
+
+
+  (def widget-id "<guid-1>")
+  (def path [:some-value])
+  (def path [:tab-panel :value])
+
+  (defn subscribe-local [widget-id [a & more]]
+    (let [p (keyword widget-id (str (name a)
+                                 (when more
+                                   (str "." (clojure.string/join "." (map name more))))))]
+      p))
+  ;(re-frame/subscribe p)))
+
+  (let [d (subscribe-local :line-chart [:grid :strokeDasharray :d])]
+    d)
+  (keyword :line-chart)
+
+  (subscribe-local widget-id [:some-value])
+  (subscribe-local :line-chart [:tab-panel :value])
+  (subscribe-local :line-chart [:grid :strokeDasharray :d])
+
+  ())
+
+
+; how do we build all the cascading subscriptions for the widget's locals?
+; rocky-road just uses a single [:widget-locals widget-id :some-value]...
+; so it doesn't HAVE cascaded subscriptions in the first place
+(comment
+
+  (def widget-locals {:tab-panel  {:value     :<guid-1>/dummy
+                                   :data-path [:<guid-1> :tab-panel]}
+                      :some-value "value"
+                      :grid       {}
+                      :x-axis     {}})
+
+  ; NOTE 1: does ':data-path' need the :widgets prefix to work? PROBABLY
+
+  ; NOTE 2: widget-locals is both the structure AND the initial value
+
+
+  ; THE GOAL:
+  ;
+  ;      (init-widget-locals "widget-1" widget-locals)
+  ;
+  ; this (1) builds all the subscriptions AND (2) loads the initial data into the app-db
+  ; at the correct level
+
+
+  ;; region ; set initial values into the app-db:
+  (defn load-local-values [widget-id values]
+    (let [target (keyword widget-id)
+          path [:events/init-widget-locals target values]]
+      (re-frame/dispatch-sync path)))
+
+  (load-local-values "<guid-1>" widget-locals)
+  (load-local-values "<guid-2>" widget-locals)
+
+  ;; endregion
+
+  ;; region ; building the subscriptions
+
+  ; let's start with hand-crafted, artisanal subscriptions
+  ; sub-widget
+  (re-frame/reg-sub
+    :widgets/<guid-1>
+    :<- [:widgets]
+    (fn [widgets _]
+      (:<guid-1> widgets)))
+  @(re-frame/subscribe [:widgets])
+  (->> @(re-frame/subscribe [:widgets/<guid-1>])
+    keys)
+
+  ; sub-some-value
+  (re-frame/reg-sub
+    :<guid-1>/some-value
+    :<- [:widgets/<guid-1>]
+    (fn [widget _]
+      (:some-value widget)))
+  @(re-frame/subscribe [:<guid-1>/some-value])
+
+  ; sub-tab-panel
+  (re-frame/reg-sub
+    :<guid-1>/tab-panel
+    :<- [:widgets/<guid-1>]
+    (fn [widget _]
+      (:tab-panel widget)))
+  @(re-frame/subscribe [:widgets/<guid-1>])
+  @(re-frame/subscribe [:<guid-1>/tab-panel])
+
+  ; sub-tab-panel-value
+  ;    see `subscribe-local` above
+  (re-frame/reg-sub
+    :<guid-1>/tab-panel.value
+    :<- [:<guid-1>/tab-panel]
+    (fn [tab-panel _]
+      (:value tab-panel)))
+  @(re-frame/subscribe [:<guid-1>/tab-panel.value])
+
+  ;; endregion
+
+  ;; region ; subscribing to locals (wrapper around re-frame/subscribe)
+  (defn subscribe-local [widget-id [a & more :as path]]
+    (let [p (keyword widget-id (str (name a)
+                                 (when more
+                                   (str "." (clojure.string/join "." (map name more))))))]
+      (log/info "subscribe-local" widget-id path p)
+      (re-frame/subscribe [p])))
+
+  ; let's spell out what we needed to build these subscriptions
+  (def sub-widget ["<guid-1>"])                             ; [(assume :widgets) <widget-id>]
+  (def sub-some-value ["<guid-1>" [:some-value]])           ; [<widget-id> <path>]
+  (def sub-tab-panel ["<guid-1>" [:tab-panel]])             ; [<widget-id> <path>]
+  (def sub-tab-panel-value ["<guid-1>" [:tab-panel :value]]) ; [<widget-id> <path>]
+
+  ; so 2 types:
+  ;      "create-widget-sub"        i.e., [<widget-id>] (`:widget` is assumed)
+  ;      "create-widget-local-sub"  i.e., [<widget-id> [<path>]]
+
+  (keyword :widgets "dummy.part-1.part-2")
+  (keyword :widgets ":dummy")
+  (name :dummy)
+
+  ;; endregion
+
+  ;; region ; create all the subscriptions (by hand)
+  (defn create-widget-sub [widget-id]
+    (let [id (keyword widget-id)
+          w (keyword :widgets widget-id)]
+      (re-frame/reg-sub
+        w
+        :<- [:widgets]
+        (fn [widgets _]
+          (log/info w id)
+          (get widgets id)))))
+
+
+  (defn create-widget-local-sub [widget-id [a & more]]
+    (let [p (keyword widget-id (str (name a)
+                                 (when more
+                                   (str "." (clojure.string/join "." (map name more))))))
+          dep (if more
+                (keyword widget-id
+                  (str (name a)
+                    (when (seq (drop-last [:value]))
+                      (str "." (clojure.string/join "." (map name (drop 1 more)))))))
+                (keyword :widgets widget-id))]
+      (log/info "create-widget-local-sub" p dep more (if more (last more) a))
+      (re-frame/reg-sub
+        p
+        :<- [dep]
+        (fn [widget _]
+          (log/info p dep widget (last more))
+          (get widget (if more (last more) a))))))
+
+
+  (create-widget-sub "<guid-1>")
+  @(re-frame/subscribe [:widgets/<guid-1>])
+
+  (create-widget-local-sub "<guid-1>" [:tab-panel])
+  (create-widget-local-sub "<guid-1>" [:tab-panel :value])
+  (create-widget-local-sub "<guid-1>" [:tab-panel :data-path])
+  (create-widget-local-sub "<guid-1>" [:some-value])
+  (create-widget-local-sub "<guid-1>" [:grid])
+  (create-widget-local-sub "<guid-1>" [:x-axis])
+
+  @(subscribe-local :<guid-1> [:tab-panel])
+  @(subscribe-local :<guid-1> [:tab-panel :value])
+  @(subscribe-local :<guid-1> [:tab-panel :data-path])
+  @(subscribe-local :<guid-1> [:some-value])
+  @(subscribe-local :<guid-1> [:grid])
+  @(subscribe-local :<guid-1> [:x-axis])
+
+
+  @(re-frame/subscribe [:<guid-1>/tab-panel])
+
+  (create-widget-local-sub "<guid-1>" [:tab-panel :value])
+  @(subscribe-local :<guid-1> [:tab-panel :value])
+
+  ;; endregion
+
+  ())
+
+
+; now to figure out what subscriptions need to be built for a
+; given widget/initial-values-map
+(comment
+  (def widget-id "<guid-1>")
+  (def widget-locals {:tab-panel   {:value     :<guid-1>/dummy
+                                    :data-path [:<guid-1> :tab-panel]}
+                      :some-value  "value"
+                      :grid        {:include         true
+                                    :strokeDasharray {:dash 3 :space 3}}
+                      :x-axis      {:include     true
+                                    :orientation :bottom}
+                      :set-of-data {}})
+
+  ; GOAL:
+  ;
+  ;   (init-widget-locals widget-id widget-locals)
+  ;
+  ; turn widget-locals into:
+  ;
+  ;     {"<guid-1>" [[:tab-panel]
+  ;                  [:tab-panel :value]
+  ;                  [:tab-panel :data-path]
+  ;                  [:some-value]
+  ;                  [:grid]
+  ;                  [:grid :include]
+  ;                  [:x-axis]
+  ;                  [:x-axis :include]
+  ;                  [:set-of-data]}
+  ;
+  ; which can then be processed by
+  ;    (create-widget-sub) and (create-widget-local-sub)
+  ;
+
+  (vector? :b)
+  (conj [:b :d] :e)
+
+  (defn process-locals [a r t]
+    (loop [accum a root r tree t]
+      ;(println "process" tree root accum)
+      (if (empty? tree)
+        (do
+          ;(println "result" accum)
+          accum)
+        (let [[k v] (first tree)]
+          ;(println "let" k v)
+          (recur (if (map? v)
+                   (do
+                     ;(println "branch" v [root k] accum)
+                     (as-> accum x
+                       (conj x (if root
+                                 (if (vector? root)
+                                   (conj root k)
+                                   [root k])
+                                 [k]))
+                       (apply conj x (process-locals []
+                                       (if root
+                                         (if (vector? root)
+                                           (conj root k)
+                                           [root k])
+                                         k)
+                                       v))))
+                   (do
+                     ;(println "leaf" root k accum)
+                     (conj accum (if root
+                                   (if (vector? root)
+                                     (conj root k)
+                                     [root k])
+                                   [k]))))
+            root
+            (rest tree))))))
+
+  ;; region ; example-based tests
+  (= (process-locals [] nil {:a 1 :b 2})
+    [[:a] [:b]])
+
+  (= (process-locals [] nil {:a 1 :b 2 :c 3})
+    [[:a] [:b] [:c]])
+
+  (= (process-locals [] nil {:a 1 :b {:c 2 :d 3}})
+    [[:a] [:b] [:b :c] [:b :d]])
+
+  (= (process-locals [] nil {:a 1 :b {:c 2 :d {:e 3 :f 4}}})
+    [[:a] [:b] [:b :c] [:b :d] [:b :d :e] [:b :d :f]])
+
+  (= (process-locals [] nil {:a 1 :b {:c 2 :d {:e 3 :f {:g [2 4] :h {:i 100}}}}})
+    [[:a] [:b] [:b :c] [:b :d] [:b :d :e] [:b :d :f]
+     [:b :d :f :g] [:b :d :f :h] [:b :d :f :h :i]])
+
+
+
+  (= (process-locals [] nil widget-locals)
+    [[:tab-panel]
+     [:tab-panel :value]
+     [:tab-panel :data-path]
+     [:some-value]
+     [:grid]
+     [:grid :include]
+     [:grid :strokeDasharray]
+     [:grid :strokeDasharray :dash]
+     [:grid :strokeDasharray :space]
+     [:x-axis]
+     [:x-axis :include]
+     [:x-axis :orientation]
+     [:set-of-data]])
+
+  ;; endregion
+
+
+  ())
+
+;; endregion
