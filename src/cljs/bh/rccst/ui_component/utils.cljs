@@ -171,6 +171,8 @@
 ;
 ; Widget Locals Support
 ;
+;    suggest (re)reading https://day8.github.io/re-frame/subscriptions/
+;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
