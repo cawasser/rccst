@@ -8,8 +8,8 @@
 
 (defn image [sector symbol]
   (let [result (if symbol
-                   (WorldWind/SurfaceImage. sector symbol)
-                   (WorldWind/SurfaceImage. sector default-symbol))]
+                   (WorldWind/SurfaceImage. sector "images/400x230-splash-nww.png")
+                   (WorldWind/SurfaceImage. sector "images/400x230-splash-nww.png"))]
     (log/info "image/image" symbol)
     result))
 

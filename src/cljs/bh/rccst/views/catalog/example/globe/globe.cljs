@@ -1,16 +1,10 @@
 (ns bh.rccst.views.catalog.example.globe.globe
   (:require ["worldwindjs" :as WorldWind]
-            ["./worldwind/worldwind-react-globe.js" :as Globe]
-            ["worldwind-react-globe-bs4" :as bs4]
-            ["reactstrap" :as rs]
             [reagent.core :as reagent]
             [reagent.dom :as rdom]
             [re-frame.core :as rf]                          ;????
             [taoensso.timbre :as log]
             [clojure.set :as set]
-            [woolybear.ad.catalog.utils :as acu]
-            [bh.rccst.views.catalog.example.globe.worldwind.layer-management :as lm]
-            [bh.rccst.views.catalog.example.globe.worldwind.continental-locations :as cl]
             [bh.rccst.views.catalog.example.globe.worldwind.layer.layer :as l]
             [bh.rccst.views.catalog.example.globe.worldwind.layer.controls :as controls]
             [bh.rccst.views.catalog.example.globe.worldwind.layer.coordinates :as coords]))
@@ -148,10 +142,12 @@
           (l/addLayer this idx child))))
 
     ; add the controls layer
-    (l/addLayer this -1 [(str canvasId " Controls") (controls/controls this (str canvasId " Controls"))])
+    (if (= :max (:min-max props))
+      (l/addLayer this -1 [(str canvasId " Controls") (controls/controls this (str canvasId " Controls"))]))
 
     ; add the coordinates layer
-    (l/addLayer this -1 [(str canvasId " Coordinates") (coords/coordinates this (str canvasId " Coordinates"))])
+    (if (= :max (:min-max props))
+      (l/addLayer this -1 [(str canvasId " Coordinates") (coords/coordinates this (str canvasId " Coordinates"))]))
 
     (if (:time props)
       (do
@@ -228,53 +224,6 @@
 
            [:canvas (merge props {:id (:canvasId @state)})
             "Your browser does not support HTML5 Canvas."]))})))
-
-(defn example []
-      (let [globeRef (reagent/atom nil)
-            layersRef (reagent/atom nil)
-            layers (lm/make-layers)]
-           (acu/demo
-             "Nasa Worldwind 3D Globe"
-
-             (reagent/create-element
-               (reagent/create-class
-                 {:display-name "Globe"
-
-                  ;:component-did-mount
-                  ;  (fn [comp]
-                  ;    (r/set-state this {:globe @globeRef}))
-
-                  :reagent-render
-                                (fn []
-                                    [:div#all {:style {:width "100%" :height "100%" :overflow "hidden"}}
-                                     [:div#nav {:style {:width "100%" }}
-                                      [:> bs4/NavBar {:logo  ""
-                                                      :title ""
-                                                      :items [(reagent/as-element
-                                                                [:> bs4/NavBarItem {:key      "lyr"
-                                                                                    :title    "Layers"
-                                                                                    :icon     "list"
-                                                                                    :collapse @layersRef}])]}]]
-
-                                     [:div#contain {:style {:width "100%" :height "100%"}}
-                                      [:> rs/Container {:fluid "lg"
-                                                        :style {:width  "100%"
-                                                                :height "100%"}}
-                                       [:div#globe {:style     {:width        "100%"
-                                                               :height       "100%"
-                                                               :text-align   :center
-                                                               :border-style :none}
-                                                   :className "globe"}
-
-                                         [:> Globe (merge {:ref    #(if (not= @globeRef %) (reset! globeRef %) globeRef)
-                                                           :layers layers}
-                                                          (:n-america cl/start-loc))]]
-
-                                       [:div.overlayCards.noninteractive
-                                        [:> rs/CardColumns
-                                         [:> bs4/LayersCard {:ref        #(reset! layersRef %)
-                                                             :categories ["overlay" "base"]
-                                                             :globe      @globeRef}]]]]]])})))))
 
 
 
