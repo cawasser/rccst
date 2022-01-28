@@ -1,5 +1,5 @@
 (ns bh.rccst.views.catalog.diagrams
-  (:require [bh.rccst.views.catalog.example.globe.globe :as globe]))
+  (:require [bh.rccst.views.catalog.example.globe.globe-component :as globe]))
 
 
 
