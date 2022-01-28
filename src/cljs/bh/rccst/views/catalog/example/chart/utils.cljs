@@ -6,11 +6,16 @@
 
             [bh.rccst.ui-component.table :as table]
             [bh.rccst.ui-component.utils :as ui-utils]
+
+            [clojure.walk :as walk]
+            [clojure.zip :as zip]
+            [com.rpl.specter :as sp :refer-macros [select transform recursive-path]]
+
             [re-com.core :as rc]
             [re-frame.core :as re-frame]
             [reagent.core :as r]
-
             [reagent.ratom :refer-macros [reaction]]
+
             [taoensso.timbre :as log]
             [woolybear.packs.tab-panel :as tab-panel]))
 
@@ -485,6 +490,7 @@
    :gap "5px"
    :children [[color-config config label path position]
               [rc/input-text :src (rc/at)
+               :width "100px"
                :model (get-in @config path)
                :on-change #(swap! config assoc-in path %)]]])
 
@@ -697,7 +703,7 @@
   ; at the correct level
 
 
-  ; set initial values into the app-db:
+  ;; region ; set initial values into the app-db:
   (defn load-local-values [widget-id values]
     (let [target (keyword widget-id)
           path [::events/init-widget-locals target values]]
@@ -706,6 +712,7 @@
   (load-local-values "<guid-1>" widget-locals)
   (load-local-values "<guid-2>" widget-locals)
 
+  ;; endregion
 
   ;; region ; building the subscriptions
 
@@ -748,6 +755,7 @@
 
   ;; endregion
 
+  ;; region ; subscribing to locals (wrapper around re-frame/subscribe)
   (defn subscribe-local [widget-id [a & more :as path]]
     (let [p (keyword widget-id (str (name a)
                                  (when more
@@ -769,6 +777,9 @@
   (keyword :widgets ":dummy")
   (name :dummy)
 
+  ;; endregion
+
+  ;; region ; create all the subscriptions (by hand)
   (defn create-widget-sub [widget-id]
     (let [id (keyword widget-id)
           w (keyword :widgets widget-id)]
@@ -822,18 +833,105 @@
   (create-widget-local-sub "<guid-1>" [:tab-panel :value])
   @(subscribe-local :<guid-1> [:tab-panel :value])
 
-
-
-  ;(re-frame/reg-sub
-  ;  :<guid-1>/some-value
-  ;  :<- [:widgets/<guid-1>]
-  ;  (fn [widget _]
-  ;    (:some-value widget)))
-
-  ; how can we get these vectors from the "tree" (hash-map)
-  ;         maybe something like https://clojuredocs.org/clojure.walk?
-
+  ;; endregion
 
   ())
 
+
+; now to figure out what subscriptions need to be built for a
+; given widget/initial-values-map
+(comment
+  (def widget-id "<guid-1>")
+  (def widget-locals {:tab-panel   {:value     :<guid-1>/dummy
+                                    :data-path [:<guid-1> :tab-panel]}
+                      :some-value  "value"
+                      :grid        {:include         true
+                                    :strokeDasharray {:dash 3 :space 3}}
+                      :x-axis      {:include     true
+                                    :orientation :bottom}
+                      :set-of-data {}})
+
+  ; GOAL:
+  ;
+  ;   (init-widget-locals widget-id widget-locals)
+  ;
+  ; turn widget-locals into:
+  ;
+  ;     {"<guid-1>" [[:tab-panel]
+  ;                  [:tab-panel :value]
+  ;                  [:tab-panel :data-path]
+  ;                  [:some-value]
+  ;                  [:grid]
+  ;                  [:grid :include]
+  ;                  [:x-axis]
+  ;                  [:x-axis :include]
+  ;                  [:set-of-data]}
+  ;
+  ; which can then be processed by
+  ;    (create-widget-sub) and (create-widget-local-sub)
+  ;
+
+  (vector? :b)
+  (conj [:b :d] :e)
+
+  (defn process-locals [a r t]
+    (loop [accum a root r tree t]
+      ;(println "process" tree root accum)
+      (if (empty? tree)
+        (do
+          ;(println "result" accum)
+          accum)
+        (let [[k v] (first tree)]
+          ;(println "let" k v)
+          (recur (if (map? v)
+                   (do
+                     ;(println "branch" v [root k] accum)
+                     (as-> accum x
+                       (conj x (if root [root k] [k]))
+                       (apply conj x (process-locals []
+                                       (if root [root k] k)
+                                       v))))
+                   (do
+                     ;(println "leaf" root k accum)
+                     (conj accum (if root
+                                   (if (vector? root)
+                                     (conj root k)
+                                     [root k])
+                                   [k]))))
+            root
+            (rest tree))))))
+
+  ;; region ; example-based tests
+  (= (process-locals [] nil {:a 1 :b 2})
+    [[:a] [:b]])
+
+  (= (process-locals [] nil {:a 1 :b 2 :c 3})
+    [[:a] [:b] [:c]])
+
+  (= (process-locals [] nil {:a 1 :b {:c 2 :d 3}})
+    [[:a] [:b] [:b :c] [:b :d]])
+
+  (= (process-locals [] nil {:a 1 :b {:c 2 :d {:e 3 :f 4}}})
+    [[:a] [:b] [:b :c] [:b :d] [:b :d :e] [:b :d :f]])
+
+
+  (= (process-locals [] nil widget-locals)
+    [[:tab-panel]
+     [:tab-panel :value]
+     [:tab-panel :data-path]
+     [:some-value]
+     [:grid]
+     [:grid :include]
+     [:grid :strokeDasharray]
+     [:grid :strokeDasharray :dash]
+     [:grid :strokeDasharray :space]
+     [:x-axis]
+     [:x-axis :include]
+     [:x-axis :orientation]
+     [:set-of-data]])
+
+  ;; endregion
+
+
+  ())
 
