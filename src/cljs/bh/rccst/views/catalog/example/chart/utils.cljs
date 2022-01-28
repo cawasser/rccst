@@ -887,9 +887,17 @@
                    (do
                      ;(println "branch" v [root k] accum)
                      (as-> accum x
-                       (conj x (if root [root k] [k]))
+                       (conj x (if root
+                                 (if (vector? root)
+                                   (conj root k)
+                                   [root k])
+                                 [k]))
                        (apply conj x (process-locals []
-                                       (if root [root k] k)
+                                       (if root
+                                         (if (vector? root)
+                                           (conj root k)
+                                           [root k])
+                                         k)
                                        v))))
                    (do
                      ;(println "leaf" root k accum)
@@ -913,6 +921,11 @@
 
   (= (process-locals [] nil {:a 1 :b {:c 2 :d {:e 3 :f 4}}})
     [[:a] [:b] [:b :c] [:b :d] [:b :d :e] [:b :d :f]])
+
+  (= (process-locals [] nil {:a 1 :b {:c 2 :d {:e 3 :f {:g [2 4] :h {:i 100}}}}})
+    [[:a] [:b] [:b :c] [:b :d] [:b :d :e] [:b :d :f]
+     [:b :d :f :g] [:b :d :f :h] [:b :d :f :h :i]])
+
 
 
   (= (process-locals [] nil widget-locals)
