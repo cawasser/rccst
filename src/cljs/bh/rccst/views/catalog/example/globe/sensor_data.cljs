@@ -981,28 +981,28 @@
 
 
 (def all-aoi-data {"alpha-hd"  {:sensor-type "hidef-image"
-                                :symbol      [faUmbrella "imgs/worldwind/symbols/cloud-rain-solid.png"] ; currently, these DON'T matter
+                                :symbol      [faUmbrella "images/symbols/cloud-rain-solid.png"] ; currently, these DON'T matter
                                 :cells#      {[7 7 "hidef-image" 0]
                                               [7 6 "hidef-image" 1]
                                               [7 6 "hidef-image" 2]
                                               [7 5 "hidef-image" 3]}}
                    "bravo-img" {:sensor-type "image"
-                                :symbol      [faCloudSunRain "imgs/worldwind/symbols/cloud-sun-rain-solid.png"] ; currently, these DON'T matter
+                                :symbol      [faCloudSunRain "images/symbols/cloud-sun-rain-solid.png"] ; currently, these DON'T matter
                                 :cells       #{[7 2 "image" 0]
                                                [7 1 "image" 1]}}
                    "fire-hd"   {:sensor-type "hidef-image"
-                                :symbol      [faCloudSunRain "imgs/worldwind/symbols/cloud-sun-rain-solid.png"] ; currently, these DON'T matter
+                                :symbol      [faCloudSunRain "images/symbols/cloud-sun-rain-solid.png"] ; currently, these DON'T matter
                                 :cells       #{[5 3 "hidef-image" 0]
                                                [4 3 "hidef-image" 2] [5 3 "hidef-image" 2]
                                                [4 3 "hidef-image" 3] [5 3 "hidef-image" 3]}}
                    "fire-ir"   {:sensor-type "v/ir"
-                                :symbol      [faCloudSunRain "imgs/worldwind/symbols/cloud-sun-rain-solid.png"] ; currently, these DON'T matter
+                                :symbol      [faCloudSunRain "images/symbols/cloud-sun-rain-solid.png"] ; currently, these DON'T matter
                                 :cells       #{[5 4 "v/ir" 0]
                                                [5 3 "v/ir" 1] [5 4 "v/ir" 1]
                                                [5 4 "v/ir" 2]
                                                [5 4 "v/ir" 3]}}
                    "severe-hd" {:sensor-type "hidef-image"
-                                :symbol      [faCloudSunRain "imgs/worldwind/symbols/cloud-sun-rain-solid.png"] ; currently, these DON'T matter
+                                :symbol      [faCloudSunRain "images/symbols/cloud-sun-rain-solid.png"] ; currently, these DON'T matter
                                 :cells       #{[5 6 "hidef-image" 0]
                                                [5 7 "hidef-image" 1] [6 5 "hidef-image" 1]
                                                [6 6 "hidef-image" 2]
@@ -1033,7 +1033,7 @@
                              :el-type   :node
                              :type      "platform"
                              :data      {:label "GOES East"
-                                         :image "/imgs/worldwind/icons/Weather-Satellite-PNG-Clipart.png"}
+                                         :image "/images/icons/Weather-Satellite-PNG-Clipart.png"}
                              ;:dragHandle "drag-handle"
                              :draggable false
                              :position  (diagram-cell 1 0)}
@@ -1042,7 +1042,7 @@
                              :el-type   :node
                              :type      "downlink-terminal"
                              :data      {:label "Wallops"
-                                         :image "/imgs/worldwind/icons/downlink-terminal.png"}
+                                         :image "/images/icons/downlink-terminal.png"}
                              :draggable false
                              :position  (diagram-cell 2 0)}
 
@@ -1050,7 +1050,7 @@
                              :el-type   :node
                              :type      "processing-center"
                              :data      {:label "NSOF Suitland"
-                                         :image "/imgs/worldwind/icons/processing-center.png"}
+                                         :image "/images/icons/processing-center.png"}
                              :draggable false
                              :position  (diagram-cell 3 0)}
 
@@ -1058,7 +1058,7 @@
                              :el-type   :node
                              :type      "platform"
                              :data      {:label "NOAA XX"
-                                         :image "/imgs/worldwind/icons/Weather-Satellite-PNG-Clipart.png"}
+                                         :image "/images/icons/Weather-Satellite-PNG-Clipart.png"}
                              :draggable false
                              :position  (diagram-cell 1 1)}
 
@@ -1066,7 +1066,7 @@
                              :el-type   :node
                              :type      "downlink-terminal"
                              :data      {:label "Svalbaard/McMurdo"
-                                         :image "/imgs/worldwind/icons/downlink-terminal.png"}
+                                         :image "/images/icons/downlink-terminal.png"}
                              :draggable false
                              :position  (diagram-cell 2 1)}
 
@@ -1089,7 +1089,7 @@
                             :el-type   :node
                             :type      "server"
                             :data      {:label "Vanilla"
-                                        :image "/imgs/worldwind/icons/Cloud-Server.png"}
+                                        :image "/images/icons/Cloud-Server.png"}
                             ;:dragHandle "drag-handle"
                             :draggable false
                             :position  (diagram-cell 0 0)}
@@ -1098,7 +1098,7 @@
                             :el-type   :node
                             :type      "service"
                             :data      {:label "Sensor Allocations"
-                                        :image "/imgs/worldwind/icons/gears.png"}
+                                        :image "/images/icons/gears.png"}
                             ;:dragHandle "drag-handle"
                             :draggable false
                             :position  (diagram-cell 1 1)}
@@ -1107,7 +1107,7 @@
                             :el-type   :node
                             :type      "event-channel"
                             :data      {:label "AoIs Events"
-                                        :image "/imgs/worldwind/icons/kafka.png"}
+                                        :image "/images/icons/kafka.png"}
                             ;:dragHandle "drag-handle"
                             :draggable false
                             :position  (diagram-cell 0 3)}
@@ -1116,7 +1116,7 @@
                             :el-type   :node
                             :type      "view-channel"
                             :data      {:label "Sensor Allocs View"
-                                        :image "/imgs/worldwind/icons/kafka.png"}
+                                        :image "/images/icons/kafka.png"}
                             ;:dragHandle "drag-handle"
                             :draggable false
                             :position  (diagram-cell 1 2.5)}
@@ -1125,7 +1125,7 @@
                             :el-type   :node
                             :type      "event-channel"
                             :data      {:label "Comms Request Events"
-                                        :image "/imgs/worldwind/icons/kafka.png"}
+                                        :image "/images/icons/kafka.png"}
                             ;:dragHandle "drag-handle"
                             :draggable false
                             :position  (diagram-cell 2 3)}
@@ -1134,7 +1134,7 @@
                             :el-type   :node
                             :type      "service"
                             :data      {:label "Comms Allocations"
-                                        :image "/imgs/worldwind/icons/gears.png"}
+                                        :image "/images/icons/gears.png"}
                             ;:dragHandle "drag-handle"
                             :draggable false
                             :position  (diagram-cell 2 1)}
@@ -1143,7 +1143,7 @@
                             :el-type   :node
                             :type      "view-channel"
                             :data      {:label "Comms Allocs View"
-                                        :image "/imgs/worldwind/icons/kafka.png"}
+                                        :image "/images/icons/kafka.png"}
                             ;:dragHandle "drag-handle"
                             :draggable false
                             :position  (diagram-cell 3 2.5)}

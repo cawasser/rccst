@@ -141,9 +141,9 @@
           (merge @base-layer @aoi-layers @sensor-layers)]]]])))
 
 (defn example []
-      ;(acu/demo "Nasa Worldwind Globe"
-        [g/globe {:id "globe-1"
-                  :style {:width "100%" :height "100%"}}])
+      (acu/demo "Nasa Worldwind Globe"
+        [globe {:id "globe-1"
+                  :style {:width "100%" :height "600px"}}]))
 
 
 
