@@ -43,7 +43,6 @@
       - clojure.cljs
       - clojurescript.cljs
       - system-services.cljs
-
   - _ui-component_
     - _atom_
       - _input_
@@ -118,8 +117,8 @@
 
 - text
 - float/double
-- guid/uuid
-- date-time _(or is this a molecule?)_
+- guid/uuid ([`#uuid`](https://clojure.org/reference/reader#_built_in_tagged_literals))
+- date-time ([`#inst`](https://clojure.org/reference/reader#_built_in_tagged_literals))
 
 ### Molecules
 
