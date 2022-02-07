@@ -37,12 +37,12 @@
       - services.cljs
       - technologies.cljs
       - giants.cljs
-  - _giants_
-  - _services_
-  - _technologies_
-    - clojure.cljs
-    - clojurescript.cljs
-    - system-services.cljs
+    - _giants_
+    - _services_
+    - _technologies_
+      - clojure.cljs
+      - clojurescript.cljs
+      - system-services.cljs
 
   - _ui-component_
     - _atom_
