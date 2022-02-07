@@ -414,7 +414,7 @@
   2. creates and registers a subscription to `:widgets/<widget-id>`
   3. creates and registers a subscription (cascaded off `:widgets/<widget-id>`) for each relative path in `locals-and-defaults`
   4. creates and registers an event handler for`:widgets/<widget-id>`
-  5. creates and registers an event handler (cascaded off `:widgets/<widget-id>`) for each relative path in `locals-and-defaults`
+  5. creates and registers an event handler for each relative path in `locals-and-defaults`
 
   `locals-and-defaults` provides both the structure used to create the subscriptions and the default values when a new widget is
   created
