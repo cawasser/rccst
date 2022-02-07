@@ -101,8 +101,8 @@
 ### Semantic
 
 - identifier
-- system
-- domain
+  - system
+  - domain
 - name
 - description
 - attribute
@@ -119,7 +119,7 @@
 - text
 - float/double
 - guid/uuid
-- date-time
+- date-time _(or is this a molecule?)_
 
 ### Molecules
 
@@ -128,9 +128,9 @@
 - ephemeris
 - phone-number
 - address
-- shipping
-- billing
-- residence
+  - shipping
+  - billing
+  - residence
 
 ### Collections
 
