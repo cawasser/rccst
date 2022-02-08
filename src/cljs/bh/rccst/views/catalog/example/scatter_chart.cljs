@@ -82,7 +82,7 @@
            (bcu/configurable-demo
              "Scatter Chart"
              "Basic scatter chart"
-             [:scatter-chart-demo/config :scatter-chart-demo/data :scatter-chart-demo/tab-panel :scatter-chart-demo/selected-tab]
+             [:scatter-chart-demo/config :scatter-chart-demo/data :scatter-chart-demo/tab-panel :scatter-chart-demo/value]
              [utils/tabular-data-panel data]
              [config-panel data config]
              [component data config]

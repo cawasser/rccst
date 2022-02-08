@@ -30,7 +30,7 @@
     (:tab-panel tech)))
 
 (re-frame/reg-sub
-  :tech/selected-tab
+  :tech/value
   :<- [:tech/tab-panel]
   (fn [tab-panel]
     (:value tab-panel)))
@@ -57,7 +57,7 @@
 
     [layout/page-body {:extra-classes :rccst}
      [tab-panel/tab-panel {:extra-classes             :rccst
-                           :subscribe-to-selected-tab [:tech/selected-tab]}
+                           :subscribe-to-selected-tab [:tech/value]}
 
       [tab-panel/sub-panel {:panel-id :tech/server}
        [tech-clj/page]]

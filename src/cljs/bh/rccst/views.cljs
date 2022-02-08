@@ -42,18 +42,10 @@
 
         [layout/page-body {:extra-classes :rccst}
          [tab-panel/tab-panel {:extra-classes             :rccst
-                               :subscribe-to-selected-tab [:app-bar/selected-tab]}
+                               :subscribe-to-selected-tab [:app-bar/value]}
 
           [tab-panel/sub-panel {:panel-id :app-bar/molecules}
            [molecules/page]]
-           ;[rc/v-box :src (rc/at)
-           ; :children [[#'header/header-bar]
-           ;            [rc/gap :size "5px"]
-           ;            [rc/h-box :src (rc/at)
-           ;             :gap "15px"
-           ;             :children [[#'widget-ish/view "uuid-1"]
-           ;                        [#'widget-ish/view "uuid-2"]
-           ;                        [#'widget-ish/view "uuid-3"]]]]]]
 
           [tab-panel/sub-panel {:panel-id :app-bar/atoms}
            [catalog/page]]

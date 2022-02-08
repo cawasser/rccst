@@ -70,7 +70,7 @@
       they are all the same color.
 
 > See `Colored Pie Chart` for an example of how to get the slices to be different colors."
-      [:pie-chart-demo/config :pie-chart-demo/data :pie-chart-demo/tab-panel :pie-chart-demo/selected-tab]
+      [:pie-chart-demo/config :pie-chart-demo/data :pie-chart-demo/tab-panel :pie-chart-demo/value]
       [utils/tabular-data-panel data]
       [config-panel config]
       [component-panel data config]

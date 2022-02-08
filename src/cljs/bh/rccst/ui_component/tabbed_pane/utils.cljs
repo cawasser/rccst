@@ -15,7 +15,7 @@
         data-id (keyword base-id "data")
         db-id (keyword "db" base-id)
         tab-id (keyword base-id "tab-panel")
-        selected-id (keyword base-id "selected-tab")
+        value-id (keyword base-id "value")
         init-db {:tab-panel (tab-panel/mk-tab-panel-data
                               data-path initial-value)}]
 
@@ -31,7 +31,7 @@
         (:tab-panel navbar)))
 
     (re-frame/reg-sub
-      selected-id
+      value-id
       :<- [tab-id]
       (fn [tab-panel]
         (:value tab-panel)))

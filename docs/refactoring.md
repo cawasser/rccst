@@ -116,22 +116,22 @@
 ### Atoms
 
 - text
-- float/double
+- number (float/double/integer/long/etc.)
 - guid/uuid ([`#uuid`](https://clojure.org/reference/reader#_built_in_tagged_literals))
 - date-time ([`#inst`](https://clojure.org/reference/reader#_built_in_tagged_literals))
 
-### Molecules
+### Molecules (composed of Atoms)
 
-- velocity
-- geo-ref
-- ephemeris
-- phone-number
-- address
+- velocity (speed & direction)
+- geo-ref (lat, lon, alt)
+- ephemeris (position, orbit)
+- phone-number (county code, area, exchange, etc.)
+- address (omg...)
   - shipping
   - billing
   - residence
 
-### Collections
+### Collections (of Molecules)
 
 - row-col
 - graph

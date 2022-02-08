@@ -101,7 +101,7 @@
     (bcu/configurable-demo
       "Treemap Chart"
       "A simple Treemap Chart built using [Recharts](https://recharts.org/en-US/api/Treemap)"
-      [:treemap-chart-demo/config :treemap-chart-demo/data :treemap-chart-demo/tab-panel :treemap-chart-demo/selected-tab]
+      [:treemap-chart-demo/config :treemap-chart-demo/data :treemap-chart-demo/tab-panel :treemap-chart-demo/value]
       [:div "Dummy Data here"]                              ;[utils/tabular-data-panel data]
       [config-panel config]
       [component data config]

@@ -25,7 +25,7 @@
     (:tab-panel navbar)))
 
 (re-frame/reg-sub
-  :navbar-example/selected-tab
+  :navbar-example/value
   :<- [:navbar-example/tab-panel]
   (fn [tab-panel]
     (:value tab-panel)))
@@ -51,7 +51,7 @@
       [:navbar-example/tab-panel]]
 
      [tab-panel/tab-panel {:extra-classes             :rccst
-                           :subscribe-to-selected-tab [:navbar-example/selected-tab]}
+                           :subscribe-to-selected-tab [:navbar-example/value]}
 
       [tab-panel/sub-panel {:panel-id :demo-navbar/one}
        [:div "Panel One"]]
@@ -69,7 +69,7 @@
                       [:demo-navbar/four "Four"]]
        [:navbar-example/tab-panel]]
       [tab-panel/tab-panel {:extra-classes             :rccst
-                            :subscribe-to-selected-tab [:navbar-example/selected-tab]}
+                            :subscribe-to-selected-tab [:navbar-example/value]}
 
        [tab-panel/sub-panel {:panel-id :demo-navbar/one}
         [:div "Panel One"]]

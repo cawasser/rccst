@@ -101,7 +101,7 @@
 > Note: the API page for Sankey is woefully incomplete, it does NOT explain how to build the
 \"custom\" node or link components used in the example. You need to look at the [demo source](https://github.com/recharts/recharts/blob/master/demo/component/Sankey.tsx)
 ***AND*** the source for the [custom node](https://github.com/recharts/recharts/blob/master/demo/component/DemoSankeyNode.tsx) to understand how this all works."
-      [:sankey-chart-demo/config :sankey-chart-demo/data :sankey-chart-demo/tab-panel :sankey-chart-demo/selected-tab]
+      [:sankey-chart-demo/config :sankey-chart-demo/data :sankey-chart-demo/tab-panel :sankey-chart-demo/value]
       [:div "Dummy Data here"]                              ;[utils/tabular-data-panel data]
       [config-panel config]
       [component data config]

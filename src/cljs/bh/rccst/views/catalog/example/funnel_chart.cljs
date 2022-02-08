@@ -88,7 +88,7 @@
            (bcu/configurable-demo
              "Funnel Chart"
              "Funnel Chart with different colors for each chunk.  This requires embedding `Cell` elements inside the `Funnel` element"
-             [:funnel-chart-demo/config :funnel-chart-demo/data :funnel-chart-demo/tab-panel :funnel-chart-demo/selected-tab]
+             [:funnel-chart-demo/config :funnel-chart-demo/data :funnel-chart-demo/tab-panel :funnel-chart-demo/value]
              [utils/tabular-data-panel data]
              [config-panel data config]
              [component data config]

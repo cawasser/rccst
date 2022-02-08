@@ -16,7 +16,7 @@
 
 
 (defn- chart-config [[config data panel tab] data-panel config-panel]
-  ;(log/info "chart-config" config data panel tab)
+  (log/info "chart-config" config data panel tab)
   (let [data-or-config [[config "config"]
                         [data "data"]]]
     [:div.chart-config {:style {:width "100%"}}
@@ -82,3 +82,10 @@
      [containers/spoiler {:show-label "Show Code"
                           :hide-label "Hide Code"}
       [ad-utils/code-block (string/triml (ad-utils/pps src))]]]))
+
+
+(comment
+  ()
+
+
+  ())
