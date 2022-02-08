@@ -19,7 +19,7 @@
       [:h2.has-text-info "System / Services"]
       [layout/markdown-block
 "We use a number of techniques, technologies, and tools to provide critical system-level functionality:
-> For a short video summary of event driven design as the backbone of a microservice architecture in Clojure, [click here](https://www.youtube.com/watch?v=ZEcjEHYs0zo)"]]]
+> For a short video summary of event-driven design as the backbone of a microservice architecture in Clojure, [click here](https://www.youtube.com/watch?v=ZEcjEHYs0zo)"]]]
     [layout/frame
      [event-modeling/overview]]
     [layout/frame
