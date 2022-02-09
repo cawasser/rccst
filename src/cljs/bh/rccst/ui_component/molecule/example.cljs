@@ -2,7 +2,23 @@
   (:require [taoensso.timbre :as log]
 
             [bh.rccst.views.catalog.utils :as bcu]
-            [bh.rccst.ui-component.utils :as ui-utils]))
+            [bh.rccst.ui-component.utils :as ui-utils]
+
+            [woolybear.ad.catalog.utils :as acu]))
+
+
+(defn component-example [& {:keys [title widget-id description
+                                   data config
+                                   component-panel
+                                   source-code]}]
+
+  (ui-utils/init-widget widget-id config)
+
+  (acu/demo
+    title
+    description
+    [component-panel data widget-id]
+    source-code))
 
 
 (defn example [& {:keys [title widget-id description
@@ -10,7 +26,7 @@
                          data-panel config-panel component-panel
                          source-code]}]
 
-  (log/info "example widget" title config)
+  ;(log/info "example widget" title config)
 
   (ui-utils/init-widget widget-id config)
 

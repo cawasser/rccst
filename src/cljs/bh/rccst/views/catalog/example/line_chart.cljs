@@ -9,16 +9,14 @@
 
 (defn simple-example []
   (let [widget-id "line-chart-demo"]
-    [example/example
+    [example/component-example
      :title "Line Chart"
      :widget-id widget-id
      :description "A simple Line Chart built using [Recharts]()"
      :data (r/atom utils/tabular-data)
      :config (chart/config widget-id)
-     :data-panel utils/tabular-data-panel
-     :config-panel chart/config-panel
      :component-panel chart/component
-     :source-code "dummy source code"]))
+     :source-code chart/source-code]))
 
 
 (defn stacked-example []
