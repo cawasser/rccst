@@ -4,7 +4,6 @@
             [bh.rccst.ui-component.atom.bar-chart :as chart]
             [bh.rccst.ui-component.molecule.example :as example]
             [bh.rccst.ui-component.atom.chart.utils :as utils]))
-;norihgorhg
 
 (defn example []
   (let [widget-id "bar-chart-demo"]
