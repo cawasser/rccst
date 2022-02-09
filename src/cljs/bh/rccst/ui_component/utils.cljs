@@ -279,6 +279,25 @@
           (rest tree))))))
 
 
+(defn- compute-path [widget-id a more]
+  (keyword widget-id (str (name a)
+                       (when more
+                         (str "." (clojure.string/join "." (->> more
+                                                             (map name)
+                                                             (map #(clojure.string/replace % #" " "")))))))))
+
+(defn- compute-deps [widget-id a more]
+  (if more
+    (keyword widget-id
+      (str (name a)
+        (when (seq (drop-last more))
+          (str "." (clojure.string/join "." (->> more
+                                              drop-last
+                                              (map name)
+                                              (map #(clojure.string/replace % #" " ""))))))))
+    (keyword :widgets widget-id)))
+
+
 (defn- create-widget-sub
   "create and registers a re-frame [subscription handler](https://day8.github.io/re-frame/subscriptions/)
   for the `widget-id` (as a keyword) inside the `:widgets` top-level key in the `app-db`.
@@ -329,15 +348,8 @@
 > in place of standard re-frame subscription calls. It provides the same result, and does all the encoding for you.
   "
   [widget-id [a & more :as value-path]]
-  (let [p (keyword widget-id (str (name a)
-                               (when more
-                                 (str "." (clojure.string/join "." (map name more))))))
-        dep (if more
-              (keyword widget-id
-                (str (name a)
-                  (when (seq (drop-last more))
-                    (str "." (clojure.string/join "." (map name (drop-last more)))))))
-              (keyword :widgets widget-id))]
+  (let [p (compute-path widget-id a more)
+        dep (compute-deps widget-id a more)]
     ;(log/info "create-widget-local-sub" p dep more (if more (last more) a))
     (re-frame/reg-sub
       p
@@ -396,9 +408,7 @@
 > in place of standard re-frame subscription calls. It provides the same result, and does all the encoding for you.
   "
   [widget-id [a & more :as value-path]]
-  (let [p (keyword widget-id (str (name a)
-                               (when more
-                                 (str "." (clojure.string/join "." (map name more))))))]
+  (let [p (compute-path widget-id a more)]
     ;(log/info "create-widget-local-event" p (conj [:widgets (keyword widget-id)] value-path))
     (re-frame/reg-event-db
       p
@@ -489,9 +499,7 @@
    | `:nested-value`      | `(subscribe-local \"some-guid\" [:value-2 :nested-value])` |
   "
   [widget-id [a & more :as value-path]]
-  (let [p (keyword widget-id (str (name a)
-                               (when more
-                                 (str "." (clojure.string/join "." (map name more))))))]
+  (let [p (compute-path widget-id a more)]
     ;(log/info "subscribe-local" widget-id value-path p)
     (re-frame/subscribe [p])))
 
@@ -530,9 +538,48 @@
   [widget-id [a & more :as value-path] new-val]
   (let [p (keyword widget-id (str (name a)
                                (when more
-                                 (str "." (clojure.string/join "." (map name more))))))]
+                                 (str "." (clojure.string/join "." (->> more
+                                                                     (map name)
+                                                                     (map #(clojure.string/replace % #" " ""))))))))]
     (log/info "dispatch-local" widget-id value-path new-val p)
     (re-frame/dispatch [p new-val])))
+
+
+
+(comment
+  (do
+    (def widget-id "colored-pie-chart-demo")
+    (def data [{:name "Group A" :value 400}
+               {:name "Group B" :value 300}
+               {:name "Group C" :value 300}
+               {:name "Group D" :value 200}
+               {:name "Group E" :value 278}
+               {:name "Group F" :value 189}])
+    (def a [])
+    (def r nil)
+    (def t {:tab-panel {:value     (keyword widget-id "config")
+                        :data-path [:widgets (keyword widget-id) :tab-panel]}
+            :colors (zipmap (map :name data)
+                      ["#ffff00" "#ff0000" "#00ff00"
+                       "#0000ff" "#009999" "#ff00ff"])}))
+
+  (def paths (process-locals a r t))
+
+  (let [[a & more :as value-path] (last paths)
+        p (keyword widget-id (str (name a)
+                               (when more
+                                 (str "." (clojure.string/join "." (->> more
+                                                                     (map name)
+                                                                     (map #(clojure.string/replace % #" " ""))))))))
+        dep (compute-deps widget-id a more)]
+    [p dep more (if more (last more) a)])
+
+  (create-widget-local-sub widget-id (last paths))
+
+
+  (clojure.string/replace % #" " "")
+
+  ())
 
 ;; endregion
 
