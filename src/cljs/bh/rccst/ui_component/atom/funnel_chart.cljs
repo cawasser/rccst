@@ -1,7 +1,7 @@
 (ns bh.rccst.ui-component.atom.funnel-chart
   (:require ["recharts" :refer [FunnelChart Funnel Cell LabelList XAxis YAxis CartesianGrid Tooltip Brush]]
             [bh.rccst.ui-component.utils :as ui-utils]
-            [bh.rccst.views.catalog.example.chart.utils :as utils]
+            [bh.rccst.ui-component.atom.chart.utils :as utils]
             [re-com.core :as rc]
             [woolybear.ad.buttons :as buttons]
             [woolybear.ad.icons :as icons]

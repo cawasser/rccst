@@ -1,12 +1,10 @@
 (ns bh.rccst.ui-component.atom.bar-chart
-  (:require ["recharts" :refer [BarChart Bar Brush]]
-            [bh.rccst.ui-component.utils :as ui-utils]
-            [bh.rccst.views.catalog.example.chart.utils :as utils]
+  (:require [taoensso.timbre :as log]
+            ["recharts" :refer [BarChart Bar Brush]]
             [re-com.core :as rc]
-            [woolybear.ad.buttons :as buttons]
-            [woolybear.ad.icons :as icons]
-
-            [taoensso.timbre :as log]))
+            [bh.rccst.ui-component.utils :as ui-utils]
+            [bh.rccst.ui-component.atom.chart.utils :as utils]
+            [bh.rccst.ui-component.atom.chart.wrapper :as c]))
 
 
 (defn config
@@ -22,10 +20,10 @@
       {:tab-panel {:value     (keyword widget-id "config")
                    :data-path [:widgets (keyword widget-id) :tab-panel]}
        :brush     false
-       :bar-uv  {:include true :fill "#ff0000" :stackId ""}
-       :bar-pv  {:include true :fill "#00ff00"  :stackId ""}
-       :bar-amt {:include false :fill "#0000ff" :stackId ""}
-       :bar-d   {:include false :fill "#0f0f0f" :stackId ""}})
+       :bar-uv    {:include true :fill "#ff0000" :stackId ""}
+       :bar-pv    {:include true :fill "#00ff00" :stackId ""}
+       :bar-amt   {:include false :fill "#0000ff" :stackId ""}
+       :bar-d     {:include false :fill "#0f0f0f" :stackId ""}})
     (assoc-in [:x-axis :dataKey] :name)))
 
 
@@ -42,7 +40,7 @@
 
   ---
 
-  - config : (atom) holds all the configuration settings made by the user
+  - data : (atom) data to display (may be used by the standard configuration components for thins like axes, etc.\n  - config : (atom) holds all the configuration settings made by the user
   "
   [data widget-id]
 
@@ -92,34 +90,29 @@
         brush? (ui-utils/subscribe-local widget-id [:brush])]
 
     (fn []
-      [rc/v-box :src (rc/at)
-       :gap "2px"
-       :children [[buttons/button
-                   {:on-click #(log/info "open config panel")}
-                   [icons/icon {:icon "edit"} "Edit"]]
-                  [:> BarChart {:width 400 :height 400 :data @data}
+      [c/chart
+       [:> BarChart {:width 400 :height 400 :data @data}
 
-                   (utils/standard-chart-components widget-id)
+        (utils/standard-chart-components widget-id)
 
-                   (when @brush? [:> Brush])
+        (when @brush? [:> Brush])
 
-                   (when @bar-uv? [:> Bar (merge {:type              "monotone" :dataKey :uv
-                                                  :isAnimationActive @isAnimationActive?
-                                                  :fill              @bar-uv-fill}
-                                            (when (seq @bar-uv-stackId) {:stackId @bar-uv-stackId}))])
+        (when @bar-uv? [:> Bar (merge {:type              "monotone" :dataKey :uv
+                                       :isAnimationActive @isAnimationActive?
+                                       :fill              @bar-uv-fill}
+                                 (when (seq @bar-uv-stackId) {:stackId @bar-uv-stackId}))])
 
-                   (when @bar-pv? [:> Bar (merge {:type              "monotone" :dataKey :pv
-                                                  :isAnimationActive @isAnimationActive?
-                                                  :fill              @bar-pv-fill}
-                                            (when (seq @bar-pv-stackId) {:stackId @bar-pv-stackId}))])
+        (when @bar-pv? [:> Bar (merge {:type              "monotone" :dataKey :pv
+                                       :isAnimationActive @isAnimationActive?
+                                       :fill              @bar-pv-fill}
+                                 (when (seq @bar-pv-stackId) {:stackId @bar-pv-stackId}))])
 
-                   (when @bar-amt? [:> Bar (merge {:type              "monotone" :dataKey :amt
-                                                   :isAnimationActive @isAnimationActive?
-                                                   :fill              @bar-amt-fill}
-                                             (when (seq @bar-amt-stackId) {:stackId @bar-amt-stackId}))])
+        (when @bar-amt? [:> Bar (merge {:type              "monotone" :dataKey :amt
+                                        :isAnimationActive @isAnimationActive?
+                                        :fill              @bar-amt-fill}
+                                  (when (seq @bar-amt-stackId) {:stackId @bar-amt-stackId}))])
 
-                   (when @bar-d? [:> Bar (merge {:type              "monotone" :dataKey :d
-                                                 :isAnimationActive @isAnimationActive?
-                                                 :fill              @bar-d-fill}
-                                           (when (seq @bar-d-stackId) {:stackId @bar-d-stackId}))])]]])))
-
+        (when @bar-d? [:> Bar (merge {:type              "monotone" :dataKey :d
+                                      :isAnimationActive @isAnimationActive?
+                                      :fill              @bar-d-fill}
+                                (when (seq @bar-d-stackId) {:stackId @bar-d-stackId}))])]])))

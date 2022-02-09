@@ -5,7 +5,7 @@
 
 (defn example []
   (acu/demo "Page"
-    "The page component is a simple wrapper designed to contain an entire
+    "The page component is a simple chart designed to contain an entire
     \"page\" (not including the site header and footer). Use this container
     to wrap each page, then edit the AD page component whenever you want to
     make changes that apply to the page as a whole."

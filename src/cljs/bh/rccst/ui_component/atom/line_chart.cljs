@@ -1,23 +1,24 @@
 (ns bh.rccst.ui-component.atom.line-chart
-  (:require ["recharts" :refer [LineChart Line Brush]]
-            [bh.rccst.ui-component.utils :as ui-utils]
-            [bh.rccst.views.catalog.example.chart.utils :as utils]
+  (:require [taoensso.timbre :as log]
             [re-com.core :as rc]
-            [woolybear.ad.buttons :as buttons]
-            [woolybear.ad.icons :as icons]
 
-            [taoensso.timbre :as log]))
+            ["recharts" :refer [LineChart Line Brush]]
+            [bh.rccst.ui-component.utils :as ui-utils]
+            [bh.rccst.ui-component.atom.chart.utils :as utils]
+            [bh.rccst.ui-component.atom.chart.wrapper :as c]))
+
+
 
 
 (defn config
-  "constructs the configuration data structure for the widget. This is specific to this being asn \"example\"
-  of the line-chart component.
+  "constructs the configuration data structure for the widget. This is specific to this being a
+  line-chart component.
 
 > Note: it is possible to make this be a common configuration for ANY line-chart use
 
   ---
 
-  - widget-id : (string) id of the widget, in this specific case (being an example of a \"line-chart\") this should be \"line-chart-demo\"
+  - widget-id : (string) id of the widget,
   "
   [widget-id]
   (-> utils/default-config
@@ -46,6 +47,7 @@
 
   ---
 
+  - data : (atom) data to display (may be used by the standard configuration components for thins like axes, etc.
   - config : (atom) holds all the configuration settings made by the user
   "
   [data widget-id]
@@ -72,7 +74,7 @@
   ---
 
   - data : (atom) any data shown by the component's ui
-  - config : (atom) configuration settings made by the user using the config-panel, see [[config]].
+  - widget-id : (string) unique identifier for this specific widget instanc
   "
   [data widget-id]
   (let [line-uv? (ui-utils/subscribe-local widget-id [:line-uv :include])
@@ -90,29 +92,25 @@
     (fn []
       ;(log/info "configurable-chart" @config)
 
-      [rc/v-box :src (rc/at)
-       :gap "2px"
-       :children [[buttons/button
-                   {:on-click #(log/info "open config panel")}
-                   [icons/icon {:icon "edit"} "Edit"]]
-                  [:> LineChart {:width 400 :height 400 :data @data}
+      [c/chart
+       [:> LineChart {:width 400 :height 400 :data @data}
 
-                   (utils/standard-chart-components widget-id)
+        (utils/standard-chart-components widget-id)
 
-                   (when @brush? [:> Brush])
+        (when @brush? [:> Brush])
 
-                   (when @line-uv? [:> Line {:type              "monotone" :dataKey :uv
-                                             :isAnimationActive @isAnimationActive?
-                                             :stroke            @line-uv-stroke
-                                             :fill              @line-uv-fill}])
+        (when @line-uv? [:> Line {:type              "monotone" :dataKey :uv
+                                  :isAnimationActive @isAnimationActive?
+                                  :stroke            @line-uv-stroke
+                                  :fill              @line-uv-fill}])
 
-                   (when @line-pv? [:> Line {:type              "monotone" :dataKey :pv
-                                             :isAnimationActive @isAnimationActive?
-                                             :stroke            @line-pv-stroke
-                                             :fill              @line-pv-fill}])
+        (when @line-pv? [:> Line {:type              "monotone" :dataKey :pv
+                                  :isAnimationActive @isAnimationActive?
+                                  :stroke            @line-pv-stroke
+                                  :fill              @line-pv-fill}])
 
-                   (when @line-amt? [:> Line {:type              "monotone" :dataKey :amt
-                                              :isAnimationActive @isAnimationActive?
-                                              :stroke            @line-amt-stroke
-                                              :fill              @line-amt-fill}])]]])))
+        (when @line-amt? [:> Line {:type              "monotone" :dataKey :amt
+                                   :isAnimationActive @isAnimationActive?
+                                   :stroke            @line-amt-stroke
+                                   :fill              @line-amt-fill}])]])))
 

@@ -1,18 +1,16 @@
-(ns bh.rccst.views.catalog.example.chart.utils
-  (:require [bh.rccst.events :as events]
-            ["recharts" :refer [XAxis YAxis CartesianGrid
-                                Tooltip Legend]]
-            ["react-colorful" :refer [HexColorPicker]]
-
-            [bh.rccst.ui-component.table :as table]
-            [bh.rccst.ui-component.utils :as ui-utils]
-
-            [bh.rccst.ui-component.utils :as u]
+(ns bh.rccst.ui-component.atom.chart.utils
+  (:require [taoensso.timbre :as log]
             [re-com.core :as rc]
             [re-frame.core :as re-frame]
             [reagent.core :as r]
 
-            [taoensso.timbre :as log]
+            ["recharts" :refer [XAxis YAxis CartesianGrid Tooltip Legend]]
+            ["react-colorful" :refer [HexColorPicker]]
+
+            [bh.rccst.events :as events]
+            [bh.rccst.ui-component.utils :as u]
+            [bh.rccst.ui-component.table :as table]
+
             [woolybear.packs.tab-panel :as tab-panel]))
 
 
@@ -179,6 +177,57 @@
 ;; endregion
 
 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;
+; DATA DISPLAY/EDIT PANELS
+;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; region
+
+(defn tabular-data-panel
+  "provides a simple tabular component (via `bh.rccst.ui-component.table`) to show the data presented
+  in the Chart.
+
+> Note: `table` uses the keys of the first hash-map in `@data` as the header label for the columns
+
+  ---
+
+  - data : (atom) vector of content hash-maps."
+
+  [data]
+  [table/table
+   :width 500
+   :data data
+   :max-rows 5])
+
+
+(defn dag-data-panel
+  "provides a UI component to show the DAG data presented in the Chart.
+
+> Note: `table` uses the keys of the first hash-map in `@data` as the header label for the columns
+
+  ---
+
+  - data : (atom) vector of content hash-maps."
+
+  [data]
+  [:div "DAG data will be shown here"])
+
+
+(defn hierarchy-data-panel
+  "provides a UI component to show the hierarchical data presented in the Chart.
+
+  ---
+
+  - data : (atom) data to show/edit"
+
+  [data]
+  [:div "hierarchical data will be shown here"])
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;
@@ -212,23 +261,6 @@
                                          :layout        "horizontal"
                                          :align         "center"
                                          :verticalAlign "bottom"}})
-
-
-(defn tabular-data-panel
-  "provides a simple tabular component (via `bh.rccst.ui-component.table`) to show the data presented
-  in the Chart.
-
-> Note: `table` uses the keys of the first hash-map in `@data` as the header label for the columns
-
-  ---
-
-  - data : (atom) vector of content hash-maps."
-
-  [data]
-  [table/table
-   :width 500
-   :data data
-   :max-rows 5])
 
 
 (defn column-picker [data widget-id label path]
@@ -487,8 +519,8 @@
        :anchor [rc/button :src (rc/at)
                 :label label
                 :style {:background-color @background-color
-                        :color            (ui-utils/best-text-color
-                                            (ui-utils/hex->rgba @background-color))}
+                        :color            (u/best-text-color
+                                            (u/hex->rgba @background-color))}
                 :on-click #(swap! showing? not)]
        :popover [rc/popover-content-wrapper :src (rc/at)
                  :close-button? true
@@ -606,18 +638,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; region
-
-
-(comment
-  (def widget-id "line-chart-demo")
-  (let [grid-dash (u/subscribe-local widget-id [:grid :strokeDasharray :dash])
-        grid-space (u/subscribe-local widget-id [:grid :strokeDasharray :space])]
-    (str @grid-dash " " @grid-space))
-
-
-  ())
-
-
 
 (defn standard-chart-components [widget-id]
   (let [grid? (u/subscribe-local widget-id [:grid :include])
