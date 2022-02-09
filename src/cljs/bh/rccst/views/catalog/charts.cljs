@@ -18,7 +18,7 @@
    [colored-pie-chart/example]
    [scatter-chart/example]
    ;[funnel-chart/example]
-   ;[treemap-chart/example]
+   [treemap-chart/example]
    [sankey-chart/example]])
 
 

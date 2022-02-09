@@ -26,7 +26,3 @@
      :component-panel chart/component
      :source-code chart/source-code]))
 
-(comment
-  (def widget-id "sankey-chart-demo")
-
-  ())

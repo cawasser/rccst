@@ -177,6 +177,57 @@
 ;; endregion
 
 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;
+; DATA DISPLAY/EDIT PANELS
+;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; region
+
+(defn tabular-data-panel
+  "provides a simple tabular component (via `bh.rccst.ui-component.table`) to show the data presented
+  in the Chart.
+
+> Note: `table` uses the keys of the first hash-map in `@data` as the header label for the columns
+
+  ---
+
+  - data : (atom) vector of content hash-maps."
+
+  [data]
+  [table/table
+   :width 500
+   :data data
+   :max-rows 5])
+
+
+(defn dag-data-panel
+  "provides a UI component to show the DAG data presented in the Chart.
+
+> Note: `table` uses the keys of the first hash-map in `@data` as the header label for the columns
+
+  ---
+
+  - data : (atom) vector of content hash-maps."
+
+  [data]
+  [:div "DAG data will be shown here"])
+
+
+(defn hierarchy-data-panel
+  "provides a UI component to show the hierarchical data presented in the Chart.
+
+  ---
+
+  - data : (atom) data to show/edit"
+
+  [data]
+  [:div "hierarchical data will be shown here"])
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;
@@ -210,36 +261,6 @@
                                          :layout        "horizontal"
                                          :align         "center"
                                          :verticalAlign "bottom"}})
-
-
-(defn tabular-data-panel
-  "provides a simple tabular component (via `bh.rccst.ui-component.table`) to show the data presented
-  in the Chart.
-
-> Note: `table` uses the keys of the first hash-map in `@data` as the header label for the columns
-
-  ---
-
-  - data : (atom) vector of content hash-maps."
-
-  [data]
-  [table/table
-   :width 500
-   :data data
-   :max-rows 5])
-
-
-(defn dag-data-panel
-  "provides a UI component  to show the DAG data presented in the Chart.
-
-> Note: `table` uses the keys of the first hash-map in `@data` as the header label for the columns
-
-  ---
-
-  - data : (atom) vector of content hash-maps."
-
-  [data]
-  [:div "DAG data will be shown here"])
 
 
 (defn column-picker [data widget-id label path]
