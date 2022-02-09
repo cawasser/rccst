@@ -4,8 +4,8 @@
 
             ["recharts" :refer [PieChart Pie]]
             [bh.rccst.ui-component.utils :as ui-utils]
-            [bh.rccst.views.catalog.example.chart.utils :as utils]
-            [bh.rccst.ui-component.atom.chart.util :as c]))
+            [bh.rccst.ui-component.atom.chart.utils :as utils]
+            [bh.rccst.ui-component.atom.chart.wrapper :as c]))
 
 
 
@@ -61,7 +61,7 @@
         fill (ui-utils/subscribe-local widget-id [:fill])]
 
     (fn []
-      [c/wrapper
+      [c/chart
                   [:> PieChart {:width 400 :height 400 :label true}
 
                    (utils/non-gridded-chart-components widget-id)

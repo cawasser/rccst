@@ -3,8 +3,8 @@
             ["recharts" :refer [BarChart Bar Brush]]
             [re-com.core :as rc]
             [bh.rccst.ui-component.utils :as ui-utils]
-            [bh.rccst.views.catalog.example.chart.utils :as utils]
-            [bh.rccst.ui-component.atom.chart.util :as c]))
+            [bh.rccst.ui-component.atom.chart.utils :as utils]
+            [bh.rccst.ui-component.atom.chart.wrapper :as c]))
 
 
 (defn config
@@ -90,7 +90,7 @@
         brush? (ui-utils/subscribe-local widget-id [:brush])]
 
     (fn []
-      [c/wrapper
+      [c/chart
        [:> BarChart {:width 400 :height 400 :data @data}
 
         (utils/standard-chart-components widget-id)
@@ -116,4 +116,3 @@
                                       :isAnimationActive @isAnimationActive?
                                       :fill              @bar-d-fill}
                                 (when (seq @bar-d-stackId) {:stackId @bar-d-stackId}))])]])))
-

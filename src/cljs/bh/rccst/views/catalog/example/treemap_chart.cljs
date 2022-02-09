@@ -10,7 +10,7 @@
             [bh.rccst.events :as events]
             [bh.rccst.views.catalog.utils :as bcu]
 
-            [bh.rccst.views.catalog.example.chart.utils :as utils]))
+            [bh.rccst.ui-component.atom.chart.utils :as utils]))
 
 
 ; region ; configuration params

@@ -1,9 +1,18 @@
-(ns bh.rccst.ui-component.atom.chart.util
+(ns bh.rccst.ui-component.atom.chart.wrapper
   (:require [taoensso.timbre :as log]
             [re-com.core :as rc]))
 
 
-(defn wrapper [component]
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;
+; CHART
+;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; region
+
+(defn chart [component]
   [rc/v-box :src (rc/at)
    :gap "2px"
    :children [[rc/h-box :src (rc/at)
@@ -13,3 +22,5 @@
                            :tooltip "configure this chart"
                            :on-click #(log/info "open config panel")]]]
               component]])
+
+;; endregion

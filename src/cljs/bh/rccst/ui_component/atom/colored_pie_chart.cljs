@@ -4,8 +4,8 @@
 
             ["recharts" :refer [PieChart Pie Cell]]
             [bh.rccst.ui-component.utils :as ui-utils]
-            [bh.rccst.views.catalog.example.chart.utils :as utils]
-            [bh.rccst.ui-component.atom.chart.util :as c]))
+            [bh.rccst.ui-component.atom.chart.utils :as utils]
+            [bh.rccst.ui-component.atom.chart.wrapper :as c]))
 
 
 (defn config [widget-id]
@@ -69,7 +69,7 @@
         colors (ui-utils/subscribe-local widget-id [:colors])]
 
     (fn []
-      [c/wrapper
+      [c/chart
        [:> PieChart {:width 400 :height 400 :label true}
 
         (utils/non-gridded-chart-components widget-id)

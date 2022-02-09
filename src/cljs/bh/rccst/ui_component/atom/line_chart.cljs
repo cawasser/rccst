@@ -4,8 +4,8 @@
 
             ["recharts" :refer [LineChart Line Brush]]
             [bh.rccst.ui-component.utils :as ui-utils]
-            [bh.rccst.views.catalog.example.chart.utils :as utils]
-            [bh.rccst.ui-component.atom.chart.util :as c]))
+            [bh.rccst.ui-component.atom.chart.utils :as utils]
+            [bh.rccst.ui-component.atom.chart.wrapper :as c]))
 
 
 
@@ -92,7 +92,7 @@
     (fn []
       ;(log/info "configurable-chart" @config)
 
-      [c/wrapper
+      [c/chart
        [:> LineChart {:width 400 :height 400 :data @data}
 
         (utils/standard-chart-components widget-id)

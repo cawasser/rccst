@@ -1,9 +1,10 @@
 (ns bh.rccst.views.catalog.example.colored-pie-chart
-  (:require [bh.rccst.ui-component.atom.colored-pie-chart :as chart]
+  (:require [reagent.core :as r]
 
+            [bh.rccst.ui-component.atom.colored-pie-chart :as chart]
             [bh.rccst.ui-component.molecule.example :as example]
-            [bh.rccst.views.catalog.example.chart.utils :as utils]
-            [reagent.core :as r]))
+            [bh.rccst.ui-component.atom.chart.utils :as utils]))
+
 
 
 (defn example []

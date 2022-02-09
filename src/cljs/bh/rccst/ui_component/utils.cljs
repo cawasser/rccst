@@ -745,7 +745,7 @@
 
   ;; endregion
 
-  ;; region ; subscribing to locals (wrapper around re-frame/subscribe)
+  ;; region ; subscribing to locals (chart around re-frame/subscribe)
   (defn subscribe-local [widget-id [a & more :as path]]
     (let [p (keyword widget-id (str (name a)
                                  (when more

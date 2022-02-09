@@ -1,11 +1,8 @@
 (ns bh.rccst.ui-component.molecule.example
   (:require [taoensso.timbre :as log]
+
             [bh.rccst.views.catalog.utils :as bcu]
-            ;[bh.rccst.views.catalog.example.chart.utils :as utils]
-
             [bh.rccst.ui-component.utils :as ui-utils]))
-            ;[reagent.core :as r]))
-
 
 
 (defn example [& {:keys [title widget-id description
@@ -13,7 +10,7 @@
                          data-panel config-panel component-panel
                          source-code]}]
 
-  (log/info "example widget" title config)
+  ;(log/info "example widget" title config)
 
   (ui-utils/init-widget widget-id config)
 

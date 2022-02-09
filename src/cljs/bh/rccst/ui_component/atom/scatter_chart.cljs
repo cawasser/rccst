@@ -1,11 +1,12 @@
 (ns bh.rccst.ui-component.atom.scatter-chart
-  (:require [bh.rccst.ui-component.atom.chart.util :as c]
-            [bh.rccst.ui-component.utils :as ui-utils]
+  (:require [re-com.core :as rc]
+            [taoensso.timbre :as log]
 
-            ["recharts" :refer [ScatterChart Scatter XAxis YAxis CartesianGrid Legend Tooltip Brush]]
-            [bh.rccst.views.catalog.example.chart.utils :as utils]
-            [re-com.core :as rc]
-            [taoensso.timbre :as log]))
+            ["recharts" :refer [ScatterChart Scatter Brush]]
+
+            [bh.rccst.ui-component.atom.chart.wrapper :as c]
+            [bh.rccst.ui-component.utils :as ui-utils]
+            [bh.rccst.ui-component.atom.chart.utils :as utils]))
 
 
 (defn config [widget-id]
@@ -60,7 +61,7 @@
     (fn []
       ;(log/info "configurable-Scatter-chart" @config @data)
 
-      [c/wrapper
+      [c/chart
        [:> ScatterChart {:width 400 :height 400}
 
         (utils/standard-chart-components widget-id)

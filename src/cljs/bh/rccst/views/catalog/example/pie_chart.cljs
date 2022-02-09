@@ -3,7 +3,7 @@
 
             [bh.rccst.ui-component.atom.pie-chart :as chart]
             [bh.rccst.ui-component.molecule.example :as example]
-            [bh.rccst.views.catalog.example.chart.utils :as utils]))
+            [bh.rccst.ui-component.atom.chart.utils :as utils]))
 
 
 (defn example []
