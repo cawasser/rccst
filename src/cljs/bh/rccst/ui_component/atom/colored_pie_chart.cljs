@@ -1,13 +1,11 @@
 (ns bh.rccst.ui-component.atom.colored-pie-chart
-  (:require ["recharts" :refer [PieChart Pie Cell]]
+  (:require [taoensso.timbre :as log]
+            [re-com.core :as rc]
+
+            ["recharts" :refer [PieChart Pie Cell]]
             [bh.rccst.ui-component.utils :as ui-utils]
             [bh.rccst.views.catalog.example.chart.utils :as utils]
-            [reagent.core :as r]
-            [re-com.core :as rc]
-            [woolybear.ad.buttons :as buttons]
-            [woolybear.ad.icons :as icons]
-
-            [taoensso.timbre :as log]))
+            [bh.rccst.ui-component.atom.chart.util :as c]))
 
 
 (defn config [widget-id]
@@ -71,25 +69,21 @@
         colors (ui-utils/subscribe-local widget-id [:colors])]
 
     (fn []
-      [rc/v-box :src (rc/at)
-       :gap "2px"
-       :children [[buttons/button
-                   {:on-click #(log/info "open config panel")}
-                   [icons/icon {:icon "edit"} "Edit"]]
-                  [:> PieChart {:width 400 :height 400 :label true}
+      [c/wrapper
+       [:> PieChart {:width 400 :height 400 :label true}
 
-                   (utils/non-gridded-chart-components widget-id)
+        (utils/non-gridded-chart-components widget-id)
 
-                   [:> Pie {:dataKey "value"
-                            :nameKey "name"
-                            :data @data
-                            :label true
-                            :isAnimationActive @isAnimationActive?}
-                    (doall
-                      (map-indexed
-                        (fn [idx {name :name}]
-                          ^{:key (str idx name)}
-                          [:> Cell {:key (str "cell-" idx)
-                                    :fill (get @colors name)}])
-                        @data))]]]])))
+        [:> Pie {:dataKey "value"
+                 :nameKey "name"
+                 :data @data
+                 :label true
+                 :isAnimationActive @isAnimationActive?}
+         (doall
+           (map-indexed
+             (fn [idx {name :name}]
+               ^{:key (str idx name)}
+               [:> Cell {:key (str "cell-" idx)
+                         :fill (get @colors name)}])
+             @data))]]])))
 

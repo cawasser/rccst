@@ -1,12 +1,13 @@
 (ns bh.rccst.ui-component.atom.pie-chart
-  (:require ["recharts" :refer [PieChart Pie]]
+  (:require [taoensso.timbre :as log]
+            [re-com.core :as rc]
+
+            ["recharts" :refer [PieChart Pie]]
             [bh.rccst.ui-component.utils :as ui-utils]
             [bh.rccst.views.catalog.example.chart.utils :as utils]
-            [re-com.core :as rc]
-            [woolybear.ad.buttons :as buttons]
-            [woolybear.ad.icons :as icons]
+            [bh.rccst.ui-component.atom.chart.util :as c]))
 
-            [taoensso.timbre :as log]))
+
 
 
 (defn config [widget-id]
@@ -60,11 +61,7 @@
         fill (ui-utils/subscribe-local widget-id [:fill])]
 
     (fn []
-      [rc/v-box :src (rc/at)
-       :gap "2px"
-       :children [[buttons/button
-                   {:on-click #(log/info "open config panel")}
-                   [icons/icon {:icon "edit"} "Edit"]]
+      [c/wrapper
                   [:> PieChart {:width 400 :height 400 :label true}
 
                    (utils/non-gridded-chart-components widget-id)
@@ -74,10 +71,5 @@
                             :data @data
                             :fill @fill
                             :label true
-                            :isAnimationActive @isAnimationActive?}]]]])))
+                            :isAnimationActive @isAnimationActive?}]]])))
 
-
-(comment
-  (def widget-id "pie-chart-demo")
-
-  ())

@@ -546,41 +546,6 @@
 
 
 
-(comment
-  (do
-    (def widget-id "colored-pie-chart-demo")
-    (def data [{:name "Group A" :value 400}
-               {:name "Group B" :value 300}
-               {:name "Group C" :value 300}
-               {:name "Group D" :value 200}
-               {:name "Group E" :value 278}
-               {:name "Group F" :value 189}])
-    (def a [])
-    (def r nil)
-    (def t {:tab-panel {:value     (keyword widget-id "config")
-                        :data-path [:widgets (keyword widget-id) :tab-panel]}
-            :colors (zipmap (map :name data)
-                      ["#ffff00" "#ff0000" "#00ff00"
-                       "#0000ff" "#009999" "#ff00ff"])}))
-
-  (def paths (process-locals a r t))
-
-  (let [[a & more :as value-path] (last paths)
-        p (keyword widget-id (str (name a)
-                               (when more
-                                 (str "." (clojure.string/join "." (->> more
-                                                                     (map name)
-                                                                     (map #(clojure.string/replace % #" " ""))))))))
-        dep (compute-deps widget-id a more)]
-    [p dep more (if more (last more) a)])
-
-  (create-widget-local-sub widget-id (last paths))
-
-
-  (clojure.string/replace % #" " "")
-
-  ())
-
 ;; endregion
 
 
