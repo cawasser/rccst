@@ -10,7 +10,7 @@
                          data-panel config-panel component-panel
                          source-code]}]
 
-  ;(log/info "example widget" title config)
+  (log/info "example widget" title config)
 
   (ui-utils/init-widget widget-id config)
 

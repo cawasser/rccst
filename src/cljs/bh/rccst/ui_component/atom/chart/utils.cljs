@@ -229,6 +229,19 @@
    :max-rows 5])
 
 
+(defn dag-data-panel
+  "provides a UI component  to show the DAG data presented in the Chart.
+
+> Note: `table` uses the keys of the first hash-map in `@data` as the header label for the columns
+
+  ---
+
+  - data : (atom) vector of content hash-maps."
+
+  [data]
+  [:div "DAG data will be shown here"])
+
+
 (defn column-picker [data widget-id label path]
   (let [model (u/subscribe-local widget-id path)
         headings (apply set (map keys @data))
