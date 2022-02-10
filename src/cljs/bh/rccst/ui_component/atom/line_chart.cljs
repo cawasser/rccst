@@ -1,13 +1,14 @@
 (ns bh.rccst.ui-component.atom.line-chart
   (:require [taoensso.timbre :as log]
+            [reagent.core :as r]
             [re-com.core :as rc]
 
             ["recharts" :refer [LineChart Line Brush]]
+            [woolybear.ad.layout :as layout]
+
             [bh.rccst.ui-component.utils :as ui-utils]
             [bh.rccst.ui-component.atom.chart.utils :as utils]
             [bh.rccst.ui-component.atom.chart.wrapper :as c]))
-
-
 
 
 (defn config
@@ -42,7 +43,7 @@
                           [utils/color-config widget-id ":fill" (conj path :fill) position]]]]])
 
 
-(defn config-panel
+(defn- config-panel
   "the panel of configuration controls
 
   ---
@@ -68,15 +69,7 @@
               [utils/boolean-config widget-id ":brush?" [:brush]]]])
 
 
-(defn component
-  "the chart to draw, taking cues from the settings of the configuration panel
-
-  ---
-
-  - data : (atom) any data shown by the component's ui
-  - widget-id : (string) unique identifier for this specific widget instanc
-  "
-  [data widget-id]
+(defn- component-panel [data widget-id]
   (let [line-uv? (ui-utils/subscribe-local widget-id [:line-uv :include])
         line-uv-stroke (ui-utils/subscribe-local widget-id [:line-uv :stroke])
         line-uv-fill (ui-utils/subscribe-local widget-id [:line-uv :fill])
@@ -90,27 +83,59 @@
         brush? (ui-utils/subscribe-local widget-id [:brush])]
 
     (fn []
-      ;(log/info "configurable-chart" @config)
+      [:> LineChart {:width 400 :height 400 :data @data}
 
-      [c/chart
-       [:> LineChart {:width 400 :height 400 :data @data}
+       (utils/standard-chart-components widget-id)
 
-        (utils/standard-chart-components widget-id)
+       (when @brush? [:> Brush])
 
-        (when @brush? [:> Brush])
+       (when @line-uv? [:> Line {:type              "monotone" :dataKey :uv
+                                 :isAnimationActive @isAnimationActive?
+                                 :stroke            @line-uv-stroke
+                                 :fill              @line-uv-fill}])
 
-        (when @line-uv? [:> Line {:type              "monotone" :dataKey :uv
+       (when @line-pv? [:> Line {:type              "monotone" :dataKey :pv
+                                 :isAnimationActive @isAnimationActive?
+                                 :stroke            @line-pv-stroke
+                                 :fill              @line-pv-fill}])
+
+       (when @line-amt? [:> Line {:type              "monotone" :dataKey :amt
                                   :isAnimationActive @isAnimationActive?
-                                  :stroke            @line-uv-stroke
-                                  :fill              @line-uv-fill}])
+                                  :stroke            @line-amt-stroke
+                                  :fill              @line-amt-fill}])])))
 
-        (when @line-pv? [:> Line {:type              "monotone" :dataKey :pv
-                                  :isAnimationActive @isAnimationActive?
-                                  :stroke            @line-pv-stroke
-                                  :fill              @line-pv-fill}])
 
-        (when @line-amt? [:> Line {:type              "monotone" :dataKey :amt
-                                   :isAnimationActive @isAnimationActive?
-                                   :stroke            @line-amt-stroke
-                                   :fill              @line-amt-fill}])]])))
+(def source-code '[:> LineChart {:width 400 :height 400 :data @data}])
+
+
+(defn component
+  "the chart to draw, taking cues from the settings of the configuration panel
+
+  ---
+
+  - data : (atom) any data shown by the component's ui
+  - widget-id : (string) unique identifier for this specific widget instanc
+  "
+  [data widget-id]
+  (let [open? (r/atom false)
+        config-key (keyword widget-id "config")
+        data-key (keyword widget-id "data")
+        tab-panel (keyword widget-id "tab-panel")
+        selected-tab (keyword widget-id "tab-panel.value")
+        chart-events [config-key data-key tab-panel selected-tab]]
+
+    (fn [data widget-id]
+      [c/configurable-chart open?
+       [layout/centered {:extra-classes :is-one-third}
+        [rc/h-box :src (rc/at)
+         :gap "5px"
+         :children (conj
+                     (if @open?
+                       [[layout/centered {:extra-classes :is-one-third}
+                         [ui-utils/chart-config
+                          chart-events
+                          (utils/tabular-data-panel data)
+                          [config-panel data widget-id]]]]
+                       [])
+                     [component-panel data widget-id])]]])))
 
