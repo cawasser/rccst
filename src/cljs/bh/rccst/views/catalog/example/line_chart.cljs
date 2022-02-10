@@ -12,23 +12,10 @@
     [example/component-example
      :title "Line Chart"
      :widget-id widget-id
-     :description "A simple Line Chart built using [Recharts]()"
+     :description "A simple Line Chart built using [Recharts](https://recharts.org/en-US)"
      :data (r/atom utils/tabular-data)
-     :config (chart/config widget-id)
-     :component-panel chart/component
+     :component chart/component
      :source-code chart/source-code]))
 
 
-(defn stacked-example []
-  (let [widget-id "stacked-line-chart-demo"]
-    [example/example
-     :title "Stacked Line Chart"
-     :widget-id widget-id
-     :description "A simple Line Chart built using [Recharts]()"
-     :data (r/atom utils/tabular-data)
-     :config (chart/config widget-id)
-     :data-panel utils/tabular-data-panel
-     :config-panel chart/config-panel
-     :component-panel chart/component
-     :source-code "dummy source code"]))
 

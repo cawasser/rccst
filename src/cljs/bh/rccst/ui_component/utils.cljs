@@ -3,9 +3,15 @@
             [re-frame.core :as re-frame]
             [re-com.core :as rc]
             [taoensso.timbre :as log]
+            [cljs-uuid-utils.core :as uuid]
 
             [bh.rccst.ui-component.navbar :as navbar]
             [woolybear.packs.tab-panel :as tab-panel]))
+
+
+(defn component-id []
+  (-> (uuid/make-random-uuid)
+    uuid/uuid-string))
 
 
 (defn chart-config [[config data panel tab] data-panel config-panel]

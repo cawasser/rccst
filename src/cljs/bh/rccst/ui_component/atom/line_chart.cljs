@@ -1,17 +1,17 @@
 (ns bh.rccst.ui-component.atom.line-chart
-  (:require [taoensso.timbre :as log]
-            [reagent.core :as r]
-            [re-com.core :as rc]
+  (:require [bh.rccst.ui-component.atom.chart.utils :as utils]
+            [bh.rccst.ui-component.atom.chart.wrapper :as c]
+            [bh.rccst.ui-component.utils :as ui-utils]
 
             ["recharts" :refer [LineChart Line Brush]]
-            [woolybear.ad.layout :as layout]
+            [re-com.core :as rc]
 
-            [bh.rccst.ui-component.utils :as ui-utils]
-            [bh.rccst.ui-component.atom.chart.utils :as utils]
-            [bh.rccst.ui-component.atom.chart.wrapper :as c]))
+            [reagent.core :as r]
+            [taoensso.timbre :as log]
+            [woolybear.ad.layout :as layout]))
 
 
-(defn config
+(defn- config
   "constructs the configuration data structure for the widget. This is specific to this being a
   line-chart component.
 
@@ -24,7 +24,8 @@
   [widget-id]
   (-> utils/default-config
     (merge
-      {:tab-panel {:value     (keyword widget-id "config")
+      {:type      "line-chart"
+       :tab-panel {:value     (keyword widget-id "config")
                    :data-path [:widgets (keyword widget-id) :tab-panel]}
        :brush     false
        :line-uv   {:include true :stroke "#8884d8" :fill "#8884d8"}
@@ -52,6 +53,8 @@
   - config : (atom) holds all the configuration settings made by the user
   "
   [data widget-id]
+
+  ;(log/info "config-panel" widget-id)
 
   [rc/v-box :src (rc/at)
    :gap "10px"
@@ -83,6 +86,8 @@
         brush? (ui-utils/subscribe-local widget-id [:brush])]
 
     (fn []
+      ;(log/info "component-panel" widget-id)
+
       [:> LineChart {:width 400 :height 400 :data @data}
 
        (utils/standard-chart-components widget-id)
@@ -111,31 +116,28 @@
 (defn component
   "the chart to draw, taking cues from the settings of the configuration panel
 
+  the component creates its own ID (a random-uuid) to hold the local state. This way multiple charts
+  can be placed inside the same outer container/composite
+
   ---
 
   - data : (atom) any data shown by the component's ui
-  - widget-id : (string) unique identifier for this specific widget instanc
   "
-  [data widget-id]
-  (let [open? (r/atom false)
-        config-key (keyword widget-id "config")
-        data-key (keyword widget-id "data")
-        tab-panel (keyword widget-id "tab-panel")
-        selected-tab (keyword widget-id "tab-panel.value")
-        chart-events [config-key data-key tab-panel selected-tab]]
+  [data]
 
-    (fn [data widget-id]
-      [c/configurable-chart open?
-       [layout/centered {:extra-classes :is-one-third}
-        [rc/h-box :src (rc/at)
-         :gap "5px"
-         :children (conj
-                     (if @open?
-                       [[layout/centered {:extra-classes :is-one-third}
-                         [ui-utils/chart-config
-                          chart-events
-                          (utils/tabular-data-panel data)
-                          [config-panel data widget-id]]]]
-                       [])
-                     [component-panel data widget-id])]]])))
+  (let [id (r/atom nil)]
+
+    (fn []
+      (when (nil? @id)
+        (do
+          (reset! id (ui-utils/component-id))
+          (ui-utils/init-widget @id (config @id))))
+
+      (log/info "component" @id)
+
+      [c/configurable-chart
+       :data data
+       :id @id
+       :config-panel config-panel
+       :component component-panel])))
 

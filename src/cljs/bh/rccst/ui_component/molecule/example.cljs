@@ -7,17 +7,16 @@
             [woolybear.ad.catalog.utils :as acu]))
 
 
-(defn component-example [& {:keys [title widget-id description
-                                   data config
-                                   component-panel
+(defn component-example [& {:keys [title
+                                   description
+                                   data
+                                   component
                                    source-code]}]
-
-  (ui-utils/init-widget widget-id config)
 
   (acu/demo
     title
     description
-    [component-panel data widget-id]
+    [component data]
     source-code))
 
 
