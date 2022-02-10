@@ -1,7 +1,37 @@
 (ns bh.rccst.ui-component.utils
   (:require [day8.re-frame.tracing :refer-macros [fn-traced]]
             [re-frame.core :as re-frame]
-            [taoensso.timbre :as log]))
+            [re-com.core :as rc]
+            [taoensso.timbre :as log]
+            [cljs-uuid-utils.core :as uuid]
+
+            [bh.rccst.ui-component.navbar :as navbar]
+            [woolybear.packs.tab-panel :as tab-panel]))
+
+
+(defn component-id []
+  (-> (uuid/make-random-uuid)
+    uuid/uuid-string))
+
+
+(defn chart-config [[config data panel tab] data-panel config-panel]
+  (log/info "chart-config" config data panel tab)
+  (let [data-or-config [[config "config"]
+                        [data "data"]]]
+    [:div.chart-config {:style {:width "100%"}}
+     [navbar/navbar data-or-config [panel]]
+
+     [rc/scroller
+      :v-scroll :auto
+      :height   "500px"
+      :child    [tab-panel/tab-panel {:extra-classes             :rccst
+                                      :subscribe-to-selected-tab [tab]}
+
+                 [tab-panel/sub-panel {:panel-id config}
+                  config-panel]
+
+                 [tab-panel/sub-panel {:panel-id data}
+                  data-panel]]]]))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -11,7 +41,6 @@
 ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 ;; region
 
 (defn hex->rgba
@@ -175,7 +204,6 @@
 ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 ;; region
 
 (re-frame/reg-event-db
@@ -556,7 +584,6 @@
 ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 ;; region
 
 (re-frame/reg-event-db

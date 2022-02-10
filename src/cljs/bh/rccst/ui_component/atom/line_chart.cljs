@@ -1,16 +1,17 @@
 (ns bh.rccst.ui-component.atom.line-chart
-  (:require [taoensso.timbre :as log]
-            [re-com.core :as rc]
+  (:require [bh.rccst.ui-component.atom.chart.utils :as utils]
+            [bh.rccst.ui-component.atom.chart.wrapper :as c]
+            [bh.rccst.ui-component.utils :as ui-utils]
 
             ["recharts" :refer [LineChart Line Brush]]
-            [bh.rccst.ui-component.utils :as ui-utils]
-            [bh.rccst.ui-component.atom.chart.utils :as utils]
-            [bh.rccst.ui-component.atom.chart.wrapper :as c]))
+            [re-com.core :as rc]
+
+            [reagent.core :as r]
+            [taoensso.timbre :as log]
+            [woolybear.ad.layout :as layout]))
 
 
-
-
-(defn config
+(defn- config
   "constructs the configuration data structure for the widget. This is specific to this being a
   line-chart component.
 
@@ -23,7 +24,8 @@
   [widget-id]
   (-> utils/default-config
     (merge
-      {:tab-panel {:value     (keyword widget-id "config")
+      {:type      "line-chart"
+       :tab-panel {:value     (keyword widget-id "config")
                    :data-path [:widgets (keyword widget-id) :tab-panel]}
        :brush     false
        :line-uv   {:include true :stroke "#8884d8" :fill "#8884d8"}
@@ -42,7 +44,7 @@
                           [utils/color-config widget-id ":fill" (conj path :fill) position]]]]])
 
 
-(defn config-panel
+(defn- config-panel
   "the panel of configuration controls
 
   ---
@@ -51,6 +53,8 @@
   - config : (atom) holds all the configuration settings made by the user
   "
   [data widget-id]
+
+  ;(log/info "config-panel" widget-id)
 
   [rc/v-box :src (rc/at)
    :gap "10px"
@@ -68,15 +72,7 @@
               [utils/boolean-config widget-id ":brush?" [:brush]]]])
 
 
-(defn component
-  "the chart to draw, taking cues from the settings of the configuration panel
-
-  ---
-
-  - data : (atom) any data shown by the component's ui
-  - widget-id : (string) unique identifier for this specific widget instanc
-  "
-  [data widget-id]
+(defn- component-panel [data widget-id]
   (let [line-uv? (ui-utils/subscribe-local widget-id [:line-uv :include])
         line-uv-stroke (ui-utils/subscribe-local widget-id [:line-uv :stroke])
         line-uv-fill (ui-utils/subscribe-local widget-id [:line-uv :fill])
@@ -90,27 +86,58 @@
         brush? (ui-utils/subscribe-local widget-id [:brush])]
 
     (fn []
-      ;(log/info "configurable-chart" @config)
+      ;(log/info "component-panel" widget-id)
 
-      [c/chart
-       [:> LineChart {:width 400 :height 400 :data @data}
+      [:> LineChart {:width 400 :height 400 :data @data}
 
-        (utils/standard-chart-components widget-id)
+       (utils/standard-chart-components widget-id)
 
-        (when @brush? [:> Brush])
+       (when @brush? [:> Brush])
 
-        (when @line-uv? [:> Line {:type              "monotone" :dataKey :uv
+       (when @line-uv? [:> Line {:type              "monotone" :dataKey :uv
+                                 :isAnimationActive @isAnimationActive?
+                                 :stroke            @line-uv-stroke
+                                 :fill              @line-uv-fill}])
+
+       (when @line-pv? [:> Line {:type              "monotone" :dataKey :pv
+                                 :isAnimationActive @isAnimationActive?
+                                 :stroke            @line-pv-stroke
+                                 :fill              @line-pv-fill}])
+
+       (when @line-amt? [:> Line {:type              "monotone" :dataKey :amt
                                   :isAnimationActive @isAnimationActive?
-                                  :stroke            @line-uv-stroke
-                                  :fill              @line-uv-fill}])
+                                  :stroke            @line-amt-stroke
+                                  :fill              @line-amt-fill}])])))
 
-        (when @line-pv? [:> Line {:type              "monotone" :dataKey :pv
-                                  :isAnimationActive @isAnimationActive?
-                                  :stroke            @line-pv-stroke
-                                  :fill              @line-pv-fill}])
 
-        (when @line-amt? [:> Line {:type              "monotone" :dataKey :amt
-                                   :isAnimationActive @isAnimationActive?
-                                   :stroke            @line-amt-stroke
-                                   :fill              @line-amt-fill}])]])))
+(def source-code '[:> LineChart {:width 400 :height 400 :data @data}])
+
+
+(defn component
+  "the chart to draw, taking cues from the settings of the configuration panel
+
+  the component creates its own ID (a random-uuid) to hold the local state. This way multiple charts
+  can be placed inside the same outer container/composite
+
+  ---
+
+  - data : (atom) any data shown by the component's ui
+  "
+  [data]
+
+  (let [id (r/atom nil)]
+
+    (fn []
+      (when (nil? @id)
+        (do
+          (reset! id (ui-utils/component-id))
+          (ui-utils/init-widget @id (config @id))))
+
+      (log/info "component" @id)
+
+      [c/configurable-chart
+       :data data
+       :id @id
+       :config-panel config-panel
+       :component component-panel])))
 
