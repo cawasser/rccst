@@ -125,18 +125,17 @@
         chart-events [config-key data-key tab-panel selected-tab]]
 
     (fn [data widget-id]
-      ;(log/info "line-chart component" widget-id chart-events)
-
       [c/configurable-chart open?
-       [rc/h-box :src (rc/at)
-        :gap "5px"
-        :children (conj
-                    (if @open?
-                      [[layout/centered {:extra-classes :is-one-third}
-                        [ui-utils/chart-config
-                         chart-events
-                         (utils/tabular-data-panel data)
-                         [config-panel data widget-id]]]]
-                      [])
-                    [component-panel data widget-id])]])))
+       [layout/centered {:extra-classes :is-one-third}
+        [rc/h-box :src (rc/at)
+         :gap "5px"
+         :children (conj
+                     (if @open?
+                       [[layout/centered {:extra-classes :is-one-third}
+                         [ui-utils/chart-config
+                          chart-events
+                          (utils/tabular-data-panel data)
+                          [config-panel data widget-id]]]]
+                       [])
+                     [component-panel data widget-id])]]])))
 
