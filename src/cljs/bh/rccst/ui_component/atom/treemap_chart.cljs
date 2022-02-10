@@ -61,8 +61,8 @@
               [rc/v-box :src (rc/at)
                :gap "10px"
                :children [[ratio-config widget-id]
-                          [utils/color-config widget-id :stroke [:stroke :color]]
-                          [utils/color-config widget-id :fill [:fill :color]]]]]])
+                          [utils/color-config-text widget-id ":stroke" [:stroke :color]]
+                          [utils/color-config-text widget-id ":fill" [:fill :color]]]]]])
 
 ;; endregion
 
