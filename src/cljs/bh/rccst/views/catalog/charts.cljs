@@ -6,7 +6,8 @@
             [bh.rccst.views.catalog.example.scatter-chart :as scatter-chart]
             [bh.rccst.views.catalog.example.funnel-chart :as funnel-chart]
             [bh.rccst.views.catalog.example.treemap-chart :as treemap-chart]
-            [bh.rccst.views.catalog.example.sankey-chart :as sankey-chart]))
+            [bh.rccst.views.catalog.example.sankey-chart :as sankey-chart]
+            [bh.rccst.views.catalog.example.radar-chart :as radar-chart]))
 
 
 
@@ -19,6 +20,7 @@
    [scatter-chart/example]
    [funnel-chart/example]
    [treemap-chart/example]
-   [sankey-chart/example]])
+   [sankey-chart/example]
+   [radar-chart/example]])
 
 
