@@ -9,7 +9,7 @@
 
 (defn example []
   (let [widget-id "colored-pie-chart-demo"]
-    [example/example
+    [example/component-example
      :title "Colored Pie Chart"
      :widget-id widget-id
      :description "Pie Chart with different colors for each slice. This requires embedding `Cell` elements
@@ -17,9 +17,7 @@ inside the `Pie` element.
 
 > Note: Recharts supports embedding `Cell` in a variety of other chart types, for example BarChart"
      :data (r/atom utils/paired-data)
-     :config (chart/config widget-id)
-     :data-panel utils/tabular-data-panel
-     :config-panel chart/config-panel
-     :component-panel chart/component
+     :component chart/component
+     :component-id (str widget-id "/colored-pie-chart")
      :source-code chart/source-code]))
 
