@@ -21,7 +21,9 @@
                    :data-path [:widgets (keyword widget-id) :tab-panel]}
        :brush     false
        :area-uv   {:include true :stroke "#8884d8" :fill "#8884d8" :stackId ""}
-       :area-pv   {:include true :stroke "#82ca9d" :fill "#82ca9d" :stackId ""}})
+       :area-pv   {:include true :stroke "#82ca9d" :fill "#82ca9d" :stackId ""}
+       :area-amt  {:include true :stroke "#5974ab" :fill "#5974ab" :stackId ""}
+       :area-d    {:include true :stroke "#3db512" :fill "#3db512" :stackId ""}})
     (assoc-in [:x-axis :dataKey] :name)))
 
 
@@ -29,8 +31,8 @@
   [rc/v-box :src (rc/at)
    :gap "5px"
    :children [[utils/boolean-config widget-id label (conj path :include)]
-              [utils/color-config-text widget-id ":fill" (conj path :fill) position]
-              [utils/color-config-text widget-id ":stroke" (conj path :stroke) position]
+              [utils/color-config widget-id ":fill" (conj path :fill) :above-right]
+              [utils/color-config widget-id ":stroke" (conj path :stroke) :above-left]
               [utils/text-config widget-id ":stackId" (conj path :stackId)]]])
 
 
@@ -54,7 +56,9 @@
               [rc/h-box :src (rc/at)
                :gap "10px"
                :children [[area-config widget-id "area (uv)" [:area-uv] :above-right]
-                          [area-config widget-id "area (pv)" [:area-pv] :above-center]]]
+                          [area-config widget-id "area (pv)" [:area-pv] :above-center]
+                          [area-config widget-id "area (amt)" [:area-amt] :above-center]
+                          [area-config widget-id "area (d)" [:area-d] :above-left]]]
               [rc/line :src (rc/at) :size "2px"]
               [utils/boolean-config widget-id ":brush?" [:brush]]]])
 
@@ -79,6 +83,14 @@
         area-pv-fill (ui-utils/subscribe-local widget-id [:area-pv :fill])
         area-pv-stroke (ui-utils/subscribe-local widget-id [:area-pv :stroke])
         area-pv-stackId (ui-utils/subscribe-local widget-id [:area-pv :stackId])
+        area-amt? (ui-utils/subscribe-local widget-id [:area-amt :include])
+        area-amt-fill (ui-utils/subscribe-local widget-id [:area-amt :fill])
+        area-amt-stroke (ui-utils/subscribe-local widget-id [:area-amt :stroke])
+        area-amt-stackId (ui-utils/subscribe-local widget-id [:area-amt :stackId])
+        area-d? (ui-utils/subscribe-local widget-id [:area-d :include])
+        area-d-fill (ui-utils/subscribe-local widget-id [:area-d :fill])
+        area-d-stroke (ui-utils/subscribe-local widget-id [:area-d :stroke])
+        area-d-stackId (ui-utils/subscribe-local widget-id [:area-d :stackId])
         isAnimationActive? (ui-utils/subscribe-local widget-id [:isAnimationActive])
         brush? (ui-utils/subscribe-local widget-id [:brush])]
 
@@ -100,4 +112,16 @@
                                          :isAnimationActive @isAnimationActive?
                                          :stroke            @area-pv-stroke
                                          :fill              @area-pv-fill}
-                                   (when (seq @area-pv-stackId) {:stackId @area-pv-stackId}))])]])))
+                                   (when (seq @area-pv-stackId) {:stackId @area-pv-stackId}))])
+
+        (when @area-amt? [:> Area (merge {:type              "monotone" :dataKey :amt
+                                          :isAnimationActive @isAnimationActive?
+                                          :stroke            @area-amt-stroke
+                                          :fill              @area-amt-fill}
+                                    (when (seq @area-amt-stackId) {:stackId @area-amt-stackId}))])
+
+        (when @area-d? [:> Area (merge {:type              "monotone" :dataKey :d
+                                        :isAnimationActive @isAnimationActive?
+                                        :stroke            @area-d-stroke
+                                        :fill              @area-d-fill}
+                                  (when (seq @area-d-stackId) {:stackId @area-d-stackId}))])]])))
