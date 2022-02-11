@@ -10,11 +10,14 @@
 
 
 (defn config [widget-id]
-  {:tab-panel {:value     (keyword widget-id "config")
-               :data-path [:widgets (keyword widget-id) :tab-panel]}
-   :tooltip   {:include true}
-   :node      {:fill "#77c878" :stroke "#000000"}
-   :link      {:stroke "#77c878" :curve 0.5}})
+
+  (merge
+    ui-utils/default-pub-sub
+    {:tab-panel {:value     (keyword widget-id "config")
+                 :data-path [:widgets (keyword widget-id) :tab-panel]}
+     :tooltip   {:include true}
+     :node      {:fill "#77c878" :stroke "#000000"}
+     :link      {:stroke "#77c878" :curve 0.5}}))
 
 
 (defn config-panel [_ widget-id]
@@ -34,7 +37,7 @@
                :children [[utils/text-config widget-id ":curve" [:link :curve]]
                           [utils/slider-config widget-id 0 1 0.1 [:link :curve]]]]]])
 
-;; region ; component
+;; region ; component-panel
 
 (def source-code '[:> Sankey
                    {:width         500 :height 400
@@ -80,7 +83,7 @@
         (str value "k")]])))
 
 
-(defn component [data widget-id]
+(defn- component-panel [data widget-id]
   (let [tooltip? (ui-utils/subscribe-local widget-id [:tooltip :include])
         node-fill (ui-utils/subscribe-local widget-id [:node :fill])
         node-stroke (ui-utils/subscribe-local widget-id [:node :stroke])
@@ -88,21 +91,55 @@
         curve (ui-utils/subscribe-local widget-id [:link :curve])]
 
     (fn []
-      [c/chart
-       [:> Sankey
-        {:width         500 :height 400
-         :node          (partial complex-node 500 @node-fill @node-stroke)
-         :data          @data
-         :margin        {:top 20 :bottom 20 :left 20 :right 20}
-         :nodeWidth     10
-         :nodePadding   60
-         :linkCurvature @curve
-         :iterations    64
-         :link          {:stroke @link-stroke}}
-        (when @tooltip? [:> Tooltip])]])))
+      [:> Sankey
+       {:width         500 :height 400
+        :node          (partial complex-node 500 @node-fill @node-stroke)
+        :data          @data
+        :margin        {:top 20 :bottom 20 :left 20 :right 20}
+        :nodeWidth     10
+        :nodePadding   60
+        :linkCurvature @curve
+        :iterations    64
+        :link          {:stroke @link-stroke}}
+       (when @tooltip? [:> Tooltip])])))
 
 
-;; endregion
+;; endregion-pane
+
+
+(defn component
+  "the chart to draw, taking cues from the settings of the configuration panel
+
+  the component creates its own ID (a random-uuid) to hold the local state. This way multiple charts
+  can be placed inside the same outer container/composite
+
+  ---
+
+  - data : (atom) any data shown by the component's ui
+  - container-id : (string) name of the container this chart is inside of
+  "
+  ([data component-id]
+   [component data component-id ""])
+
+
+  ([data component-id container-id]
+
+   (let [id (r/atom nil)]
+
+     (fn []
+       (when (nil? @id)
+         (reset! id component-id)
+         (ui-utils/init-widget @id (config @id))
+         (ui-utils/dispatch-local @id [:container] container-id))
+
+       ;(log/info "component" @id)
+
+       [c/configurable-chart
+        :data data
+        :id @id
+        :config-panel config-panel
+        :component component-panel]))))
+
 
 (comment
   (def widget-id "sankey-chart-demo")

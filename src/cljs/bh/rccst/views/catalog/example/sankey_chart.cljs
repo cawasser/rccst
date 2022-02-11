@@ -10,7 +10,7 @@
 
 (defn example []
   (let [widget-id "sankey-chart-demo"]
-    [example/example
+    [example/component-example
      :title "Sankey Chart"
      :widget-id widget-id
      :description "A simple Sankey Chart built using [Recharts](https://recharts.org/en-US/api/Sankey)
@@ -20,9 +20,7 @@
 ***AND*** the source for the [custom node](https://github.com/recharts/recharts/blob/master/demo/component/DemoSankeyNode.tsx) to understand how this all works."
 
      :data (r/atom utils/dag-data)
-     :config (chart/config widget-id)
-     :data-panel utils/dag-data-panel
-     :config-panel chart/config-panel
-     :component-panel chart/component
+     :component chart/component
+     :component-id (str widget-id "/sankey-chart")
      :source-code chart/source-code]))
 
