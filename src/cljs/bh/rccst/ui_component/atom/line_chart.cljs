@@ -22,8 +22,9 @@
   - widget-id : (string) id of the widget,
   "
   [widget-id]
-  (-> utils/default-config
+  (-> ui-utils/default-pub-sub
     (merge
+      utils/default-config
       {:type      "line-chart"
        :tab-panel {:value     (keyword widget-id "config")
                    :data-path [:widgets (keyword widget-id) :tab-panel]}
@@ -31,7 +32,9 @@
        :line-uv   {:include true :stroke "#8884d8" :fill "#8884d8"}
        :line-pv   {:include true :stroke "#82ca9d" :fill "#82ca9d"}
        :line-amt  {:include false :stroke "#ff00ff" :fill "#ff00ff"}})
-    (assoc-in [:x-axis :dataKey] :name)))
+    (assoc-in [:x-axis :dataKey] :name)
+    (assoc-in [:pub] :name)
+    (assoc-in [:sub] :something-selected)))
 
 
 (defn- line-config [widget-id label path position]
@@ -73,7 +76,8 @@
 
 
 (defn- component-panel [data widget-id]
-  (let [line-uv? (ui-utils/subscribe-local widget-id [:line-uv :include])
+  (let [container (ui-utils/subscribe-local widget-id [:container])
+        line-uv? (ui-utils/subscribe-local widget-id [:line-uv :include])
         line-uv-stroke (ui-utils/subscribe-local widget-id [:line-uv :stroke])
         line-uv-fill (ui-utils/subscribe-local widget-id [:line-uv :fill])
         line-pv? (ui-utils/subscribe-local widget-id [:line-pv :include])
@@ -87,6 +91,11 @@
 
     (fn []
       ;(log/info "component-panel" widget-id)
+
+      (ui-utils/publish-to-container @container [widget-id :brush] @brush?)
+      (ui-utils/publish-to-container @container [widget-id :line-uv] @line-uv?)
+      (ui-utils/publish-to-container @container [widget-id :line-pv] @line-pv?)
+      (ui-utils/publish-to-container @container [widget-id :line-amt] @line-amt?)
 
       [:> LineChart {:width 400 :height 400 :data @data}
 
@@ -122,22 +131,27 @@
   ---
 
   - data : (atom) any data shown by the component's ui
+  - container-id : (string) name of the container this chart is inside of
   "
-  [data]
+  ([data]
+   [component data ""])
 
-  (let [id (r/atom nil)]
 
-    (fn []
-      (when (nil? @id)
-        (do
-          (reset! id (ui-utils/component-id))
-          (ui-utils/init-widget @id (config @id))))
+  ([data container-id]
 
-      (log/info "component" @id)
+   (let [id (r/atom nil)]
 
-      [c/configurable-chart
-       :data data
-       :id @id
-       :config-panel config-panel
-       :component component-panel])))
+     (fn []
+       (when (nil? @id)
+         (reset! id (ui-utils/component-id))
+         (ui-utils/init-widget @id (config @id))
+         (ui-utils/dispatch-local @id [:container] container-id))
+
+       (log/info "component" @id)
+
+       [c/configurable-chart
+        :data data
+        :id @id
+        :config-panel config-panel
+        :component component-panel]))))
 

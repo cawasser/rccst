@@ -10,14 +10,26 @@
 (defn component-example [& {:keys [title
                                    description
                                    data
+                                   widget-id
                                    component
                                    source-code]}]
+
+  (log/info "component-example" title widget-id)
+
+  (ui-utils/init-container widget-id)
 
   (acu/demo
     title
     description
-    [component data]
+    [component data widget-id]
     source-code))
+
+
+(comment
+
+  (ui-utils/init-widget "dummy" ui-utils/default-container)
+
+  ())
 
 
 (defn example [& {:keys [title widget-id description
