@@ -1,6 +1,7 @@
 (ns bh.rccst.ui-component.atom.treemap-chart
   (:require [taoensso.timbre :as log]
             [re-com.core :as rc]
+            [reagent.core :as r]
 
             ["recharts" :refer [Treemap]]
             [bh.rccst.ui-component.utils :as ui-utils]
@@ -15,14 +16,16 @@
 (def default-fill "#8884d8")
 
 (defn config [widget-id]
-  {:tab-panel {:value     (keyword widget-id "config")
-               :data-path [:widgets (keyword widget-id) :tab-panel]}
-   :isAnimationActive true
-   :ratio  {:include true
-            :n 4
-            :d 3}
-   :stroke  {:color "#ffffff"}
-   :fill {:color "#8884d8"}})
+  (merge
+    ui-utils/default-pub-sub
+    {:tab-panel {:value     (keyword widget-id "config")
+                 :data-path [:widgets (keyword widget-id) :tab-panel]}
+     :isAnimationActive true
+     :ratio  {:include true
+              :n 4
+              :d 3}
+     :stroke  {:color "#ffffff"}
+     :fill {:color "#8884d8"}}))
 
 ;; endregion
 
@@ -40,7 +43,7 @@
                           [utils/slider-config widget-id 1 10 [:ratio :d]]]]]])
 
 
-(defn config-panel
+(defn- config-panel
   "the panel of configuration controls
 
   ---
@@ -77,7 +80,7 @@
                     :fill "#8884d8"}])
 
 
-(defn component
+(defn- component-panel
   "the chart to draw, taking cues from the settings of the configuration panel
 
   ---
@@ -92,16 +95,48 @@
         fill (ui-utils/subscribe-local widget-id [:fill :color])]
 
     (fn []
-      [c/chart
-       [:> Treemap
-        {:width 400 :height 400
-         :data @data
-         :dataKey "size"
-         :isAnimationActive @isAnimationActive?
-         :ratio default-ratio
-         :stroke @stroke
-         :fill @fill}]])))
+      [:> Treemap
+       {:width 400 :height 400
+        :data @data
+        :dataKey "size"
+        :isAnimationActive @isAnimationActive?
+        :ratio default-ratio
+        :stroke @stroke
+        :fill @fill}])))
 
+
+(defn component
+  "the chart to draw, taking cues from the settings of the configuration panel
+
+  the component creates its own ID (a random-uuid) to hold the local state. This way multiple charts
+  can be placed inside the same outer container/composite
+
+  ---
+
+  - data : (atom) any data shown by the component's ui
+  - container-id : (string) name of the container this chart is inside of
+  "
+  ([data component-id]
+   [component data component-id ""])
+
+
+  ([data component-id container-id]
+
+   (let [id (r/atom nil)]
+
+     (fn []
+       (when (nil? @id)
+         (reset! id component-id)
+         (ui-utils/init-widget @id (config @id))
+         (ui-utils/dispatch-local @id [:container] container-id))
+
+       ;(log/info "component" @id)
+
+       [c/configurable-chart
+        :data data
+        :id @id
+        :config-panel config-panel
+        :component component-panel]))))
 
 (comment
   (def widget-id "treemap-chart-demo")
