@@ -11,6 +11,12 @@
             [woolybear.ad.layout :as layout]))
 
 
+(def local-config {:brush     false
+                   :line-uv   {:include true :stroke "#8884d8" :fill "#8884d8"}
+                   :line-pv   {:include true :stroke "#82ca9d" :fill "#82ca9d"}
+                   :line-amt  {:include false :stroke "#ff00ff" :fill "#ff00ff"}})
+
+
 (defn- config
   "constructs the configuration data structure for the widget. This is specific to this being a
   line-chart component.
@@ -27,11 +33,8 @@
       utils/default-config
       {:type      "line-chart"
        :tab-panel {:value     (keyword widget-id "config")
-                   :data-path [:widgets (keyword widget-id) :tab-panel]}
-       :brush     false
-       :line-uv   {:include true :stroke "#8884d8" :fill "#8884d8"}
-       :line-pv   {:include true :stroke "#82ca9d" :fill "#82ca9d"}
-       :line-amt  {:include false :stroke "#ff00ff" :fill "#ff00ff"}})
+                   :data-path [:widgets (keyword widget-id) :tab-panel]}}
+      local-config)
     (assoc-in [:x-axis :dataKey] :name)
     (assoc-in [:pub] :name)
     (assoc-in [:sub] :something-selected)))
@@ -75,8 +78,37 @@
               [utils/boolean-config widget-id ":brush?" [:brush]]]])
 
 
+;;;;;;;;;;;;;
+;
+; these more into ui-utils...
+;
+;;;;;;;;;;;;;
+;; region
+(defn build-subs [widget-id local-config]
+  ; 1. process-locals
+  ; 2. map over the result and call ui-utils/subscribe-local
+  ; 3. put the result into a hash-map
+  ())
+
+
+
+(defn resolve-sub [sub]
+  (deref sub))
+
+
+(comment
+  (ui-utils/process-locals [] nil {:brush     false
+                                   :line-uv   {:include true :stroke "#8884d8" :fill "#8884d8"}
+                                   :line-pv   {:include true :stroke "#82ca9d" :fill "#82ca9d"}
+                                   :line-amt  {:include false :stroke "#ff00ff" :fill "#ff00ff"}})
+
+  ())
+;;endregion
+
 (defn- component-panel [data widget-id]
   (let [container (ui-utils/subscribe-local widget-id [:container])
+        subscription (build-subs widget-id local-config)
+
         line-uv? (ui-utils/subscribe-local widget-id [:line-uv :include])
         line-uv-stroke (ui-utils/subscribe-local widget-id [:line-uv :stroke])
         line-uv-fill (ui-utils/subscribe-local widget-id [:line-uv :fill])
@@ -101,7 +133,7 @@
 
        (utils/standard-chart-components widget-id)
 
-       (when @brush? [:> Brush])
+       (when (resolve-sub brush?) [:> Brush]) ;(when @brush? [:> Brush])
 
        (when @line-uv? [:> Line {:type              "monotone" :dataKey :uv
                                  :isAnimationActive @isAnimationActive?
@@ -133,21 +165,21 @@
   - data : (atom) any data shown by the component's ui
   - container-id : (string) name of the container this chart is inside of
   "
-  ([data]
-   [component data ""])
+  ([data component-id]
+   [component data component-id ""])
 
 
-  ([data container-id]
+  ([data component-id container-id]
 
    (let [id (r/atom nil)]
 
      (fn []
        (when (nil? @id)
-         (reset! id (ui-utils/component-id))
+         (reset! id component-id)
          (ui-utils/init-widget @id (config @id))
          (ui-utils/dispatch-local @id [:container] container-id))
 
-       (log/info "component" @id)
+       ;(log/info "component" @id)
 
        [c/configurable-chart
         :data data

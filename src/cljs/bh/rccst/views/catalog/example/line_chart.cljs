@@ -15,6 +15,7 @@
      :description "A simple Line Chart built using [Recharts](https://recharts.org/en-US)"
      :data (r/atom utils/tabular-data)
      :component chart/component
+     :component-id "line-chart-demo/line-chart"
      :source-code chart/source-code]))
 
 

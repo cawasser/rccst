@@ -12,6 +12,7 @@
                                    data
                                    widget-id
                                    component
+                                   component-id
                                    source-code]}]
 
   (log/info "component-example" title widget-id)
@@ -21,15 +22,8 @@
   (acu/demo
     title
     description
-    [component data widget-id]
+    [component data component-id widget-id]
     source-code))
-
-
-(comment
-
-  (ui-utils/init-widget "dummy" ui-utils/default-container)
-
-  ())
 
 
 (defn example [& {:keys [title widget-id description

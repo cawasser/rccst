@@ -246,7 +246,7 @@
     (re-frame/dispatch-sync path)))
 
 
-(defn- process-locals
+(defn process-locals
   "recursively walks through the 'tree' of values and computes the 'path vector' to reach each
   value.
 
@@ -615,26 +615,26 @@
         c (keyword :widgets container-id)
         blackboard (keyword container-id "blackboard")]
 
-    (log/info "init-container" container-id id c blackboard)
+    ;(log/info "init-container" container-id id c blackboard)
 
     (re-frame/reg-sub
       c
       :<- [:widgets]
       (fn [widgets _]
-        (log/info "init-container sub" c id)
+        ;(log/info "init-container sub" c id)
         (get widgets id)))
 
     (re-frame/reg-sub
       blackboard
       :<- [c]
       (fn [c _]
-        (log/info "init-container sub" c blackboard)
+        ;(log/info "init-container sub" c blackboard)
         (get c :blackboard)))
 
     (re-frame/reg-event-db
       blackboard
       (fn [db [_ component-path new-val]]
-        (log/info "container-event " blackboard id component-path new-val)
+        ;(log/info "container-event " blackboard id component-path new-val)
         (update-in db [:widgets id :blackboard]
           assoc component-path new-val)))
 
@@ -672,7 +672,7 @@
   "
   [container-id component-path new-val]
 
-  (log/info "publish-to-container-local" container-id component-path new-val)
+  ;(log/info "publish-to-container-local" container-id component-path new-val)
 
   (let [p (keyword container-id "blackboard")]
     (log/info "publish-to-container" container-id component-path new-val p)
