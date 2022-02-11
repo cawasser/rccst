@@ -14,15 +14,15 @@
 
 (defn catalog []
   [:div
-   ;[area-chart/example]
-   ;[bar-chart/example]
-   [line-chart/simple-example]])
-   ;[pie-chart/example]
-   ;[colored-pie-chart/example]
-   ;[scatter-chart/example]
-   ;[funnel-chart/example]
-   ;[treemap-chart/example]
-   ;[sankey-chart/example]
-   ;[radar-chart/example]])
+   [area-chart/example]
+   [bar-chart/example]
+   [line-chart/simple-example]
+   [pie-chart/example]
+   [colored-pie-chart/example]
+   [scatter-chart/example]
+   [funnel-chart/example]
+   [treemap-chart/example]
+   [sankey-chart/example]
+   [radar-chart/example]])
 
 
