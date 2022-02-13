@@ -1,6 +1,5 @@
 (ns bh.rccst.views.catalog.example.scatter-chart
-  (:require [reagent.core :as r]
-            [taoensso.timbre :as log]
+  (:require [taoensso.timbre :as log]
 
             [bh.rccst.ui-component.atom.scatter-chart :as chart]
             [bh.rccst.ui-component.molecule.example :as example]
@@ -13,7 +12,7 @@
             :title "Scatter Chart"
             :widget-id widget-id
             :description "A simple Scatter Chart built using [Recharts]()"
-            :data (r/atom utils/triplet-data)
+            :data chart/sample-data
             :config (chart/config widget-id)
             :data-panel utils/tabular-data-panel
             :config-panel chart/config-panel

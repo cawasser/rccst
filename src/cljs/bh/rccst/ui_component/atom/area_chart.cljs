@@ -1,10 +1,15 @@
 (ns bh.rccst.ui-component.atom.area-chart
-  (:require [bh.rccst.ui-component.atom.chart.utils :as utils]
-            ["recharts" :refer [AreaChart Area Brush]]
-            [bh.rccst.ui-component.atom.chart.wrapper :as c]
-            [bh.rccst.ui-component.utils :as ui-utils]
+  (:require [taoensso.timbre :as log]
             [re-com.core :as rc]
-            [taoensso.timbre :as log]))
+            [reagent.core :as r]
+            ["recharts" :refer [AreaChart Area Brush]]
+
+            [bh.rccst.ui-component.atom.chart.utils :as utils]
+            [bh.rccst.ui-component.atom.chart.wrapper :as c]
+            [bh.rccst.ui-component.utils :as ui-utils]))
+
+
+(def sample-data (r/atom (mapv (fn [d] (assoc d :d (rand-int 5000))) utils/tabular-data)))
 
 
 (defn config

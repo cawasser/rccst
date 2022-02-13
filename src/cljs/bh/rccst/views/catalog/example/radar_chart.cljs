@@ -1,5 +1,5 @@
 (ns bh.rccst.views.catalog.example.radar-chart
-  (:require [reagent.core :as r]
+  (:require [taoensso.timbre :as log]
 
             [bh.rccst.ui-component.atom.radar-chart :as chart]
             [bh.rccst.ui-component.molecule.example :as example]
@@ -11,7 +11,7 @@
             :title "Radar Chart"
             :widget-id widget-id
             :description "A simple Radar Chart built using [Recharts]()"
-            :data (r/atom (mapv (fn [d] (assoc d :d (rand-int 5000))) utils/tabular-data))
+            :data chart/sample-data
             :config (chart/config widget-id)
             :data-panel utils/tabular-data-panel
             :config-panel chart/config-panel

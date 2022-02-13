@@ -1,12 +1,16 @@
 (ns bh.rccst.ui-component.atom.scatter-chart
   (:require [re-com.core :as rc]
             [taoensso.timbre :as log]
+            [reagent.core :as r]
 
             ["recharts" :refer [ScatterChart Scatter Brush]]
 
             [bh.rccst.ui-component.atom.chart.wrapper :as c]
             [bh.rccst.ui-component.utils :as ui-utils]
             [bh.rccst.ui-component.atom.chart.utils :as utils]))
+
+
+(def sample-data (r/atom utils/triplet-data))
 
 
 (defn config [widget-id]

@@ -1,5 +1,5 @@
 (ns bh.rccst.views.catalog.example.pie-chart
-  (:require [reagent.core :as r]
+  (:require [taoensso.timbre :as log]
 
             [bh.rccst.ui-component.atom.pie-chart :as chart]
             [bh.rccst.ui-component.molecule.example :as example]
@@ -15,7 +15,7 @@
       they are all the same color.
 
 > See `Colored Pie Chart` for an example of how to get the slices to be different colors."
-     :data (r/atom utils/paired-data)
+     :data chart/sample-data
      :config (chart/config widget-id)
      :data-panel utils/tabular-data-panel
      :config-panel chart/config-panel

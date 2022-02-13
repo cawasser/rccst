@@ -9,6 +9,9 @@
             [bh.rccst.ui-component.atom.chart.wrapper :as c]))
 
 
+(def sample-data (r/atom (mapv (fn [d] (assoc d :d (rand-int 5000))) utils/tabular-data)))
+
+
 (defn config
   "constructs the configuration data structure for the widget. This is specific to this being a bar-chart component.
 

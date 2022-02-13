@@ -1,7 +1,6 @@
 (ns bh.rccst.views.catalog.example.funnel-chart
-  (:require [reagent.core :as r]
-            [reagent.ratom :refer-macros [reaction]]
-            [taoensso.timbre :as log]
+  (:require [taoensso.timbre :as log]
+
             [bh.rccst.ui-component.atom.funnel-chart :as chart]
             [bh.rccst.ui-component.molecule.example :as example]
             [bh.rccst.ui-component.atom.chart.utils :as utils]))
@@ -13,7 +12,7 @@
             :title "Funnel Chart"
             :widget-id widget-id
             :description "A simple Funnel Chart built using [Recharts]()"
-            :data (r/atom utils/paired-data)
+            :data chart/sample-data
             :config (chart/config widget-id)
             :data-panel utils/tabular-data-panel
             :config-panel chart/config-panel

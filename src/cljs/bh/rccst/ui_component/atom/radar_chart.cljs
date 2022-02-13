@@ -2,9 +2,14 @@
   (:require [taoensso.timbre :as log]
             ["recharts" :refer [BarChart Bar Brush]]
             [re-com.core :as rc]
+            [reagent.core :as r]
+
             [bh.rccst.ui-component.utils :as ui-utils]
             [bh.rccst.ui-component.atom.chart.utils :as utils]
             [bh.rccst.ui-component.atom.chart.wrapper :as c]))
+
+(def sample-data (r/atom []))
+
 
 (defn config
       "constructs the configuration data structure for the widget. This is specific to this being a bar-chart component.

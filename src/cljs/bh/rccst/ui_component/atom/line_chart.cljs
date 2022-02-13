@@ -11,6 +11,9 @@
             [woolybear.ad.layout :as layout]))
 
 
+(def sample-data (r/atom utils/tabular-data))
+
+
 (def local-config {:brush     false
                    :line-uv   {:include true :stroke "#8884d8" :fill "#8884d8"}
                    :line-pv   {:include true :stroke "#82ca9d" :fill "#82ca9d"}

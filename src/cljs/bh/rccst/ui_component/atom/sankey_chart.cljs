@@ -9,6 +9,9 @@
             [taoensso.timbre :as log]))
 
 
+(def sample-data (r/atom utils/dag-data))
+
+
 (defn config [widget-id]
 
   (merge
@@ -37,7 +40,6 @@
                :children [[utils/text-config widget-id ":curve" [:link :curve]]
                           [utils/slider-config widget-id 0 1 0.1 [:link :curve]]]]]])
 
-;; region ; component-panel
 
 (def source-code '[:> Sankey
                    {:width         500 :height 400
@@ -102,9 +104,6 @@
         :iterations    64
         :link          {:stroke @link-stroke}}
        (when @tooltip? [:> Tooltip])])))
-
-
-;; endregion-pane
 
 
 (defn component

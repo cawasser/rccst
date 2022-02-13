@@ -1,9 +1,8 @@
 (ns bh.rccst.views.catalog.example.colored-pie-chart
-  (:require [reagent.core :as r]
+  (:require [taoensso.timbre :as log]
 
             [bh.rccst.ui-component.atom.colored-pie-chart :as chart]
-            [bh.rccst.ui-component.molecule.example :as example]
-            [bh.rccst.ui-component.atom.chart.utils :as utils]))
+            [bh.rccst.ui-component.molecule.example :as example]))
 
 
 
@@ -16,7 +15,7 @@
 inside the `Pie` element.
 
 > Note: Recharts supports embedding `Cell` in a variety of other chart types, for example BarChart"
-     :data (r/atom utils/paired-data)
+     :data chart/sample-data
      :component chart/component
      :component-id (str widget-id "/colored-pie-chart")
      :source-code chart/source-code]))

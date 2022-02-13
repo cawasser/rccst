@@ -20,6 +20,9 @@
                 "#0000ff" "#009999" "#ff00ff"])}))
 
 
+(def sample-data (r/atom utils/paired-data))
+
+
 (defn- color-anchors [widget-id]
   [:<>
    (doall

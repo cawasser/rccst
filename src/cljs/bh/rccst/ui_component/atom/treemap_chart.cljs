@@ -9,7 +9,8 @@
             [bh.rccst.ui-component.atom.chart.wrapper :as c]))
 
 
-; region ; configuration params
+(def sample-data (r/atom utils/hierarchy-data))
+
 
 (def default-ratio (/ 4 3))
 (def default-stroke "#ffffff")
@@ -26,11 +27,6 @@
               :d 3}
      :stroke  {:color "#ffffff"}
      :fill {:color "#8884d8"}}))
-
-;; endregion
-
-
-;; region ; config and component panels
 
 
 (defn- ratio-config [widget-id]
@@ -66,8 +62,6 @@
                :children [[ratio-config widget-id]
                           [utils/color-config-text widget-id ":stroke" [:stroke :color]]
                           [utils/color-config-text widget-id ":fill" [:fill :color]]]]]])
-
-;; endregion
 
 
 (def source-code `[:> Treemap
@@ -137,6 +131,7 @@
         :id @id
         :config-panel config-panel
         :component component-panel]))))
+
 
 (comment
   (def widget-id "treemap-chart-demo")
