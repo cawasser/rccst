@@ -8,7 +8,7 @@
             [bh.rccst.ui-component.atom.chart.utils :as utils]
             [bh.rccst.ui-component.atom.chart.wrapper :as c]))
 
-(def sample-data (r/atom []))
+(def sample-data (r/atom (mapv (fn [d] (assoc d :d (rand-int 5000))) utils/tabular-data)))
 
 
 (defn config
