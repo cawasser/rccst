@@ -20,22 +20,24 @@
 
 
 (defn- time-slider [id current-time-t]
-  [:div {:style {:display     :flex
-                 :align-items :center}}
+  [:div.control {:style {:display     :flex
+                 :position :relative}}
+                 ;:align-items :center}}
    ;:width       "50%"}}
 
-   [:div.slidecontainer {:style {:width "50%" :margin-right "20px"}}
-    [:input#myRange.slider
-     {:style     {:width "100%"}
-      :type      "range" :min "0" :max "9" :value @current-time-t
-      :on-change #(do
-                    ;(log/info "time-slider" (js/parseInt (-> % .-target .-value)))
-                    (re-frame/dispatch-sync [::events/update-time id (js/parseInt (-> % .-target .-value))]))}]]
+     [:div.slidecontainer {:style {:width "100%" :height "40px" :z-index "1" :margin-right "20px"}}
+      [:input#myRange.slider
+       {:style     {:height "40px" :width "100%"}
+        :type      "range" :min "0" :max "9" :value @current-time-t
+        :on-change #(do
+                      ;(log/info "time-slider" (js/parseInt (-> % .-target .-value)))
+                      (re-frame/dispatch-sync [::events/update-time id (js/parseInt (-> % .-target .-value))]))}]]
 
-   [:h2 {:style {:width "50%"}}
-    (str (coerce/to-date
-           (cljs-time/plus ls/starting-date-time
-             (cljs-time/hours (or @current-time-t 0)))))]])
+     [:div.textdate {:style {:position :absolute :top "60px" :z-index "2"}}
+       [:h2 {:style {:width "100%" :text-align :center}}
+        (str (coerce/to-date
+               (cljs-time/plus ls/starting-date-time
+                 (cljs-time/hours (or @current-time-t 0)))))]]])
 
 
 (defn- projection-control [globe-id projections]
@@ -115,19 +117,19 @@
                                             :overflow     :hidden}
                                       style)}
        [:> SplitPane {:split       "vertical" :minSize 250
-                      :defaultSize 500
+                      :defaultSize 400
                       :style       {:position "relative"}}
-        [:> SplitPane {:split "horizontal" :minSize 150}
+        ;[:> SplitPane {:split "horizontal" :minSize 150}
          [:div
           [:h1 id]
           [time-slider id time-t]]
 
-         [:div
-          [sensor-visibility-control id sensors selected-sensors colors]
-          [aoi-visibility-control id aois selected-aois]]]
+         ;[:div
+         ; [sensor-visibility-control id sensors selected-sensors colors]
+         ; [aoi-visibility-control id aois selected-aois]]
 
 
-        [:div {:style {:width "100%" :height "100%"}}
+        [:div {:style {:width "100%" :height "95%"}}
          [projection-control id projection]
          [g/globe {:id         id
                    :min-max    :max
@@ -143,7 +145,7 @@
 (defn example []
       (acu/demo "Nasa Worldwind Globe"
         [globe {:id "globe-1"
-                  :style {:width "100%" :height "600px"}}]))
+                  :style {:width "100%" :height "700px"}}]))
 
 
 

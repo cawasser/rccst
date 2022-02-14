@@ -1,17 +1,26 @@
 (ns bh.rccst.ui-component.atom.line-chart
-  (:require [taoensso.timbre :as log]
-            [reagent.core :as r]
-            [re-com.core :as rc]
+  (:require [bh.rccst.ui-component.atom.chart.utils :as utils]
+            [bh.rccst.ui-component.atom.chart.wrapper :as c]
+            [bh.rccst.ui-component.utils :as ui-utils]
 
             ["recharts" :refer [LineChart Line Brush]]
-            [woolybear.ad.layout :as layout]
+            [re-com.core :as rc]
 
-            [bh.rccst.ui-component.utils :as ui-utils]
-            [bh.rccst.ui-component.atom.chart.utils :as utils]
-            [bh.rccst.ui-component.atom.chart.wrapper :as c]))
+            [reagent.core :as r]
+            [taoensso.timbre :as log]
+            [woolybear.ad.layout :as layout]))
 
 
-(defn config
+(def sample-data (r/atom utils/tabular-data))
+
+
+(def local-config {:brush     false
+                   :line-uv   {:include true :stroke "#8884d8" :fill "#8884d8"}
+                   :line-pv   {:include true :stroke "#82ca9d" :fill "#82ca9d"}
+                   :line-amt  {:include false :stroke "#ff00ff" :fill "#ff00ff"}})
+
+
+(defn- config
   "constructs the configuration data structure for the widget. This is specific to this being a
   line-chart component.
 
@@ -22,15 +31,16 @@
   - widget-id : (string) id of the widget,
   "
   [widget-id]
-  (-> utils/default-config
+  (-> ui-utils/default-pub-sub
     (merge
-      {:tab-panel {:value     (keyword widget-id "config")
-                   :data-path [:widgets (keyword widget-id) :tab-panel]}
-       :brush     false
-       :line-uv   {:include true :stroke "#8884d8" :fill "#8884d8"}
-       :line-pv   {:include true :stroke "#82ca9d" :fill "#82ca9d"}
-       :line-amt  {:include false :stroke "#ff00ff" :fill "#ff00ff"}})
-    (assoc-in [:x-axis :dataKey] :name)))
+      utils/default-config
+      {:type      "line-chart"
+       :tab-panel {:value     (keyword widget-id "config")
+                   :data-path [:widgets (keyword widget-id) :tab-panel]}}
+      local-config)
+    (assoc-in [:x-axis :dataKey] :name)
+    (assoc-in [:pub] :name)
+    (assoc-in [:sub] :something-selected)))
 
 
 (defn- line-config [widget-id label path position]
@@ -53,6 +63,8 @@
   "
   [data widget-id]
 
+  ;(log/info "config-panel" widget-id)
+
   [rc/v-box :src (rc/at)
    :gap "10px"
    :width "100%"
@@ -69,8 +81,38 @@
               [utils/boolean-config widget-id ":brush?" [:brush]]]])
 
 
+;;;;;;;;;;;;;
+;
+; these more into ui-utils...
+;
+;;;;;;;;;;;;;
+;; region
+(defn build-subs [widget-id local-config]
+  ; 1. process-locals
+  ; 2. map over the result and call ui-utils/subscribe-local
+  ; 3. put the result into a hash-map
+  ())
+
+
+
+(defn resolve-sub [sub]
+  (deref sub))
+
+
+(comment
+  (ui-utils/process-locals [] nil {:brush     false
+                                   :line-uv   {:include true :stroke "#8884d8" :fill "#8884d8"}
+                                   :line-pv   {:include true :stroke "#82ca9d" :fill "#82ca9d"}
+                                   :line-amt  {:include false :stroke "#ff00ff" :fill "#ff00ff"}})
+
+  ())
+;;endregion
+
 (defn- component-panel [data widget-id]
-  (let [line-uv? (ui-utils/subscribe-local widget-id [:line-uv :include])
+  (let [container (ui-utils/subscribe-local widget-id [:container])
+        subscription (build-subs widget-id local-config)
+
+        line-uv? (ui-utils/subscribe-local widget-id [:line-uv :include])
         line-uv-stroke (ui-utils/subscribe-local widget-id [:line-uv :stroke])
         line-uv-fill (ui-utils/subscribe-local widget-id [:line-uv :fill])
         line-pv? (ui-utils/subscribe-local widget-id [:line-pv :include])
@@ -83,11 +125,18 @@
         brush? (ui-utils/subscribe-local widget-id [:brush])]
 
     (fn []
+      ;(log/info "component-panel" widget-id)
+
+      (ui-utils/publish-to-container @container [widget-id :brush] @brush?)
+      (ui-utils/publish-to-container @container [widget-id :line-uv] @line-uv?)
+      (ui-utils/publish-to-container @container [widget-id :line-pv] @line-pv?)
+      (ui-utils/publish-to-container @container [widget-id :line-amt] @line-amt?)
+
       [:> LineChart {:width 400 :height 400 :data @data}
 
        (utils/standard-chart-components widget-id)
 
-       (when @brush? [:> Brush])
+       (when (resolve-sub brush?) [:> Brush]) ;(when @brush? [:> Brush])
 
        (when @line-uv? [:> Line {:type              "monotone" :dataKey :uv
                                  :isAnimationActive @isAnimationActive?
@@ -111,31 +160,33 @@
 (defn component
   "the chart to draw, taking cues from the settings of the configuration panel
 
+  the component creates its own ID (a random-uuid) to hold the local state. This way multiple charts
+  can be placed inside the same outer container/composite
+
   ---
 
   - data : (atom) any data shown by the component's ui
-  - widget-id : (string) unique identifier for this specific widget instanc
+  - container-id : (string) name of the container this chart is inside of
   "
-  [data widget-id]
-  (let [open? (r/atom false)
-        config-key (keyword widget-id "config")
-        data-key (keyword widget-id "data")
-        tab-panel (keyword widget-id "tab-panel")
-        selected-tab (keyword widget-id "tab-panel.value")
-        chart-events [config-key data-key tab-panel selected-tab]]
+  ([data component-id]
+   [component data component-id ""])
 
-    (fn [data widget-id]
-      [c/configurable-chart open?
-       [layout/centered {:extra-classes :is-one-third}
-        [rc/h-box :src (rc/at)
-         :gap "5px"
-         :children (conj
-                     (if @open?
-                       [[layout/centered {:extra-classes :is-one-third}
-                         [ui-utils/chart-config
-                          chart-events
-                          (utils/tabular-data-panel data)
-                          [config-panel data widget-id]]]]
-                       [])
-                     [component-panel data widget-id])]]])))
+
+  ([data component-id container-id]
+
+   (let [id (r/atom nil)]
+
+     (fn []
+       (when (nil? @id)
+         (reset! id component-id)
+         (ui-utils/init-widget @id (config @id))
+         (ui-utils/dispatch-local @id [:container] container-id))
+
+       ;(log/info "component" @id)
+
+       [c/configurable-chart
+        :data data
+        :id @id
+        :config-panel config-panel
+        :component component-panel]))))
 

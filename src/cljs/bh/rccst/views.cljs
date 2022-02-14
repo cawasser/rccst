@@ -10,8 +10,8 @@
             [bh.rccst.ui-component.navbar :as navbar]
             [bh.rccst.views.catalog :as catalog]
             [bh.rccst.views.molecules :as molecules]
+            [bh.rccst.views.templates :as templates]
             [bh.rccst.views.technologies :as tech]
-            [bh.rccst.views.widget-ish :as widget-ish]
             [bh.rccst.views.giants :as giants]
 
             [bh.rccst.ui-component.tabbed-pane.utils :as tab-utils]))
@@ -19,6 +19,7 @@
 
 (def main-navbar [[:app-bar/atoms "'Atoms'"]
                   [:app-bar/molecules "'Molecules'"]
+                  [:app-bar/templates "'Templates'"]
                   [:app-bar/tech "Technologies"]
                   [:app-bar/giants "'Giants'"]])
 
@@ -49,6 +50,9 @@
 
           [tab-panel/sub-panel {:panel-id :app-bar/atoms}
            [catalog/page]]
+
+          [tab-panel/sub-panel {:panel-id :app-bar/templates}
+           [templates/page]]
 
           [tab-panel/sub-panel {:panel-id :app-bar/tech}
            [tech/page]]

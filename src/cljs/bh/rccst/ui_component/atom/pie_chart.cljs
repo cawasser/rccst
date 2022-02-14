@@ -1,6 +1,7 @@
 (ns bh.rccst.ui-component.atom.pie-chart
   (:require [taoensso.timbre :as log]
             [re-com.core :as rc]
+            [reagent.core :as r]
 
             ["recharts" :refer [PieChart Pie]]
             [bh.rccst.ui-component.utils :as ui-utils]
@@ -8,6 +9,7 @@
             [bh.rccst.ui-component.atom.chart.wrapper :as c]))
 
 
+(def sample-data (r/atom utils/paired-data))
 
 
 (defn config [widget-id]

@@ -1,35 +1,42 @@
-(ns  bh.rccst.views.catalog.example.radio-button
+(ns bh.rccst.views.catalog.example.radio-button
   (:require [woolybear.ad.catalog.utils :as acu]
-            [reagent.ratom :as ratom]
-            [re-com.core   :as rc]))
 
+            [reagent.ratom :as ratom]
+            [re-com.core :as rc]))
+
+(defn component [disabled? color]
+      (doall (for [c ["red" "green" "blue"]]
+                  ^{:key c}
+                  [rc/radio-button :src (rc/at)
+                   :disabled? disabled?
+                   :label c
+                   :value c
+                   :model color
+                   :label-style (if (= c @color) {:color       c
+                                                  :font-weight "bold"})
+                   :on-change #(reset! color %)])))
+
+(defn config-panel [disabled?]
+      [rc/v-box :src (rc/at)
+       :gap "10px"
+       :style {:min-width        "150px"
+               :padding          "15px"
+               :border-top       "1px solid #DDD"
+               :background-color "#f7f7f7"}
+       :children [[rc/title :src (rc/at) :level :level3 :label "Interactive Parameters" :style {:margin-top "0"}]
+                  [rc/checkbox :src (rc/at)
+                   :label [:code ":disabled?"]
+                   :model disabled?
+                   :on-change (fn [val]
+                                  (reset! disabled? val))]]])
 
 (defn example []
-      (let [disabled?   (ratom/atom false)
+      (let [disabled? (ratom/atom false)
             color (ratom/atom "green")]
            (fn []
                (acu/demo "Radio Button"
-                           [rc/v-box :src (rc/at)
-                            :gap      "10px"
-                            :children [(doall (for [c ["red" "green" "blue"]]
-                                                   ^{:key c}
-                                                   [rc/radio-button :src (rc/at)
-                                                    :disabled? disabled?
-                                                    :label       c
-                                                    :value       c
-                                                    :model       color
-                                                    :label-style (if (= c @color) {:color       c
-                                                                                   :font-weight "bold"})
-                                                    :on-change   #(reset! color %)]))
-                                       [rc/v-box :src (rc/at)
-                                        :gap "10px"
-                                        :style {:min-width        "150px"
-                                                :padding          "15px"
-                                                :border-top       "1px solid #DDD"
-                                                :background-color "#f7f7f7"}
-                                        :children [[rc/title :src (rc/at) :level :level3 :label "Interactive Parameters" :style {:margin-top "0"}]
-                                                   [rc/checkbox :src (rc/at)
-                                                    :label [:code ":disabled?"]
-                                                    :model disabled?
-                                                    :on-change (fn [val]
-                                                                   (reset! disabled? val))]]]]]))))
+                         [rc/h-box :src (rc/at)
+                          :gap "10px"
+                          :children [(config-panel disabled?)
+                                     (component disabled? color)]]))))
+

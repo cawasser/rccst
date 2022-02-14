@@ -4,13 +4,14 @@
             [bh.rccst.ui-component.atom.chart.utils :as utils]
             [bh.rccst.ui-component.atom.chart.wrapper :as c]
             [re-com.core :as rc]
+            [reagent.core :as r]
             [woolybear.ad.buttons :as buttons]
             [woolybear.ad.icons :as icons]
             [taoensso.timbre :as log]))
 
 
+(def sample-data (r/atom utils/paired-data))
 
-; region ; configuration params
 
 (defn config [widget-id]
         (merge utils/default-config
@@ -19,10 +20,6 @@
                 :colors (zipmap (map :name utils/paired-data)
                                 ["#8884d8" "#83a6ed" "#8dd1e1"
                                  "#82ca9d" "#a4de6c" "#d7e62b"])}))
-;(assoc-in [:x-axis :dataKey] :x)
-;(assoc-in [:y-axis :dataKey] :y)
-;(assoc-in [:fill :color] "#8884d8"))))
-
 (defn- color-anchors [widget-id]
        [:<>
         (doall
@@ -30,9 +27,6 @@
                    ^{:key id}[utils/color-config-text widget-id id [:colors id] :right-above])
                @(ui-utils/subscribe-local widget-id [:colors])))])
 
-;; endregion
-
-;; region ; config and component panels
 
 (defn config-panel
        "the panel of configuration controls
@@ -88,5 +82,4 @@
                         @data))
                     [:> LabelList {:position :right :fill "#000000" :stroke "none" :dataKey :name}]]]])))
 
-;; endregion
 

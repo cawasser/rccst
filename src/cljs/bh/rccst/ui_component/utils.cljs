@@ -1,11 +1,23 @@
 (ns bh.rccst.ui-component.utils
-  (:require [day8.re-frame.tracing :refer-macros [fn-traced]]
-            [re-frame.core :as re-frame]
+  (:require [bh.rccst.ui-component.navbar :as navbar]
+            [cljs-uuid-utils.core :as uuid]
+            [day8.re-frame.tracing :refer-macros [fn-traced]]
             [re-com.core :as rc]
-            [taoensso.timbre :as log]
+            [re-frame.core :as re-frame]
 
-            [bh.rccst.ui-component.navbar :as navbar]
+            [taoensso.timbre :as log]
             [woolybear.packs.tab-panel :as tab-panel]))
+
+
+(def default-pub-sub {:pub [] :sub [] :container ""})
+
+
+(def default-composite {:blackboard {}})
+
+
+(defn component-id []
+  (-> (uuid/make-random-uuid)
+    uuid/uuid-string))
 
 
 (defn chart-config [[config data panel tab] data-panel config-panel]
@@ -17,15 +29,15 @@
 
      [rc/scroller
       :v-scroll :auto
-      :height   "500px"
-      :child    [tab-panel/tab-panel {:extra-classes             :rccst
-                                      :subscribe-to-selected-tab [tab]}
+      :height "500px"
+      :child [tab-panel/tab-panel {:extra-classes             :rccst
+                                   :subscribe-to-selected-tab [tab]}
 
-                 [tab-panel/sub-panel {:panel-id config}
-                  config-panel]
+              [tab-panel/sub-panel {:panel-id config}
+               config-panel]
 
-                 [tab-panel/sub-panel {:panel-id data}
-                  data-panel]]]]))
+              [tab-panel/sub-panel {:panel-id data}
+               data-panel]]]]))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -234,7 +246,7 @@
     (re-frame/dispatch-sync path)))
 
 
-(defn- process-locals
+(defn process-locals
   "recursively walks through the 'tree' of values and computes the 'path vector' to reach each
   value.
 
@@ -307,6 +319,7 @@
                          (str "." (clojure.string/join "." (->> more
                                                              (map name)
                                                              (map #(clojure.string/replace % #" " "")))))))))
+
 
 (defn- compute-deps [widget-id a more]
   (if more
@@ -558,6 +571,9 @@
 
   "
   [widget-id [a & more :as value-path] new-val]
+
+  (log/info "dispatch-local" widget-id value-path new-val)
+
   (let [p (keyword widget-id (str (name a)
                                (when more
                                  (str "." (clojure.string/join "." (->> more
@@ -566,6 +582,101 @@
     (log/info "dispatch-local" widget-id value-path new-val p)
     (re-frame/dispatch [p new-val])))
 
+
+;; endregion
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;
+; Composite State Support
+;
+;    suggest (re)reading https://day8.github.io/re-frame/subscriptions/
+;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; region
+
+(re-frame/reg-event-db
+  :events/init-container
+  (fn-traced [db [_ container]]
+    ;(log/info ":events/init-container" container init-vals)
+    (if (get-in db [:widgets container])
+      (do
+        ;(log/info ":events/init-container // already exists")
+        db)
+      (do
+        ;(log/info ":events/init-container // adding")
+        (assoc-in db [:widgets container] default-composite)))))
+
+
+(defn init-container [container-id]
+  (let [id (keyword container-id)
+        c (keyword :widgets container-id)
+        blackboard (keyword container-id "blackboard")]
+
+    ;(log/info "init-container" container-id id c blackboard)
+
+    (re-frame/reg-sub
+      c
+      :<- [:widgets]
+      (fn [widgets _]
+        ;(log/info "init-container sub" c id)
+        (get widgets id)))
+
+    (re-frame/reg-sub
+      blackboard
+      :<- [c]
+      (fn [c _]
+        ;(log/info "init-container sub" c blackboard)
+        (get c :blackboard)))
+
+    (re-frame/reg-event-db
+      blackboard
+      (fn [db [_ component-path new-val]]
+        ;(log/info "container-event " blackboard id component-path new-val)
+        (update-in db [:widgets id :blackboard]
+          assoc component-path new-val)))
+
+    (re-frame/dispatch-sync [:events/init-container id])))
+
+
+(defn subscribe-to-container [container-id component-path]
+  (re-frame/subscribe [(keyword container-id "blackboard") component-path]))
+
+
+(defn publish-to-container
+  "
+> NOTE: the re-frame event-handlers ***MUST*** be created beforehand, using [[init-widget]]
+
+  ---
+
+  - `container-id` : (string) name of the widget, typically a guid, but it can be any string you'd like
+  - `component-path : (vector of keys [keywords or string]) the 'key' for the item that is being publised
+  - `new-val` : (any) the new value to store at the given path
+
+  `value-path` functions exactly like any other re-frame subscription, but relative to the
+  `[:widgets <widget-id>]` in the overall `app-db`
+
+  It is destructured as follows:
+
+  | var        | type       | description                         |
+  |:-----------|:----------:|:------------------------------------|
+  | `a`        | keyword    | the (primary) value to subscribe to |
+  | `& more`   | keyword(s) | any additional parts to the path    |
+
+   ---
+
+   #### EXAMPLES
+
+  "
+  [container-id component-path new-val]
+
+  ;(log/info "publish-to-container-local" container-id component-path new-val)
+
+  (let [p (keyword container-id "blackboard")]
+    (log/info "publish-to-container" container-id component-path new-val p)
+    (re-frame/dispatch [p component-path new-val])))
 
 
 ;; endregion
@@ -598,6 +709,7 @@
 
 
 ;; endregion
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1049,3 +1161,23 @@
 
 
   ())
+
+
+
+; how do we publish things to a "container"?
+(comment
+  (do (def db {:widgets {:container {:blackboard {}}}})
+      (def container-id :container)
+      (def component-path [:chart-1 :data]))
+
+  (get-in db [:widgets container-id :blackboard])
+
+  (-> db
+    (update-in [:widgets container-id :blackboard]
+      assoc [:chart-1 :data] "new-val")
+    (update-in [:widgets container-id :blackboard]
+      assoc [:chart-2 :data] "another-val"))
+
+  ())
+
+

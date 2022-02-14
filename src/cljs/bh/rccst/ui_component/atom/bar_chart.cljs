@@ -2,9 +2,14 @@
   (:require [taoensso.timbre :as log]
             ["recharts" :refer [BarChart Bar Brush]]
             [re-com.core :as rc]
+            [reagent.core :as r]
+
             [bh.rccst.ui-component.utils :as ui-utils]
             [bh.rccst.ui-component.atom.chart.utils :as utils]
             [bh.rccst.ui-component.atom.chart.wrapper :as c]))
+
+
+(def sample-data (r/atom (mapv (fn [d] (assoc d :d (rand-int 5000))) utils/tabular-data)))
 
 
 (defn config
@@ -15,8 +20,9 @@
   - widget-id : (string) id of the widget, in this specific case
   "
   [widget-id]
-  (-> utils/default-config
+  (-> ui-utils/default-pub-sub
     (merge
+      utils/default-config
       {:tab-panel {:value     (keyword widget-id "config")
                    :data-path [:widgets (keyword widget-id) :tab-panel]}
        :brush     false
@@ -65,7 +71,7 @@
 (def source-code "dummy Bar Chart Code")
 
 
-(defn component
+(defn- component-panel
   "the chart to draw, taking cues from the settings of the configuration panel
 
   ---
@@ -74,7 +80,9 @@
   - widget-id : (string) unique identifier for this specific widget
   "
   [data widget-id]
-  (let [bar-uv? (ui-utils/subscribe-local widget-id [:bar-uv :include])
+  (let [container (ui-utils/subscribe-local widget-id [:container])
+
+        bar-uv? (ui-utils/subscribe-local widget-id [:bar-uv :include])
         bar-uv-fill (ui-utils/subscribe-local widget-id [:bar-uv :fill])
         bar-uv-stackId (ui-utils/subscribe-local widget-id [:bar-uv :stackId])
         bar-pv? (ui-utils/subscribe-local widget-id [:bar-pv :include])
@@ -90,29 +98,62 @@
         brush? (ui-utils/subscribe-local widget-id [:brush])]
 
     (fn []
-      [c/chart
-       [:> BarChart {:width 400 :height 400 :data @data}
+      [:> BarChart {:width 400 :height 400 :data @data}
 
-        (utils/standard-chart-components widget-id)
+       (utils/standard-chart-components widget-id)
 
-        (when @brush? [:> Brush])
+       (when @brush? [:> Brush])
 
-        (when @bar-uv? [:> Bar (merge {:type              "monotone" :dataKey :uv
-                                       :isAnimationActive @isAnimationActive?
-                                       :fill              @bar-uv-fill}
-                                 (when (seq @bar-uv-stackId) {:stackId @bar-uv-stackId}))])
-
-        (when @bar-pv? [:> Bar (merge {:type              "monotone" :dataKey :pv
-                                       :isAnimationActive @isAnimationActive?
-                                       :fill              @bar-pv-fill}
-                                 (when (seq @bar-pv-stackId) {:stackId @bar-pv-stackId}))])
-
-        (when @bar-amt? [:> Bar (merge {:type              "monotone" :dataKey :amt
-                                        :isAnimationActive @isAnimationActive?
-                                        :fill              @bar-amt-fill}
-                                  (when (seq @bar-amt-stackId) {:stackId @bar-amt-stackId}))])
-
-        (when @bar-d? [:> Bar (merge {:type              "monotone" :dataKey :d
+       (when @bar-uv? [:> Bar (merge {:type              "monotone" :dataKey :uv
                                       :isAnimationActive @isAnimationActive?
-                                      :fill              @bar-d-fill}
-                                (when (seq @bar-d-stackId) {:stackId @bar-d-stackId}))])]])))
+                                      :fill              @bar-uv-fill}
+                                (when (seq @bar-uv-stackId) {:stackId @bar-uv-stackId}))])
+
+       (when @bar-pv? [:> Bar (merge {:type              "monotone" :dataKey :pv
+                                      :isAnimationActive @isAnimationActive?
+                                      :fill              @bar-pv-fill}
+                                (when (seq @bar-pv-stackId) {:stackId @bar-pv-stackId}))])
+
+       (when @bar-amt? [:> Bar (merge {:type              "monotone" :dataKey :amt
+                                       :isAnimationActive @isAnimationActive?
+                                       :fill              @bar-amt-fill}
+                                 (when (seq @bar-amt-stackId) {:stackId @bar-amt-stackId}))])
+
+       (when @bar-d? [:> Bar (merge {:type              "monotone" :dataKey :d
+                                     :isAnimationActive @isAnimationActive?
+                                     :fill              @bar-d-fill}
+                               (when (seq @bar-d-stackId) {:stackId @bar-d-stackId}))])])))
+
+
+(defn component
+  "the chart to draw, taking cues from the settings of the configuration panel
+
+  the component creates its own ID (a random-uuid) to hold the local state. This way multiple charts
+  can be placed inside the same outer container/composite
+
+  ---
+
+  - data : (atom) any data shown by the component's ui
+  - container-id : (string) name of the container this chart is inside of
+  "
+  ([data component-id]
+   [component data component-id ""])
+
+
+  ([data component-id container-id]
+
+   (let [id (r/atom nil)]
+
+     (fn []
+       (when (nil? @id)
+         (reset! id component-id)
+         (ui-utils/init-widget @id (config @id))
+         (ui-utils/dispatch-local @id [:container] container-id))
+
+       ;(log/info "component" @id)
+
+       [c/configurable-chart
+        :data data
+        :id @id
+        :config-panel config-panel
+        :component component-panel]))))
