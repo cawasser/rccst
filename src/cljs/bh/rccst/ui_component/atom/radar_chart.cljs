@@ -2,10 +2,21 @@
   (:require [taoensso.timbre :as log]
             ["recharts" :refer [RadarChart PolarGrid PolarAngleAxis PolarRadiusAxis Radar]]
             [re-com.core :as rc]
+            [reagent.core :as r]
             [bh.rccst.ui-component.utils :as ui-utils]
             [bh.rccst.ui-component.atom.chart.utils :as utils]
             [bh.rccst.ui-component.atom.chart.wrapper :as c]))
-;
+
+(def sample-data (r/atom [{:subject "Math" :A 120 :B 110 :fullMark 150}
+           {:subject "Chinese" :A 98 :B 130 :fullMark 150}
+           {:subject "English" :A 100 :B 110 :fullMark 150}
+           {:subject "History" :A 77 :B 81 :fullMark 150}
+           {:subject "Economics" :A 99 :B 140 :fullMark 150}
+           {:subject "Literature" :A 98 :B 105 :fullMark 150}]))
+
+(def source-code "dummy Radar Chart Code")
+
+
 (defn config
       "constructs the configuration data structure for the widget. This is specific to this being a bar-chart component.
 
@@ -61,20 +72,20 @@
                   [utils/boolean-config widget-id ":brush?" [:brush]]]])
 
 
-(def source-code "dummy Radar Chart Code")
-
 (defn component
 
       [data widget]
 
       (fn []
           [c/chart
-           [:> RadarChart {:cx "50%" :cy "50%" :outerRadius "80%" :data data}
-            [:> PolarGrid]
-            [:> PolarAngleAxis {:dataKey "subject"}]
-            [:> PolarRadiusAxis]
-            [:> Radar {:name "Mike" :dataKey "A" :stroke "#8884d8" :fill "#8884d8" :fillOpacity "{0.6}"}]]])
-      )
+                 [:div
+                  [:> RadarChart {:width 400 :height 400 :cx "50%" :cy "50%" :outerRadius "80%" :data @data}
+                   [:> PolarGrid]
+                   [:> PolarAngleAxis {:dataKey :subject}]
+                   [:> PolarRadiusAxis]
+                   [:> Radar {:name "Mike" :dataKey :A :stroke "#8884d8" :fill "#8884d8" :fillOpacity 0.6}]
+                   [:> Radar {:name "Sally" :dataKey :B :stroke "#82ca9d" :fill "#82ca9d" :fillOpacity 0.6}]]]]
+      ))
 
 
 ;comment (
