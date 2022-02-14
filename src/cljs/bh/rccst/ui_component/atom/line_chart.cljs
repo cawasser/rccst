@@ -106,7 +106,10 @@
 ;
 ;;;;;;;;;;;;;
 ;; region
-(defn build-subs [widget-id local-config]
+(defn build-subs [chart-id local-config]
+      (-> (ui-utils/process-locals [] nil local-config)
+          (map #(ui-utils/subscribe-locals chart-id %))
+          (into {}))
   ; 1. process-locals
   ; 2. map over the result and call ui-utils/subscribe-local
   ; 3. put the result into a hash-map
