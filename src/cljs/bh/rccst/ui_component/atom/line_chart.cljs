@@ -127,7 +127,19 @@
   ())
 ;;endregion
 
-(defn- component-panel [data chart-id]
+(defn- component-panel
+  "the chart to draw, taking cues from the settings of the configuration panel
+
+  the component creates its own ID (a random-uuid) to hold the local state. This way multiple charts
+  can be placed inside the same outer container/composite
+
+  ---
+
+  - data : (atom) any data shown by the component's ui
+  - chart-id : (string) unique identifier for this chart instance within this container
+  - container-id : (string) name of the container this chart is inside of
+  "
+  [data chart-id]
   (let [container (ui-utils/subscribe-local chart-id [:container])
         subscription (build-subs chart-id local-config)
 
@@ -177,17 +189,6 @@
 
 
 (defn component
-  "the chart to draw, taking cues from the settings of the configuration panel
-
-  the component creates its own ID (a random-uuid) to hold the local state. This way multiple charts
-  can be placed inside the same outer container/composite
-
-  ---
-
-  - data : (atom) any data shown by the component's ui
-  - chart-id : (string) unique identifier for this chart instance within this container
-  - container-id : (string) name of the container this chart is inside of
-  "
   ([data chart-id]
    [component data chart-id ""])
 
