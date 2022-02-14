@@ -9,18 +9,37 @@
             [bh.rccst.ui-component.atom.chart.wrapper :as c]))
 
 
-(def sample-data (r/atom utils/hierarchy-data))
+(def sample-data
+  "the Treemap Chart works best with \"hierarchical data\" so we return the hierarchy-data from utils"
+  (r/atom utils/hierarchy-data))
 
 
 (def default-ratio (/ 4 3))
 (def default-stroke "#ffffff")
 (def default-fill "#8884d8")
 
-(defn config [widget-id]
+(defn config
+  "constructs the configuration panel for the chart's configurable properties. This is specific to
+  this being a line-chart component (see [[local-config]]).
+
+  Merges together the configuration needed for:
+
+  1. line charts
+  2. pub/sub between components of a container
+  3. `default-config` for all Rechart-based types
+  4. the `tab-panel` for view/edit configuration properties and data
+  5. sets properties of the default-config (local config properties are just set inside [[local-config]])
+  6. sets meta-data for properties this component publishes (`:pub`) or subscribes (`:sub`)
+
+  ---
+
+  - chart-id : (string) unique id of the chart
+  "
+  [chart-id]
   (merge
     ui-utils/default-pub-sub
-    {:tab-panel {:value     (keyword widget-id "config")
-                 :data-path [:widgets (keyword widget-id) :tab-panel]}
+    {:tab-panel {:value     (keyword chart-id "config")
+                 :data-path [:widgets (keyword chart-id) :tab-panel]}
      :isAnimationActive true
      :ratio  {:include true
               :n 4
@@ -29,14 +48,21 @@
      :fill {:color "#8884d8"}}))
 
 
-(defn- ratio-config [widget-id]
+(defn- ratio-config
+  "builds the ui components needed to configure the `ration` property of the treemap
+
+> See also:
+>
+> [Recharts/treemap](https://recharts.org/en-US/api/Treemap)
+"
+  [chart-id]
   [rc/h-box :src (rc/at)
    :gap "5px"
-   :children [[utils/boolean-config widget-id ":ratio" [:ratio :include]]
+   :children [[utils/boolean-config chart-id ":ratio" [:ratio :include]]
               [rc/v-box :src (rc/at)
                :gap "5px"
-               :children [[utils/slider-config widget-id 1 10 [:ratio :n]]
-                          [utils/slider-config widget-id 1 10 [:ratio :d]]]]]])
+               :children [[utils/slider-config chart-id 1 10 [:ratio :n]]
+                          [utils/slider-config chart-id 1 10 [:ratio :d]]]]]])
 
 
 (defn- config-panel
@@ -44,9 +70,10 @@
 
   ---
 
-  - config : (atom) holds all the configuration settings made by the user
+  - data : (atom) data to display (may be used by the standard configuration components for thins like axes, etc.
+  - chart-id : (string) unique identifier for this chart instance
   "
-  [_ widget-id]
+  [_ chart-id]
 
   [rc/v-box :src (rc/at)
    :gap "10px"
@@ -55,13 +82,13 @@
    :style {:padding          "15px"
            :border-top       "1px solid #DDD"
            :background-color "#f7f7f7"}
-   :children [[utils/isAnimationActive widget-id]
+   :children [[utils/isAnimationActive chart-id]
               [rc/line :src (rc/at) :size "2px"]
               [rc/v-box :src (rc/at)
                :gap "10px"
-               :children [[ratio-config widget-id]
-                          [utils/color-config-text widget-id ":stroke" [:stroke :color]]
-                          [utils/color-config-text widget-id ":fill" [:fill :color]]]]]])
+               :children [[ratio-config chart-id]
+                          [utils/color-config-text chart-id ":stroke" [:stroke :color]]
+                          [utils/color-config-text chart-id ":fill" [:fill :color]]]]]])
 
 
 (def source-code `[:> Treemap
@@ -82,11 +109,11 @@
   - data : (atom) any data shown by the component's ui
   - widget-id : (string) unique identifier for this widget instance
   "
-  [data widget-id]
+  [data chart-id]
   (let [;ratio (ui-utils/subscribe-local widget-id [:ratio :include])
-        isAnimationActive? (ui-utils/subscribe-local widget-id [:isAnimationActive])
-        stroke (ui-utils/subscribe-local widget-id [:stroke :color])
-        fill (ui-utils/subscribe-local widget-id [:fill :color])]
+        isAnimationActive? (ui-utils/subscribe-local chart-id [:isAnimationActive])
+        stroke (ui-utils/subscribe-local chart-id [:stroke :color])
+        fill (ui-utils/subscribe-local chart-id [:fill :color])]
 
     (fn []
       [:> Treemap
@@ -108,19 +135,20 @@
   ---
 
   - data : (atom) any data shown by the component's ui
+  - chart-id : (string) unique identifier for this chart instance within this container
   - container-id : (string) name of the container this chart is inside of
   "
-  ([data component-id]
-   [component data component-id ""])
+  ([data chart-id]
+   [component data chart-id ""])
 
 
-  ([data component-id container-id]
+  ([data chart-id container-id]
 
    (let [id (r/atom nil)]
 
      (fn []
        (when (nil? @id)
-         (reset! id component-id)
+         (reset! id chart-id)
          (ui-utils/init-widget @id (config @id))
          (ui-utils/dispatch-local @id [:container] container-id))
 
@@ -134,6 +162,6 @@
 
 
 (comment
-  (def widget-id "treemap-chart-demo")
+  (def chart-id "treemap-chart-demo")
 
   ())

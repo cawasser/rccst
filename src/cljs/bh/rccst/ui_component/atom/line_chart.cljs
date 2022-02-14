@@ -78,7 +78,7 @@
   ---
 
   - data : (atom) data to display (may be used by the standard configuration components for thins like axes, etc.
-  - config : (atom) holds all the configuration settings made by the user
+  - chart-id : (string) unique identifier for this chart instance
   "
   [data chart-id]
 
