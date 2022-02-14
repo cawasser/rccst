@@ -61,9 +61,36 @@
                    {:name "Page B" :uv 3000 :pv 1398 :amt 2210}
                    {:name "Page C" :uv 2000 :pv 9800 :amt 2290}
                    {:name "Page D" :uv 2780 :pv 3908 :amt 2000}
-                   {:name "Page E" :uv 1890 :pv 4800 :amt 2181}
-                   {:name "Page F" :uv 2390 :pv 3800 :amt 2500}
+                   {:name "Page A" :uv 1890 :pv 4800 :amt 2181}
+                   {:name "Page A" :uv 2390 :pv 3800 :amt 2500}
                    {:name "Page G" :uv 3490 :pv 4300 :amt 2100}])
+
+(def tabular-data-a [{:id "Page A" :name "Page A" :uv 4000 :pv 2400 :amt 2400}
+                     {:id "Page B" :name "Page B" :uv 3000 :pv 1398 :amt 2210}
+                     {:id "Page C" :name "Page C" :uv 2000 :pv 9800 :amt 2290}
+                     {:id "Page D" :name "Page D" :uv 2780 :pv 3908 :amt 2000}
+                     {:id "Page E" :name "Page E" :uv 1890 :pv 4800 :amt 2181}
+                     {:id "Page F" :name "Page F" :uv 2390 :pv 3800 :amt 2500}
+                     {:id "Page G" :name "Page G" :uv 3490 :pv 4300 :amt 2100}])
+
+(def tabular-data-b {:metadata {:type :tabular
+                                :id :name
+                                :fields {:name :string :uv :number :pv :number :amt :number :owner :string}}
+                     :data [{:name "Page A" :uv 4000 :pv 2400 :amt 2400}
+                            {:name "Page B" :uv 3000 :pv 1398 :amt 2210}
+                            {:name "Page C" :uv 2000 :pv 9800 :amt 2290}
+                            {:name "Page D" :uv 2780 :pv 3908 :amt 2000}
+                            {:name "Page E" :uv 1890 :pv 4800 :amt 2181}
+                            {:name "Page F" :uv 2390 :pv 3800 :amt 2500}
+                            {:name "Page G" :uv 3490 :pv 4300 :amt 2100}]})
+
+(def some-other-tabular [{:id "Page A" :a 4000 :b 2400 :c 2400}
+                         {:id "Page B" :a 3000 :b 1398 :c 2210}
+                         {:id "Page C" :a 2000 :b 9800 :c 2290}
+                         {:id "Page D" :a 2780 :b 3908 :c 2000}
+                         {:id "Page E" :a 1890 :b 4800 :c 2181}
+                         {:id "Page F" :a 2390 :b 3800 :c 2500}
+                         {:id "Page G" :a 3490 :b 4300 :c 2100}])
 
 (def paired-data [{:name "Group A" :value 400}
                   {:name "Group B" :value 300}
@@ -167,8 +194,7 @@
                        {:name "Page-Click"}
                        {:name "Detail-Favourite"}
                        {:name "Lost"}]
-               :links [
-                       {:source 0 :target 1 :value 3728.3}
+               :links [{:source 0 :target 1 :value 3728.3}
                        {:source 0 :target 2 :value 354170}
                        {:source 2 :target 3 :value 62429}
                        {:source 2 :target 4 :value 291741}]})

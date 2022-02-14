@@ -27,6 +27,7 @@
 > [Recharts/line-chart](https://recharts.org/en-US/api/LineChart)
   "
   {:brush     false
+   ; HERE
    :line-uv   {:include true :stroke "#8884d8" :fill "#8884d8"}
    :line-pv   {:include true :stroke "#82ca9d" :fill "#82ca9d"}
    :line-amt  {:include false :stroke "#ff00ff" :fill "#ff00ff"}})
@@ -94,7 +95,8 @@
               [rc/line :src (rc/at) :size "2px"]
               [rc/h-box :src (rc/at)
                :gap "10px"
-               :children [[line-config chart-id "line (uv)" [:line-uv] :above-right]
+               :children [; HERE
+                          [line-config chart-id "line (uv)" [:line-uv] :above-right]
                           [line-config chart-id "line (pv)" [:line-pv] :above-right]
                           [line-config chart-id "line (amt)" [:line-amt] :above-center]]]
               [utils/boolean-config chart-id ":brush?" [:brush]]]])
@@ -143,6 +145,7 @@
   (let [container (ui-utils/subscribe-local chart-id [:container])
         subscription (build-subs chart-id local-config)
 
+        ; HERE
         line-uv? (ui-utils/subscribe-local chart-id [:line-uv :include])
         line-uv-stroke (ui-utils/subscribe-local chart-id [:line-uv :stroke])
         line-uv-fill (ui-utils/subscribe-local chart-id [:line-uv :fill])
@@ -169,6 +172,7 @@
 
        (when (resolve-sub brush?) [:> Brush]) ;(when @brush? [:> Brush])
 
+       ; HERE
        (when @line-uv? [:> Line {:type              "monotone" :dataKey :uv
                                  :isAnimationActive @isAnimationActive?
                                  :stroke            @line-uv-stroke
