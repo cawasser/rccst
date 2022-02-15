@@ -7,14 +7,11 @@
 
 (defn example []
       (let [widget-id "area-chart-demo"]
-           [example/example
+           [example/component-example
             :title "Area Chart"
             :widget-id widget-id
             :description "A simple Area Chart built using [Recharts]()"
             :data chart/sample-data
             :config (chart/config widget-id)
-            :data-panel utils/tabular-data-panel
-            :config-panel chart/config-panel
-            :component-panel chart/component
-            :source-code chart/source-code]))
-
+            :component chart/component
+            :component-id "area-chart-demo/area-chart"]))

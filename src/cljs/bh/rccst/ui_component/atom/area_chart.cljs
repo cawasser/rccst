@@ -33,15 +33,16 @@
   - chart-id : (string) unique id of the chart
   "
   [chart-id]
-  (-> utils/default-config
+  (-> ui-utils/default-pub-sub
     (merge
+      utils/default-config
       {:tab-panel {:value     (keyword chart-id "config")
                    :data-path [:widgets (keyword chart-id) :tab-panel]}
        :brush     false
        :area-uv   {:include true :stroke "#8884d8" :fill "#8884d8" :stackId ""}
        :area-pv   {:include true :stroke "#82ca9d" :fill "#82ca9d" :stackId ""}
        :area-amt  {:include true :stroke "#5974ab" :fill "#5974ab" :stackId ""}
-       :area-d    {:include true :stroke "#3db512" :fill "#3db512" :stackId ""}})
+       :area-d    {:include true :stroke "#c77ed2" :fill "#c77ed2" :stackId ""}})
     (assoc-in [:x-axis :dataKey] :name)))
 
 
@@ -72,7 +73,7 @@
               [utils/text-config chart-id ":stackId" (conj path :stackId)]]])
 
 
-(defn config-panel
+(defn- config-panel
   "the panel of configuration controls
 
   ---
@@ -102,7 +103,7 @@
 (def source-code "dummy area Chart Code")
 
 
-(defn component
+(defn- component-panel
   "the chart to draw, taking cues from the settings of the configuration panel
 
   ---
@@ -131,7 +132,7 @@
         brush? (ui-utils/subscribe-local chart-id [:brush])]
 
     (fn []
-      [c/chart
+      ;[c/chart
        [:> AreaChart {:width 400 :height 400 :data @data}
 
         (utils/standard-chart-components chart-id)
@@ -160,4 +161,37 @@
                                         :isAnimationActive @isAnimationActive?
                                         :stroke            @area-d-stroke
                                         :fill              @area-d-fill}
-                                  (when (seq @area-d-stackId) {:stackId @area-d-stackId}))])]])))
+                                  (when (seq @area-d-stackId) {:stackId @area-d-stackId}))])])))
+
+(defn component
+      "the chart to draw, taking cues from the settings of the configuration panel
+
+      the component creates its own ID (a random-uuid) to hold the local state. This way multiple charts
+      can be placed inside the same outer container/composite
+
+      ---
+
+      - data : (atom) any data shown by the component's ui
+      - container-id : (string) name of the container this chart is inside of
+      "
+      ([data component-id]
+       [component data component-id ""])
+
+
+      ([data component-id container-id]
+
+       (let [id (r/atom nil)]
+
+         (fn [](when (nil? @id)
+                     (reset! id component-id)
+                     (ui-utils/init-widget @id (config @id))
+                     (ui-utils/dispatch-local @id [:container] container-id))
+
+             ;(log/info "component" @id)
+
+             [c/configurable-chart
+              :data data
+              :id @id
+              :config-panel config-panel
+              :component component-panel]))))
+

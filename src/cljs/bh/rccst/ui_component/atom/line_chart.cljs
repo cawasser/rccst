@@ -108,7 +108,7 @@
 ;; region
 (defn build-subs [chart-id local-config]
       (-> (ui-utils/process-locals [] nil local-config)
-          (map #(ui-utils/subscribe-locals chart-id %))
+          (map #(ui-utils/subscribe-local chart-id %))
           (into {}))
   ; 1. process-locals
   ; 2. map over the result and call ui-utils/subscribe-local
