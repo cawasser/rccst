@@ -15,7 +15,7 @@
                                    component-id
                                    source-code]}]
 
-  (log/info "component-example" title widget-id)
+  ;(log/info "component-example" title widget-id)
 
   (ui-utils/init-container widget-id)
 

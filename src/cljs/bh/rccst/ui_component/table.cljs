@@ -1,6 +1,7 @@
 (ns bh.rccst.ui-component.table
   (:require [taoensso.timbre :as log]
-            [re-com.core :as rc]))
+            [re-com.core :as rc]
+            [reagent.core :as r]))
 
 
 (defn table-column-headers [data rows width height]
@@ -18,10 +19,12 @@
 
 (defn table [& {:keys [data max-rows width height cell-style-fn
                        on-click-row-fn row-line-color]}]
-  [rc/simple-v-table :src (rc/at)
-   :model (get @data :data)
-   :columns (table-column-headers @data 5 (or width 100) (or height))
-   :max-rows (or max-rows (count (get @data :data)))
-   :table-row-line-color (or row-line-color "#00fff0")
-   :on-click-row (or on-click-row-fn #())
-   :cell-style (or cell-style-fn #())])
+  (let [d (get @data :data)]
+    ;(log/info "table" d)
+    [rc/simple-v-table :src (rc/at)
+     :model (r/atom d)
+     :columns (table-column-headers d 5 (or width 100) (or height))
+     :max-rows (or max-rows (count d))
+     :table-row-line-color (or row-line-color "#00fff0")
+     :on-click-row (or on-click-row-fn #())
+     :cell-style (or cell-style-fn #())]))

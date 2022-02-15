@@ -21,7 +21,7 @@
 
 
 (defn chart-config [[config data panel tab] data-panel config-panel]
-  (log/info "chart-config" config data panel tab)
+  ;(log/info "chart-config" config data panel tab)
   (let [data-or-config [[config "config"]
                         [data "data"]]]
     [:div.chart-config {:style {:width "100%"}}
@@ -50,11 +50,12 @@
 ;; region
 
 
-(def default-stroke-fill-colors ["#8884d8" "#82ca9d" "#8884d8"
-                                 "#83a6ed" "#8dd1e1"
-                                 "#a4de6c" "#d7e62b"
+; see colors at https://htmlcolors.com
+(def default-stroke-fill-colors ["#8884d8" "#ffc107" "#82ca9d"
+                                 "#ff00ff" "#00e5ff" "#4db6ac"
+                                 "#83a6ed" "#8dd1e1" "#a4de6c"
                                  "#ffff00" "#ff0000" "#00ff00"
-                                 "#0000ff" "#009999" "#ff00ff"])
+                                 "#0000ff" "#009999" "#d7e62b"])
 
 
 (defn get-color [idx]
@@ -63,7 +64,7 @@
 
 
 (defn hex->rgba
-  "convert a color in hexidcemial (stirng) into a hash-map of RGBA
+  "convert a color in hexadecimal (string) into a hash-map of RGBA
 
   ---
 
@@ -422,7 +423,7 @@
     (re-frame/reg-event-db
       w
       (fn [db [_ new-val]]
-        (log/info "event" w id)
+        ;(log/info "event" w id)
         (assoc-in db [:widgets id] new-val)))))
 
 
@@ -461,7 +462,7 @@
     (re-frame/reg-event-db
       p
       (fn [db [_ new-val]]
-        (log/info "event" p new-val)
+        ;(log/info "event" p new-val)
         (assoc-in db
           (apply conj [:widgets (keyword widget-id)] value-path)
           new-val)))))
@@ -585,14 +586,14 @@
   "
   [widget-id [a & more :as value-path] new-val]
 
-  (log/info "dispatch-local" widget-id value-path new-val)
+  ;(log/info "dispatch-local" widget-id value-path new-val)
 
   (let [p (keyword widget-id (str (name a)
                                (when more
                                  (str "." (clojure.string/join "." (->> more
                                                                      (map name)
                                                                      (map #(clojure.string/replace % #" " ""))))))))]
-    (log/info "dispatch-local" widget-id value-path new-val p)
+    ;(log/info "dispatch-local" widget-id value-path new-val p)
     (re-frame/dispatch [p new-val])))
 
 
@@ -708,7 +709,7 @@
   ;(log/info "publish-to-container-local" container-id component-path new-val)
 
   (let [p (keyword container-id "blackboard")]
-    (log/info "publish-to-container" container-id component-path new-val p)
+    ;(log/info "publish-to-container" container-id component-path new-val p)
     (re-frame/dispatch [p component-path new-val])))
 
 

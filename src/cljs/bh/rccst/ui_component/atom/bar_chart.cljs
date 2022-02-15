@@ -1,18 +1,53 @@
 (ns bh.rccst.ui-component.atom.bar-chart
-  (:require [taoensso.timbre :as log]
+  (:require [bh.rccst.ui-component.atom.chart.utils :as utils]
             ["recharts" :refer [BarChart Bar Brush]]
+            [bh.rccst.ui-component.atom.chart.wrapper :as c]
+            [bh.rccst.ui-component.utils :as ui-utils]
+
             [re-com.core :as rc]
             [reagent.core :as r]
-
-            [bh.rccst.ui-component.utils :as ui-utils]
-            [bh.rccst.ui-component.atom.chart.utils :as utils]
-            [bh.rccst.ui-component.atom.chart.wrapper :as c]))
+            [taoensso.timbre :as log]))
 
 
 (def sample-data
   "the Bar Chart works best with \"tabular data\" so we return the tabular-data from utils,
   and we mix-in a fourth column just to show how it can be done"
-  (r/atom (mapv (fn [d] (assoc d :d (rand-int 5000))) utils/tabular-data)))
+  (let [data (get utils/tabular-data-b :data)
+        fields (get-in utils/tabular-data-b [:metadata :fields])]
+    (-> utils/tabular-data-b
+      (assoc
+        :data
+        (mapv (fn [d] (assoc d :d (rand-int 5000))) data))
+      (assoc-in
+        [:metadata :fields]
+        (assoc fields :d :number))
+      r/atom)))
+
+
+(defn local-config
+  "provides both the definition and the initial default values for various properties that
+  allow user to customize the visualization of the chart.
+
+  ---
+
+   - data : (atom) atom containing the data and metadata for this chart
+
+> See Also:
+>
+> [Recharts/line-chart](https://recharts.org/en-US/api/LineChart)
+> [tabular-data]()
+  "
+  [data]
+  (merge
+    {:brush false}
+    (->> (get-in @data [:metadata :fields])
+      (filter (fn [[k v]] (= :number v)))
+      keys
+      (map-indexed (fn [idx a]
+                     {a {:include true
+                         :fill    (ui-utils/get-color idx)
+                         :stackId ""}}))
+      (into {}))))
 
 
 (defn config
@@ -32,26 +67,31 @@
 
   - chart-id : (string) unique id of the chart
   "
-  [widget-id]
+  [chart-id data]
   (-> ui-utils/default-pub-sub
     (merge
       utils/default-config
-      {:tab-panel {:value     (keyword widget-id "config")
-                   :data-path [:widgets (keyword widget-id) :tab-panel]}
-       :brush     false
-       :bar-uv    {:include true :fill "#ff0000" :stackId ""}
-       :bar-pv    {:include true :fill "#00ff00" :stackId ""}
-       :bar-amt   {:include false :fill "#0000ff" :stackId ""}
-       :bar-d     {:include false :fill "#0f0f0f" :stackId ""}})
+      {:tab-panel {:value     (keyword chart-id "config")
+                   :data-path [:widgets (keyword chart-id) :tab-panel]}}
+      (local-config data))
     (assoc-in [:x-axis :dataKey] :name)))
 
 
-(defn- bar-config [widget-id label path position]
+(defn- bar-config [chart-id label path position]
   [rc/v-box :src (rc/at)
    :gap "5px"
-   :children [[utils/boolean-config widget-id label (conj path :include)]
-              [utils/color-config widget-id ":fill" (conj path :fill) position]
-              [utils/text-config widget-id ":stackId" (conj path :stackId)]]])
+   :children [[utils/boolean-config chart-id label (conj path :include)]
+              [utils/color-config chart-id ":fill" (conj path :fill) position]
+              [utils/text-config chart-id ":stackId" (conj path :stackId)]]])
+
+
+(defn- make-bar-config [chart-id data]
+  (->> (get-in @data [:metadata :fields])
+    (filter (fn [[k v]] (= :number v)))
+    keys
+    (map-indexed (fn [idx a]
+                   [bar-config chart-id a [a] :above-right]))
+    (into [])))
 
 
 (defn config-panel
@@ -61,7 +101,7 @@
 
   - data : (atom) data to display (may be used by the standard configuration components for thins like axes, etc.\n  - config : (atom) holds all the configuration settings made by the user
   "
-  [data widget-id]
+  [data chart-id]
 
   [rc/v-box :src (rc/at)
    :gap "10px"
@@ -69,19 +109,31 @@
    :style {:padding          "15px"
            :border-top       "1px solid #DDD"
            :background-color "#f7f7f7"}
-   :children [[utils/standard-chart-config data widget-id]
+   :children [[utils/standard-chart-config data chart-id]
               [rc/line :src (rc/at) :size "2px"]
               [rc/h-box :src (rc/at)
                :gap "10px"
-               :children [[bar-config widget-id "bar (uv)" [:bar-uv] :above-right]
-                          [bar-config widget-id "bar (pv)" [:bar-pv] :above-center]
-                          [bar-config widget-id "bar (amt)" [:bar-amt] :above-center]
-                          [bar-config widget-id "bar (d)" [:bar-d] :above-left]]]
+               :children (make-bar-config chart-id data)]
               [rc/line :src (rc/at) :size "2px"]
-              [utils/boolean-config widget-id ":brush?" [:brush]]]])
+              [utils/boolean-config chart-id ":brush?" [:brush]]]])
 
 
-(def source-code "dummy Bar Chart Code")
+(def source-code '[:> BarChart {:width 400 :height 400 :data (get @data :data)}])
+
+
+(defn- make-bar-display [chart-id data subscriptions isAnimationActive?]
+  (->> (get-in @data [:metadata :fields])
+    (filter (fn [[_ v]] (= :number v)))
+    keys
+    (map (fn [a]
+           (if (ui-utils/resolve-sub subscriptions [a :include])
+             [:> Bar (merge {:type              "monotone" :dataKey a
+                             :isAnimationActive @isAnimationActive?
+                             :fill              (ui-utils/resolve-sub subscriptions [a :fill])}
+                       (when (seq (ui-utils/resolve-sub subscriptions [a :stackId]))
+                         {:stackId (ui-utils/resolve-sub subscriptions [a :stackId])}))]
+             [])))
+    (into [:<>])))
 
 
 (defn- component-panel
@@ -92,50 +144,31 @@
   - data : (atom) any data used by the component's ui
   - widget-id : (string) unique identifier for this specific widget
   "
-  [data widget-id]
-  (let [container (ui-utils/subscribe-local widget-id [:container])
-
-        bar-uv? (ui-utils/subscribe-local widget-id [:bar-uv :include])
-        bar-uv-fill (ui-utils/subscribe-local widget-id [:bar-uv :fill])
-        bar-uv-stackId (ui-utils/subscribe-local widget-id [:bar-uv :stackId])
-        bar-pv? (ui-utils/subscribe-local widget-id [:bar-pv :include])
-        bar-pv-fill (ui-utils/subscribe-local widget-id [:bar-pv :fill])
-        bar-pv-stackId (ui-utils/subscribe-local widget-id [:bar-pv :stackId])
-        bar-amt? (ui-utils/subscribe-local widget-id [:bar-amt :include])
-        bar-amt-fill (ui-utils/subscribe-local widget-id [:bar-amt :fill])
-        bar-amt-stackId (ui-utils/subscribe-local widget-id [:bar-amt :stackId])
-        bar-d? (ui-utils/subscribe-local widget-id [:bar-d :include])
-        bar-d-fill (ui-utils/subscribe-local widget-id [:bar-d :fill])
-        bar-d-stackId (ui-utils/subscribe-local widget-id [:bar-d :stackId])
-        isAnimationActive? (ui-utils/subscribe-local widget-id [:isAnimationActive])
-        brush? (ui-utils/subscribe-local widget-id [:brush])]
+  [data chart-id]
+  (let [container (ui-utils/subscribe-local chart-id [:container])
+        isAnimationActive? (ui-utils/subscribe-local chart-id [:isAnimationActive])
+        subscriptions (ui-utils/build-subs chart-id (local-config data))]
 
     (fn []
-      [:> BarChart {:width 400 :height 400 :data @data}
+      [:> BarChart {:width 400 :height 400 :data (get @data :data)}
 
-       (utils/standard-chart-components widget-id)
+       (utils/standard-chart-components chart-id)
 
-       (when @brush? [:> Brush])
+       (when (ui-utils/resolve-sub subscriptions [:brush]) [:> Brush])
 
-       (when @bar-uv? [:> Bar (merge {:type              "monotone" :dataKey :uv
-                                      :isAnimationActive @isAnimationActive?
-                                      :fill              @bar-uv-fill}
-                                (when (seq @bar-uv-stackId) {:stackId @bar-uv-stackId}))])
+       (make-bar-display chart-id data subscriptions isAnimationActive?)])))
 
-       (when @bar-pv? [:> Bar (merge {:type              "monotone" :dataKey :pv
-                                      :isAnimationActive @isAnimationActive?
-                                      :fill              @bar-pv-fill}
-                                (when (seq @bar-pv-stackId) {:stackId @bar-pv-stackId}))])
 
-       (when @bar-amt? [:> Bar (merge {:type              "monotone" :dataKey :amt
-                                       :isAnimationActive @isAnimationActive?
-                                       :fill              @bar-amt-fill}
-                                 (when (seq @bar-amt-stackId) {:stackId @bar-amt-stackId}))])
+(comment
+  (do
+    (def chart-id "bar-chart-demo/bar-chart")
+    (def data sample-data)
+    (def subscriptions (ui-utils/build-subs chart-id (local-config data)))
+    (def isAnimationActive? (r/atom true)))
 
-       (when @bar-d? [:> Bar (merge {:type              "monotone" :dataKey :d
-                                     :isAnimationActive @isAnimationActive?
-                                     :fill              @bar-d-fill}
-                               (when (seq @bar-d-stackId) {:stackId @bar-d-stackId}))])])))
+  (make-bar-display chart-id data subscriptions isAnimationActive?)
+
+  ())
 
 
 (defn component
@@ -160,7 +193,7 @@
      (fn []
        (when (nil? @id)
          (reset! id component-id)
-         (ui-utils/init-widget @id (config @id))
+         (ui-utils/init-widget @id (config @id data))
          (ui-utils/dispatch-local @id [:container] container-id))
 
        ;(log/info "component" @id)

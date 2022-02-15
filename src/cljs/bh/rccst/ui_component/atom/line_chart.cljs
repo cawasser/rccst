@@ -36,6 +36,7 @@
       (filter (fn [[k v]] (= :number v)))
       keys
       (map-indexed (fn [idx a]
+                     ;(log/info "line color" idx a (ui-utils/get-color idx))
                      {a {:include true :stroke (ui-utils/get-color idx) :fill (ui-utils/get-color idx)}}))
       (into {}))))
 
@@ -66,7 +67,7 @@
        :tab-panel {:value     (keyword chart-id "config")
                    :data-path [:widgets (keyword chart-id) :tab-panel]}}
       (local-config data))
-    (assoc-in [:x-axis :dataKey] :name)
+    (assoc-in [:x-axis :dataKey] (get-in @data [:metadata :id]))
     (assoc-in [:pub] :name)
     (assoc-in [:sub] :something-selected)))
 
@@ -113,12 +114,13 @@
               [rc/h-box :src (rc/at)
                :gap "10px"
                :children (make-line-config chart-id data)]
+              [rc/line :src (rc/at) :size "2px"]
               [utils/boolean-config chart-id ":brush?" [:brush]]]])
 
 
 (defn- make-line-display [chart-id data subscriptions isAnimationActive?]
   (->> (get-in @data [:metadata :fields])
-    (filter (fn [[k v]] (= :number v)))
+    (filter (fn [[_ v]] (= :number v)))
     keys
     (map (fn [a]
            (if (ui-utils/resolve-sub subscriptions [a :include])
@@ -144,7 +146,7 @@
   "
   [data chart-id]
 
-  (log/info "component-panel" @data chart-id)
+  ;(log/info "component-panel" @data chart-id)
 
   (let [container (ui-utils/subscribe-local chart-id [:container])
         isAnimationActive? (ui-utils/subscribe-local chart-id [:isAnimationActive])
@@ -163,7 +165,6 @@
 
        (when (ui-utils/resolve-sub subscriptions [:brush]) [:> Brush])
 
-       ; HERE
        (make-line-display chart-id data subscriptions isAnimationActive?)])))
 
 
@@ -177,7 +178,7 @@
 
   ([data chart-id container-id]
 
-   (log/info "line-chart" @data)
+   ;(log/info "line-chart" @data)
 
    (if (not= :tabular (get-in @data [:metadata :type]))
      [rc/alert-box :src (rc/at)
