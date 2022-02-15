@@ -9,7 +9,29 @@
             [bh.rccst.ui-component.atom.chart.wrapper :as c]))
 
 
-(defn config [widget-id]
+(def sample-data
+  "the Pie Chart works best with \"paired data\" so we return the paired-data from utils"
+  (r/atom utils/paired-data))
+
+
+(defn config
+  "constructs the configuration panel for the chart's configurable properties. This is specific to
+  this being a pie-chart component (see [[local-config]]).
+
+  Merges together the configuration needed for:
+
+  1. pie charts
+  2. pub/sub between components of a container
+  3. `default-config` for all Rechart-based types
+  4. the `tab-panel` for view/edit configuration properties and data
+  5. sets properties of the default-config (local config properties are just set inside [[local-config]])
+  6. sets meta-data for properties this component publishes (`:pub`) or subscribes (`:sub`)
+
+  ---
+
+  - chart-id : (string) unique id of the chart
+  "
+  [widget-id]
   (merge
     ui-utils/default-pub-sub
     utils/default-config
@@ -20,10 +42,10 @@
                 "#0000ff" "#009999" "#ff00ff"])}))
 
 
-(def sample-data (r/atom utils/paired-data))
-
-
-(defn- color-anchors [widget-id]
+(defn- color-anchors
+  "build the config ui-components needed for each of the pie slices
+  "
+  [widget-id]
   [:<>
    (doall
      (map (fn [[id _]]
@@ -32,13 +54,21 @@
 
 
 (defn- config-panel
-  "the panel of configuration controls
+  "constructs the configuration panel for the chart's configurable properties. This is specific to
+  this being a colored-pie-chart component (see [[local-config]]).
+
+  Merges together the configuration needed for:
+
+  1. colored pie charts
+  2. pub/sub between components of a container
+  3. `default-config` for all Rechart-based types
+  4. the `tab-panel` for view/edit configuration properties and data
+  5. sets properties of the default-config (local config properties are just set inside [[local-config]])
+  6. sets meta-data for properties this component publishes (`:pub`) or subscribes (`:sub`)
 
   ---
 
-  - _ (ignored)
-  - widget-id : (string) unique identifier for this specific widget instance
-
+  - chart-id : (string) unique id of the chart
   "
   [_ widget-id]
 

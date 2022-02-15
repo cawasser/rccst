@@ -9,11 +9,29 @@
             [taoensso.timbre :as log]))
 
 
-(def sample-data (r/atom utils/dag-data))
+(def sample-data
+  "the Sankey Chart works best with \"directed acyclic graph data\" so we return the dag-data from utils"
+  (r/atom utils/dag-data))
 
 
-(defn config [widget-id]
+(defn config
+  "constructs the configuration panel for the chart's configurable properties. This is specific to
+  this being a line-chart component (see [[local-config]]).
 
+  Merges together the configuration needed for:
+
+  1. line charts
+  2. pub/sub between components of a container
+  3. `default-config` for all Rechart-based types
+  4. the `tab-panel` for view/edit configuration properties and data
+  5. sets properties of the default-config (local config properties are just set inside [[local-config]])
+  6. sets meta-data for properties this component publishes (`:pub`) or subscribes (`:sub`)
+
+  ---
+
+  - chart-id : (string) unique id of the chart
+  "
+  [widget-id]
   (merge
     ui-utils/default-pub-sub
     {:tab-panel {:value     (keyword widget-id "config")
@@ -23,22 +41,31 @@
      :link      {:stroke "#77c878" :curve 0.5}}))
 
 
-(defn config-panel [_ widget-id]
+(defn- config-panel
+  "the panel of configuration controls
+
+  ---
+
+  - _ : (ignored)
+  - chart-id : (string) unique identifier for this chart instance
+  "
+  [_ chart-id]
   [rc/v-box :src (rc/at)
+   :width "400px"
    :height "500px"
    :gap "5px"
-   :children [[utils/tooltip widget-id]
+   :children [[utils/tooltip chart-id]
               [rc/line :size "2px"]
               [rc/v-box :src (rc/at)
                :gap "5px"
-               :children [[utils/color-config-text widget-id "node fill" [:node :fill] :right-below]
-                          [utils/color-config-text widget-id "node stroke" [:node :stroke] :right-below]]]
+               :children [[utils/color-config-text chart-id "node fill" [:node :fill] :right-below]
+                          [utils/color-config-text chart-id "node stroke" [:node :stroke] :right-below]]]
               [rc/line :size "2px"]
-              [utils/color-config-text widget-id "link stroke" [:link :stroke] :right-below]
+              [utils/color-config-text chart-id "link stroke" [:link :stroke] :right-below]
               [rc/h-box :src (rc/at)
                :gap "5px"
-               :children [[utils/text-config widget-id ":curve" [:link :curve]]
-                          [utils/slider-config widget-id 0 1 0.1 [:link :curve]]]]]])
+               :children [[utils/text-config chart-id ":curve" [:link :curve]]
+                          [utils/slider-config chart-id 0 1 0.1 [:link :curve]]]]]])
 
 
 (def source-code '[:> Sankey
@@ -55,7 +82,16 @@
 
 
 (defn- complex-node
-  "
+  "build the reagent/react components (as hiccup) needed to draw the `node` parts (rectangles)
+  and labels of the diagram.
+
+  ---
+
+  - containerWidth : (number) with of the container, used to determine if the label shoule be ot the left or right of the rectangle
+  - fill : (color) color to fill the rectangle
+  - stroke : (color) color to use as the outline (stroke) of the rectangle
+  - props : (has-map) additional props sent to the reagent/react component by the diagram itself
+
 > See [here](https://cljdoc.org/d/reagent/reagent/1.1.0/doc/tutorials/react-features#hooks)
 > for details on how the Reagent/React interop work for this
 "
@@ -85,12 +121,21 @@
         (str value "k")]])))
 
 
-(defn- component-panel [data widget-id]
-  (let [tooltip? (ui-utils/subscribe-local widget-id [:tooltip :include])
-        node-fill (ui-utils/subscribe-local widget-id [:node :fill])
-        node-stroke (ui-utils/subscribe-local widget-id [:node :stroke])
-        link-stroke (ui-utils/subscribe-local widget-id [:link :stroke])
-        curve (ui-utils/subscribe-local widget-id [:link :curve])]
+(defn- component-panel
+  "the chart to draw, taking cues from the settings of the configuration panel
+
+  ---
+
+  - data : (atom) any data shown by the component's ui
+  - chart-id : (string) unique identifier for this chart instance within this container
+  - container-id : (string) name of the container this chart is inside of
+  "
+  [data chart-id]
+  (let [tooltip? (ui-utils/subscribe-local chart-id [:tooltip :include])
+        node-fill (ui-utils/subscribe-local chart-id [:node :fill])
+        node-stroke (ui-utils/subscribe-local chart-id [:node :stroke])
+        link-stroke (ui-utils/subscribe-local chart-id [:link :stroke])
+        curve (ui-utils/subscribe-local chart-id [:link :curve])]
 
     (fn []
       [:> Sankey
@@ -109,25 +154,23 @@
 (defn component
   "the chart to draw, taking cues from the settings of the configuration panel
 
-  the component creates its own ID (a random-uuid) to hold the local state. This way multiple charts
-  can be placed inside the same outer container/composite
-
   ---
 
   - data : (atom) any data shown by the component's ui
+  - chart-id : (string) unique identifier of this chart insatnce within this container
   - container-id : (string) name of the container this chart is inside of
   "
-  ([data component-id]
-   [component data component-id ""])
+  ([data chart-id]
+   [component data chart-id ""])
 
 
-  ([data component-id container-id]
+  ([data chart-id container-id]
 
    (let [id (r/atom nil)]
 
      (fn []
        (when (nil? @id)
-         (reset! id component-id)
+         (reset! id chart-id)
          (ui-utils/init-widget @id (config @id))
          (ui-utils/dispatch-local @id [:container] container-id))
 
@@ -141,6 +184,6 @@
 
 
 (comment
-  (def widget-id "sankey-chart-demo")
+  (def chart-id "sankey-chart-demo")
 
   ())

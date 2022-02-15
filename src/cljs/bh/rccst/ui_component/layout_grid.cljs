@@ -5,7 +5,7 @@
 
 
 (defn grid
-  "use [react-grid-layout]() to organize a bunch of children in a draggable grid
+  "use [react-grid-layout](https://github.com/react-grid-layout/react-grid-layout) to organize a bunch of children in a draggable grid
 
   ---
 
@@ -21,9 +21,9 @@
 
 > See also
 >
-> [react-grid-layout]()
+> [react-grid-layout](https://github.com/react-grid-layout/react-grid-layout)
 >
-> [re-com]()
+> [re-com](https://github.com/Day8/re-com)
   "
   [& {:keys [id children layout layoutFn cols width rowHeight compactType]
       :as args}]

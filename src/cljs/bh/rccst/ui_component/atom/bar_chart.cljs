@@ -9,15 +9,28 @@
             [bh.rccst.ui-component.atom.chart.wrapper :as c]))
 
 
-(def sample-data (r/atom (mapv (fn [d] (assoc d :d (rand-int 5000))) utils/tabular-data)))
+(def sample-data
+  "the Bar Chart works best with \"tabular data\" so we return the tabular-data from utils,
+  and we mix-in a fourth column just to show how it can be done"
+  (r/atom (mapv (fn [d] (assoc d :d (rand-int 5000))) utils/tabular-data)))
 
 
 (defn config
-  "constructs the configuration data structure for the widget. This is specific to this being a bar-chart component.
+  "constructs the configuration panel for the chart's configurable properties. This is specific to
+  this being a bar-chart component (see [[local-config]]).
+
+  Merges together the configuration needed for:
+
+  1. bar charts
+  2. pub/sub between components of a container
+  3. `default-config` for all Rechart-based types
+  4. the `tab-panel` for view/edit configuration properties and data
+  5. sets properties of the default-config (local config properties are just set inside [[local-config]])
+  6. sets meta-data for properties this component publishes (`:pub`) or subscribes (`:sub`)
 
   ---
 
-  - widget-id : (string) id of the widget, in this specific case
+  - chart-id : (string) unique id of the chart
   "
   [widget-id]
   (-> ui-utils/default-pub-sub

@@ -1,22 +1,41 @@
 (ns bh.rccst.ui-component.atom.pie-chart
-  (:require [taoensso.timbre :as log]
-            [re-com.core :as rc]
-            [reagent.core :as r]
+  (:require [bh.rccst.ui-component.atom.chart.utils :as utils]
+            [bh.rccst.ui-component.atom.chart.wrapper :as c]
+            [bh.rccst.ui-component.utils :as ui-utils]
 
             ["recharts" :refer [PieChart Pie]]
-            [bh.rccst.ui-component.utils :as ui-utils]
-            [bh.rccst.ui-component.atom.chart.utils :as utils]
-            [bh.rccst.ui-component.atom.chart.wrapper :as c]))
+            [re-com.core :as rc]
+            [reagent.core :as r]
+            [taoensso.timbre :as log]))
 
 
-(def sample-data (r/atom utils/paired-data))
+(def sample-data
+  "the Pie Chart works best with \"paired data\" so we return the paired-data from utils"
+  (r/atom utils/paired-data))
 
 
-(defn config [widget-id]
+(defn config
+  "constructs the configuration panel for the chart's configurable properties. This is specific to
+  this being a pie-chart component (see [[local-config]]).
+
+  Merges together the configuration needed for:
+
+  1. pie charts
+  2. pub/sub between components of a container
+  3. `default-config` for all Rechart-based types
+  4. the `tab-panel` for view/edit configuration properties and data
+  5. sets properties of the default-config (local config properties are just set inside [[local-config]])
+  6. sets meta-data for properties this component publishes (`:pub`) or subscribes (`:sub`)
+
+  ---
+
+  - chart-id : (string) unique id of the chart
+  "
+  [chart-id]
   (merge utils/default-config
-    {:tab-panel {:value     (keyword widget-id "config")
-                 :data-path [:widgets (keyword widget-id) :tab-panel]}
-     :fill "#8884d8"}))
+    {:tab-panel {:value     (keyword chart-id "config")
+                 :data-path [:widgets (keyword chart-id) :tab-panel]}
+     :fill      "#8884d8"}))
 
 
 (defn config-panel
@@ -25,10 +44,10 @@
   ---
 
   - _ (ignored)
-  - widget-id : (string) unique identifier for this specific widget instance
+  - chart-id : (string) unique identifier for this specific widget instance
 
   "
-  [_ widget-id]
+  [_ chart-id]
 
   [rc/v-box :src (rc/at)
    :gap "10px"
@@ -37,11 +56,11 @@
    :style {:padding          "15px"
            :border-top       "1px solid #DDD"
            :background-color "#f7f7f7"}
-   :children [[utils/non-gridded-chart-config widget-id]
+   :children [[utils/non-gridded-chart-config chart-id]
               [rc/line :src (rc/at) :size "2px"]
               [rc/h-box :src (rc/at)
                :gap "10px"
-               :children [[utils/color-config-text widget-id ":fill" [:fill] :above-right]]]]])
+               :children [[utils/color-config-text chart-id ":fill" [:fill] :above-right]]]]])
 
 
 (def source-code '[:> PieChart {:width 400 :height 400}
@@ -58,20 +77,20 @@
   - data : (atom) any data used by the component's ui
   - widget-id : (string) unique identifier for this specific widget instance
   "
-  [data widget-id]
-  (let [isAnimationActive? (ui-utils/subscribe-local widget-id [:isAnimationActive])
-        fill (ui-utils/subscribe-local widget-id [:fill])]
+  [data chart-id]
+  (let [isAnimationActive? (ui-utils/subscribe-local chart-id [:isAnimationActive])
+        fill (ui-utils/subscribe-local chart-id [:fill])]
 
     (fn []
       [c/chart
-                  [:> PieChart {:width 400 :height 400 :label true}
+       [:> PieChart {:width 400 :height 400 :label true}
 
-                   (utils/non-gridded-chart-components widget-id)
+        (utils/non-gridded-chart-components chart-id)
 
-                   [:> Pie {:dataKey "value"
-                            :name-Key "name"
-                            :data @data
-                            :fill @fill
-                            :label true
-                            :isAnimationActive @isAnimationActive?}]]])))
+        [:> Pie {:dataKey           "value"
+                 :name-Key          "name"
+                 :data              @data
+                 :fill              @fill
+                 :label             true
+                 :isAnimationActive @isAnimationActive?}]]])))
 
