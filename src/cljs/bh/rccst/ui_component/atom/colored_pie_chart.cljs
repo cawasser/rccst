@@ -153,5 +153,6 @@
        [c/configurable-chart
         :data data
         :id @id
+        :data-panel utils/tabular-data-panel
         :config-panel config-panel
         :component component-panel]))))

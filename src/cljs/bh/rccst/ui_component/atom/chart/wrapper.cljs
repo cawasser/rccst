@@ -30,7 +30,7 @@
 
   Returns : (hiccup) the Reagent component representing the entire 'package' (component + config-panel + button)
   "
-  [& {:keys [data id config-panel component]}]
+  [& {:keys [data id config-panel data-panel component]}]
   (let [open? (r/atom false)
         config-key (keyword id "config")
         data-key (keyword id "data")
@@ -60,7 +60,7 @@
                                   [[layout/centered {:extra-classes :is-one-third}
                                     [ui-utils/chart-config
                                      chart-events
-                                     (utils/tabular-data-panel data)
+                                     [data-panel data]
                                      [config-panel data id]]]]
                                   [])
                                 [component data id])]]]])))

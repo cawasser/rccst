@@ -19,12 +19,24 @@
 
 (defn table [& {:keys [data max-rows width height cell-style-fn
                        on-click-row-fn row-line-color]}]
-  (let [d (get @data :data)]
-    ;(log/info "table" d)
-    [rc/simple-v-table :src (rc/at)
-     :model (r/atom d)
-     :columns (table-column-headers d 5 (or width 100) (or height))
-     :max-rows (or max-rows (count d))
-     :table-row-line-color (or row-line-color "#00fff0")
-     :on-click-row (or on-click-row-fn #())
-     :cell-style (or cell-style-fn #())]))
+
+  [rc/simple-v-table :src (rc/at)
+   :model data
+   :columns (table-column-headers @data 5 (or width 100) (or height))
+   :max-rows (or max-rows (count @data))
+   :table-row-line-color (or row-line-color "#00fff0")
+   :on-click-row (or on-click-row-fn #())
+   :cell-style (or cell-style-fn #())])
+
+
+(defn meta-table [& {:keys [data width height cell-style-fn
+                            on-click-row-fn row-line-color]}]
+  (let [d (r/atom (get @data :data))]
+    [table
+     :data d
+     :width width
+     :height height
+     :cell-style-fn cell-style-fn
+     :on-click-row-fn on-click-row-fn
+     :row-line-color row-line-color]))
+

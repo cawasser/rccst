@@ -65,15 +65,7 @@
                    {:name "Page A" :uv 2390 :pv 3800 :amt 2500}
                    {:name "Page G" :uv 3490 :pv 4300 :amt 2100}])
 
-(def tabular-data-a [{:id "Page A" :name "Page A" :uv 4000 :pv 2400 :amt 2400}
-                     {:id "Page B" :name "Page B" :uv 3000 :pv 1398 :amt 2210}
-                     {:id "Page C" :name "Page C" :uv 2000 :pv 9800 :amt 2290}
-                     {:id "Page D" :name "Page D" :uv 2780 :pv 3908 :amt 2000}
-                     {:id "Page E" :name "Page E" :uv 1890 :pv 4800 :amt 2181}
-                     {:id "Page F" :name "Page F" :uv 2390 :pv 3800 :amt 2500}
-                     {:id "Page G" :name "Page G" :uv 3490 :pv 4300 :amt 2100}])
-
-(def tabular-data-b
+(def meta-tabular-data
   "docstring"
   {:metadata {:type :tabular
               :id :name
@@ -226,6 +218,23 @@
 
   [data]
   [table/table
+   :width 500
+   :data data
+   :max-rows 5])
+
+
+(defn meta-tabular-data-panel
+  "provides a simple tabular component (via `bh.rccst.ui-component.table`) to show the data presented
+  in the Chart.
+
+> Note: `table` uses the keys of the first hash-map in `@data` as the header label for the columns
+
+  ---
+
+  - data : (atom) atom wrapping data with metadata included"
+
+  [data]
+  [table/meta-table
    :width 500
    :data data
    :max-rows 5])

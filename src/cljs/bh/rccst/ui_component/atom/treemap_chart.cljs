@@ -77,7 +77,7 @@
 
   [rc/v-box :src (rc/at)
    :gap "10px"
-   :width "100%"
+   :width "400px"
    :height "500px"
    :style {:padding          "15px"
            :border-top       "1px solid #DDD"
@@ -157,6 +157,7 @@
        [c/configurable-chart
         :data data
         :id @id
+        :data-panel utils/hierarchy-data-panel
         :config-panel config-panel
         :component component-panel]))))
 

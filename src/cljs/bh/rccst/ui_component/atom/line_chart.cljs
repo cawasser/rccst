@@ -7,13 +7,12 @@
             [re-com.core :as rc]
 
             [reagent.core :as r]
-            [taoensso.timbre :as log]
-            [woolybear.ad.layout :as layout]))
+            [taoensso.timbre :as log]))
 
 
 (def sample-data
   "the Line Chart works best with \"tabular data\" so we return the tabular-data from utils"
-  (r/atom utils/tabular-data-b))
+  (r/atom utils/meta-tabular-data))
 
 
 (defn local-config
@@ -101,7 +100,7 @@
   "
   [data chart-id]
 
-  (log/info "config-panel" @data chart-id)
+  ;(log/info "config-panel" @data chart-id)
 
   [rc/v-box :src (rc/at)
    :gap "10px"
@@ -200,6 +199,7 @@
          [c/configurable-chart
           :data data
           :id @id
+          :data-panel utils/meta-tabular-data-panel
           :config-panel config-panel
           :component component-panel])))))
 

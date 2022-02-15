@@ -179,6 +179,7 @@
        [c/configurable-chart
         :data data
         :id @id
+        :data-panel utils/dag-data-panel
         :config-panel config-panel
         :component component-panel]))))
 

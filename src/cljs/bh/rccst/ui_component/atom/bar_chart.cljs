@@ -12,9 +12,10 @@
 (def sample-data
   "the Bar Chart works best with \"tabular data\" so we return the tabular-data from utils,
   and we mix-in a fourth column just to show how it can be done"
-  (let [data (get utils/tabular-data-b :data)
-        fields (get-in utils/tabular-data-b [:metadata :fields])]
-    (-> utils/tabular-data-b
+  (let [source utils/meta-tabular-data
+        data (get source :data)
+        fields (get-in source [:metadata :fields])]
+    (-> source
       (assoc
         :data
         (mapv (fn [d] (assoc d :d (rand-int 5000))) data))
@@ -201,5 +202,6 @@
        [c/configurable-chart
         :data data
         :id @id
+        :data-panel utils/meta-tabular-data-panel
         :config-panel config-panel
         :component component-panel]))))
