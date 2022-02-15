@@ -73,16 +73,18 @@
                      {:id "Page F" :name "Page F" :uv 2390 :pv 3800 :amt 2500}
                      {:id "Page G" :name "Page G" :uv 3490 :pv 4300 :amt 2100}])
 
-(def tabular-data-b {:metadata {:type :tabular
-                                :id :name
-                                :fields {:name :string :uv :number :pv :number :amt :number :owner :string}}
-                     :data [{:name "Page A" :uv 4000 :pv 2400 :amt 2400}
-                            {:name "Page B" :uv 3000 :pv 1398 :amt 2210}
-                            {:name "Page C" :uv 2000 :pv 9800 :amt 2290}
-                            {:name "Page D" :uv 2780 :pv 3908 :amt 2000}
-                            {:name "Page E" :uv 1890 :pv 4800 :amt 2181}
-                            {:name "Page F" :uv 2390 :pv 3800 :amt 2500}
-                            {:name "Page G" :uv 3490 :pv 4300 :amt 2100}]})
+(def tabular-data-b
+  "docstring"
+  {:metadata {:type :tabular
+              :id :name
+              :fields {:name :string :uv :number :pv :number :tv :number :amt :number :owner :string}}
+   :data [{:name "Page A" :uv 4000 :pv 2400 :tv 1500 :amt 2400}
+          {:name "Page B" :uv 3000 :pv 1398 :tv 1500 :amt 2210}
+          {:name "Page C" :uv 2000 :pv 9800 :tv 1500 :amt 2290}
+          {:name "Page D" :uv 2780 :pv 3908 :tv 1500 :amt 2000}
+          {:name "Page E" :uv 1890 :pv 4800 :tv 1500 :amt 2181}
+          {:name "Page F" :uv 2390 :pv 3800 :tv 1500 :amt 2500}
+          {:name "Page G" :uv 3490 :pv 4300 :tv 1500 :amt 2100}]})
 
 (def some-other-tabular [{:id "Page A" :a 4000 :b 2400 :c 2400}
                          {:id "Page B" :a 3000 :b 1398 :c 2210}
@@ -292,7 +294,7 @@
 
 (defn column-picker [data widget-id label path]
   (let [model (u/subscribe-local widget-id path)
-        headings (apply set (map keys @data))
+        headings (apply set (map keys (get @data :data)))
         btns (mapv (fn [h] {:id h :label h}) headings)]
     (fn [data widget-id label path]
       [rc/h-box :src (rc/at)

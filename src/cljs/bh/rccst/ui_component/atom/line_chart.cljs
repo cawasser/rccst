@@ -13,24 +13,31 @@
 
 (def sample-data
   "the Line Chart works best with \"tabular data\" so we return the tabular-data from utils"
-  (r/atom utils/tabular-data))
+  (r/atom utils/tabular-data-b))
 
 
-; TODO: need to build the config from the columns of the tabular data itself, so we know how many there are!
-;
-(def local-config
+(defn local-config
   "provides both the definition and the initial default values for various properties that
   allow user to customize the visualization of the chart.
+
+  ---
+
+   - data : (atom) atom containing the data and metadata for this chart
 
 > See Also:
 >
 > [Recharts/line-chart](https://recharts.org/en-US/api/LineChart)
+> [tabular-data]()
   "
-  {:brush     false
-   ; HERE
-   :line-uv   {:include true :stroke "#8884d8" :fill "#8884d8"}
-   :line-pv   {:include true :stroke "#82ca9d" :fill "#82ca9d"}
-   :line-amt  {:include false :stroke "#ff00ff" :fill "#ff00ff"}})
+  [data]
+  (merge
+    {:brush false}
+    (->> (get-in @data [:metadata :fields])
+      (filter (fn [[k v]] (= :number v)))
+      keys
+      (map-indexed (fn [idx a]
+                     {a {:include true :stroke (ui-utils/get-color idx) :fill (ui-utils/get-color idx)}}))
+      (into {}))))
 
 
 (defn- config
@@ -49,15 +56,16 @@
   ---
 
   - chart-id : (string) unique id of the chart
+  - data : (atom) data and meta-data for the chart
   "
-  [chart-id]
+  [chart-id data]
   (-> ui-utils/default-pub-sub
     (merge
       utils/default-config
       {:type      "line-chart"
        :tab-panel {:value     (keyword chart-id "config")
                    :data-path [:widgets (keyword chart-id) :tab-panel]}}
-      local-config)
+      (local-config data))
     (assoc-in [:x-axis :dataKey] :name)
     (assoc-in [:pub] :name)
     (assoc-in [:sub] :something-selected)))
@@ -73,6 +81,15 @@
                           [utils/color-config widget-id ":fill" (conj path :fill) position]]]]])
 
 
+(defn- make-line-config [chart-id data]
+  (->> (get-in @data [:metadata :fields])
+    (filter (fn [[k v]] (= :number v)))
+    keys
+    (map-indexed (fn [idx a]
+                   [line-config chart-id a [a] :above-right]))
+    (into [])))
+
+
 (defn- config-panel
   "the panel of configuration controls
 
@@ -83,7 +100,7 @@
   "
   [data chart-id]
 
-  ;(log/info "config-panel" widget-id)
+  (log/info "config-panel" @data chart-id)
 
   [rc/v-box :src (rc/at)
    :gap "10px"
@@ -95,42 +112,23 @@
               [rc/line :src (rc/at) :size "2px"]
               [rc/h-box :src (rc/at)
                :gap "10px"
-               :children [; HERE
-                          [line-config chart-id "line (uv)" [:line-uv] :above-right]
-                          [line-config chart-id "line (pv)" [:line-pv] :above-right]
-                          [line-config chart-id "line (amt)" [:line-amt] :above-center]]]
+               :children (make-line-config chart-id data)]
               [utils/boolean-config chart-id ":brush?" [:brush]]]])
 
 
-;;;;;;;;;;;;;
-;
-; these more into ui-utils...
-;
-;;;;;;;;;;;;;
-;; region
-(defn build-subs [chart-id local-config]
-      (-> (ui-utils/process-locals [] nil local-config)
-          (map #(ui-utils/subscribe-locals chart-id %))
-          (into {}))
-  ; 1. process-locals
-  ; 2. map over the result and call ui-utils/subscribe-local
-  ; 3. put the result into a hash-map
-  ())
+(defn- make-line-display [chart-id data subscriptions isAnimationActive?]
+  (->> (get-in @data [:metadata :fields])
+    (filter (fn [[k v]] (= :number v)))
+    keys
+    (map (fn [a]
+           (if (ui-utils/resolve-sub subscriptions [a :include])
+             [:> Line {:type              "monotone" :dataKey a
+                       :isAnimationActive @isAnimationActive?
+                       :stroke            (ui-utils/resolve-sub subscriptions [a :stroke])
+                       :fill              (ui-utils/resolve-sub subscriptions [a :fill])}]
+             [])))
+    (into [:<>])))
 
-
-
-(defn resolve-sub [sub]
-  (deref sub))
-
-
-(comment
-  (ui-utils/process-locals [] nil {:brush     false
-                                   :line-uv   {:include true :stroke "#8884d8" :fill "#8884d8"}
-                                   :line-pv   {:include true :stroke "#82ca9d" :fill "#82ca9d"}
-                                   :line-amt  {:include false :stroke "#ff00ff" :fill "#ff00ff"}})
-
-  ())
-;;endregion
 
 (defn- component-panel
   "the chart to draw, taking cues from the settings of the configuration panel
@@ -145,51 +143,28 @@
   - container-id : (string) name of the container this chart is inside of
   "
   [data chart-id]
-  (let [container (ui-utils/subscribe-local chart-id [:container])
-        subscription (build-subs chart-id local-config)
 
-        ; HERE
-        line-uv? (ui-utils/subscribe-local chart-id [:line-uv :include])
-        line-uv-stroke (ui-utils/subscribe-local chart-id [:line-uv :stroke])
-        line-uv-fill (ui-utils/subscribe-local chart-id [:line-uv :fill])
-        line-pv? (ui-utils/subscribe-local chart-id [:line-pv :include])
-        line-pv-stroke (ui-utils/subscribe-local chart-id [:line-pv :stroke])
-        line-pv-fill (ui-utils/subscribe-local chart-id [:line-pv :fill])
-        line-amt? (ui-utils/subscribe-local chart-id [:line-amt :include])
-        line-amt-stroke (ui-utils/subscribe-local chart-id [:line-amt :stroke])
-        line-amt-fill (ui-utils/subscribe-local chart-id [:line-amt :fill])
+  (log/info "component-panel" @data chart-id)
+
+  (let [container (ui-utils/subscribe-local chart-id [:container])
         isAnimationActive? (ui-utils/subscribe-local chart-id [:isAnimationActive])
-        brush? (ui-utils/subscribe-local chart-id [:brush])]
+        subscriptions (ui-utils/build-subs chart-id (local-config data))]
 
     (fn []
-      ;(log/info "component-panel" widget-id)
+      ; TODO: more refactoring!!!!
+      (ui-utils/publish-to-container @container [chart-id :brush] (ui-utils/resolve-sub subscriptions [:brush]))
+      (ui-utils/publish-to-container @container [chart-id :uv] (ui-utils/resolve-sub subscriptions [:uv :include]))
+      (ui-utils/publish-to-container @container [chart-id :pv] (ui-utils/resolve-sub subscriptions [:pv :include]))
+      (ui-utils/publish-to-container @container [chart-id :amt] (ui-utils/resolve-sub subscriptions [:amt :include]))
 
-      (ui-utils/publish-to-container @container [chart-id :brush] @brush?)
-      (ui-utils/publish-to-container @container [chart-id :line-uv] @line-uv?)
-      (ui-utils/publish-to-container @container [chart-id :line-pv] @line-pv?)
-      (ui-utils/publish-to-container @container [chart-id :line-amt] @line-amt?)
-
-      [:> LineChart {:width 400 :height 400 :data @data}
+      [:> LineChart {:width 400 :height 400 :data (get @data :data)}
 
        (utils/standard-chart-components chart-id)
 
-       (when (resolve-sub brush?) [:> Brush]) ;(when @brush? [:> Brush])
+       (when (ui-utils/resolve-sub subscriptions [:brush]) [:> Brush])
 
        ; HERE
-       (when @line-uv? [:> Line {:type              "monotone" :dataKey :uv
-                                 :isAnimationActive @isAnimationActive?
-                                 :stroke            @line-uv-stroke
-                                 :fill              @line-uv-fill}])
-
-       (when @line-pv? [:> Line {:type              "monotone" :dataKey :pv
-                                 :isAnimationActive @isAnimationActive?
-                                 :stroke            @line-pv-stroke
-                                 :fill              @line-pv-fill}])
-
-       (when @line-amt? [:> Line {:type              "monotone" :dataKey :amt
-                                  :isAnimationActive @isAnimationActive?
-                                  :stroke            @line-amt-stroke
-                                  :fill              @line-amt-fill}])])))
+       (make-line-display chart-id data subscriptions isAnimationActive?)])))
 
 
 (def source-code '[:> LineChart {:width 400 :height 400 :data @data}])
@@ -202,19 +177,68 @@
 
   ([data chart-id container-id]
 
-   (let [id (r/atom nil)]
+   (log/info "line-chart" @data)
 
-     (fn []
-       (when (nil? @id)
-         (reset! id chart-id)
-         (ui-utils/init-widget @id (config @id))
-         (ui-utils/dispatch-local @id [:container] container-id))
+   (if (not= :tabular (get-in @data [:metadata :type]))
+     [rc/alert-box :src (rc/at)
+      :id (str container-id "/" chart-id ".ERROR")
+      :alert-type :danger
+      :closeable? false
+      :body [:div "The data passed is NOT of type :tabular!"]]
 
-       ;(log/info "component" @id)
+     (let [id (r/atom nil)]
 
-       [c/configurable-chart
-        :data data
-        :id @id
-        :config-panel config-panel
-        :component component-panel]))))
+       (fn []
+         (when (nil? @id)
+           (reset! id chart-id)
+           (ui-utils/init-widget @id (config @id data))
+           (ui-utils/dispatch-local @id [:container] container-id))
 
+         ;(log/info "component" @id)
+
+         [c/configurable-chart
+          :data data
+          :id @id
+          :config-panel config-panel
+          :component component-panel])))))
+
+
+
+(comment
+  (def data sample-data)
+  (def chart-id "line-chart-demo/line-chart")
+
+  (def subscriptions (ui-utils/build-subs chart-id (local-config data)))
+
+
+  ())
+
+
+(comment
+  (def data sample-data)
+
+  (def p1 {:name :string, :uv :number, :pv :number, :amt :number, :owner :string})
+
+  (filter (fn [[k v]] (= :number v)) p1)
+
+  (->> (get-in @data [:metadata :fields])
+    (filter (fn [[k v]] (= :number v)))
+    keys)
+
+  (keyword :line-1)
+  (keyword (clojure.string/replace "line 1" #" " "-"))
+
+  (clojure.string/replace :line-1 #" " "-")
+
+  (def k '(:uv :pv :amt))
+  (map-indexed (fn [idx a]
+                 {a {:include true :stroke "#8884d8" :fill "#8884d8"}})
+    k)
+
+
+  (map-indexed (fn [idx a]
+                 {(keyword (clojure.string/replace a #" " "-"))
+                  {:include true :stroke "#8884d8" :fill "#8884d8"}})
+    k)
+
+  ())

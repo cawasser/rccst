@@ -49,6 +49,19 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; region
 
+
+(def default-stroke-fill-colors ["#8884d8" "#82ca9d" "#8884d8"
+                                 "#83a6ed" "#8dd1e1"
+                                 "#a4de6c" "#d7e62b"
+                                 "#ffff00" "#ff0000" "#00ff00"
+                                 "#0000ff" "#009999" "#ff00ff"])
+
+
+(defn get-color [idx]
+  (let [i (mod idx (count default-stroke-fill-colors))]
+    (get default-stroke-fill-colors i)))
+
+
 (defn hex->rgba
   "convert a color in hexidcemial (stirng) into a hash-map of RGBA
 
@@ -581,6 +594,26 @@
                                                                      (map #(clojure.string/replace % #" " ""))))))))]
     (log/info "dispatch-local" widget-id value-path new-val p)
     (re-frame/dispatch [p new-val])))
+
+
+(defn build-subs
+  "build the subscription needed to access all the 'local' configuration
+  properties
+
+  1. process-locals
+  2. map over the result and call ui-utils/subscribe-local
+  3. put the result into a hash-map
+  "
+  [chart-id local-config]
+  (->> (process-locals [] nil local-config)
+    (map (fn [path]
+           {path (subscribe-local chart-id path)}))
+    (into {})))
+
+
+(defn resolve-sub [subs path]
+  (deref (get subs path)))
+
 
 
 ;; endregion

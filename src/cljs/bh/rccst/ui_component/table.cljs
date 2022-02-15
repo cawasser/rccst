@@ -19,9 +19,9 @@
 (defn table [& {:keys [data max-rows width height cell-style-fn
                        on-click-row-fn row-line-color]}]
   [rc/simple-v-table :src (rc/at)
-   :model data
+   :model (get @data :data)
    :columns (table-column-headers @data 5 (or width 100) (or height))
-   :max-rows (or max-rows (count @data))
+   :max-rows (or max-rows (count (get @data :data)))
    :table-row-line-color (or row-line-color "#00fff0")
    :on-click-row (or on-click-row-fn #())
    :cell-style (or cell-style-fn #())])
