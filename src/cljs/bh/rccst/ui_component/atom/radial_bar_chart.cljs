@@ -32,7 +32,7 @@
             {:tab-panel {:value     (keyword widget-id "config")
                          :data-path [:widgets (keyword widget-id) :tab-panel]}
              :radial-uv   {:include true :minAngle 15
-                           :label {:fill "#666", :position "insideStart" }
+                           :label {:fill "#666", :position "insideStart"}
                            :background {:clockWise true}
                            :dataKey :uv}})))
 
@@ -90,7 +90,7 @@
 
 
                  (when @radial-uv? [:> RadialBar {:minAngle 15
-                                                  :label {:fill "#666", :position "insideStart" }
+                                                  :label {:fill "#666", :position "insideStart"}
                                                   :background {:clockWise true}
                                                   :dataKey :uv}])
                  [:> Legend {:iconSize 10 :width 120 :height 140 :layout "vertical" :verticalAlign "middle" :align "right"}]
@@ -126,6 +126,7 @@
                 [c/configurable-chart
                  :data data
                  :id @id
+                 :data-panel utils/tabular-data-panel
                  :config-panel config-panel
                  :component component-panel]))))
 

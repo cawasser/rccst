@@ -67,6 +67,7 @@
   ---
 
   - chart-id : (string) unique id of the chart
+  - data : (atom) metadata wrapped data  to display
   "
   [chart-id data]
   (-> ui-utils/default-pub-sub
@@ -74,8 +75,8 @@
       utils/default-config
       {:tab-panel {:value     (keyword chart-id "config")
                    :data-path [:widgets (keyword chart-id) :tab-panel]}}
-      (local-config data))
-    (assoc-in [:x-axis :dataKey] :name)))
+      (local-config data))))
+    ;(assoc-in [:x-axis :dataKey] :name)))
 
 
 (defn- bar-config [chart-id label path position]
