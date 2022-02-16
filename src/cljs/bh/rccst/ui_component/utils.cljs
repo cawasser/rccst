@@ -24,6 +24,11 @@
 (def default-composite {:blackboard {}})
 
 
+(defn config-tab-panel [chart-id]
+  {:tab-panel {:value     (keyword chart-id "config")
+               :data-path [:widgets (keyword chart-id) :tab-panel]}})
+
+
 (defn component-id []
   (-> (uuid/make-random-uuid)
     uuid/uuid-string))
