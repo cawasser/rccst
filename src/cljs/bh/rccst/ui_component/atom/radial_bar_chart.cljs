@@ -7,17 +7,8 @@
             [bh.rccst.ui-component.atom.chart.utils :as utils]
             [bh.rccst.ui-component.atom.chart.wrapper :as c]))
 
-(def sample-data (r/atom [{:name "18-24",
-                           :uv 31.47,
-                           :pv 2400,
-                           :fill "#8884d8"
-                           }
-                          {:name "25-29",
-                           :uv 26.69,
-                           :pv 4567,
-                           :fill "#83a6ed"
-                           }
-                          ]))
+(def sample-data (r/atom [{:name "18-24", :uv 31.47, :pv 2400, :fill "#8884d8"}
+                          {:name "25-29", :uv 26.69, :pv 4567, :fill "#83a6ed"}]))
 
 (def source-code "dummy Radar Chart Code")
 
@@ -34,16 +25,20 @@
             utils/default-config
             {:tab-panel {:value     (keyword widget-id "config")
                          :data-path [:widgets (keyword widget-id) :tab-panel]}
-             :radar-mark    {:include true :dataKey :A :stroke "#8884d8" :fill "#8884d8" :fillOpacity 0.6}
-             :radar-sally   {:include true :dataKey :B :stroke "#82ca9d" :fill "#82ca9d" :fillOpacity 0.6}})))
+             :radial-uv   {:include true :minAngle 15
+                           :label {:fill "#666", :position "insideStart" }
+                           :background {:clockWise true}
+                           :dataKey :uv}})))
 
-(defn- radar-config [widget-id label path position]
+(defn- radial-config [widget-id label path position]
        [rc/v-box :src (rc/at)
         :gap "5px"
         :children [[utils/boolean-config widget-id label (conj path :include)]
-                   [utils/color-config widget-id ":fill" (conj path :fill) position]
-                   [utils/color-config widget-id ":stroke" (conj path :stroke) position]
-                   [utils/slider-config widget-id 0 1 0.1 (conj path :fillOpacity)]]])
+                   [utils/color-config widget-id ":fill" (conj path :fill) position]]])
+
+;[utils/color-config widget-id ":fill" (conj path :fill) position]
+;[utils/color-config widget-id ":stroke" (conj path :stroke) position]
+;[utils/slider-config widget-id 0 1 0.1 (conj path :fillOpacity)]
 
 (defn config-panel
       "the panel of configuration controls
@@ -64,8 +59,7 @@
                   [rc/line :src (rc/at) :size "2px"]
                   [rc/h-box :src (rc/at)
                    :gap "10px"
-                   :children [[radar-config widget-id "Mark" [:radar-mark] :above-right]
-                              [radar-config widget-id "Sally" [:radar-sally] :above-center]]]]])
+                   :children [[radial-config widget-id "uv" [:radial-uv] :above-right]]]]])
 
 (defn- component-panel
        "the chart to draw, taking cues from the settings of the configuration panel
@@ -77,25 +71,30 @@
        "
        [data widget-id]
        (let [container (ui-utils/subscribe-local widget-id [:container])
-             radar-mark? (ui-utils/subscribe-local widget-id [:radar-mark :include])
-             radar-mark-stroke (ui-utils/subscribe-local widget-id [:radar-mark :stroke])
-             radar-mark-fill (ui-utils/subscribe-local widget-id [:radar-mark :fill])
-             radar-mark-fillOpacity (ui-utils/subscribe-local widget-id [:radar-mark :fillOpacity])
-             radar-sally? (ui-utils/subscribe-local widget-id [:radar-sally :include])
-             radar-sally-stroke (ui-utils/subscribe-local widget-id [:radar-sally :stroke])
-             radar-sally-fill (ui-utils/subscribe-local widget-id [:radar-sally :fill])
-             radar-sally-fillOpacity (ui-utils/subscribe-local widget-id [:radar-sally :fillOpacity])]
+             radial-uv? (ui-utils/subscribe-local widget-id [:radial-uv :include])
+             radial-uv-fill (ui-utils/subscribe-local widget-id [:radial-uv :fill])]
 
 
 
 
             (fn []
-                [:> RadialBarChart {:width 400 :height 400 :innerRadius "10%" :outerRadius "80%" :data @data :startAngle 180 :endAngle 0}
-                 [:> RadialBar {:minAngle 15 :label {:fill "#666", :position "insideStart" } :background {:clockWise true} :dataKey :uv}]
-                 ;[:> RadialBar {:minAngle 15 :label {:fill "#888", :position "insideStart" } :background {:clockWise true} :dataKey :pv}]
+                [:> RadialBarChart {:width 400
+                                    :height 400
+                                    :innerRadius "10%"
+                                    :outerRadius "80%"
+                                    :data @data
+                                    :startAngle 180
+                                    :endAngle 0}
+
+                 ;(utils/non-gridded-chart-components widget-id)
+
+
+                 (when @radial-uv? [:> RadialBar {:minAngle 15
+                                                  :label {:fill "#666", :position "insideStart" }
+                                                  :background {:clockWise true}
+                                                  :dataKey :uv}])
                  [:> Legend {:iconSize 10 :width 120 :height 140 :layout "vertical" :verticalAlign "middle" :align "right"}]
-                 [:> Tooltip]]
-                )))
+                 [:> Tooltip]])))
 
 (defn component
       "the chart to draw, taking cues from the settings of the configuration panel
@@ -129,5 +128,8 @@
                  :id @id
                  :config-panel config-panel
                  :component component-panel]))))
+
+
+;[:> RadialBar {:minAngle 15 :label {:fill "#888", :position "insideStart" } :background {:clockWise true} :dataKey :pv}]
 
 
