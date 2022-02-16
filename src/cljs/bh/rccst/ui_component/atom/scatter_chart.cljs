@@ -33,13 +33,16 @@
   - chart-id : (string) unique id of the chart
   "
   [chart-id]
-  (-> utils/default-config
-    (merge {:tab-panel {:value     (keyword chart-id "config")
-                        :data-path [:widgets (keyword chart-id) :tab-panel]}
-            :brush     false})
-    (assoc-in [:x-axis :dataKey] :x)
-    (assoc-in [:y-axis :dataKey] :y)
-    (assoc-in [:fill :color] "#8884d8")))
+      (->
+        ui-utils/default-pub-sub
+        (merge
+          utils/default-config
+          {:tab-panel {:value     (keyword chart-id "config")
+                            :data-path [:widgets (keyword chart-id) :tab-panel]}
+                :brush     false})
+        (assoc-in [:x-axis :dataKey] :x)
+        (assoc-in [:y-axis :dataKey] :y)
+        (assoc-in [:fill :color] "#8884d8")))
 
 
 (defn config-panel
@@ -65,7 +68,10 @@
               [utils/color-config-text chart-id ":fill" [:fill :color] :above-right]]])
 
 
-(defn component
+(def source-code `[:> ScatterChart {:width 400 :height 400}])
+
+
+(defn- component-panel
   "the chart to draw, taking cues from the settings of the configuration panel
 
   ---
@@ -85,7 +91,6 @@
     (fn []
       ;(log/info "configurable-Scatter-chart" @config @data)
 
-      [c/chart
        [:> ScatterChart {:width 400 :height 400}
 
         (utils/standard-chart-components chart-id)
@@ -99,5 +104,29 @@
 
         [:> Scatter {:name              "tempScatter" :data @data
                      :isAnimationActive @isAnimationActive?
-                     :fill              @scatter-dot-fill}]]])))
+                     :fill              @scatter-dot-fill}]])))
+
+(defn component
+      ([data component-id]
+       [component data component-id ""])
+
+
+      ([data component-id container-id]
+
+       (let [id (r/atom nil)]
+
+         (fn []
+             (when (nil? @id)
+                   (reset! id component-id)
+                   (ui-utils/init-widget @id (config @id))
+                   (ui-utils/dispatch-local @id [:container] container-id))
+
+             ;(log/info "component" @id)
+
+             [c/configurable-chart
+              :data data
+              :id @id
+              :data-panel utils/tabular-data-panel
+              :config-panel config-panel
+              :component component-panel]))))
 
