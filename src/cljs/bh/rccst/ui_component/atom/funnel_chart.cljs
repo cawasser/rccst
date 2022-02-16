@@ -33,12 +33,16 @@
   - chart-id : (string) unique id of the chart
   "
   [chart-id]
-  (merge utils/default-config
-    {:tab-panel {:value     (keyword chart-id "config")
-                 :data-path [:widgets (keyword chart-id) :tab-panel]}
-     :colors    (zipmap (map :name utils/paired-data)
-                  ["#8884d8" "#83a6ed" "#8dd1e1"
-                   "#82ca9d" "#a4de6c" "#d7e62b"])}))
+      (merge
+        ui-utils/default-pub-sub
+        utils/default-config
+        {:tab-panel {:value     (keyword chart-id "config")
+                     :data-path [:widgets (keyword chart-id) :tab-panel]}
+         :colors    (zipmap (map :name utils/paired-data)
+                      ["#8884d8" "#83a6ed" "#8dd1e1"
+                       "#82ca9d" "#a4de6c" "#d7e62b"])}))
+        ;(assoc-in [:pub] :name)
+        ;(assoc-in [:sub] :something-selected)))
 
 
 (defn- color-anchors
@@ -87,7 +91,7 @@
                           (color-anchors chart-id)]]]])
 
 
-(defn component
+(defn- component-panel
   "the chart to draw, taking cues from the settings of the configuration panel
 
   ---
@@ -96,12 +100,12 @@
   - chart-id : (string) unique identifier for this chart instance
   "
   [data chart-id]
-  (let [colors (ui-utils/subscribe-local chart-id [:colors])
+  (let [container (ui-utils/subscribe-local chart-id [:container])
+        colors (ui-utils/subscribe-local chart-id [:colors])
         isAnimationActive? (ui-utils/subscribe-local chart-id [:isAnimationActive])]
 
     (fn []
       ;(log/info "configurable-funnel-chart" @config)
-      [c/chart
        [:> FunnelChart {:height 400 :width 500}
         (utils/non-gridded-chart-components chart-id)
         [:> Funnel {:dataKey           :value
@@ -116,6 +120,39 @@
                [:> Cell {:key  (str "cell-" idx)
                          :fill (get @colors name)}])
              @data))
-         [:> LabelList {:position :right :fill "#000000" :stroke "none" :dataKey :name}]]]])))
+         [:> LabelList {:position :right :fill "#000000" :stroke "none" :dataKey :name}]]])))
+
+
+(def source-code `[:> FunnelChart {:height 400 :width 500}
+                   [:> Funnel {:dataKey           :value
+                               :nameKey           "name"
+                               :label             true
+                               :data              @data
+                               :isAnimationActive @isAnimationActive?}]])
+
+(defn component
+      ([data chart-id]
+       [component data chart-id ""])
+
+      ([data chart-id container-id]
+
+       (log/info "funnel-chart" @data)
+
+       (let [id (r/atom nil)]
+
+              (fn []
+                  (when (nil? @id)
+                        (reset! id chart-id)
+                        (ui-utils/init-widget @id (config @id))
+                        (ui-utils/dispatch-local @id [:container] container-id))
+
+                  ;(log/info "component" @id)
+
+                  [c/configurable-chart
+                   :data data
+                   :id @id
+                   :data-panel utils/tabular-data-panel
+                   :config-panel config-panel
+                   :component component-panel]))))
 
 

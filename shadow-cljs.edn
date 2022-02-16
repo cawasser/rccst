@@ -1,4 +1,5 @@
 {:nrepl        {:port 8777}
+ :socket-repl  {:port 8999}
 
  :source-paths ["src/cljs" "env/dev/cljs"]
 
