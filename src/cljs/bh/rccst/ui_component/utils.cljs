@@ -9,6 +9,15 @@
             [woolybear.packs.tab-panel :as tab-panel]))
 
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;
+; General Helper
+;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; region
+
 (def default-pub-sub {:pub [] :sub [] :container ""})
 
 
@@ -38,6 +47,15 @@
 
               [tab-panel/sub-panel {:panel-id data}
                data-panel]]]]))
+
+
+(def h-wrap {:-webkit-flex-flow "row wrap"
+             :flex-flow "row wrap"})
+
+(def v-wrap {:-webkit-flex-flow "column wrap"
+             :flex-flow "column wrap"})
+
+;; endregion
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -214,6 +232,7 @@
 
 
 ;; endregion
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
