@@ -11,7 +11,51 @@
 
 (def sample-data
   "the Pie Chart works best with \"paired data\" so we return the paired-data from utils"
-  (r/atom utils/paired-data))
+  (r/atom utils/meta-tabular-data))
+
+
+(defn local-config [data]
+  (let [d (get @data :data)
+        fields (get-in @data [:metadata :fields])]
+
+    (merge
+      ; process options for :name
+      (->> fields
+        (filter (fn [[k v]] (= :string v)))
+        keys
+        ((fn [m]
+           {:name {:keys m :chosen (first m)}})))
+
+      ; process :name to map up the :colors
+      (->> d
+        (map :name)
+        (#(zipmap % ui-utils/default-stroke-fill-colors))
+        (assoc {} :colors))
+
+      ; process options for :value
+      (->> fields
+        (filter (fn [[k v]] (= :number v)))
+        keys
+        ((fn [m]
+           {:value {:keys m :chosen (first m)}}))))))
+
+
+(comment
+  (def data sample-data)
+  (def d (get @data :data))
+
+  (->> d
+    (map :name ,)
+    (#(zipmap % ui-utils/default-stroke-fill-colors) ,)
+    (assoc {} :colors ,))
+
+  (as-> d x
+    (map :name x)
+    (zipmap x ui-utils/default-stroke-fill-colors)
+    (assoc {} :colors x))
+
+
+  ())
 
 
 (defn config
@@ -30,27 +74,25 @@
   ---
 
   - chart-id : (string) unique id of the chart
+  - data : (atom) metadata wrapped data to display
   "
-  [widget-id]
+  [chart-id data]
   (merge
     ui-utils/default-pub-sub
     utils/default-config
-    {:tab-panel {:value     (keyword widget-id "config")
-                 :data-path [:widgets (keyword widget-id) :tab-panel]}
-     :colors (zipmap (map :name utils/paired-data)
-               ["#ffff00" "#ff0000" "#00ff00"
-                "#0000ff" "#009999" "#ff00ff"])}))
+    (ui-utils/config-tab-panel chart-id)
+    (local-config data)))
 
 
 (defn- color-anchors
   "build the config ui-components needed for each of the pie slices
   "
-  [widget-id]
+  [chart-id]
   [:<>
    (doall
      (map (fn [[id _]]
-            ^{:key id}[utils/color-config-text widget-id id [:colors id] :right-above])
-       @(ui-utils/subscribe-local widget-id [:colors])))])
+            ^{:key id}[utils/color-config-text chart-id id [:colors id] :right-above])
+       @(ui-utils/subscribe-local chart-id [:colors])))])
 
 
 (defn- config-panel
@@ -70,20 +112,23 @@
 
   - chart-id : (string) unique id of the chart
   "
-  [_ widget-id]
+  [_ chart-id]
 
   [rc/v-box :src (rc/at)
    :gap "10px"
-   :width "100%"
+   :width "400px"
    :style {:padding          "15px"
            :border-top       "1px solid #DDD"
            :background-color "#f7f7f7"}
-   :children [[utils/non-gridded-chart-config widget-id]
+   :children [[utils/non-gridded-chart-config chart-id]
               [rc/line :src (rc/at) :size "2px"]
+              [utils/option chart-id ":name" [:name]]
+              [rc/line :src (rc/at) :size "2px"]
+              [utils/option chart-id ":value" [:value]]
               [rc/v-box :src (rc/at)
                :gap "5px"
                :children [[rc/label :src (rc/at) :label "Pie Colors"]
-                          (color-anchors widget-id)]]]])
+                          (color-anchors chart-id)]]]])
 
 
 (def source-code '[:> PieChart {:width 400 :height 400}
@@ -100,18 +145,18 @@
   - data : (atom) any data used by the component's ui
   - widget-id : (string) unique identifier for this specific widget instance
   "
-  [data widget-id]
-  (let [isAnimationActive? (ui-utils/subscribe-local widget-id [:isAnimationActive])
-        colors (ui-utils/subscribe-local widget-id [:colors])]
+  [data chart-id]
+  (let [isAnimationActive? (ui-utils/subscribe-local chart-id [:isAnimationActive])
+        subscriptions (ui-utils/build-subs chart-id (local-config data))]
 
-    (fn []
+    (fn [data chart-id]
       [:> PieChart {:width 400 :height 400 :label true}
 
-       (utils/non-gridded-chart-components widget-id)
+       (utils/non-gridded-chart-components chart-id)
 
-       [:> Pie {:dataKey "value"
-                :nameKey "name"
-                :data @data
+       [:> Pie {:dataKey (ui-utils/resolve-sub subscriptions [:value :chosen])
+                :nameKey (ui-utils/resolve-sub subscriptions [:name :chosen])
+                :data (get @data :data)
                 :label true
                 :isAnimationActive @isAnimationActive?}
         (doall
@@ -119,8 +164,9 @@
             (fn [idx {name :name}]
               ^{:key (str idx name)}
               [:> Cell {:key (str "cell-" idx)
-                        :fill (get @colors name)}])
-            @data))]])))
+                        :fill (or (ui-utils/resolve-sub subscriptions [:colors name])
+                                (ui-utils/get-color 0))}])
+            (get @data :data)))]])))
 
 
 (defn component
@@ -145,7 +191,7 @@
      (fn []
        (when (nil? @id)
          (reset! id component-id)
-         (ui-utils/init-widget @id (config @id))
+         (ui-utils/init-widget @id (config @id data))
          (ui-utils/dispatch-local @id [:container] container-id))
 
        ;(log/info "component" @id)
@@ -153,6 +199,18 @@
        [c/configurable-chart
         :data data
         :id @id
-        :data-panel utils/tabular-data-panel
+        :data-panel utils/meta-tabular-data-panel
         :config-panel config-panel
         :component component-panel]))))
+
+
+(comment
+  (do
+    (def data sample-data)
+    (def chart-id "colored-pie-chart-demo/colored-pie-chart")
+    (def subscriptions (ui-utils/build-subs chart-id (local-config data))))
+
+  (ui-utils/resolve-sub subscriptions [:colors "Group A"])
+
+  ())
+

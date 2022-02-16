@@ -14,40 +14,28 @@
 
   ; switching to tabular data to work out the UI logic
   (r/atom utils/meta-tabular-data))
-;(r/atom utils/paired-data))
 
 
 (defn local-config [data]
-  (let [d (get @data :data)]
+  (let [d (get @data :data)
+        fields (get-in @data [:metadata :fields])]
 
     (merge
       {:fill (ui-utils/get-color 0)}
 
       ; process options for :name
-      (->> (get-in @data [:metadata :fields])
+      (->> fields
         (filter (fn [[k v]] (= :string v)))
         keys
         ((fn [m]
            {:name {:keys m :chosen (first m)}})))
 
       ; process options for :value
-      (->> (get-in @data [:metadata :fields])
+      (->> fields
         (filter (fn [[k v]] (= :number v)))
         keys
         ((fn [m]
            {:value {:keys m :chosen (first m)}}))))))
-
-
-(comment
-  (def data (r/atom utils/meta-tabular-data))
-
-  (->> (get-in @data [:metadata :fields])
-    (filter (fn [[k v]] (= :number v)))
-    keys
-    ((fn [m]
-       {:value {:keys m :chosen (first m)}})))
-
-  ())
 
 
 (defn config
@@ -72,31 +60,8 @@
   (-> ui-utils/default-pub-sub
     (merge
       utils/default-config
-      {:tab-panel {:value     (keyword chart-id "config")
-                   :data-path [:widgets (keyword chart-id) :tab-panel]}}
+      (ui-utils/config-tab-panel chart-id)
       (local-config data))))
-
-
-(defn- option-config [chart-id label path-root]
-  (let [chosen-path (conj path-root :chosen)
-        keys-path (conj path-root :keys)
-        chosen (ui-utils/subscribe-local chart-id chosen-path)
-        keys (ui-utils/subscribe-local chart-id keys-path)
-        btns (->> @keys
-               (map (fn [k]
-                      {:id k :label k})))]
-
-    ;(log/info "keys-config" @keys @chosen btns)
-
-    (fn [chart-id label path-root]
-      [rc/h-box :src (rc/at)
-       :children [[rc/box :src (rc/at) :align :start :child [:code label]]
-                  [rc/horizontal-bar-tabs
-                   :src (rc/at)
-                   :model @chosen
-                   :tabs btns
-                   :style utils/btns-style
-                   :on-change #(ui-utils/dispatch-local chart-id chosen-path %)]]])))
 
 
 (defn- config-panel
@@ -119,9 +84,9 @@
            :background-color "#f7f7f7"}
    :children [[utils/non-gridded-chart-config chart-id]
               [rc/line :src (rc/at) :size "2px"]
-              [option-config chart-id ":name" [:name]]
+              [utils/option chart-id ":name" [:name]]
               [rc/line :src (rc/at) :size "2px"]
-              [option-config chart-id ":value" [:value]]
+              [utils/option chart-id ":value" [:value]]
               [utils/color-config-text chart-id ":fill" [:fill] :above-right]]])
 
 
@@ -150,7 +115,7 @@
        (utils/non-gridded-chart-components chart-id)
 
        [:> Pie {:dataKey           (ui-utils/resolve-sub subscriptions [:value :chosen])
-                :name-Key          (ui-utils/resolve-sub subscriptions [:name :chosen])
+                :nameKey           (ui-utils/resolve-sub subscriptions [:name :chosen])
                 :data              (get @data :data)
                 :fill              (ui-utils/resolve-sub subscriptions [:fill])
                 :label             true

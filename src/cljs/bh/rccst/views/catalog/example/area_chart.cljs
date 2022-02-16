@@ -12,7 +12,6 @@
             :widget-id widget-id
             :description "A simple Area Chart built using [Recharts]()"
             :data chart/sample-data
-            :config (chart/config widget-id)
             :component chart/component
             :component-id "area-chart-demo/area-chart"
             :source-code chart/source-code]))

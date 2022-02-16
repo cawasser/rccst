@@ -102,11 +102,11 @@
                   {:name "Group F" :value 189}])
 
 (def triplet-data [{:x 100 :y 200 :z 200}
+                   {:x 110 :y 280 :z 200}
                    {:x 120 :y 100 :z 260}
-                   {:x 170 :y 300 :z 400}
                    {:x 140 :y 250 :z 280}
                    {:x 150 :y 400 :z 500}
-                   {:x 110 :y 280 :z 200}])
+                   {:x 170 :y 300 :z 400}])
 
 (def hierarchy-data [{:name     "axis"
                       :children [{:name "Axis" :size 24593}
@@ -637,6 +637,28 @@
               [layout-config widget-id [:legend :layout]]
               [align-config widget-id [:legend :align]]
               [verticalAlign-config widget-id [:legend :verticalAlign]]]])
+
+
+(defn option [chart-id label path-root]
+  (let [chosen-path (conj path-root :chosen)
+        keys-path (conj path-root :keys)
+        chosen (u/subscribe-local chart-id chosen-path)
+        keys (u/subscribe-local chart-id keys-path)
+        btns (->> @keys
+               (map (fn [k]
+                      {:id k :label k})))]
+
+    ;(log/info "option" @keys @chosen btns)
+
+    (fn [chart-id label path-root]
+      [rc/h-box :src (rc/at)
+       :children [[rc/box :src (rc/at) :align :start :child [:code label]]
+                  [rc/horizontal-bar-tabs
+                   :src (rc/at)
+                   :model @chosen
+                   :tabs btns
+                   :style btns-style
+                   :on-change #(u/dispatch-local chart-id chosen-path %)]]])))
 
 ;; endregion
 

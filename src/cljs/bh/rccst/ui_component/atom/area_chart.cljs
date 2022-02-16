@@ -12,7 +12,44 @@
 (def sample-data
   "the Area Chart works best with \"tabular data\" so we return the tabular-data from utils,
   and we mix-in a fourth column just to show how it can be done"
-  (r/atom (mapv (fn [d] (assoc d :d (rand-int 5000))) utils/tabular-data)))
+  (let [source utils/meta-tabular-data
+        data (get source :data)
+        fields (get-in source [:metadata :fields])]
+    (-> source
+      (assoc
+        :data
+        (mapv (fn [d] (assoc d :d (rand-int 5000))) data))
+      (assoc-in
+        [:metadata :fields]
+        (assoc fields :d :number))
+      r/atom)))
+
+
+(defn local-config
+  "provides both the definition and the initial default values for various properties that
+  allow user to customize the visualization of the chart.
+
+  ---
+
+   - data : (atom) atom containing the data and metadata for this chart
+
+> See Also:
+>
+> [Recharts/line-chart](https://recharts.org/en-US/api/LineChart)
+> [tabular-data]()
+  "
+  [data]
+  (merge
+    {:brush false}
+    (->> (get-in @data [:metadata :fields])
+      (filter (fn [[k v]] (= :number v)))
+      keys
+      (map-indexed (fn [idx a]
+                     {a {:include true
+                         :fill    (ui-utils/get-color idx)
+                         :stroke    (ui-utils/get-color idx)
+                         :stackId ""}}))
+      (into {}))))
 
 
 (defn config
@@ -31,19 +68,16 @@
   ---
 
   - chart-id : (string) unique id of the chart
+  - data : (atom) metadata wrapped data  to display
   "
-  [chart-id]
+  [chart-id data]
   (-> ui-utils/default-pub-sub
     (merge
       utils/default-config
       {:tab-panel {:value     (keyword chart-id "config")
-                   :data-path [:widgets (keyword chart-id) :tab-panel]}
-       :brush     false
-       :area-uv   {:include true :stroke "#8884d8" :fill "#8884d8" :stackId ""}
-       :area-pv   {:include true :stroke "#82ca9d" :fill "#82ca9d" :stackId ""}
-       :area-amt  {:include true :stroke "#f5c242" :fill "#f5c242" :stackId ""}
-       :area-d    {:include true :stroke "#c77ed2" :fill "#c77ed2" :stackId ""}})
-    (assoc-in [:x-axis :dataKey] :name)))
+                   :data-path [:widgets (keyword chart-id) :tab-panel]}}
+      (local-config data))
+    (assoc-in [:x-axis :dataKey] (get-in @data [:metadata :id]))))
 
 
 (defn- area-config
@@ -68,9 +102,18 @@
   [rc/v-box :src (rc/at)
    :gap "5px"
    :children [[utils/boolean-config chart-id label (conj path :include)]
-              [utils/color-config chart-id ":fill" (conj path :fill) :above-right]
-              [utils/color-config chart-id ":stroke" (conj path :stroke) :above-left]
+              [utils/color-config chart-id ":fill" (conj path :fill) :right-above]
+              [utils/color-config chart-id ":stroke" (conj path :stroke) :right-above]
               [utils/text-config chart-id ":stackId" (conj path :stackId)]]])
+
+
+(defn- make-area-config [chart-id data]
+  (->> (get-in @data [:metadata :fields])
+    (filter (fn [[k v]] (= :number v)))
+    keys
+    (map-indexed (fn [idx a]
+                   [area-config chart-id a [a] :right-center]))
+    (into [])))
 
 
 (defn- config-panel
@@ -92,15 +135,31 @@
               [rc/line :src (rc/at) :size "2px"]
               [rc/h-box :src (rc/at)
                :gap "10px"
-               :children [[area-config chart-id "area (uv)" [:area-uv] :above-right]
-                          [area-config chart-id "area (pv)" [:area-pv] :above-center]
-                          [area-config chart-id "area (amt)" [:area-amt] :above-center]
-                          [area-config chart-id "area (d)" [:area-d] :above-left]]]
+               :width "400px"
+               :style ui-utils/h-wrap
+               :children (make-area-config chart-id data)]
               [rc/line :src (rc/at) :size "2px"]
               [utils/boolean-config chart-id ":brush?" [:brush]]]])
 
 
 (def source-code "dummy area Chart Code")
+
+
+(defn- make-area-display [chart-id data subscriptions isAnimationActive?]
+  (->> (get-in @data [:metadata :fields])
+    (filter (fn [[_ v]] (= :number v)))
+    keys
+    (map (fn [a]
+           (if (ui-utils/resolve-sub subscriptions [a :include])
+             [:> Area (merge {:type              "monotone" :dataKey a
+                              :isAnimationActive @isAnimationActive?
+                              :stroke            (ui-utils/resolve-sub subscriptions [a :stroke])
+                              :fill              (ui-utils/resolve-sub subscriptions [a :fill])}
+                        (when (seq (ui-utils/resolve-sub subscriptions [a :stackId]))
+                          {:stackId (ui-utils/resolve-sub subscriptions [a :stackId])}))]
+             [])))
+    (remove empty?)
+    (into [:<>])))
 
 
 (defn- component-panel
@@ -112,56 +171,19 @@
   - widget-id : (string) unique identifier for this specific widget
   "
   [data chart-id]
-  (let [area-uv? (ui-utils/subscribe-local chart-id [:area-uv :include])
-        area-uv-fill (ui-utils/subscribe-local chart-id [:area-uv :fill])
-        area-uv-stroke (ui-utils/subscribe-local chart-id [:area-uv :stroke])
-        area-uv-stackId (ui-utils/subscribe-local chart-id [:area-uv :stackId])
-        area-pv? (ui-utils/subscribe-local chart-id [:area-pv :include])
-        area-pv-fill (ui-utils/subscribe-local chart-id [:area-pv :fill])
-        area-pv-stroke (ui-utils/subscribe-local chart-id [:area-pv :stroke])
-        area-pv-stackId (ui-utils/subscribe-local chart-id [:area-pv :stackId])
-        area-amt? (ui-utils/subscribe-local chart-id [:area-amt :include])
-        area-amt-fill (ui-utils/subscribe-local chart-id [:area-amt :fill])
-        area-amt-stroke (ui-utils/subscribe-local chart-id [:area-amt :stroke])
-        area-amt-stackId (ui-utils/subscribe-local chart-id [:area-amt :stackId])
-        area-d? (ui-utils/subscribe-local chart-id [:area-d :include])
-        area-d-fill (ui-utils/subscribe-local chart-id [:area-d :fill])
-        area-d-stroke (ui-utils/subscribe-local chart-id [:area-d :stroke])
-        area-d-stackId (ui-utils/subscribe-local chart-id [:area-d :stackId])
+  (let [container (ui-utils/subscribe-local chart-id [:container])
         isAnimationActive? (ui-utils/subscribe-local chart-id [:isAnimationActive])
-        brush? (ui-utils/subscribe-local chart-id [:brush])]
+        subscriptions (ui-utils/build-subs chart-id (local-config data))]
 
     (fn []
       ;[c/chart
-      [:> AreaChart {:width 400 :height 400 :data @data}
+      [:> AreaChart {:width 400 :height 400 :data (get @data :data)}
 
        (utils/standard-chart-components chart-id)
 
-       (when @brush? [:> Brush])
+       (when (ui-utils/resolve-sub subscriptions [:brush]) [:> Brush])
 
-       (when @area-uv? [:> Area (merge {:type              "monotone" :dataKey :uv
-                                        :isAnimationActive @isAnimationActive?
-                                        :stroke            @area-uv-stroke
-                                        :fill              @area-uv-fill}
-                                  (when (seq @area-uv-stackId) {:stackId @area-uv-stackId}))])
-
-       (when @area-pv? [:> Area (merge {:type              "monotone" :dataKey :pv
-                                        :isAnimationActive @isAnimationActive?
-                                        :stroke            @area-pv-stroke
-                                        :fill              @area-pv-fill}
-                                  (when (seq @area-pv-stackId) {:stackId @area-pv-stackId}))])
-
-       (when @area-amt? [:> Area (merge {:type              "monotone" :dataKey :amt
-                                         :isAnimationActive @isAnimationActive?
-                                         :stroke            @area-amt-stroke
-                                         :fill              @area-amt-fill}
-                                   (when (seq @area-amt-stackId) {:stackId @area-amt-stackId}))])
-
-       (when @area-d? [:> Area (merge {:type              "monotone" :dataKey :d
-                                       :isAnimationActive @isAnimationActive?
-                                       :stroke            @area-d-stroke
-                                       :fill              @area-d-fill}
-                                 (when (seq @area-d-stackId) {:stackId @area-d-stackId}))])])))
+       (make-area-display chart-id data subscriptions isAnimationActive?)])))
 
 
 (defn component
@@ -185,7 +207,7 @@
 
      (fn [] (when (nil? @id)
               (reset! id component-id)
-              (ui-utils/init-widget @id (config @id))
+              (ui-utils/init-widget @id (config @id data))
               (ui-utils/dispatch-local @id [:container] container-id))
 
        ;(log/info "component" @id)
@@ -193,7 +215,34 @@
        [c/configurable-chart
         :data data
         :id @id
-        :data-panel utils/tabular-data-panel
+        :data-panel utils/meta-tabular-data-panel
         :config-panel config-panel
         :component component-panel]))))
 
+
+
+(comment
+  (do
+    (def chart-id "area-chart-demo/area-chart")
+    (def data sample-data)
+    (def subscriptions (ui-utils/build-subs chart-id (local-config data)))
+    (def isAnimationActive? (r/atom true)))
+
+  (make-area-display chart-id data subscriptions isAnimationActive?)
+
+
+  (->> (get-in @data [:metadata :fields])
+    (filter (fn [[_ v]] (= :number v)))
+    keys
+    (map (fn [a]
+           (if (ui-utils/resolve-sub subscriptions [a :include])
+             [:> Area (merge {:type              "monotone" :dataKey a
+                              :isAnimationActive @isAnimationActive?
+                              :fill              (ui-utils/resolve-sub subscriptions [a :fill])}
+                        (when (seq (ui-utils/resolve-sub subscriptions [a :stackId]))
+                          {:stackId (ui-utils/resolve-sub subscriptions [a :stackId])}))]
+             [])))
+    (remove empty?)
+    (into [:<>]))
+
+  ())
