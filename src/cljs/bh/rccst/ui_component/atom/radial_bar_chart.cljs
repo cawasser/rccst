@@ -1,18 +1,23 @@
 (ns bh.rccst.ui-component.atom.radial-bar-chart
   (:require [taoensso.timbre :as log]
-            ["recharts" :refer [RadarChart PolarGrid PolarAngleAxis PolarRadiusAxis Radar]]
+            ["recharts" :refer [RadialBarChart RadialBar Legend Tooltip]]
             [re-com.core :as rc]
             [reagent.core :as r]
             [bh.rccst.ui-component.utils :as ui-utils]
             [bh.rccst.ui-component.atom.chart.utils :as utils]
             [bh.rccst.ui-component.atom.chart.wrapper :as c]))
 
-(def sample-data (r/atom [{:subject "Math" :A 120 :B 110 :fullMark 150}
-                          {:subject "Chinese" :A 98 :B 130 :fullMark 150}
-                          {:subject "English" :A 100 :B 110 :fullMark 150}
-                          {:subject "History" :A 77 :B 81 :fullMark 150}
-                          {:subject "Economics" :A 99 :B 140 :fullMark 150}
-                          {:subject "Literature" :A 98 :B 105 :fullMark 150}]))
+(def sample-data (r/atom [{:name "18-24",
+                           :uv 31.47,
+                           :pv 2400,
+                           :fill "#8884d8"
+                           }
+                          {:name "25-29",
+                           :uv 26.69,
+                           :pv 4567,
+                           :fill "#83a6ed"
+                           }
+                          ]))
 
 (def source-code "dummy Radar Chart Code")
 
@@ -62,38 +67,6 @@
                    :children [[radar-config widget-id "Mark" [:radar-mark] :above-right]
                               [radar-config widget-id "Sally" [:radar-sally] :above-center]]]]])
 
-
-;(defn- component-panel
-;       "the chart to draw, taking cues from the settings of the configuration panel
-;
-;       ---
-;
-;       - data : (atom) any data used by the component's ui
-;       - widget-id : (string) unique identifier for this specific widget
-;       "
-;       [data widget-id]
-;       (let [container (ui-utils/subscribe-local widget-id [:container])
-;             radar-mark? (ui-utils/subscribe-local widget-id [:radar-mark :include])
-;             radar-mark-stroke (ui-utils/subscribe-local widget-id [:radar-mark :stroke])
-;             radar-mark-fill (ui-utils/subscribe-local widget-id [:radar-mark :fill])
-;             radar-mark-fillOpacity (ui-utils/subscribe-local widget-id [:radar-mark :fillOpacity])
-;             radar-sally? (ui-utils/subscribe-local widget-id [:radar-sally :include])
-;             radar-sally-stroke (ui-utils/subscribe-local widget-id [:radar-sally :stroke])
-;             radar-sally-fill (ui-utils/subscribe-local widget-id [:radar-sally :fill])
-;             radar-sally-fillOpacity (ui-utils/subscribe-local widget-id [:radar-sally :fillOpacity])]
-;
-;
-;
-;
-;            (fn []
-;                [:> RadarChart {:width 400 :height 400 :cx "50%" :cy "50%" :outerRadius "80%" :data @data}
-;                                    [:> PolarGrid]
-;                                    [:> PolarAngleAxis {:dataKey :subject}]
-;                                    [:> PolarRadiusAxis {:angle "30" :domain [0, 150]}]
-;                                    [:> Radar {:name "Mike" :dataKey :A :stroke "#8884d8" :fill "#8884d8" :fillOpacity 0.6}]
-;                                    [:> Radar {:name "Sally" :dataKey :B :stroke "#82ca9d" :fill "#82ca9d" :fillOpacity 0.6}]] )))               ;[:> RadarChart {:width 400 :height 400 :cx "50%" :cy "50%" :outerRadius "80%" :data @data}
-
-
 (defn- component-panel
        "the chart to draw, taking cues from the settings of the configuration panel
 
@@ -117,22 +90,12 @@
 
 
             (fn []
-                [:> RadarChart {:width 400 :height 400 :outerRadius "75%" :data @data}
-                 (utils/non-gridded-chart-components widget-id)
-
-                 [:> PolarGrid]
-                 [:> PolarAngleAxis {:dataKey :subject}]
-                 [:> PolarRadiusAxis {:angle "30" :domain [0, 150]}]
-                 (when @radar-mark? [:> Radar {:name "Mark"
-                                               :dataKey :A
-                                               :fill @radar-mark-fill
-                                               :stroke @radar-mark-stroke
-                                               :fillOpacity @radar-mark-fillOpacity}])
-                 (when @radar-sally? [:> Radar {:name "Sally"
-                                                :dataKey :B
-                                                :fill @radar-sally-fill
-                                                :stroke @radar-sally-stroke
-                                                :fillOpacity @radar-sally-fillOpacity}])])))
+                [:> RadialBarChart {:width 400 :height 400 :innerRadius "10%" :outerRadius "80%" :data @data :startAngle 180 :endAngle 0}
+                 [:> RadialBar {:minAngle 15 :label {:fill "#666", :position "insideStart" } :background {:clockWise true} :dataKey :uv}]
+                 ;[:> RadialBar {:minAngle 15 :label {:fill "#888", :position "insideStart" } :background {:clockWise true} :dataKey :pv}]
+                 [:> Legend {:iconSize 10 :width 120 :height 140 :layout "vertical" :verticalAlign "middle" :align "right"}]
+                 [:> Tooltip]]
+                )))
 
 (defn component
       "the chart to draw, taking cues from the settings of the configuration panel
@@ -167,10 +130,4 @@
                  :config-panel config-panel
                  :component component-panel]))))
 
-;(fn []
-;    [:> RadialBarChart {:width 400 :height 400 :innerRadius "10%" :outerRadius "80%" :data @data :startAngle "180" :endAngle "0"}
-;     [:> RadialBar {:minAngle "15" :label {:fill "#666", :position "insideStart" } :background {:clockWise true} :dataKey "uv"}]
-;     [:> Legend {:iconSize "10" :width "120" :height "140" :layout "vertical" :verticalAlign "middle" :align "right"}]
-;     [:> Tooltip]]
-;    )
 
