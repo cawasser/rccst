@@ -34,7 +34,7 @@
 
   (let [logged-in? (re-frame/subscribe [::subs/logged-in?])]
     (fn []
-      (log/info "view" @logged-in?)
+      ;(log/info "view" @logged-in?)
 
       [layout/page {:extra-classes :rccst}
        [flex/flex-panel {:height "calc(100vh - 2rem)"}

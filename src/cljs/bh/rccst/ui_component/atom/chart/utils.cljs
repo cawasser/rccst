@@ -65,18 +65,26 @@
                    {:name "Page A" :uv 2390 :pv 3800 :amt 2500}
                    {:name "Page G" :uv 3490 :pv 4300 :amt 2100}])
 
+(def tabular-data-org [{:name "Page A" :org "Alpha" :uv 4000 :pv 2400 :amt 2400}
+                       {:name "Page B" :org "Alpha" :uv 3000 :pv 1398 :amt 2210}
+                       {:name "Page C" :org "Bravo" :uv 2000 :pv 9800 :amt 2290}
+                       {:name "Page D" :org "Bravo" :uv 2780 :pv 3908 :amt 2000}
+                       {:name "Page A" :org "Charlie" :uv 1890 :pv 4800 :amt 2181}
+                       {:name "Page A" :org "Charlie" :uv 2390 :pv 3800 :amt 2500}
+                       {:name "Page G" :org "Charlie" :uv 3490 :pv 4300 :amt 2100}])
+
 (def meta-tabular-data
   "docstring"
   {:metadata {:type :tabular
               :id :name
               :fields {:name :string :uv :number :pv :number :tv :number :amt :number :owner :string}}
-   :data [{:name "Page A" :uv 4000 :pv 2400 :tv 1500 :amt 2400}
-          {:name "Page B" :uv 3000 :pv 1398 :tv 1500 :amt 2210}
-          {:name "Page C" :uv 2000 :pv 9800 :tv 1500 :amt 2290}
-          {:name "Page D" :uv 2780 :pv 3908 :tv 1500 :amt 2000}
-          {:name "Page E" :uv 1890 :pv 4800 :tv 1500 :amt 2181}
-          {:name "Page F" :uv 2390 :pv 3800 :tv 1500 :amt 2500}
-          {:name "Page G" :uv 3490 :pv 4300 :tv 1500 :amt 2100}]})
+   :data [{:name "Page A" :uv 4000 :pv 2400 :tv 1500 :amt 2400 :owner "Bob"}
+          {:name "Page B" :uv 3000 :pv 1398 :tv 1500 :amt 2210 :owner "Bob"}
+          {:name "Page C" :uv 2000 :pv 9800 :tv 1500 :amt 2290 :owner "Sally"}
+          {:name "Page D" :uv 2780 :pv 3908 :tv 1500 :amt 2000 :owner "Sally"}
+          {:name "Page E" :uv 1890 :pv 4800 :tv 1500 :amt 2181 :owner "Alex"}
+          {:name "Page F" :uv 2390 :pv 3800 :tv 1500 :amt 2500 :owner "Erin"}
+          {:name "Page G" :uv 3490 :pv 4300 :tv 1500 :amt 2100 :owner "Alvin"}]})
 
 (def some-other-tabular [{:id "Page A" :a 4000 :b 2400 :c 2400}
                          {:id "Page B" :a 3000 :b 1398 :c 2210}

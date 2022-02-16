@@ -44,7 +44,7 @@
 (re-frame/reg-event-fx
   ::get-version
   (fn-traced [_ _]
-    (log/info "::get-version")
+    ;(log/info "::get-version")
     {:http-xhrio (merge default-header
                    {:method     :get
                     :uri        "/version"
@@ -55,7 +55,7 @@
 (re-frame/reg-event-db
   ::version-success
   (fn-traced [db [_ {:keys [version]}]]
-    (log/info "::version-success" version)
+    ;(log/info "::version-success" version)
     (assoc db :version version)))
 
 
@@ -74,7 +74,7 @@
 (re-frame/reg-event-db
   ::update-counter
   (fn-traced [db [_ content]]
-    (log/info "::update-counter" (:i content))
+    ;(log/info "::update-counter" (:i content))
     (assoc db :counter (:i content)
       :set (:last-3 content))))
 
@@ -82,35 +82,35 @@
 (re-frame/reg-event-db
   ::data-update
   (fn-traced [db [_ {:keys [id value]}]]
-    (log/info "::data-update" id value)
+    ;(log/info "::data-update" id value)
     (assoc-in db [:sources id] value)))
 
 
 (re-frame/reg-event-db
   ::add-to-set
   (fn-traced [db [_ new-value]]
-    (log/info "add-to-set" (:set db) "<-" new-value)
+    ;(log/info "add-to-set" (:set db) "<-" new-value)
     (update db :set conj new-value)))
 
 
 (re-frame/reg-event-db
   ::remove-from-set
   (fn-traced [db [_ new-value]]
-    (log/info "remove-from-set" (:set db) "<-" new-value)
+    ;(log/info "remove-from-set" (:set db) "<-" new-value)
     (update db :set disj new-value)))
 
 
 (re-frame/reg-event-db
   ::union-set
   (fn-traced [db [_ new-values]]
-    (log/info "union-set" (:set db) "<-" new-values)
+    ;(log/info "union-set" (:set db) "<-" new-values)
     (update db :set clojure.set/union new-values)))
 
 
 (re-frame/reg-event-db
   ::diff-set
   (fn-traced [db [_ new-values]]
-    (log/info "diff-set" (:set db) "<-" new-values)
+    ;(log/info "diff-set" (:set db) "<-" new-values)
     (update db :set clojure.set/difference new-values)))
 
 
