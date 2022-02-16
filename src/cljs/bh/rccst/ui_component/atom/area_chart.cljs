@@ -41,7 +41,7 @@
        :brush     false
        :area-uv   {:include true :stroke "#8884d8" :fill "#8884d8" :stackId ""}
        :area-pv   {:include true :stroke "#82ca9d" :fill "#82ca9d" :stackId ""}
-       :area-amt  {:include true :stroke "#5974ab" :fill "#5974ab" :stackId ""}
+       :area-amt  {:include true :stroke "#f5c242" :fill "#f5c242" :stackId ""}
        :area-d    {:include true :stroke "#c77ed2" :fill "#c77ed2" :stackId ""}})
     (assoc-in [:x-axis :dataKey] :name)))
 

@@ -8,7 +8,7 @@
 
 (defn example []
   (let [widget-id "pie-chart-demo"]
-    [example/example
+    [example/component-example
      :title "Pie Chart"
      :widget-id widget-id
      :description       "Pie Chart with a default fill for each slice. Each slice is sized correctly and labeled with the value, but
@@ -17,7 +17,6 @@
 > See `Colored Pie Chart` for an example of how to get the slices to be different colors."
      :data chart/sample-data
      :config (chart/config widget-id)
-     :data-panel utils/tabular-data-panel
-     :config-panel chart/config-panel
-     :component-panel chart/component
+     :component chart/component
+     :component-id "pie-chart-demo/pie-chart"
      :source-code chart/source-code]))

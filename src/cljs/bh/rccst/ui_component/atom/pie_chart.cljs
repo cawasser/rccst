@@ -32,13 +32,15 @@
   - chart-id : (string) unique id of the chart
   "
   [chart-id]
-  (merge utils/default-config
-    {:tab-panel {:value     (keyword chart-id "config")
-                 :data-path [:widgets (keyword chart-id) :tab-panel]}
-     :fill      "#8884d8"}))
+  (-> ui-utils/default-pub-sub
+    (merge
+      utils/default-config
+      {:tab-panel {:value     (keyword chart-id "config")
+                   :data-path [:widgets (keyword chart-id) :tab-panel]}
+       :fill      "#8884d8"})))
 
 
-(defn config-panel
+(defn- config-panel
   "the panel of configuration controls
 
   ---
@@ -69,7 +71,7 @@
                    [:> Pie {:dataKey "value" :data @data :fill "#8884d8"}]])
 
 
-(defn component
+(defn- component-panel
   "the chart to draw, taking cues from the settings of the configuration panel
 
   ---
@@ -82,7 +84,6 @@
         fill (ui-utils/subscribe-local chart-id [:fill])]
 
     (fn []
-      [c/chart
        [:> PieChart {:width 400 :height 400 :label true}
 
         (utils/non-gridded-chart-components chart-id)
@@ -92,5 +93,38 @@
                  :data              @data
                  :fill              @fill
                  :label             true
-                 :isAnimationActive @isAnimationActive?}]]])))
+                 :isAnimationActive @isAnimationActive?}]])))
+
+(defn component
+      "the chart to draw, taking cues from the settings of the configuration panel
+
+      the component creates its own ID (a random-uuid) to hold the local state. This way multiple charts
+      can be placed inside the same outer container/composite
+
+      ---
+
+      - data : (atom) any data shown by the component's ui
+      - container-id : (string) name of the container this chart is inside of
+      "
+      ([data component-id]
+       [component data component-id ""])
+
+
+      ([data component-id container-id]
+
+       (let [id (r/atom nil)]
+
+         (fn [] (when (nil? @id)
+                  (reset! id component-id)
+                  (ui-utils/init-widget @id (config @id))
+                  (ui-utils/dispatch-local @id [:container] container-id))
+
+             ;(log/info "component" @id)
+
+             [c/configurable-chart
+              :data data
+              :id @id
+              :data-panel utils/tabular-data-panel
+              :config-panel config-panel
+              :component component-panel]))))
 

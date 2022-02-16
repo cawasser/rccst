@@ -14,4 +14,5 @@
             :data chart/sample-data
             :config (chart/config widget-id)
             :component chart/component
-            :component-id "area-chart-demo/area-chart"]))
+            :component-id "area-chart-demo/area-chart"
+            :source-code chart/source-code]))
