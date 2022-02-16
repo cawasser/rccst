@@ -106,13 +106,15 @@
 
   [rc/v-box :src (rc/at)
    :gap "10px"
-   :width "100%"
+   :width "400px"
    :style {:padding          "15px"
            :border-top       "1px solid #DDD"
            :background-color "#f7f7f7"}
    :children [[utils/standard-chart-config data chart-id]
               [rc/line :src (rc/at) :size "2px"]
               [rc/h-box :src (rc/at)
+               :width "400px"
+               :style ui-utils/h-wrap
                :gap "10px"
                :children (make-bar-config chart-id data)]
               [rc/line :src (rc/at) :size "2px"]
@@ -134,6 +136,7 @@
                        (when (seq (ui-utils/resolve-sub subscriptions [a :stackId]))
                          {:stackId (ui-utils/resolve-sub subscriptions [a :stackId])}))]
              [])))
+    (remove empty?)
     (into [:<>])))
 
 
@@ -168,6 +171,21 @@
     (def isAnimationActive? (r/atom true)))
 
   (make-bar-display chart-id data subscriptions isAnimationActive?)
+
+
+  (->> (get-in @data [:metadata :fields])
+    (filter (fn [[_ v]] (= :number v)))
+    keys
+    (map (fn [a]
+           (if (ui-utils/resolve-sub subscriptions [a :include])
+             [:> Bar (merge {:type              "monotone" :dataKey a
+                             :isAnimationActive @isAnimationActive?
+                             :fill              (ui-utils/resolve-sub subscriptions [a :fill])}
+                       (when (seq (ui-utils/resolve-sub subscriptions [a :stackId]))
+                         {:stackId (ui-utils/resolve-sub subscriptions [a :stackId])}))]
+             [])))
+    (remove empty?)
+    (into [:<>]))
 
   ())
 

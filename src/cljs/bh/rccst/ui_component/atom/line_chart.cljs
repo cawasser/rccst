@@ -128,6 +128,7 @@
                        :stroke            (ui-utils/resolve-sub subscriptions [a :stroke])
                        :fill              (ui-utils/resolve-sub subscriptions [a :fill])}]
              [])))
+    (remove empty?)
     (into [:<>])))
 
 

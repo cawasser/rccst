@@ -11,7 +11,43 @@
 
 (def sample-data
   "the Pie Chart works best with \"paired data\" so we return the paired-data from utils"
-  (r/atom utils/paired-data))
+
+  ; switching to tabular data to work out the UI logic
+  (r/atom utils/meta-tabular-data))
+;(r/atom utils/paired-data))
+
+
+(defn local-config [data]
+  (let [d (get @data :data)]
+
+    (merge
+      {:fill (ui-utils/get-color 0)}
+
+      ; process options for :name
+      (->> (get-in @data [:metadata :fields])
+        (filter (fn [[k v]] (= :string v)))
+        keys
+        ((fn [m]
+           {:name {:keys m :chosen (first m)}})))
+
+      ; process options for :value
+      (->> (get-in @data [:metadata :fields])
+        (filter (fn [[k v]] (= :number v)))
+        keys
+        ((fn [m]
+           {:value {:keys m :chosen (first m)}}))))))
+
+
+(comment
+  (def data (r/atom utils/meta-tabular-data))
+
+  (->> (get-in @data [:metadata :fields])
+    (filter (fn [[k v]] (= :number v)))
+    keys
+    ((fn [m]
+       {:value {:keys m :chosen (first m)}})))
+
+  ())
 
 
 (defn config
@@ -30,14 +66,37 @@
   ---
 
   - chart-id : (string) unique id of the chart
+  - data : (atom) atom holding metadata-wrapped data to display
   "
-  [chart-id]
+  [chart-id data]
   (-> ui-utils/default-pub-sub
     (merge
       utils/default-config
       {:tab-panel {:value     (keyword chart-id "config")
-                   :data-path [:widgets (keyword chart-id) :tab-panel]}
-       :fill      "#8884d8"})))
+                   :data-path [:widgets (keyword chart-id) :tab-panel]}}
+      (local-config data))))
+
+
+(defn- option-config [chart-id label path-root]
+  (let [chosen-path (conj path-root :chosen)
+        keys-path (conj path-root :keys)
+        chosen (ui-utils/subscribe-local chart-id chosen-path)
+        keys (ui-utils/subscribe-local chart-id keys-path)
+        btns (->> @keys
+               (map (fn [k]
+                      {:id k :label k})))]
+
+    ;(log/info "keys-config" @keys @chosen btns)
+
+    (fn [chart-id label path-root]
+      [rc/h-box :src (rc/at)
+       :children [[rc/box :src (rc/at) :align :start :child [:code label]]
+                  [rc/horizontal-bar-tabs
+                   :src (rc/at)
+                   :model @chosen
+                   :tabs btns
+                   :style utils/btns-style
+                   :on-change #(ui-utils/dispatch-local chart-id chosen-path %)]]])))
 
 
 (defn- config-panel
@@ -60,9 +119,10 @@
            :background-color "#f7f7f7"}
    :children [[utils/non-gridded-chart-config chart-id]
               [rc/line :src (rc/at) :size "2px"]
-              [rc/h-box :src (rc/at)
-               :gap "10px"
-               :children [[utils/color-config-text chart-id ":fill" [:fill] :above-right]]]]])
+              [option-config chart-id ":name" [:name]]
+              [rc/line :src (rc/at) :size "2px"]
+              [option-config chart-id ":value" [:value]]
+              [utils/color-config-text chart-id ":fill" [:fill] :above-right]]])
 
 
 (def source-code '[:> PieChart {:width 400 :height 400}
@@ -80,51 +140,75 @@
   - widget-id : (string) unique identifier for this specific widget instance
   "
   [data chart-id]
-  (let [isAnimationActive? (ui-utils/subscribe-local chart-id [:isAnimationActive])
-        fill (ui-utils/subscribe-local chart-id [:fill])]
+  (let [container (ui-utils/subscribe-local chart-id [:container])
+        isAnimationActive? (ui-utils/subscribe-local chart-id [:isAnimationActive])
+        subscriptions (ui-utils/build-subs chart-id (local-config data))]
 
     (fn []
-       [:> PieChart {:width 400 :height 400 :label true}
+      [:> PieChart {:width 400 :height 400 :label true}
 
-        (utils/non-gridded-chart-components chart-id)
+       (utils/non-gridded-chart-components chart-id)
 
-        [:> Pie {:dataKey           "value"
-                 :name-Key          "name"
-                 :data              @data
-                 :fill              @fill
-                 :label             true
-                 :isAnimationActive @isAnimationActive?}]])))
+       [:> Pie {:dataKey           (ui-utils/resolve-sub subscriptions [:value :chosen])
+                :name-Key          (ui-utils/resolve-sub subscriptions [:name :chosen])
+                :data              (get @data :data)
+                :fill              (ui-utils/resolve-sub subscriptions [:fill])
+                :label             true
+                :isAnimationActive @isAnimationActive?}]])))
+
 
 (defn component
-      "the chart to draw, taking cues from the settings of the configuration panel
+  "the chart to draw, taking cues from the settings of the configuration panel
 
-      the component creates its own ID (a random-uuid) to hold the local state. This way multiple charts
-      can be placed inside the same outer container/composite
+  the component creates its own ID (a random-uuid) to hold the local state. This way multiple charts
+  can be placed inside the same outer container/composite
 
-      ---
+  ---
 
-      - data : (atom) any data shown by the component's ui
-      - container-id : (string) name of the container this chart is inside of
-      "
-      ([data component-id]
-       [component data component-id ""])
+  - data : (atom) any data shown by the component's ui
+  - container-id : (string) name of the container this chart is inside of
+  "
+  ([data component-id]
+   [component data component-id ""])
 
 
-      ([data component-id container-id]
+  ([data component-id container-id]
 
-       (let [id (r/atom nil)]
+   (let [id (r/atom nil)]
 
-         (fn [] (when (nil? @id)
-                  (reset! id component-id)
-                  (ui-utils/init-widget @id (config @id))
-                  (ui-utils/dispatch-local @id [:container] container-id))
+     (fn [] (when (nil? @id)
+              (reset! id component-id)
+              (ui-utils/init-widget @id (config @id data))
+              (ui-utils/dispatch-local @id [:container] container-id))
 
-             ;(log/info "component" @id)
+       ;(log/info "component" @id)
 
-             [c/configurable-chart
-              :data data
-              :id @id
-              :data-panel utils/tabular-data-panel
-              :config-panel config-panel
-              :component component-panel]))))
+       [c/configurable-chart
+        :data data
+        :id @id
+        :data-panel utils/meta-tabular-data-panel
+        :config-panel config-panel
+        :component component-panel]))))
+
+
+
+; work out the logic for (option-config)
+(comment
+  (do
+    (def data sample-data)
+    (def chart-id "pie-chart-demo/pie-chart")
+    (def label ":name")
+    (def path-root [:name])
+
+    (def chosen-path (conj path-root :chosen))
+    (def keys-path (conj path-root :keys))
+    (def chosen (ui-utils/subscribe-local chart-id chosen-path))
+    (def keys (ui-utils/subscribe-local chart-id keys-path))
+    (def btns (->> @keys
+                (map (fn [k]
+                       {:id k :label k})))))
+
+  (def subscriptions (ui-utils/build-subs chart-id (local-config data)))
+
+  ())
 

@@ -16,7 +16,6 @@
 
 > See `Colored Pie Chart` for an example of how to get the slices to be different colors."
      :data chart/sample-data
-     :config (chart/config widget-id)
      :component chart/component
-     :component-id "pie-chart-demo/pie-chart"
+     :component-id (str widget-id "/pie-chart")
      :source-code chart/source-code]))
