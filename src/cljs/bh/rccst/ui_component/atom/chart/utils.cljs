@@ -214,6 +214,10 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; region
 
+(defn dummy-data-panel [data]
+  [:div "a dummy data panel"])
+
+
 (defn tabular-data-panel
   "provides a simple tabular component (via `bh.rccst.ui-component.table`) to show the data presented
   in the Chart.

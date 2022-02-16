@@ -30,6 +30,10 @@
                    :on-change (fn [val]
                                   (reset! disabled? val))]]])
 
+(def sample-data
+  {:disabled? false
+   :color "green"})
+
 (defn example []
       (let [disabled? (ratom/atom false)
             color (ratom/atom "green")]
