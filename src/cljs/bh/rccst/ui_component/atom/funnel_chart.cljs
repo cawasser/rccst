@@ -12,7 +12,32 @@
 
 (def sample-data
   "the Funnel Chart works best with \"paired data\" so we return the paired-data from utils"
-  (r/atom utils/paired-data))
+  (r/atom utils/meta-tabular-data))
+
+(defn local-config [data]
+      (let [d (get @data :data)
+            fields (get-in @data [:metadata :fields])]
+
+           (merge
+             ; process options for :name
+             (->> fields
+                  (filter (fn [[k v]] (= :string v)))
+                  keys
+                  ((fn [m]
+                       {:name {:keys m :chosen (first m)}})))
+
+             ; process :name to map up the :colors
+             (->> d
+                  (map :name)
+                  (#(zipmap % ui-utils/default-stroke-fill-colors))
+                  (assoc {} :colors))
+
+             ; process options for :value
+             (->> fields
+                  (filter (fn [[k v]] (= :number v)))
+                  keys
+                  ((fn [m]
+                       {:value {:keys m :chosen (first m)}}))))))
 
 
 (defn config
@@ -32,17 +57,20 @@
 
   - chart-id : (string) unique id of the chart
   "
-  [chart-id]
+  [chart-id data]
+
       (merge
         ui-utils/default-pub-sub
         utils/default-config
-        {:tab-panel {:value     (keyword chart-id "config")
-                     :data-path [:widgets (keyword chart-id) :tab-panel]}
-         :colors    (zipmap (map :name utils/paired-data)
-                      ["#8884d8" "#83a6ed" "#8dd1e1"
-                       "#82ca9d" "#a4de6c" "#d7e62b"])}))
-        ;(assoc-in [:pub] :name)
-        ;(assoc-in [:sub] :something-selected)))
+        (ui-utils/config-tab-panel chart-id)
+        (local-config data)))
+
+
+        ;{:tab-panel {:value     (keyword chart-id "config")
+        ;             :data-path [:widgets (keyword chart-id) :tab-panel]}
+        ; :colors    (zipmap (map :name utils/paired-data)
+        ;              ["#8884d8" "#83a6ed" "#8dd1e1"
+        ;               "#82ca9d" "#a4de6c" "#d7e62b"])}
 
 
 (defn- color-anchors
@@ -85,6 +113,9 @@
            :background-color "#f7f7f7"}
    :children [[utils/non-gridded-chart-config chart-id]
               [rc/line :src (rc/at) :size "2px"]
+              [utils/option chart-id ":name" [:name]]
+              [rc/line :src (rc/at) :size "2px"]
+              [utils/option chart-id ":value" [:value]]
               [rc/v-box :src (rc/at)
                :gap "5px"
                :children [[rc/label :src (rc/at) :label "Funnel Colors"]
@@ -100,27 +131,29 @@
   - chart-id : (string) unique identifier for this chart instance
   "
   [data chart-id]
-  (let [container (ui-utils/subscribe-local chart-id [:container])
-        colors (ui-utils/subscribe-local chart-id [:colors])
-        isAnimationActive? (ui-utils/subscribe-local chart-id [:isAnimationActive])]
+  (let [isAnimationActive? (ui-utils/subscribe-local chart-id [:isAnimationActive])
+        subscriptions (ui-utils/build-subs chart-id (local-config data))]
 
-    (fn []
+    (fn [data chart-id]
       ;(log/info "configurable-funnel-chart" @config)
-       [:> FunnelChart {:height 400 :width 500}
+       [:> FunnelChart {:height 400 :width 500 :label true}
+
         (utils/non-gridded-chart-components chart-id)
-        [:> Funnel {:dataKey           :value
-                    :nameKey           "name"
+
+        [:> Funnel {:dataKey           (ui-utils/resolve-sub subscriptions [:value :chosen])
+                    :nameKey           (ui-utils/resolve-sub subscriptions [:name :chosen])
                     :label             true
-                    :data              @data
+                    :data              (get @data :data)
                     :isAnimationActive @isAnimationActive?}
          (doall
            (map-indexed
              (fn [idx {name :name}]
                ^{:key (str idx name)}
                [:> Cell {:key  (str "cell-" idx)
-                         :fill (get @colors name)}])
-             @data))
-         [:> LabelList {:position :right :fill "#000000" :stroke "none" :dataKey :name}]]])))
+                         :fill (or (ui-utils/resolve-sub subscriptions [:colors name])
+                                   (ui-utils/get-color 0))}])
+             (get @data :data)))
+         [:> LabelList {:position :right :fill "#000000" :stroke "none" :dataKey (ui-utils/resolve-sub subscriptions [:value :chosen])}]]])))
 
 
 (def source-code `[:> FunnelChart {:height 400 :width 500}
@@ -131,19 +164,19 @@
                                :isAnimationActive @isAnimationActive?}]])
 
 (defn component
-      ([data chart-id]
-       [component data chart-id ""])
+      ([data component-id]
+       [component data component-id ""])
 
-      ([data chart-id container-id]
+      ([data component-id container-id]
 
-       (log/info "funnel-chart" @data)
+       ;(log/info "funnel-chart" @data)
 
        (let [id (r/atom nil)]
 
               (fn []
                   (when (nil? @id)
-                        (reset! id chart-id)
-                        (ui-utils/init-widget @id (config @id))
+                        (reset! id component-id)
+                        (ui-utils/init-widget @id (config @id data))
                         (ui-utils/dispatch-local @id [:container] container-id))
 
                   ;(log/info "component" @id)
@@ -151,7 +184,7 @@
                   [c/configurable-chart
                    :data data
                    :id @id
-                   :data-panel utils/tabular-data-panel
+                   :data-panel utils/meta-tabular-data-panel
                    :config-panel config-panel
                    :component component-panel]))))
 
