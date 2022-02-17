@@ -1,5 +1,4 @@
-(ns bh.rccst.ui-component.flippable-card
-  (:require ["react-ui-cards" :refer (FlippingCard FlippingCardBack FlippingCardFront)]))
+(ns bh.rccst.ui-component.flippable-card)
 
 
 (def default-background "#9CA8B3")
@@ -38,6 +37,8 @@
 > See [here](https://line25.com/articles/super-cool-css-flip-effect-with-webkit-animation/) for an approach.
   "
   [& {:keys [front back style]}]
-  [:> FlippingCard {:style (or style default-style)}
-   [:> FlippingCardFront front]
-   [:> FlippingCardBack back]])
+
+  [:div.flip-card {:style (or style default-style)}
+   [:div.flip-card-inner
+    [:div.flip-card-front front]
+    [:div.flip-card-back back]]])

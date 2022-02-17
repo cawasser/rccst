@@ -42,9 +42,9 @@
     `FlippingCardFront` and a `FlippingCardBack` and flips between them when the user moves the mouse
     over the card.
     "
-    [layout/centered
+    [layout/centered {:extra-classes :width-50}
      [flippable-card/card
-      :style node-style-square
+      :style (assoc node-style-square :width "300px" :height "500px")
       :front [rc/v-box
               :gap "10px"
               :children [[:img {:style image-style

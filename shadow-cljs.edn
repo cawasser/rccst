@@ -22,7 +22,9 @@
                 [day8.re-frame/tracing "0.6.2"]
                 [re-com "2.13.2"]
                 [org.clojars.ertucetin/re-frame-flow "0.1.4"]
-                [com.lucasbradstreet/cljs-uuid-utils "1.0.2"]]
+                [com.lucasbradstreet/cljs-uuid-utils "1.0.2"]
+
+                [metasoarous/oz "2.0.0-alpha2"]]
 
  :builds       {:app
                 {:target       :browser
