@@ -12,6 +12,6 @@
             :description "A simple Radar Chart built using [Recharts]()"
             :data chart/sample-data
             :component chart/component
-            :component-id "radar-chart-demo/radar-chart"
+            :component-id (str widget-id "/radar-chart")
             :source-code chart/source-code]))
 
