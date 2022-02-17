@@ -13,6 +13,7 @@
             [bh.rccst.views.catalog.layouts :as layout-demo]
             [bh.rccst.views.catalog.miscellaneous :as misc]
             [bh.rccst.views.catalog.re-com :as re-com-demo]
+            [bh.rccst.views.catalog.experimental :as experimental]
             [taoensso.timbre :as log]
 
             [bh.rccst.ui-component.tabbed-panel :as tabbed-panel]))
@@ -28,6 +29,7 @@
                      [:atoms/forms "Forms" [forms-demo/catalog]]
                      [:atoms/re-com "Re-com" [re-com-demo/catalog]]
                      [:atoms/misc "Misc." [misc/catalog]]
+                     [:atoms/experimental "Experimental" [experimental/catalog]]
                      [:atoms/all "All" [all-demo/catalog]]])
 
 
