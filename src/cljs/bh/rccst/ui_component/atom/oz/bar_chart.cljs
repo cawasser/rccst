@@ -39,7 +39,7 @@
 (def sample-data
   (r/atom {:$schema "https://vega.github.io/schema/vega/v5.json"
            :width   400
-           :height  200
+           :height  400
            :padding 5
 
            :data    [{:name   "table"
