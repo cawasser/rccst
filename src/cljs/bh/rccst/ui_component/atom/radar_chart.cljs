@@ -26,8 +26,25 @@
                                      {:subject "Economics" :A 99 :B 140 :fullMark 150}
                                      {:subject "Literature" :A 98 :B 105 :fullMark 150}]}))
 
+
+(defn- get-range-across-fields [data]
+       {:domain [50 200]})
+
+
+(defn- get-field-range [field data]
+       (let [domainMin 150
+             domainMax 150]
+            (if (= domainMin domainMax)
+              {:domain [0 domainMax]}
+              {:domain [domainMin domainMax]})))
+
+
 (defn- domain-range [data]
-       {:domain [0 150]})
+       (let [domainField (get-in @data [:metadata :domainField])]
+            (if (nil? domainField)
+              (get-range-across-fields data)
+              (get-field-range domainField data))))
+
 
 (defn local-config
       "provides both the definition and the initial default values for various properties that
