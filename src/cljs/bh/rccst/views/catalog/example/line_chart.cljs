@@ -2,8 +2,7 @@
   (:require [taoensso.timbre :as log]
 
             [bh.rccst.ui-component.atom.line-chart :as chart]
-            [bh.rccst.ui-component.molecule.example :as example]
-            [bh.rccst.ui-component.atom.chart.utils :as utils]))
+            [bh.rccst.ui-component.molecule.example :as example]))
 
 
 (defn simple-example []
