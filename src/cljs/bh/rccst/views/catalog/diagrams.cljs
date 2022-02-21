@@ -1,9 +1,7 @@
-(ns bh.rccst.views.catalog.diagrams
-  (:require [bh.rccst.views.catalog.example.globe.globe-component :as globe]))
+(ns bh.rccst.views.catalog.diagrams)
 
 
 
 (defn catalog []
   [:div "Diagrams"
-   [:div
-    [globe/example]]])
+   [:div]])
