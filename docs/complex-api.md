@@ -21,4 +21,22 @@ to include the things we'll want in the future:
    1. [ ] save-layout
    2. [ ] load-layout
 
+## Some other considerations
 
+(see also [Will Low Code/No Code Kill Programming Jobs - Dave Farley](https://www.youtube.com/watch?v=uxBZFju0Mjs))
+
+- `rollback`, so if a user does something they don't like, they can `undo` their changes, perhaps all the 
+way back to the application being completely blank
+- insight into how the widget works
+  - tracing events
+  - seeing how the components interconnect
+  - etc.
+- ability to store configured widgets as `templates` that can be shared with other users
+- discovery
+  - data sources
+  - ui components
+  - pre-built widget templates
+  - themes
+  - color-pallets
+  - etc.
+  - 

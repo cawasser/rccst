@@ -10,37 +10,24 @@
             [taoensso.timbre :as log]))
 
 
-(defn play-data [& names]
-  (for [n names
-        i (range 20)]
-    {:time i
-     :item n
-     :quantity (+ (Math/pow (* i (count n)) 0.8)
-                 (rand-int (count n)))}))
-
-
-(def sample-data
-  "the Line Chart works best with \"tabular data\" so we return the tabular-data from utils"
-  (r/atom (play-data "monkey" "slipper" "broom")))
-
 
 (def source-code '[oz.core/vega-lite
-                   {:data {:values (get @data :data)}
-                    :mark "bar"
-                    :encoding {:x {:field "time"
-                                   :type "ordinal"}
-                               :y {:aggregate "sum"
-                                   :field "quantity"
-                                   :type "quantitative"}
+                   {:data     {:values (get @data :data)}
+                    :mark     "bar"
+                    :encoding {:x     {:field "time"
+                                       :type  "ordinal"}
+                               :y     {:aggregate "sum"
+                                       :field     "quantity"
+                                       :type      "quantitative"}
                                :color {:field "item"
-                                       :type "nominal"}}}])
+                                       :type  "nominal"}}}])
 
 
 (defn- config [chart-id data]
   (-> ui-utils/default-pub-sub
     (merge
       utils/default-config
-      {:type      "oz-line-chart"}
+      {:type "oz-line-chart"}
       (ui-utils/config-tab-panel chart-id))))
 
 
@@ -50,31 +37,78 @@
   [:div "config panel here"])
 
 
-(defn data []
-  {:width 250
-   :height 300
-   :autosize {:type "fit"
-              :contains "padding"}
-   :background "#000"
-   :data {:values (play-data "munchkin" "witch" "dog" "lion" "tiger" "bear")}
-   :mark "line"
-   :encoding {:y {:field "quantity" :type "quantitative"}
-              :x {:field "time" :type "ordinal"}
-              :color {:field "item" :type "nominal"}}})
+(def sample-data
+  (r/atom {:$schema "https://vega.github.io/schema/vega/v5.json"
+           :width   400
+           :height  200
+           :padding 5
+
+           :signals [{:name  "interpolate"
+                      :value "linear"
+                      :bind  {:input   "select"
+                              :options ["basis"
+                                        "cardinal"
+                                        "catmull-rom"
+                                        "linear"
+                                        "monotone"
+                                        "natural"
+                                        "step"
+                                        "step-after"
+                                        "step-before"]}}]
+
+           :data    [{:name   "table"
+                      :values [{:x 0 :y 28 :c 0} {:x 0 :y 20 :c 1}
+                               {:x 1 :y 43 :c 0} {:x 1 :y 35 :c 1}
+                               {:x 2 :y 81 :c 0} {:x 2 :y 10 :c 1}
+                               {:x 3 :y 19 :c 0} {:x 3 :y 15 :c 1}
+                               {:x 4 :y 52 :c 0} {:x 4 :y 48 :c 1}
+                               {:x 5 :y 24 :c 0} {:x 5 :y 28 :c 1}
+                               {:x 6 :y 87 :c 0} {:x 6 :y 66 :c 1}
+                               {:x 7 :y 17 :c 0} {:x 7 :y 27 :c 1}
+                               {:x 8 :y 68 :c 0} {:x 8 :y 16 :c 1}
+                               {:x 9 :y 49 :c 0} {:x 9 :y 25 :c 1}]}]
+
+           :scales  [{:name   :x-axis
+                      :type   :point
+                      :domain {:data "table" :field :x}
+                      :range  :width
+                      :round  true}
+                     {:name   :y-axis
+                      :type   :linear
+                      :domain {:data "table" :field :y}
+                      :nice   true
+                      :zero   true
+                      :range  :height}
+                     {:name   :color
+                      :type   :ordinal
+                      :domain {:data "table" :field :c}
+                      :range  :category}]
+
+           :axes    [{:orient :bottom :scale :x-axis}
+                     {:orient :left :scale :y-axis}]
+
+           :marks   [{:type "group"
+                      :from {:facet {:name    "series"
+                                     :data    "table"
+                                     :groupby :c}}
+                      :marks [{:type   "line"
+                               :from   {:data "series"}
+                               :encode {:enter  {:x           {:scale :x-axis :field :x}
+                                                 :y           {:scale :y-axis :field :y}
+                                                 :stroke      {:scale :color :field :c}
+                                                 :strokeWidth {:value 2}}
+                                        :update {:interpolate   {:signal "interpolate"}
+                                                 :strokeOpacity {:value 1}}
+                                        :hover  {:strokeOpacity {:value 0.5}}}}]}]}))
+
 
 (defn- component-panel
-  [_ chart-id]
+  [data chart-id]
 
   [:div {:style {:width "400px" :height "500px"}}
-   [oz/vega-lite (data)]])
+   [oz/vega @data]])
 
 
-
-(comment
-  (def data sample-data)
-
-  @data
-  ())
 
 (defn component
   ([data chart-id]
@@ -85,12 +119,12 @@
 
    ;(log/info "line-chart" @data)
 
-    ;(if (not= :tabular (get-in @data [:metadata :type]))
-    ;  [rc/alert-box :src (rc/at)
-    ;   :id (str container-id "/" chart-id ".ERROR")
-    ;   :alert-type :danger
-    ;   :closeable? false
-    ;   :body [:div "The data passed is NOT of type :tabular!"]]
+   ;(if (not= :tabular (get-in @data [:metadata :type]))
+   ;  [rc/alert-box :src (rc/at)
+   ;   :id (str container-id "/" chart-id ".ERROR")
+   ;   :alert-type :danger
+   ;   :closeable? false
+   ;   :body [:div "The data passed is NOT of type :tabular!"]]
 
    (let [id (r/atom nil)]
 
@@ -110,10 +144,3 @@
         :component component-panel]))))
 
 
-(comment
-  [:div
-   [oz.core/vega {}]
-   [oz.core/vega-lite {}]]
-
-
-  ())
