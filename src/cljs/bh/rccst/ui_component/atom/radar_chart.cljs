@@ -17,6 +17,7 @@
 
 (def sample-data (r/atom {:metadata {:type   :tabular
                                      :id     :subject
+                                     :domainField :fullMark
                                      :fields {:subject :string :A :number :B :number :fullMark :number}}
                           :data     [{:subject "Math" :A 120 :B 110 :fullMark 150}
                                      {:subject "Chinese" :A 98 :B 130 :fullMark 150}
@@ -24,6 +25,9 @@
                                      {:subject "History" :A 77 :B 81 :fullMark 150}
                                      {:subject "Economics" :A 99 :B 140 :fullMark 150}
                                      {:subject "Literature" :A 98 :B 105 :fullMark 150}]}))
+
+(defn- domain-range [data]
+       {:domain [0 150]})
 
 (defn local-config
       "provides both the definition and the initial default values for various properties that
@@ -39,7 +43,7 @@
     > [tabular-data]()
       "
       [data]
-      (merge {:domain [0 150]}
+      (merge (domain-range data)
              (->> (get-in @data [:metadata :fields])
                   (filter (fn [[k v]] (= :number v)))
                   keys
