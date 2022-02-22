@@ -1,4 +1,4 @@
-(ns bh.rccst.views.catalog.example.alert-box
+(ns bh.rccst.views.catalog.example.re-com.alert-box
   (:require [woolybear.ad.layout :as layout]
             [woolybear.ad.catalog.utils :as acu]
             [reagent.core :as r]

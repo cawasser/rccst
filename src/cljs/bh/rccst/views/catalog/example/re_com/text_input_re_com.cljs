@@ -1,4 +1,4 @@
-(ns bh.rccst.views.catalog.example.text-input-re-com
+(ns bh.rccst.views.catalog.example.re-com.text-input-re-com
   (:require [woolybear.ad.catalog.utils :as acu]
             [woolybear.ad.layout :as layout]
             [reagent.ratom :as ratom]

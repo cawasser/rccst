@@ -1,4 +1,4 @@
-(ns bh.rccst.views.catalog.example.date-picker
+(ns bh.rccst.views.catalog.example.re-com.date-picker
   (:require-macros
     [reagent.ratom     :refer [reaction]])
   (:require [reagent.core :as r]

@@ -1,4 +1,4 @@
-(ns  bh.rccst.views.catalog.example.checkbox-re-com
+(ns  bh.rccst.views.catalog.example.re-com.checkbox-re-com
   (:require [woolybear.ad.catalog.utils :as acu]
             [reagent.ratom :as ratom]
             [re-com.core   :as rc]))

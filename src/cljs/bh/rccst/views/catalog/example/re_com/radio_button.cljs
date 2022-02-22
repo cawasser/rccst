@@ -1,4 +1,4 @@
-(ns bh.rccst.views.catalog.example.radio-button
+(ns bh.rccst.views.catalog.example.re-com.radio-button
   (:require [woolybear.ad.catalog.utils :as acu]
 
             [reagent.ratom :as ratom]

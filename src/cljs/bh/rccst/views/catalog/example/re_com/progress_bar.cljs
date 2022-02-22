@@ -1,4 +1,4 @@
-(ns bh.rccst.views.catalog.example.progress-bar
+(ns bh.rccst.views.catalog.example.re-com.progress-bar
   (:require [reagent.core :as r]
             [woolybear.ad.catalog.utils :as acu]
             [re-com.core :as rc]))

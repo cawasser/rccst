@@ -42,9 +42,9 @@
             [bh.rccst.views.catalog.example.chart.pie-chart :as pie-chart]
             [bh.rccst.views.catalog.example.chart.colored-pie-chart :as colored-piechart]
 
-            [bh.rccst.views.catalog.example.table :as table]
-            [bh.rccst.views.catalog.example.alert-box :as alert-box]
-            [bh.rccst.views.catalog.example.line :as line]))
+            [bh.rccst.views.catalog.example.re-com.table :as table]
+            [bh.rccst.views.catalog.example.re-com.alert-box :as alert-box]
+            [bh.rccst.views.catalog.example.re-com.line :as line]))
 
 
 

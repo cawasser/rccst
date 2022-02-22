@@ -1,4 +1,4 @@
-(ns bh.rccst.views.catalog.example.input-time
+(ns bh.rccst.views.catalog.example.re-com.input-time
   (:require [reagent.core :as r]
             [woolybear.ad.catalog.utils :as acu]
             [re-com.core :as core]

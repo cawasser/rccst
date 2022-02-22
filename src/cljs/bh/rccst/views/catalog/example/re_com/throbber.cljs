@@ -1,4 +1,4 @@
-(ns bh.rccst.views.catalog.example.throbber
+(ns bh.rccst.views.catalog.example.re-com.throbber
   (:require [reagent.core :as r]
             [woolybear.ad.catalog.utils :as acu]
             [re-com.core :as core]

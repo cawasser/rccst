@@ -1,4 +1,4 @@
-(ns bh.rccst.views.catalog.example.table
+(ns bh.rccst.views.catalog.example.re-com.table
   (:require [taoensso.timbre :as log]
             [woolybear.ad.layout :as layout]
             [woolybear.ad.catalog.utils :as acu]

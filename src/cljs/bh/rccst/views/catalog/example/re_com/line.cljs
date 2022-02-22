@@ -1,4 +1,4 @@
-(ns bh.rccst.views.catalog.example.line
+(ns bh.rccst.views.catalog.example.re-com.line
   (:require [woolybear.ad.layout :as layout]
             [woolybear.ad.catalog.utils :as acu]
             [re-com.core :as rc]))
