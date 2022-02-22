@@ -7,12 +7,6 @@
    [taoensso.timbre :as log]))
 
 
-(re-frame/reg-event-db
- ::initialize-db
- (fn-traced [_ _]
-   (log/info ":initialize-db")
-   db/default-db))
-
 
 (re-frame/reg-event-db
   ::init-widget
@@ -75,84 +69,6 @@
       (update-in [:widgets id :layers] dissoc layer-name) ; remove all existing layers
       (assoc-in [:widgets id :layers] {layer-name layer}))))
 
-
-(re-frame/reg-event-db
-  ::toggle-sensor
-
-  (fn-traced [db [_ globe-id selection]]
-    (let [current-set (get-in db [:widgets globe-id :selected-sensors])
-          the-fn (if (contains? current-set selection) disj conj)]
-      (update-in db [:widgets globe-id :selected-sensors] the-fn selection))))
-
-
-(re-frame/reg-event-db
-  ::toggle-aoi
-
-  (fn-traced [db [_ globe-id selection]]
-    (let [current-set (get-in db [:widgets globe-id :selected-aois])
-          the-fn (if (contains? current-set selection) disj conj)]
-      (update-in db [:widgets globe-id :selected-aois] the-fn selection))))
-
-
-(re-frame/reg-event-db
-  ::add-weather-element
-
-  (fn-traced [db [_ new-element]]
-    (log/info "::add-weather-element" new-element)
-    (update db :weather-flow-elements conj new-element)))
-
-
-(re-frame/reg-event-db
-  ::remove-weather-element
-
-  (fn-traced [db [_ element-id]]
-    (let [current (:weather-flow-elements db)]
-      (assoc db :weather-flow-elements (remove (fn [x]
-                                                 (= (:id x) element-id))
-                                         current)))))
-
-
-(re-frame/reg-event-db
-  ::update-weather-element
-
-  (fn-traced [db [_ {:keys [id] :as element}]]
-    (let [current (:weather-flow-elements db)]
-      (-> db
-        (assoc :weather-flow-elements (remove (fn [x]
-                                                (= (:id x) id))
-                                        current))
-        (update :weather-flow-elements conj element)))))
-
-
-
-(re-frame/reg-event-db
-  ::add-system-element
-
-  (fn-traced [db [_ new-element]]
-    (log/info "::add-system-element" new-element)
-    (update db :system-flow-elements conj new-element)))
-
-
-(re-frame/reg-event-db
-  ::remove-system-element
-
-  (fn-traced [db [_ element-id]]
-    (let [current (:system-flow-elements db)]
-      (assoc db :system-flow-elements (remove (fn [x]
-                                                (= (:id x) element-id))
-                                        current)))))
-
-
-(re-frame/reg-event-db
-  ::update-system-element
-
-  (fn-traced [db [_ {:keys [id] :as element}]]
-    (let [current (:system-flow-elements db)]
-      (-> db
-        (assoc :system-flow-elements (remove (fn [x]
-                                               (= (:id x) id))
-                                       current))
-        (update :system-flow-elements conj element)))))
 
 
 ; removing an element from a vector with a given "map key"

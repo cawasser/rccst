@@ -3,7 +3,6 @@
             [bh.rccst.views.catalog.example.globe.worldwind.layer.compass :as compass]
             [bh.rccst.views.catalog.example.globe.worldwind.layer.star-field :as star-field]
             [bh.rccst.views.catalog.example.globe.worldwind.layer.night :as night]
-            [bh.rccst.views.catalog.example.globe.sensor-data :as sd]
 
             [taoensso.timbre :as log]))
 
@@ -22,20 +21,5 @@
    :layers           {}
    :time             0})
 
-
-(def default-db
-  {:name                  "re-frame"
-   :sensor-allocations    sd/all-sensor-data
-   :aois                  sd/all-aoi-data
-   :weather-flow-elements sd/weather-flow-elements
-   :system-flow-elements  sd/system-flow-elements})
-
-
-
-(comment
-  (globe-config "dummy" :min)
-  (globe-config "dummy" :max)
-
-  ())
 
 
