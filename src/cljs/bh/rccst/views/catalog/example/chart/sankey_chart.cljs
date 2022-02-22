@@ -1,4 +1,4 @@
-(ns bh.rccst.views.catalog.example.sankey-chart
+(ns bh.rccst.views.catalog.example.chart.sankey-chart
   (:require [taoensso.timbre :as log]
 
             [bh.rccst.ui-component.atom.sankey-chart :as chart]

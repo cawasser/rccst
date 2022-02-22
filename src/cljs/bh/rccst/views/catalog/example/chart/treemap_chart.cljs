@@ -1,4 +1,4 @@
-(ns bh.rccst.views.catalog.example.treemap-chart
+(ns bh.rccst.views.catalog.example.chart.treemap-chart
   (:require [taoensso.timbre :as log]
 
             [bh.rccst.ui-component.atom.treemap-chart :as chart]

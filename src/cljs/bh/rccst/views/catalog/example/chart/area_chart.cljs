@@ -1,4 +1,4 @@
-(ns bh.rccst.views.catalog.example.area-chart
+(ns bh.rccst.views.catalog.example.chart.area-chart
   (:require [taoensso.timbre :as log]
 
             [bh.rccst.ui-component.atom.area-chart :as chart]

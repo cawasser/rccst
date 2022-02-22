@@ -37,10 +37,10 @@
             [bh.rccst.views.catalog.example.checkbox :as checkbox]
             [bh.rccst.views.catalog.example.disabled-checkbox :as disabled-checkbox]
 
-            [bh.rccst.views.catalog.example.bar-chart :as bar-chart]
-            [bh.rccst.views.catalog.example.line-chart :as line-chart]
-            [bh.rccst.views.catalog.example.pie-chart :as pie-chart]
-            [bh.rccst.views.catalog.example.colored-pie-chart :as colored-piechart]
+            [bh.rccst.views.catalog.example.chart.bar-chart :as bar-chart]
+            [bh.rccst.views.catalog.example.chart.line-chart :as line-chart]
+            [bh.rccst.views.catalog.example.chart.pie-chart :as pie-chart]
+            [bh.rccst.views.catalog.example.chart.colored-pie-chart :as colored-piechart]
 
             [bh.rccst.views.catalog.example.table :as table]
             [bh.rccst.views.catalog.example.alert-box :as alert-box]

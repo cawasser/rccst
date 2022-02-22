@@ -1,15 +1,15 @@
 (ns bh.rccst.views.catalog.charts
-  (:require [bh.rccst.views.catalog.example.area-chart :as area-chart]
-            [bh.rccst.views.catalog.example.bar-chart :as bar-chart]
-            [bh.rccst.views.catalog.example.colored-pie-chart :as colored-pie-chart]
-            [bh.rccst.views.catalog.example.line-chart :as line-chart]
-            [bh.rccst.views.catalog.example.pie-chart :as pie-chart]
-            [bh.rccst.views.catalog.example.scatter-chart :as scatter-chart]
-            [bh.rccst.views.catalog.example.funnel-chart :as funnel-chart]
-            [bh.rccst.views.catalog.example.treemap-chart :as treemap-chart]
-            [bh.rccst.views.catalog.example.sankey-chart :as sankey-chart]
-            [bh.rccst.views.catalog.example.radar-chart :as radar-chart]
-            [bh.rccst.views.catalog.example.radial-bar-chart :as radial-bar-chart]))
+  (:require [bh.rccst.views.catalog.example.chart.area-chart :as area-chart]
+            [bh.rccst.views.catalog.example.chart.bar-chart :as bar-chart]
+            [bh.rccst.views.catalog.example.chart.colored-pie-chart :as colored-pie-chart]
+            [bh.rccst.views.catalog.example.chart.line-chart :as line-chart]
+            [bh.rccst.views.catalog.example.chart.pie-chart :as pie-chart]
+            [bh.rccst.views.catalog.example.chart.scatter-chart :as scatter-chart]
+            [bh.rccst.views.catalog.example.chart.funnel-chart :as funnel-chart]
+            [bh.rccst.views.catalog.example.chart.treemap-chart :as treemap-chart]
+            [bh.rccst.views.catalog.example.chart.sankey-chart :as sankey-chart]
+            [bh.rccst.views.catalog.example.chart.radar-chart :as radar-chart]
+            [bh.rccst.views.catalog.example.chart.radial-bar-chart :as radial-bar-chart]))
 
 
 

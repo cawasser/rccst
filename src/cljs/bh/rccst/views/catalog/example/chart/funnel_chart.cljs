@@ -1,4 +1,4 @@
-(ns bh.rccst.views.catalog.example.funnel-chart
+(ns bh.rccst.views.catalog.example.chart.funnel-chart
   (:require [taoensso.timbre :as log]
 
             [bh.rccst.ui-component.atom.funnel-chart :as chart]

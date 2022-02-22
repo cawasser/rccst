@@ -1,4 +1,4 @@
-(ns bh.rccst.views.catalog.example.colored-pie-chart
+(ns bh.rccst.views.catalog.example.chart.colored-pie-chart
   (:require [taoensso.timbre :as log]
 
             [bh.rccst.ui-component.atom.colored-pie-chart :as chart]

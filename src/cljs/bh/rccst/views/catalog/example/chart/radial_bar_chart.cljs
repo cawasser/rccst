@@ -1,4 +1,4 @@
-(ns bh.rccst.views.catalog.example.radial-bar-chart
+(ns bh.rccst.views.catalog.example.chart.radial-bar-chart
   (:require [taoensso.timbre :as log]
 
             [bh.rccst.ui-component.atom.radial-bar-chart :as chart]

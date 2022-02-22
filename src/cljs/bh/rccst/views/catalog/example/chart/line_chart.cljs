@@ -1,4 +1,4 @@
-(ns bh.rccst.views.catalog.example.line-chart
+(ns bh.rccst.views.catalog.example.chart.line-chart
   (:require [taoensso.timbre :as log]
 
             [bh.rccst.ui-component.atom.line-chart :as chart]

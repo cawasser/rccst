@@ -1,4 +1,4 @@
-(ns bh.rccst.views.catalog.example.scatter-chart
+(ns bh.rccst.views.catalog.example.chart.scatter-chart
   (:require [taoensso.timbre :as log]
 
             [bh.rccst.ui-component.atom.scatter-chart :as chart]
