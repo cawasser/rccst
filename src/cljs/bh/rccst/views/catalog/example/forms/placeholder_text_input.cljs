@@ -1,4 +1,4 @@
-(ns bh.rccst.views.catalog.example.placeholder-text-input
+(ns bh.rccst.views.catalog.example.forms.placeholder-text-input
   (:require [woolybear.ad.catalog.utils :as acu]
             [woolybear.ad.layout :as layout]
             [woolybear.ad.forms :as forms]))

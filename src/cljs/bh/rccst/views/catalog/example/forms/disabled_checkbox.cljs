@@ -1,4 +1,4 @@
-(ns bh.rccst.views.catalog.example.disabled-checkbox
+(ns bh.rccst.views.catalog.example.forms.disabled-checkbox
   (:require [woolybear.ad.catalog.utils :as acu]
             [woolybear.ad.layout :as layout]
             [woolybear.ad.forms :as forms]))

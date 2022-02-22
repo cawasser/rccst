@@ -1,4 +1,4 @@
-(ns bh.rccst.views.catalog.example.password-input
+(ns bh.rccst.views.catalog.example.forms.password-input
   (:require [woolybear.ad.catalog.utils :as acu]
             [woolybear.ad.layout :as layout]
             [woolybear.ad.forms :as forms]))

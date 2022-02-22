@@ -1,4 +1,4 @@
-(ns bh.rccst.views.catalog.example.simple-form-label
+(ns bh.rccst.views.catalog.example.forms.simple-form-label
   (:require [woolybear.ad.catalog.utils :as acu]
             [woolybear.ad.layout :as layout]
             [woolybear.ad.forms :as forms]))

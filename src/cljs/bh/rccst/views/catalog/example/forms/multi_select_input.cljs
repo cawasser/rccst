@@ -1,4 +1,4 @@
-(ns bh.rccst.views.catalog.example.multi-select-input
+(ns bh.rccst.views.catalog.example.forms.multi-select-input
   (:require [woolybear.ad.catalog.utils :as acu]
             [woolybear.ad.utils :as adu]
             [woolybear.ad.layout :as layout]
