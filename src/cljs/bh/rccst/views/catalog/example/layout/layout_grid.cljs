@@ -1,4 +1,4 @@
-(ns bh.rccst.views.catalog.example.layout-grid
+(ns bh.rccst.views.catalog.example.layout.layout-grid
   (:require [woolybear.ad.catalog.utils :as acu]
             [woolybear.ad.layout :as layout]
             [woolybear.ad.icons :as icons]

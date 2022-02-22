@@ -1,4 +1,4 @@
-(ns bh.rccst.views.catalog.example.section
+(ns bh.rccst.views.catalog.example.layout.section
   (:require [woolybear.ad.catalog.utils :as acu]
             [woolybear.ad.layout :as layout]))
 

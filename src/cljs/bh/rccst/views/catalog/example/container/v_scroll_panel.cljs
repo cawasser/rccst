@@ -1,4 +1,4 @@
-(ns bh.rccst.views.catalog.example.v-scroll-panel
+(ns bh.rccst.views.catalog.example.container.v-scroll-panel
   (:require [woolybear.ad.catalog.utils :as acu]
             [woolybear.ad.layout :as layout]
             [woolybear.ad.containers :as containers]))

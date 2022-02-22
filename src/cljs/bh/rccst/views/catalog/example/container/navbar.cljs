@@ -1,4 +1,4 @@
-(ns bh.rccst.views.catalog.example.navbar
+(ns bh.rccst.views.catalog.example.container.navbar
   (:require [woolybear.ad.catalog.utils :as acu]
             [woolybear.ad.layout :as layout]
             [woolybear.packs.tab-panel :as tab-panel]

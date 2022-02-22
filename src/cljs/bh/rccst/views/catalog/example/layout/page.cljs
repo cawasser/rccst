@@ -1,4 +1,4 @@
-(ns bh.rccst.views.catalog.example.page
+(ns bh.rccst.views.catalog.example.layout.page
   (:require [woolybear.ad.catalog.utils :as acu]
             [woolybear.ad.layout :as layout]))
 

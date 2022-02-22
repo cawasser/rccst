@@ -1,4 +1,4 @@
-(ns bh.rccst.views.catalog.example.flex-panel
+(ns bh.rccst.views.catalog.example.container.flex-panel
   (:require [woolybear.ad.catalog.utils :as acu]
             [woolybear.ad.layout :as layout]
             [woolybear.packs.flex-panel :as flex]))

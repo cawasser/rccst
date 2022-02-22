@@ -2,15 +2,17 @@
   "Catalog and acu/demonstrations of all available UI components."
   (:require [re-com.core :as rc]
 
-            [bh.rccst.views.catalog.example.page :as page]
-            [bh.rccst.views.catalog.example.page-header :as page-header]
-            [bh.rccst.views.catalog.example.page-title :as page-title]
-            [bh.rccst.views.catalog.example.text-block :as text-block]
-            [bh.rccst.views.catalog.example.centered-block :as centered-block]
-            [bh.rccst.views.catalog.example.markdown-block :as markdown-block]
-            [bh.rccst.views.catalog.example.frame :as frame]
-            [bh.rccst.views.catalog.example.navbar :as navbar]
-            [bh.rccst.views.catalog.example.section :as section]
+            [bh.rccst.views.catalog.example.layout.page :as page]
+            [bh.rccst.views.catalog.example.layout.page-header :as page-header]
+            [bh.rccst.views.catalog.example.layout.page-title :as page-title]
+            [bh.rccst.views.catalog.example.layout.text-block :as text-block]
+            [bh.rccst.views.catalog.example.layout.centered-block :as centered-block]
+            [bh.rccst.views.catalog.example.layout.markdown-block :as markdown-block]
+            [bh.rccst.views.catalog.example.layout.frame :as frame]
+            [bh.rccst.views.catalog.example.layout.section :as section]
+
+            [bh.rccst.views.catalog.example.container.navbar :as navbar]
+
             [bh.rccst.views.catalog.example.icons.simple-image :as simple-image]
             [bh.rccst.views.catalog.example.icons.standard-icon :as standard-icon]
             [bh.rccst.views.catalog.example.icons.colored-icon :as colored-icon]
@@ -19,7 +21,6 @@
             [bh.rccst.views.catalog.example.icons.large-icon :as large-icon]
             [bh.rccst.views.catalog.example.icons.brand-icon :as brand-icon]
             [bh.rccst.views.catalog.example.icons.clickable-icon :as clickable-icon]
-            [bh.rccst.views.catalog.example.section :as section]
 
 
 

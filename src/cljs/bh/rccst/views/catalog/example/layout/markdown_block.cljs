@@ -1,4 +1,4 @@
-(ns bh.rccst.views.catalog.example.markdown-block
+(ns bh.rccst.views.catalog.example.layout.markdown-block
   (:require [woolybear.ad.catalog.utils :as acu]
             [woolybear.ad.layout :as layout]
             [reagent.core :as r]))
