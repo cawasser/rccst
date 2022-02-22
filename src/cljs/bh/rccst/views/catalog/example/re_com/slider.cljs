@@ -1,4 +1,4 @@
-(ns  bh.rccst.views.catalog.example.slider
+(ns  bh.rccst.views.catalog.example.re-com.slider
   (:require [woolybear.ad.catalog.utils :as acu]
             [reagent.ratom :as ratom]
             [re-com.core   :as rc]))

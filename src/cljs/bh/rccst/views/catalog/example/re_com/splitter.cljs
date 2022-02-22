@@ -1,4 +1,4 @@
-(ns bh.rccst.views.catalog.example.splitter
+(ns bh.rccst.views.catalog.example.re-com.splitter
   (:require [taoensso.timbre :as log]
             [woolybear.ad.layout :as layout]
             [woolybear.ad.catalog.utils :as acu]
