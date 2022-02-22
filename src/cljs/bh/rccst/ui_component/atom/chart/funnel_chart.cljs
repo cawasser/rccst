@@ -1,4 +1,4 @@
-(ns bh.rccst.ui-component.atom.funnel-chart
+(ns bh.rccst.ui-component.atom.chart.funnel-chart
   (:require ["recharts" :refer [FunnelChart Funnel Cell LabelList XAxis YAxis CartesianGrid Tooltip Brush]]
             [bh.rccst.ui-component.atom.chart.utils :as utils]
             [bh.rccst.ui-component.atom.chart.wrapper :as c]

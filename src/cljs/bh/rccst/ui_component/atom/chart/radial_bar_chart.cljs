@@ -1,4 +1,4 @@
-(ns bh.rccst.ui-component.atom.radial-bar-chart
+(ns bh.rccst.ui-component.atom.chart.radial-bar-chart
   (:require [taoensso.timbre :as log]
             ["recharts" :refer [RadialBarChart RadialBar Legend Tooltip]]
             [re-com.core :as rc]

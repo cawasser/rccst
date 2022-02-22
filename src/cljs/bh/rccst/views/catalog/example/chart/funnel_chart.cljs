@@ -1,7 +1,7 @@
 (ns bh.rccst.views.catalog.example.chart.funnel-chart
   (:require [taoensso.timbre :as log]
 
-            [bh.rccst.ui-component.atom.funnel-chart :as chart]
+            [bh.rccst.ui-component.atom.chart.funnel-chart :as chart]
             [bh.rccst.ui-component.molecule.example :as example]
             [bh.rccst.ui-component.atom.chart.utils :as utils]))
 

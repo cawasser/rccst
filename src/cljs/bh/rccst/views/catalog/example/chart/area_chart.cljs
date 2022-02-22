@@ -1,7 +1,7 @@
 (ns bh.rccst.views.catalog.example.chart.area-chart
   (:require [taoensso.timbre :as log]
 
-            [bh.rccst.ui-component.atom.area-chart :as chart]
+            [bh.rccst.ui-component.atom.chart.area-chart :as chart]
             [bh.rccst.ui-component.molecule.example :as example]
             [bh.rccst.ui-component.atom.chart.utils :as utils]))
 

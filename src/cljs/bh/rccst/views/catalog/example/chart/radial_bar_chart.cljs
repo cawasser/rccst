@@ -1,7 +1,7 @@
 (ns bh.rccst.views.catalog.example.chart.radial-bar-chart
   (:require [taoensso.timbre :as log]
 
-            [bh.rccst.ui-component.atom.radial-bar-chart :as chart]
+            [bh.rccst.ui-component.atom.chart.radial-bar-chart :as chart]
             [bh.rccst.ui-component.molecule.example :as example]))
 
 

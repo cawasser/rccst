@@ -1,4 +1,4 @@
-(ns bh.rccst.ui-component.atom.colored-pie-chart
+(ns bh.rccst.ui-component.atom.chart.colored-pie-chart
   (:require [taoensso.timbre :as log]
             [re-com.core :as rc]
             [reagent.core :as r]

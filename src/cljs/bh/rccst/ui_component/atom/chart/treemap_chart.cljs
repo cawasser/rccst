@@ -1,4 +1,4 @@
-(ns bh.rccst.ui-component.atom.treemap-chart
+(ns bh.rccst.ui-component.atom.chart.treemap-chart
   (:require [taoensso.timbre :as log]
             [re-com.core :as rc]
             [reagent.core :as r]

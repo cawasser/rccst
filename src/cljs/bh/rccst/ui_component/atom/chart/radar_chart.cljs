@@ -1,4 +1,4 @@
-(ns bh.rccst.ui-component.atom.radar-chart
+(ns bh.rccst.ui-component.atom.chart.radar-chart
   (:require [bh.rccst.ui-component.atom.chart.utils :as utils]
             ["recharts" :refer [RadarChart PolarGrid PolarAngleAxis PolarRadiusAxis Radar]]
             [bh.rccst.ui-component.atom.chart.wrapper :as c]

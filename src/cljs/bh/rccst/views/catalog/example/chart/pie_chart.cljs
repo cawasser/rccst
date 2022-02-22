@@ -1,7 +1,7 @@
 (ns bh.rccst.views.catalog.example.chart.pie-chart
   (:require [taoensso.timbre :as log]
 
-            [bh.rccst.ui-component.atom.pie-chart :as chart]
+            [bh.rccst.ui-component.atom.chart.pie-chart :as chart]
             [bh.rccst.ui-component.molecule.example :as example]
             [bh.rccst.ui-component.atom.chart.utils :as utils]))
 

@@ -1,7 +1,7 @@
 (ns bh.rccst.views.catalog.example.chart.scatter-chart
   (:require [taoensso.timbre :as log]
 
-            [bh.rccst.ui-component.atom.scatter-chart :as chart]
+            [bh.rccst.ui-component.atom.chart.scatter-chart :as chart]
             [bh.rccst.ui-component.molecule.example :as example]
             [bh.rccst.ui-component.atom.chart.utils :as utils]))
 

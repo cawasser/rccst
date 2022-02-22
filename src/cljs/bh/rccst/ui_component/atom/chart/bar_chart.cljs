@@ -1,4 +1,4 @@
-(ns bh.rccst.ui-component.atom.bar-chart
+(ns bh.rccst.ui-component.atom.chart.bar-chart
   (:require [bh.rccst.ui-component.atom.chart.utils :as utils]
             ["recharts" :refer [BarChart Bar Brush]]
             [bh.rccst.ui-component.atom.chart.wrapper :as c]

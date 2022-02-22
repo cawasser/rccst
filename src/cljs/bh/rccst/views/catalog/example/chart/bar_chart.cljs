@@ -1,5 +1,5 @@
 (ns bh.rccst.views.catalog.example.chart.bar-chart
-  (:require [bh.rccst.ui-component.atom.bar-chart :as chart]
+  (:require [bh.rccst.ui-component.atom.chart.bar-chart :as chart]
 
             [bh.rccst.ui-component.molecule.example :as example]
             [taoensso.timbre :as log]))

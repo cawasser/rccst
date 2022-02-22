@@ -1,5 +1,5 @@
 (ns bh.rccst.views.catalog.example.chart.radar-chart
-  (:require [bh.rccst.ui-component.atom.radar-chart :as chart]
+  (:require [bh.rccst.ui-component.atom.chart.radar-chart :as chart]
             [bh.rccst.ui-component.molecule.example :as example]))
 
 

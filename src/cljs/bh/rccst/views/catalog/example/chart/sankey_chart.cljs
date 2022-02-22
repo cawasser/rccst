@@ -1,7 +1,7 @@
 (ns bh.rccst.views.catalog.example.chart.sankey-chart
   (:require [taoensso.timbre :as log]
 
-            [bh.rccst.ui-component.atom.sankey-chart :as chart]
+            [bh.rccst.ui-component.atom.chart.sankey-chart :as chart]
             [bh.rccst.ui-component.molecule.example :as example]))
 
 
