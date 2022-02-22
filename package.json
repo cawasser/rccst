@@ -12,8 +12,8 @@
 		"@fortawesome/free-regular-svg-icons": "^5.15.4",
 		"@fortawesome/free-solid-svg-icons": "^5.15.4",
 		"@fortawesome/react-fontawesome": "^0.1.16",
-		"dagre": "0.8.5",
 		"bulma": "^0.9.3",
+		"dagre": "0.8.5",
 		"highlight.js": "11.1.0",
 		"react": "^17.0.2",
 		"react-colorful": "^5.5.1",
@@ -23,7 +23,9 @@
 		"react-markdown": "^4.0.6",
 		"react-split-pane": "^0.1.92",
 		"recharts": "^2.1.8",
+		"vega": "^5.21.0",
 		"vega-embed": "^6.20.5",
+		"vega-lite": "^5.2.0",
 		"worldwindjs": "^1.8.0"
 	},
 	"devDependencies": {
