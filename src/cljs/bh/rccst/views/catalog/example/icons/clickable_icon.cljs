@@ -1,4 +1,4 @@
-(ns bh.rccst.views.catalog.example.clickable-icon
+(ns bh.rccst.views.catalog.example.icons.clickable-icon
   (:require [woolybear.ad.catalog.utils :as acu]
             [woolybear.ad.containers :as containers]
             [woolybear.ad.icons :as icons]))
