@@ -1,4 +1,4 @@
-(ns bh.rccst.views.catalog.example.hex-color-picker
+(ns bh.rccst.views.catalog.example.misc.hex-color-picker
   (:require [reagent.core :as r]
             [woolybear.ad.layout :as layout]
             [woolybear.ad.catalog.utils :as acu]

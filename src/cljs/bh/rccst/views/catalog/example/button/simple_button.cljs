@@ -1,4 +1,4 @@
-(ns bh.rccst.views.catalog.example.simple-button
+(ns bh.rccst.views.catalog.example.button.simple-button
   (:require [woolybear.ad.catalog.utils :as acu]
             [woolybear.ad.layout :as layout]
             [woolybear.ad.buttons :as buttons]))

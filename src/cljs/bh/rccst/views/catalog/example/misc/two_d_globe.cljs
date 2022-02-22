@@ -1,4 +1,4 @@
-(ns bh.rccst.views.catalog.example.two-d-globe
+(ns bh.rccst.views.catalog.example.misc.two-d-globe
   (:require [woolybear.ad.layout :as layout]
             [woolybear.ad.catalog.utils :as acu]))
 

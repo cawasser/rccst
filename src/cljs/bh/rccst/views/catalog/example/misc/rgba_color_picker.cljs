@@ -1,4 +1,4 @@
-(ns bh.rccst.views.catalog.example.rgba-color-picker
+(ns bh.rccst.views.catalog.example.misc.rgba-color-picker
   (:require [taoensso.timbre :as log]
             [reagent.core :as r]
             [woolybear.ad.layout :as layout]

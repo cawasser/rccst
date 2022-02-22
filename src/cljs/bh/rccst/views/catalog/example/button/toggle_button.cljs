@@ -1,4 +1,4 @@
-(ns bh.rccst.views.catalog.example.toggle-button
+(ns bh.rccst.views.catalog.example.button.toggle-button
   (:require [reagent.ratom :as ratom]
             [woolybear.ad.catalog.utils :as acu]
             [woolybear.ad.layout :as layout]
