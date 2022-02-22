@@ -1,7 +1,7 @@
 (ns bh.rccst.views.catalog.example.misc.three-d-globe
   (:require [woolybear.ad.layout :as layout]
             [woolybear.ad.catalog.utils :as acu]
-            [bh.rccst.views.catalog.example.globe.globe-component :as globe]))
+            [bh.rccst.ui-component.atom.globe.globe-component :as globe]))
 
 
 
