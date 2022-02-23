@@ -8,7 +8,7 @@
 
             [bh.rccst.subs :as subs]
             [bh.rccst.ui-component.navbar :as navbar]
-            [bh.rccst.views.catalog :as catalog]
+            [bh.rccst.views.atoms :as atoms]
             [bh.rccst.views.molecules :as molecules]
             [bh.rccst.views.templates :as templates]
             [bh.rccst.views.technologies :as tech]
@@ -49,7 +49,7 @@
            [molecules/page]]
 
           [tab-panel/sub-panel {:panel-id :app-bar/atoms}
-           [catalog/page]]
+           [atoms/page]]
 
           [tab-panel/sub-panel {:panel-id :app-bar/templates}
            [templates/page]]

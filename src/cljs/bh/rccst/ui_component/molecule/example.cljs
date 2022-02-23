@@ -1,9 +1,10 @@
 (ns bh.rccst.ui-component.molecule.example
   (:require [taoensso.timbre :as log]
 
-            [bh.rccst.views.catalog.utils :as bcu]
+            [bh.rccst.views.atom.utils :as bcu]
             [bh.rccst.ui-component.utils :as ui-utils]
 
+            [woolybear.ad.layout :as layout]
             [woolybear.ad.catalog.utils :as acu]))
 
 
@@ -22,7 +23,8 @@
   (acu/demo
     title
     description
-    [component data component-id widget-id]
+    [layout/centered {:extra-classes :width-50}
+     [component data component-id widget-id]]
     source-code))
 
 
