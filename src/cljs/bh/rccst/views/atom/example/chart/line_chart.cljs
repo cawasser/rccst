@@ -12,7 +12,7 @@
      :widget-id widget-id
      :description "A simple Line Chart built using [Recharts](https://recharts.org/en-US)"
      :data chart/sample-data
-     :component chart/component
+     :component chart/configurable-component
      :component-id "line-chart-demo/line-chart"
      :source-code chart/source-code]))
 

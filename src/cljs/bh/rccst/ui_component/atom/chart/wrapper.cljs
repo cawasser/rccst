@@ -59,3 +59,33 @@
 (defn chart [& {:keys [data id component]}]
   [component data id])
 
+
+(defn base-chart [& {:keys [data config
+                            component-id container-id
+                            data-panel config-panel component-panel]}]
+
+  ;(log/info "base-chart"
+  ;  data component-id container-id
+  ;  data-panel config-panel component-panel)
+
+  (let [id (r/atom nil)
+        not-configurable? (nil? config-panel)]
+
+    (fn []
+      (when (nil? @id)
+        (reset! id component-id)
+        (ui-utils/init-widget @id config)
+        (ui-utils/dispatch-local @id [:container] container-id))
+
+      (if not-configurable?
+        [chart
+         :data data
+         :id @id
+         :component component-panel]
+
+        [configurable-chart
+         :data data
+         :id @id
+         :data-panel data-panel
+         :config-panel config-panel
+         :component component-panel]))))

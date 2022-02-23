@@ -35,7 +35,7 @@
   "
   [& {:keys [id components]}]
 
-  (ui-utils/init-widget id config)
+  ;(ui-utils/init-widget id config)
 
   (re-frame/dispatch-sync [::add-component id components])
 

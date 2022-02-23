@@ -11,7 +11,7 @@
      :widget-id widget-id
      :description "A simple Bar Chart built using [Recharts]()"
      :data chart/sample-data
-     :component chart/component
+     :component chart/configurable-component
      :component-id (str widget-id "/bar-chart")
      :source-code chart/source-code]))
 

@@ -1,11 +1,9 @@
 (ns bh.rccst.ui-component.molecule.example
-  (:require [taoensso.timbre :as log]
-
+  (:require [bh.rccst.ui-component.utils :as ui-utils]
             [bh.rccst.views.atom.utils :as bcu]
-            [bh.rccst.ui-component.utils :as ui-utils]
-
-            [woolybear.ad.layout :as layout]
-            [woolybear.ad.catalog.utils :as acu]))
+            [taoensso.timbre :as log]
+            [woolybear.ad.catalog.utils :as acu]
+            [woolybear.ad.layout :as layout]))
 
 
 (defn component-example [& {:keys [title
@@ -14,16 +12,17 @@
                                    widget-id
                                    component
                                    component-id
-                                   source-code]}]
+                                   source-code
+                                   extra-classes]}]
 
-  ;(log/info "component-example" title widget-id)
+  ;(log/info "component-example" title widget-id (or extra-classes {}))
 
   (ui-utils/init-container widget-id)
 
   (acu/demo
     title
     description
-    [layout/centered {:extra-classes :width-50}
+    [layout/centered (or extra-classes {})
      [component data component-id widget-id]]
     source-code))
 

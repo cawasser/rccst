@@ -171,40 +171,33 @@
 (def source-code '[:> LineChart {:width 400 :height 400 :data @data}])
 
 
+(defn configurable-component
+  ([data component-id]
+   [configurable-component data component-id ""])
+
+  ([data component-id container-id]
+   [c/base-chart
+    :data data
+    :config (config component-id data)
+    :component-id component-id
+    :container-id container-id
+    :data-panel utils/meta-tabular-data-panel
+    :config-panel config-panel
+    :component-panel component-panel]))
+
+
 (defn component
-  ([data chart-id]
-   [component data chart-id ""])
+  ([data component-id]
+   [component data component-id ""])
 
 
-  ([data chart-id container-id]
-
-   ;(log/info "line-chart" @data)
-
-   (if (not= :tabular (get-in @data [:metadata :type]))
-     [rc/alert-box :src (rc/at)
-      :id (str container-id "/" chart-id ".ERROR")
-      :alert-type :danger
-      :closeable? false
-      :body [:div "The data passed is NOT of type :tabular!"]]
-
-     (let [id (r/atom nil)]
-
-       (fn []
-         (when (nil? @id)
-           (reset! id chart-id)
-           (ui-utils/init-widget @id (config @id data))
-           (ui-utils/dispatch-local @id [:container] container-id))
-
-         ;(log/info "component" @id)
-
-         [c/configurable-chart
-          :data data
-          :id @id
-          :data-panel utils/meta-tabular-data-panel
-          :config-panel config-panel
-          :component component-panel])))))
-
-
+  ([data component-id container-id]
+   [c/base-chart
+    :data data
+    :config (config component-id data)
+    :component-id component-id
+    :container-id container-id
+    :component-panel component-panel]))
 
 (comment
   (def data sample-data)
