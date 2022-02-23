@@ -1,20 +1,10 @@
 (ns bh.rccst.ui-component.atom.chart.wrapper
-  (:require [taoensso.timbre :as log]
+  (:require [bh.rccst.ui-component.utils :as ui-utils]
             [re-com.core :as rc]
             [reagent.core :as r]
-            [woolybear.ad.layout :as layout]
-            [bh.rccst.ui-component.utils :as ui-utils]
-            [bh.rccst.ui-component.atom.chart.utils :as utils]))
+            [taoensso.timbre :as log]
+            [woolybear.ad.layout :as layout]))
 
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;
-; CHART WRAPPERS
-;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; region
 
 (defn configurable-chart
   "takes a component and wraps it with a 'settings' button which can show/hide the
@@ -66,15 +56,6 @@
                                 [component data id])]]]])))
 
 
-(defn chart [component]
-  [rc/v-box :src (rc/at)
-   :gap "2px"
-   :children [[rc/h-box :src (rc/at)
-               :justify :end
-               :children [[rc/md-icon-button
-                           :md-icon-name "zmdi-settings"
-                           :tooltip "configure this chart"
-                           :on-click #(log/info "toggle config panel")]]]
-              component]])
+(defn chart [& {:keys [data id component]}]
+  [component data id])
 
-;; endregion
