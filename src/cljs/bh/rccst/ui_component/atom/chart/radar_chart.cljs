@@ -11,13 +11,15 @@
 (def sample-data (r/atom {:metadata {:type   :tabular
                                      :id     :subject
                                      ;:domain :fullMark
+                                     :domainRangeMin 10
+                                     :domainRangeMax 100
                                      :fields {:subject :string :A :number :B :number :fullMark :number}}
-                          :data     [{:subject "Math" :A 120 :B 110 :fullMark 150}
-                                     {:subject "Chinese" :A 98 :B 130 :fullMark 150}
-                                     {:subject "English" :A 100 :B 110 :fullMark 150}
-                                     {:subject "History" :A 77 :B 81 :fullMark 150}
-                                     {:subject "Economics" :A 99 :B 140 :fullMark 150}
-                                     {:subject "Literature" :A 98 :B 105 :fullMark 150}]}))
+                          :data     [{:subject "Math" :A 120 :B 110}
+                                     {:subject "Chinese" :A 98 :B 130}
+                                     {:subject "English" :A 100 :B 110}
+                                     {:subject "History" :A 77 :B 81}
+                                     {:subject "Economics" :A 99 :B 140}
+                                     {:subject "Literature" :A 98 :B 105}]}))
 
 
 
