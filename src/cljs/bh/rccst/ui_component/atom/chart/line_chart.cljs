@@ -36,7 +36,9 @@
       keys
       (map-indexed (fn [idx a]
                      ;(log/info "line color" idx a (ui-utils/get-color idx))
-                     {a {:include true :stroke (ui-utils/get-color idx) :fill (ui-utils/get-color idx)}}))
+                     {a {:include true
+                         :stroke  (ui-utils/get-color idx)
+                         :fill    (ui-utils/get-color idx)}}))
       (into {}))))
 
 
@@ -68,7 +70,12 @@
       (local-config data))
     (assoc-in [:x-axis :dataKey] (get-in @data [:metadata :id]))
     (assoc-in [:pub] :name)
-    (assoc-in [:sub] :something-selected)))
+    ;; TODO: this should be produced by a function that processes the data
+    ;; or passed in?
+    ;; or looked up from metadata?
+    (assoc-in [:sub] [[:brush]
+                      [:uv :include] [:uv :stroke] [:uv :fill]
+                      [:pv :include] [:pv :stroke] [:pv :fill]])))
 
 
 (defn- line-config [widget-id label path position]
@@ -144,28 +151,25 @@
   - chart-id : (string) unique identifier for this chart instance within this container
   - container-id : (string) name of the container this chart is inside of
   "
-  [data chart-id]
+  [data component-id container-id]
 
-  ;(log/info "component-panel" @data chart-id)
+  ;(log/info "component-panel" chart-id "///" @(ui-utils/subscribe-local chart-id [:container]))
 
-  (let [container (ui-utils/subscribe-local chart-id [:container])
-        isAnimationActive? (ui-utils/subscribe-local chart-id [:isAnimationActive])
-        subscriptions (ui-utils/build-subs chart-id (local-config data))]
+  (let [container @(ui-utils/subscribe-local component-id [:container])
+        isAnimationActive? (ui-utils/subscribe-local component-id [:isAnimationActive])
+        override-subs @(ui-utils/subscribe-local component-id [:sub])
+        local-subs (ui-utils/build-subs component-id (local-config data))
+        subscriptions (ui-utils/override-subs container-id local-subs override-subs)]
 
     (fn []
-      ; TODO: more refactoring!!!!
-      (ui-utils/publish-to-container @container [chart-id :brush] (ui-utils/resolve-sub subscriptions [:brush]))
-      (ui-utils/publish-to-container @container [chart-id :uv] (ui-utils/resolve-sub subscriptions [:uv :include]))
-      (ui-utils/publish-to-container @container [chart-id :pv] (ui-utils/resolve-sub subscriptions [:pv :include]))
-      (ui-utils/publish-to-container @container [chart-id :amt] (ui-utils/resolve-sub subscriptions [:amt :include]))
-
+      ;[:div "line Chart"]
       [:> LineChart {:width 400 :height 400 :data (get @data :data)}
 
-       (utils/standard-chart-components chart-id)
+       (utils/standard-chart-components component-id)
 
        (when (ui-utils/resolve-sub subscriptions [:brush]) [:> Brush])
 
-       (make-line-display chart-id data subscriptions isAnimationActive?)])))
+       (make-line-display component-id data subscriptions isAnimationActive?)])))
 
 
 (def source-code '[:> LineChart {:width 400 :height 400 :data @data}])
@@ -190,8 +194,8 @@
   ([data component-id]
    [component data component-id ""])
 
-
   ([data component-id container-id]
+   ;(log/info "line-chart component" container-id)
    [c/base-chart
     :data data
     :config (config component-id data)
@@ -199,16 +203,40 @@
     :container-id container-id
     :component-panel component-panel]))
 
+
+
+
+; subscriptions
 (comment
   (def data sample-data)
   (def chart-id "line-chart-demo/line-chart")
+  (def container-id "line-chart-demo")
+  (def chart-id "multi-chart-demo/multi-chart/line-chart")
+  (def container-id "multi-chart-demo/multi-chart")
 
-  (def subscriptions (ui-utils/build-subs chart-id (local-config data)))
+  (get-in @re-frame.db/app-db
+    [:widgets
+     (keyword "multi-chart-demo/multi-chart/line-chart")
+     :sub])
+
+
+  (ui-utils/subscribe-local chart-id [:sub])
+
+
+  (def c (config chart-id data))
+  (get-in c [:tab-panel :value])
+
+  (def subscriptions
+    (ui-utils/build-container-subs container-id (local-config data)))
+
+  (def subscriptions
+    (ui-utils/build-subs container-id (local-config data)))
 
 
   ())
 
 
+; playing with building keywords
 (comment
   (def data sample-data)
 
@@ -237,3 +265,41 @@
     k)
 
   ())
+
+
+
+; override local subscriptions with ones from the container
+(comment
+  (do
+    (def data sample-data)
+    (def component-id "multi-chart-demo/multi-chart/line-chart")
+    (def container-id "multi-chart-demo/multi-chart")
+    (def override-subs @(ui-utils/subscribe-local component-id [:sub]))
+    (def local-subs (ui-utils/build-subs component-id (local-config data))))
+
+  (def path (first override-subs))
+
+  (ui-utils/subscribe-to-container container-id path)
+
+
+  (->> override-subs
+    (map (fn [path]
+           (println "override-subs" container-id path)
+           {path (ui-utils/subscribe-to-container container-id path)}))
+    (apply merge local-subs))
+
+  (->> override-subs
+    (map (fn [path]
+           (println "override-subs" container-id path)
+           {path (ui-utils/subscribe-to-container container-id path)}))
+    (appl assoc local-subs))
+
+
+  (def subscriptions (ui-utils/override-subs container-id local-subs override-subs))
+
+  (deref (get subscriptions [:brush]))
+
+  (ui-utils/resolve-sub subscriptions [:brush])
+
+  ())
+

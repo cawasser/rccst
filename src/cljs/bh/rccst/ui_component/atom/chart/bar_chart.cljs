@@ -75,8 +75,12 @@
       utils/default-config
       {:tab-panel {:value     (keyword chart-id "config")
                    :data-path [:widgets (keyword chart-id) :tab-panel]}}
-      (local-config data))))
-    ;(assoc-in [:x-axis :dataKey] :name)))
+      (local-config data))
+    (assoc-in [:x-axis :dataKey] :name)
+    ; TODO: this should be produced by a function that processes the data
+    (assoc-in [:sub] [[:brush]
+                      [:uv :include] [:uv :stroke] [:uv :fill]
+                      [:pv :include] [:pv :stroke] [:pv :fill]])))
 
 
 (defn- bar-config [chart-id label path position]
@@ -149,46 +153,21 @@
   - data : (atom) any data used by the component's ui
   - widget-id : (string) unique identifier for this specific widget
   "
-  [data chart-id]
-  (let [container (ui-utils/subscribe-local chart-id [:container])
-        isAnimationActive? (ui-utils/subscribe-local chart-id [:isAnimationActive])
-        subscriptions (ui-utils/build-subs chart-id (local-config data))]
+  [data component-id container-id]
+  (let [container (ui-utils/subscribe-local component-id [:container])
+        isAnimationActive? (ui-utils/subscribe-local component-id [:isAnimationActive])
+        override-subs @(ui-utils/subscribe-local component-id [:sub])
+        local-subs (ui-utils/build-subs component-id (local-config data))
+        subscriptions (ui-utils/override-subs container-id local-subs override-subs)]
 
     (fn []
       [:> BarChart {:width 400 :height 400 :data (get @data :data)}
 
-       (utils/standard-chart-components chart-id)
+       (utils/standard-chart-components component-id)
 
        (when (ui-utils/resolve-sub subscriptions [:brush]) [:> Brush])
 
-       (make-bar-display chart-id data subscriptions isAnimationActive?)])))
-
-
-(comment
-  (do
-    (def chart-id "bar-chart-demo/bar-chart")
-    (def data sample-data)
-    (def subscriptions (ui-utils/build-subs chart-id (local-config data)))
-    (def isAnimationActive? (r/atom true)))
-
-  (make-bar-display chart-id data subscriptions isAnimationActive?)
-
-
-  (->> (get-in @data [:metadata :fields])
-    (filter (fn [[_ v]] (= :number v)))
-    keys
-    (map (fn [a]
-           (if (ui-utils/resolve-sub subscriptions [a :include])
-             [:> Bar (merge {:type              "monotone" :dataKey a
-                             :isAnimationActive @isAnimationActive?
-                             :fill              (ui-utils/resolve-sub subscriptions [a :fill])}
-                       (when (seq (ui-utils/resolve-sub subscriptions [a :stackId]))
-                         {:stackId (ui-utils/resolve-sub subscriptions [a :stackId])}))]
-             [])))
-    (remove empty?)
-    (into [:<>]))
-
-  ())
+       (make-bar-display component-id data subscriptions isAnimationActive?)])))
 
 
 (defn configurable-component
@@ -217,6 +196,7 @@
 
     :component-panel component-panel]))
 
+
 (defn component
   "the chart to draw. this variant does NOT provide a configuration panel
 
@@ -239,3 +219,30 @@
     :component-id component-id
     :container-id container-id
     :component-panel component-panel]))
+
+
+(comment
+  (do
+    (def chart-id "bar-chart-demo/bar-chart")
+    (def data sample-data)
+    (def subscriptions (ui-utils/build-subs chart-id (local-config data)))
+    (def isAnimationActive? (r/atom true)))
+
+  (make-bar-display chart-id data subscriptions isAnimationActive?)
+
+
+  (->> (get-in @data [:metadata :fields])
+    (filter (fn [[_ v]] (= :number v)))
+    keys
+    (map (fn [a]
+           (if (ui-utils/resolve-sub subscriptions [a :include])
+             [:> Bar (merge {:type              "monotone" :dataKey a
+                             :isAnimationActive @isAnimationActive?
+                             :fill              (ui-utils/resolve-sub subscriptions [a :fill])}
+                       (when (seq (ui-utils/resolve-sub subscriptions [a :stackId]))
+                         {:stackId (ui-utils/resolve-sub subscriptions [a :stackId])}))]
+             [])))
+    (remove empty?)
+    (into [:<>]))
+
+  ())
