@@ -8,17 +8,10 @@
             [taoensso.timbre :as log]))
 
 
-;(def sample-data (r/atom [{:subject "Math" :A 120 :B 110 :fullMark 150}
-;                          {:subject "Chinese" :A 98 :B 130 :fullMark 150}
-;                          {:subject "English" :A 100 :B 110 :fullMark 150}
-;                          {:subject "History" :A 77 :B 81 :fullMark 150}
-;                          {:subject "Economics" :A 99 :B 140 :fullMark 150}
-;                          {:subject "Literature" :A 98 :B 105 :fullMark 150}]))
-
-(def sample-data (r/atom {:metadata {:type        :tabular
-                                     :id          :subject
-                                     :domainField :fullMark
-                                     :fields      {:subject :string :A :number :B :number :fullMark :number}}
+(def sample-data (r/atom {:metadata {:type   :tabular
+                                     :id     :subject
+                                     ;:domain :fullMark
+                                     :fields {:subject :string :A :number :B :number :fullMark :number}}
                           :data     [{:subject "Math" :A 120 :B 110 :fullMark 150}
                                      {:subject "Chinese" :A 98 :B 130 :fullMark 150}
                                      {:subject "English" :A 100 :B 110 :fullMark 150}
@@ -27,23 +20,36 @@
                                      {:subject "Literature" :A 98 :B 105 :fullMark 150}]}))
 
 
-(defn- get-range-across-fields [data]
-  {:domain [50 200]})
 
+(defn- get-range-across-fields [data]
+       (let [source-data (get-in @data [:data])
+             all-values (->> (get-in @data [:metadata :fields])
+                             (filter (fn [[k v]] (= :number v)))
+                             keys
+                             (map-indexed (fn [idx a] (map #(a %) source-data)))
+                             (reduce into)
+                             (distinct))
+             domainMin (apply min all-values)
+             domainMax (apply max all-values)]
+            (log/info "domain min = " domainMin, "domain max = " domainMax)
+            (if (= domainMin domainMax)
+              {:domain [0 domainMax]}
+              {:domain [domainMin domainMax]})))
 
 (defn- get-field-range [field data]
-  (let [domainMin 150
-        domainMax 150]
-    (if (= domainMin domainMax)
-      {:domain [0 domainMax]}
-      {:domain [domainMin domainMax]})))
+       (let [source-data (get-in @data [:data])
+             domainMin (reduce min (map #(field %) source-data))
+             domainMax (reduce max (map #(field %) source-data))]
+            (if (= domainMin domainMax)
+              {:domain [0 domainMax]}
+              {:domain [domainMin domainMax]})))
 
 
 (defn- domain-range [data]
-  (let [domainField (get-in @data [:metadata :domainField])]
-    (if (nil? domainField)
-      (get-range-across-fields data)
-      (get-field-range domainField data))))
+       (let [domainField (get-in @data [:metadata :domain])]
+            (if (nil? domainField)
+              (get-range-across-fields data)
+              (get-field-range domainField data))))
 
 
 (defn local-config
@@ -192,7 +198,6 @@
 
        (make-radar-display chart-id data subscriptions)])))
 
-
 (defn component
   "the chart to draw, taking cues from the settings of the configuration panel
 
@@ -229,3 +234,59 @@
         :data-panel utils/dummy-data-panel
         :config-panel config-panel
         :component component-panel]))))
+
+(comment
+  (def domainField :fullMark)
+  (def source-data (get-in @sample-data [:data]))
+  (reduce max (map #(domainField %) source-data))
+  (let [source-data (get-in @sample-data [:data])])
+
+  (def fields (get-in @sample-data [:metadata :fields]))
+  (filter (fn [[k v]] (= :number v)) fields)
+  keys
+
+
+  (def numValues nil)
+  (concat numValues '(1 2 3))
+  (concat numValues '(3 4 5))
+
+  (def source-data (get-in @sample-data [:data]))
+  (->> (get-in @sample-data [:metadata :fields])
+       (filter (fn [[k v]] (= :number v)))
+       keys
+       (map-indexed (fn [idx a] (map #(a %) source-data)))
+       (reduce into)
+       (distinct))
+
+  (def fieldNames (get-in @sample-data [:metadata :fields]))
+  (def numFieldsOnly (filter (fn [[k v]] (= :number v)) fieldNames))
+  (def keysOnly (keys numFieldsOnly))
+  (def res (map-indexed (fn [idx a] (a source-data)) keysOnly))
+  ())
+
+(comment
+  (def source-data (get-in @data [:data]))
+  (def all-values (->> (get-in @data [:metadata :fields])
+                       (filter (fn [[k v]] (= :number v)))
+                       keys
+                       (map-indexed (fn [idx a] (map #(a %) source-data)))
+                       (reduce into)
+                       (distinct)))
+  (def domainMin (apply min all-values))
+  (def domainMax (apply max all-values))
+
+  (->> (get-in @data [:metadata :fields])
+       (filter (fn [[k v]] (= :number v)))
+       keys
+       (map-indexed (fn [idx a] (map #(a %) source-data)))
+       (reduce into)
+       (distinct))
+  ())
+
+(comment
+  (def chart-id "radar-chart-demo/radar-chart")
+  (def data sample-data)
+  (def subscriptions (ui-utils/build-subs chart-id (local-config data)))
+  ())
+
+
