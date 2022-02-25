@@ -55,10 +55,21 @@
 
 
 (def h-wrap {:-webkit-flex-flow "row wrap"
-             :flex-flow "row wrap"})
+             :flex-flow         "row wrap"})
+
 
 (def v-wrap {:-webkit-flex-flow "column wrap"
-             :flex-flow "column wrap"})
+             :flex-flow         "column wrap"})
+
+
+(defn path->keyword [id & path]
+  (->> path
+    flatten
+    (apply conj [])
+    (map name)
+    (clojure.string/join ".")
+    (keyword id)))
+
 
 ;; endregion
 
@@ -281,6 +292,7 @@
   [widget-id values]
   (let [target (keyword widget-id)
         path [:events/init-widget-locals target values]]
+    ;(log/info "init-local-values" path)
     (re-frame/dispatch-sync path)))
 
 
@@ -359,6 +371,16 @@
                                                              (map #(clojure.string/replace % #" " "")))))))))
 
 
+(defn- compute-container-path [widget-id a more]
+  (keyword widget-id (str "blackboard."
+                       (name a)
+                       (when more
+                         (str "." (clojure.string/join "."
+                                    (->> more
+                                      (map name)
+                                      (map #(clojure.string/replace % #" " "")))))))))
+
+
 (defn- compute-deps [widget-id a more]
   (if more
     (keyword widget-id
@@ -423,7 +445,7 @@
   [widget-id [a & more :as value-path]]
   (let [p (compute-path widget-id a more)
         dep (compute-deps widget-id a more)]
-    ;(log/info "create-widget-local-sub" p dep more (if more (last more) a))
+    ;(log/info "create-widget-local-sub" widget-id p dep more (if more (last more) a))
     (re-frame/reg-sub
       p
       :<- [dep]
@@ -482,7 +504,7 @@
   "
   [widget-id [a & more :as value-path]]
   (let [p (compute-path widget-id a more)]
-    ;(log/info "create-widget-local-event" p (conj [:widgets (keyword widget-id)] value-path))
+    ;(log/info "create-widget-local-event" widget-id p (conj [:widgets (keyword widget-id)] value-path))
     (re-frame/reg-event-db
       p
       (fn [db [_ new-val]]
@@ -511,6 +533,8 @@
   "
   [widget-id locals-and-defaults]
   (let [paths (process-locals [] nil locals-and-defaults)]
+
+    ;(log/info "init-widget" widget-id paths)
 
     ; load the app-db with the default values
     (init-local-values widget-id locals-and-defaults)
@@ -629,10 +653,10 @@
   2. map over the result and call ui-utils/subscribe-local
   3. put the result into a hash-map
   "
-  [chart-id local-config]
+  [component-id local-config]
   (->> (process-locals [] nil local-config)
     (map (fn [path]
-           {path (subscribe-local chart-id path)}))
+           {path (subscribe-local component-id path)}))
     (into {})))
 
 
@@ -658,7 +682,7 @@
 (re-frame/reg-event-db
   :events/init-container
   (fn-traced [db [_ container]]
-    ;(log/info ":events/init-container" container init-vals)
+    ;(log/info ":events/init-container" container)
     (if (get-in db [:widgets container])
       (do
         ;(log/info ":events/init-container // already exists")
@@ -679,28 +703,30 @@
       c
       :<- [:widgets]
       (fn [widgets _]
-        ;(log/info "init-container sub" c id)
+        ;(log/info "sub" c id)
         (get widgets id)))
 
     (re-frame/reg-sub
       blackboard
       :<- [c]
-      (fn [c _]
-        ;(log/info "init-container sub" c blackboard)
-        (get c :blackboard)))
+      (fn [w [_ path]]
+        ;(log/info "blackboard sub" w blackboard)
+        (get-in w path)))
 
     (re-frame/reg-event-db
       blackboard
-      (fn [db [_ component-path new-val]]
-        ;(log/info "container-event " blackboard id component-path new-val)
-        (update-in db [:widgets id :blackboard]
-          assoc component-path new-val)))
+      (fn [bb [_ id component-path new-val]]
+        ;(log/info "container-event blackboard" id component-path new-val)
+        (update-in bb [:widgets id :blackboard]
+          assoc component-path new-val)))))
 
-    (re-frame/dispatch-sync [:events/init-container id])))
+;(re-frame/dispatch-sync [:events/init-container id])))
 
 
-(defn subscribe-to-container [container-id component-path]
-  (re-frame/subscribe [(keyword container-id "blackboard") component-path]))
+(defn subscribe-to-container [container-id [a & more :as component-path]]
+  (let [p (compute-container-path container-id a more)]
+    ;(log/info "subscribe-to-container" container-id component-path p)
+    (re-frame/subscribe [p])))
 
 
 (defn publish-to-container
@@ -735,6 +761,33 @@
   (let [p (keyword container-id "blackboard")]
     ;(log/info "publish-to-container" container-id component-path new-val p)
     (re-frame/dispatch [p component-path new-val])))
+
+
+(defn build-container-subs
+  "build the subscription needed to access all the container's configuration
+  properties
+
+  1. process-locals
+  2. map over the result and call ui-utils/subscribe-to-container
+  3. put the result into a hash-map
+  "
+  [container-id local-config]
+
+  (->> (process-locals [] nil local-config)
+    (map (fn [path]
+           ;(log/info "build-container-subs" container-id path)
+           {path (subscribe-to-container container-id path)}))
+    (into {})))
+
+
+(defn override-subs [container-id local-subs subs]
+  ;(log/info "override-subs" subs)
+  (->> subs
+    (map (fn [path]
+           ;(log/info "override-subs map" container-id path)
+           (let [s (subscribe-to-container container-id path)]
+             (when s {path s}))))
+    (apply merge local-subs)))
 
 
 ;; endregion
@@ -1209,6 +1262,7 @@
 ;; endregion
 
 
+; playing with subscriptions and events
 (comment
   @(subscribe-local "line-chart-demo" [:line-chart-demo/tab-panel.value])
   (dispatch-local "line-chart-demo" [:tab-panel :value] :line-chart-demo/data)
@@ -1239,3 +1293,56 @@
   ())
 
 
+
+; turning a hash-map into a collection of vectors that are the key paths into all
+; the data leaves
+(comment
+  (def local-config {:brush false,
+                     :uv    {:include true, :stroke "#8884d8", :fill "#8884d8"},
+                     :pv    {:include true, :stroke "#ffc107", :fill "#ffc107"},
+                     :tv    {:include true, :stroke "#82ca9d", :fill "#82ca9d"},
+                     :amt   {:include true, :stroke "#ff00ff", :fill "#ff00ff"}})
+
+
+  (->> (process-locals [] nil local-config)
+    (map (fn [path]
+           (log/info "build-container-subs" container-id path)
+           {path (subscribe-to-container container-id path)}))
+    (into {}))
+
+  (do
+    (def widget-id "multi-chart-demo/multi-chart")
+    (def a :tv)
+    (def more [:fill]))
+
+  (compute-container-path widget-id a more)
+
+
+
+
+  ())
+
+
+
+; building valid keyword for use in the app-db, subscriptions, events, etc
+(comment
+  (def path ["line-chart-demo" "line-chart" "tab-panel" "value"])
+  (def path2 '("line-chart-demo" "line-chart" [:uv :fill]))
+
+  (keyword (clojure.string/join "." path))
+
+  (path->keyword "line-chart-demo" "line-chart" "tab-panel" "value")
+
+  (flatten path2)
+  (apply conj [] (flatten path2))
+
+  (->> path2
+    flatten
+    (apply conj [])
+    (map name)
+    (clojure.string/join ".")
+    keyword)
+
+  (path->keyword "line-chart-demo" "line-chart" [:uv :fill])
+
+  ())

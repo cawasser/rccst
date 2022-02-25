@@ -15,9 +15,10 @@
                                    source-code
                                    extra-classes]}]
 
-  ;(log/info "component-example" title widget-id (or extra-classes {}))
+  ;(log/info "component-example" title  "///" widget-id
+  ;  "///" component-id "///" component)
 
-  (ui-utils/init-container widget-id)
+  (ui-utils/init-container component-id)
 
   (acu/demo
     title

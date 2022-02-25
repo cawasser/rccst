@@ -199,6 +199,9 @@
        [c/configurable-chart
         :data data
         :id @id
+        :config (config component-id data)
+        :component-id component-id
+        :container-id container-id
         :data-panel utils/meta-tabular-data-panel
         :config-panel config-panel
         :component component-panel]))))

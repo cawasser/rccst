@@ -20,15 +20,17 @@
 
   Returns : (hiccup) the Reagent component representing the entire 'package' (component + config-panel + button)
   "
-  [& {:keys [data id config-panel data-panel component]}]
+  [& {:keys [data component-id container-id config-panel data-panel component]}]
   (let [open? (r/atom false)
-        config-key (keyword id "config")
-        data-key (keyword id "data")
-        tab-panel (keyword id "tab-panel")
-        selected-tab (keyword id "tab-panel.value")
+        config-key (keyword component-id "config")
+        data-key (keyword component-id "data")
+        tab-panel (keyword component-id "tab-panel")
+        selected-tab (keyword component-id "tab-panel.value")
         chart-events [config-key data-key tab-panel selected-tab]]
 
-    (fn [& {:keys [data id config-panel component]}]
+    (ui-utils/dispatch-local component-id [:container] container-id)
+
+    (fn [& {:keys [data component-id config-panel component]}]
       ;(log/info "configurable-chart-2" id config-panel component)
       [rc/v-box :src (rc/at)
        :gap "2px"
@@ -51,13 +53,16 @@
                                     [ui-utils/chart-config
                                      chart-events
                                      [data-panel data]
-                                     [config-panel data id]]]]
+                                     [config-panel data component-id]]]]
                                   [])
-                                [component data id])]]]])))
+                                [component data component-id container-id])]]]])))
 
 
-(defn chart [& {:keys [data id component]}]
-  [component data id])
+(defn chart [& {:keys [data component-id container-id component]}]
+  (ui-utils/dispatch-local component-id [:container] container-id)
+  ;(log/info "chart" component-id "///" container-id "///" @(ui-utils/subscribe-local component-id [:container]))
+
+  [component data component-id container-id])
 
 
 (defn base-chart [& {:keys [data config
@@ -80,12 +85,58 @@
       (if not-configurable?
         [chart
          :data data
-         :id @id
+         :component-id @id
+         :container-id container-id
          :component component-panel]
 
         [configurable-chart
          :data data
-         :id @id
+         :component-id @id
+         :container-id container-id
          :data-panel data-panel
          :config-panel config-panel
          :component component-panel]))))
+
+
+
+(comment
+  (do
+    (def id "line-chart-demo.line-chart")
+    (def container-id "line-chart-demo")
+    (def config {:tv {:include true, :stroke "#82ca9d", :fill "#82ca9d"},
+                 :brush false,
+                 :y-axis {:include true, :dataKey "", :orientation :left, :scale "auto"},
+                 :sub :something-selected,
+                 :grid {:include true, :strokeDasharray {:dash "3", :space "3"}, :stroke "#a9a9a9"},
+                 :legend {:include true, :layout "horizontal", :align "center", :verticalAlign "bottom"},
+                 :type "line-chart",
+                 :amt {:include true, :stroke "#ff00ff", :fill "#ff00ff"},
+                 :tab-panel {:value :line-chart-demo.line-chart.config, :data-path [:widgets :line-chart-demo.line-chart :tab-panel]},
+                 :pv {:include true, :stroke "#ffc107", :fill "#ffc107"},
+                 :container "",
+                 :x-axis {:include true, :dataKey :name, :orientation :bottom, :scale "auto"},
+                 :pub :name,
+                 :uv {:include true, :stroke "#8884d8", :fill "#8884d8"},
+                 :tooltip {:include true},
+                 :isAnimationActive true}))
+
+  (ui-utils/init-widget id config)
+  (ui-utils/dispatch-local id [:container] container-id)
+
+  @(ui-utils/subscribe-local id [:container])
+
+
+
+  ())
+
+(comment
+
+  (def id "multi-chart-demo/multi-chart/line-chart")
+  (def container-id "multi-chart-demo/multi-chart")
+
+  @(ui-utils/subscribe-local id [:container])
+
+  (ui-utils/dispatch-local id [:container] container-id)
+
+
+  ())

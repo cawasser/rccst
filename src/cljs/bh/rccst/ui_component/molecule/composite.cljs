@@ -12,7 +12,7 @@
 (re-frame/reg-event-db
   ::add-component
   (fn-traced [db [_ id component]]
-    (update-in db [:widgets id :components] (partial apply conj) component)))
+    (update-in db [:widgets (keyword id) :components] (partial apply conj) component)))
 
 
 (defn config [id]
@@ -34,10 +34,6 @@
   Returns - (hiccup) a single reagent component (equivalent to a `:div`)
   "
   [& {:keys [id components]}]
-
-  ;(ui-utils/init-widget id config)
-
-  (re-frame/dispatch-sync [::add-component id components])
 
   [layout/layout components])
 

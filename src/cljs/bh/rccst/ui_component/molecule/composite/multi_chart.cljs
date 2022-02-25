@@ -1,13 +1,13 @@
 (ns bh.rccst.ui-component.molecule.composite.multi-chart
-  (:require [bh.rccst.ui-component.molecule.component-layout :as layout]
+  (:require [bh.rccst.ui-component.atom.chart.bar-chart :as bar-chart]
+            [bh.rccst.ui-component.atom.chart.line-chart :as line-chart]
+            [bh.rccst.ui-component.atom.chart.utils :as utils]
             [bh.rccst.ui-component.molecule.composite :as c]
             [bh.rccst.ui-component.utils :as ui-utils]
-            [bh.rccst.ui-component.atom.chart.bar-chart :as bar-chart]
-            [bh.rccst.ui-component.atom.chart.line-chart :as line-chart]
             [re-com.core :as rc]
             [reagent.core :as r]
-            [taoensso.timbre :as log]))
-
+            [taoensso.timbre :as log]
+            [woolybear.ad.containers :as containers]))
 
 
 (def sample-data line-chart/sample-data)
@@ -16,15 +16,51 @@
 (def source-code '[:div])
 
 
-(defn my-div [x]
-  [:div {:style {:border-width "1px"
-                 :border-style :solid
-                 :border-color :black}} x])
+(defn- data-config [component-id label path position]
+  (log/info "data-config" component-id label path position)
+  [rc/v-box :src (rc/at)
+   :gap "5px"
+   :children [[utils/boolean-config component-id label (conj path :include)]
+              [utils/color-config component-id ":stroke" (conj path :stroke) position]
+              [utils/color-config component-id ":fill" (conj path :fill) position]
+              [utils/text-config component-id ":stackId" (conj path :stackId)]]])
+
+
+(defn- make-config [component-id data]
+  (->> (get-in @data [:metadata :fields])
+    (filter (fn [[k v]] (= :number v)))
+    keys
+    (map-indexed (fn [idx a]
+                   [data-config component-id a [:blackboard a] :above-right]))
+    (into [])))
+
+
+(defn- config-panel [component-id data]
+  [containers/v-scroll-pane
+   {:height "400px"}
+   [rc/v-box :src (rc/at)
+    :width "200px"
+    :height "400px"
+    :gap "2px"
+    :children (apply merge
+                [[utils/boolean-config component-id ":brush?" [:blackboard :brush]]]
+                (make-config component-id data))]])
 
 
 (defn local-config [data component-id]
   {:components [[[line-chart/component data (str component-id "/line-chart") component-id]
-                 [bar-chart/component data  (str component-id "/bar-chart") component-id]]]})
+                 [config-panel component-id data]
+                 [bar-chart/component data (str component-id "/bar-chart") component-id]]]
+   :blackboard (merge {:brush false}
+                 (->> (get-in @data [:metadata :fields])
+                   (filter (fn [[k v]] (= :number v)))
+                   keys
+                   (map-indexed (fn [idx a]
+                                  {a {:include true
+                                      :stroke    (ui-utils/get-color idx)
+                                      :fill    (ui-utils/get-color idx)
+                                      :stackId ""}}))
+                   (into {})))})
 
 
 (defn- config [component-id data]
@@ -48,7 +84,7 @@
 
   ([data component-id container-id]
 
-   (log/info "multi-chart" @data)
+   ;(log/info "multi-chart" @data)
 
    (let [id (r/atom nil)]
 
@@ -58,7 +94,38 @@
          (ui-utils/init-widget @id (config @id data))
          (ui-utils/dispatch-local @id [:container] container-id))
 
-       (log/info "component" @id)
+       ;(log/info "multi-chart" @id (config @id data))
 
        [component-panel data @id container-id]))))
+
+
+
+; play with the app-db configuration and subscriptions
+(comment
+  (do
+    (def data sample-data)
+    (def component-id "multi-chart-demo/multi-chart")
+    (def container-id "")
+    (def id (r/atom component-id))
+    (def locals-and-defaults (config @id data)))
+
+  (ui-utils/init-widget @id (config @id data))
+  (ui-utils/dispatch-local @id [:container] container-id)
+
+  (def subscriptions (ui-utils/build-subs component-id
+                       (local-config data component-id)))
+  (keys (get @re-frame.db/app-db :widgets))
+  (get-in @re-frame.db/app-db [:widgets :multi-chart-demo/multi-chart])
+
+  subscriptions
+
+  (ui-utils/process-locals [] nil locals-and-defaults)
+
+  (ui-utils/resolve-sub subscriptions [:components])
+  (ui-utils/resolve-sub subscriptions [:blackboard :tv :include])
+
+  ())
+
+
+
 

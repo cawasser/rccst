@@ -104,15 +104,15 @@
   - data : (atom) any data used by the component's ui
   - widget-id : (string) unique identifier for this specific widget instance
   "
-  [data chart-id]
-  (let [container (ui-utils/subscribe-local chart-id [:container])
-        isAnimationActive? (ui-utils/subscribe-local chart-id [:isAnimationActive])
-        subscriptions (ui-utils/build-subs chart-id (local-config data))]
+  [data component-id container-id]
+  (let [container (ui-utils/subscribe-local component-id [:container])
+        isAnimationActive? (ui-utils/subscribe-local component-id [:isAnimationActive])
+        subscriptions (ui-utils/build-subs component-id (local-config data))]
 
     (fn []
       [:> PieChart {:width 400 :height 400 :label true}
 
-       (utils/non-gridded-chart-components chart-id)
+       (utils/non-gridded-chart-components component-id)
 
        [:> Pie {:dataKey           (ui-utils/resolve-sub subscriptions [:value :chosen])
                 :nameKey           (ui-utils/resolve-sub subscriptions [:name :chosen])
@@ -141,16 +141,20 @@
 
    (let [id (r/atom nil)]
 
-     (fn [] (when (nil? @id)
-              (reset! id component-id)
-              (ui-utils/init-widget @id (config @id data))
-              (ui-utils/dispatch-local @id [:container] container-id))
+     (fn []
+       (when (nil? @id)
+         (reset! id component-id)
+         (ui-utils/init-widget @id (config @id data))
+         (ui-utils/dispatch-local @id [:container] container-id))
 
        ;(log/info "component" @id)
 
        [c/configurable-chart
         :data data
         :id @id
+        :config (config component-id data)
+        :component-id component-id
+        :container-id container-id
         :data-panel utils/meta-tabular-data-panel
         :config-panel config-panel
         :component component-panel]))))
@@ -161,19 +165,21 @@
 (comment
   (do
     (def data sample-data)
-    (def chart-id "pie-chart-demo/pie-chart")
+    (def component-id "pie-chart-demo/pie-chart"))
+
+  (do
     (def label ":name")
     (def path-root [:name])
 
     (def chosen-path (conj path-root :chosen))
     (def keys-path (conj path-root :keys))
-    (def chosen (ui-utils/subscribe-local chart-id chosen-path))
-    (def keys (ui-utils/subscribe-local chart-id keys-path))
+    (def chosen (ui-utils/subscribe-local component-id chosen-path))
+    (def keys (ui-utils/subscribe-local component-id keys-path))
     (def btns (->> @keys
                 (map (fn [k]
                        {:id k :label k})))))
 
-  (def subscriptions (ui-utils/build-subs chart-id (local-config data)))
+  (def subscriptions (ui-utils/build-subs component-id (local-config data)))
 
   ())
 

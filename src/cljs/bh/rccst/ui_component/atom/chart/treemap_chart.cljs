@@ -35,11 +35,11 @@
 
   - chart-id : (string) unique id of the chart
   "
-  [chart-id]
+  [component-id data]
   (merge
     ui-utils/default-pub-sub
-    {:tab-panel {:value     (keyword chart-id "config")
-                 :data-path [:widgets (keyword chart-id) :tab-panel]}
+    {:tab-panel {:value     (keyword component-id "config")
+                 :data-path [:widgets (keyword component-id) :tab-panel]}
      :isAnimationActive true
      :ratio  {:include true
               :n 4
@@ -55,14 +55,14 @@
 >
 > [Recharts/treemap](https://recharts.org/en-US/api/Treemap)
 "
-  [chart-id]
+  [component-id]
   [rc/h-box :src (rc/at)
    :gap "5px"
-   :children [[utils/boolean-config chart-id ":ratio" [:ratio :include]]
+   :children [[utils/boolean-config component-id ":ratio" [:ratio :include]]
               [rc/v-box :src (rc/at)
                :gap "5px"
-               :children [[utils/slider-config chart-id 1 10 [:ratio :n]]
-                          [utils/slider-config chart-id 1 10 [:ratio :d]]]]]])
+               :children [[utils/slider-config component-id 1 10 [:ratio :n]]
+                          [utils/slider-config component-id 1 10 [:ratio :d]]]]]])
 
 
 (defn- config-panel
@@ -73,7 +73,7 @@
   - data : (atom) data to display (may be used by the standard configuration components for thins like axes, etc.
   - chart-id : (string) unique identifier for this chart instance
   "
-  [_ chart-id]
+  [_ component-id]
 
   [rc/v-box :src (rc/at)
    :gap "10px"
@@ -82,13 +82,13 @@
    :style {:padding          "15px"
            :border-top       "1px solid #DDD"
            :background-color "#f7f7f7"}
-   :children [[utils/isAnimationActive chart-id]
+   :children [[utils/isAnimationActive component-id]
               [rc/line :src (rc/at) :size "2px"]
               [rc/v-box :src (rc/at)
                :gap "10px"
-               :children [[ratio-config chart-id]
-                          [utils/color-config-text chart-id ":stroke" [:stroke :color]]
-                          [utils/color-config-text chart-id ":fill" [:fill :color]]]]]])
+               :children [[ratio-config component-id]
+                          [utils/color-config-text component-id ":stroke" [:stroke :color]]
+                          [utils/color-config-text component-id ":fill" [:fill :color]]]]]])
 
 
 (def source-code `[:> Treemap
@@ -109,11 +109,11 @@
   - data : (atom) any data shown by the component's ui
   - widget-id : (string) unique identifier for this widget instance
   "
-  [data chart-id]
+  [data component-id]
   (let [;ratio (ui-utils/subscribe-local widget-id [:ratio :include])
-        isAnimationActive? (ui-utils/subscribe-local chart-id [:isAnimationActive])
-        stroke (ui-utils/subscribe-local chart-id [:stroke :color])
-        fill (ui-utils/subscribe-local chart-id [:fill :color])]
+        isAnimationActive? (ui-utils/subscribe-local component-id [:isAnimationActive])
+        stroke (ui-utils/subscribe-local component-id [:stroke :color])
+        fill (ui-utils/subscribe-local component-id [:fill :color])]
 
     (fn []
       [:> Treemap
@@ -138,18 +138,18 @@
   - chart-id : (string) unique identifier for this chart instance within this container
   - container-id : (string) name of the container this chart is inside of
   "
-  ([data chart-id]
-   [component data chart-id ""])
+  ([data component-id]
+   [component data component-id ""])
 
 
-  ([data chart-id container-id]
+  ([data component-id container-id]
 
    (let [id (r/atom nil)]
 
      (fn []
        (when (nil? @id)
-         (reset! id chart-id)
-         (ui-utils/init-widget @id (config @id))
+         (reset! id component-id)
+         (ui-utils/init-widget @id (config @id data))
          (ui-utils/dispatch-local @id [:container] container-id))
 
        ;(log/info "component" @id)
@@ -157,12 +157,15 @@
        [c/configurable-chart
         :data data
         :id @id
+        :config (config component-id data)
+        :component-id component-id
+        :container-id container-id
         :data-panel utils/hierarchy-data-panel
         :config-panel config-panel
         :component component-panel]))))
 
 
 (comment
-  (def chart-id "treemap-chart-demo")
+  (def component-id "treemap-chart-demo")
 
   ())

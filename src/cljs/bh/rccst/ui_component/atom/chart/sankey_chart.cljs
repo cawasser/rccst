@@ -29,13 +29,13 @@
 
   ---
 
-  - chart-id : (string) unique id of the chart
+  - component-id : (string) unique id of the chart
   "
-  [widget-id]
+  [component-id data]
   (merge
     ui-utils/default-pub-sub
-    {:tab-panel {:value     (keyword widget-id "config")
-                 :data-path [:widgets (keyword widget-id) :tab-panel]}
+    {:tab-panel {:value     (keyword component-id "config")
+                 :data-path [:widgets (keyword component-id) :tab-panel]}
      :tooltip   {:include true}
      :node      {:fill "#77c878" :stroke "#000000"}
      :link      {:stroke "#77c878" :curve 0.5}}))
@@ -47,25 +47,25 @@
   ---
 
   - _ : (ignored)
-  - chart-id : (string) unique identifier for this chart instance
+  - component-id : (string) unique identifier for this chart instance
   "
-  [_ chart-id]
+  [_ component-id]
   [rc/v-box :src (rc/at)
    :width "400px"
    :height "500px"
    :gap "5px"
-   :children [[utils/tooltip chart-id]
+   :children [[utils/tooltip component-id]
               [rc/line :size "2px"]
               [rc/v-box :src (rc/at)
                :gap "5px"
-               :children [[utils/color-config-text chart-id "node fill" [:node :fill] :right-below]
-                          [utils/color-config-text chart-id "node stroke" [:node :stroke] :right-below]]]
+               :children [[utils/color-config-text component-id "node fill" [:node :fill] :right-below]
+                          [utils/color-config-text component-id "node stroke" [:node :stroke] :right-below]]]
               [rc/line :size "2px"]
-              [utils/color-config-text chart-id "link stroke" [:link :stroke] :right-below]
+              [utils/color-config-text component-id "link stroke" [:link :stroke] :right-below]
               [rc/h-box :src (rc/at)
                :gap "5px"
-               :children [[utils/text-config chart-id ":curve" [:link :curve]]
-                          [utils/slider-config chart-id 0 1 0.1 [:link :curve]]]]]])
+               :children [[utils/text-config component-id ":curve" [:link :curve]]
+                          [utils/slider-config component-id 0 1 0.1 [:link :curve]]]]]])
 
 
 (def source-code '[:> Sankey
@@ -130,12 +130,12 @@
   - chart-id : (string) unique identifier for this chart instance within this container
   - container-id : (string) name of the container this chart is inside of
   "
-  [data chart-id]
-  (let [tooltip? (ui-utils/subscribe-local chart-id [:tooltip :include])
-        node-fill (ui-utils/subscribe-local chart-id [:node :fill])
-        node-stroke (ui-utils/subscribe-local chart-id [:node :stroke])
-        link-stroke (ui-utils/subscribe-local chart-id [:link :stroke])
-        curve (ui-utils/subscribe-local chart-id [:link :curve])]
+  [data component-id]
+  (let [tooltip? (ui-utils/subscribe-local component-id [:tooltip :include])
+        node-fill (ui-utils/subscribe-local component-id [:node :fill])
+        node-stroke (ui-utils/subscribe-local component-id [:node :stroke])
+        link-stroke (ui-utils/subscribe-local component-id [:link :stroke])
+        curve (ui-utils/subscribe-local component-id [:link :curve])]
 
     (fn []
       [:> Sankey
@@ -160,18 +160,18 @@
   - chart-id : (string) unique identifier of this chart insatnce within this container
   - container-id : (string) name of the container this chart is inside of
   "
-  ([data chart-id]
-   [component data chart-id ""])
+  ([data component-id]
+   [component data component-id ""])
 
 
-  ([data chart-id container-id]
+  ([data component-id container-id]
 
    (let [id (r/atom nil)]
 
      (fn []
        (when (nil? @id)
-         (reset! id chart-id)
-         (ui-utils/init-widget @id (config @id))
+         (reset! id component-id)
+         (ui-utils/init-widget @id (config @id data))
          (ui-utils/dispatch-local @id [:container] container-id))
 
        ;(log/info "component" @id)
@@ -179,6 +179,9 @@
        [c/configurable-chart
         :data data
         :id @id
+        :config (config component-id data)
+        :component-id component-id
+        :container-id container-id
         :data-panel utils/dag-data-panel
         :config-panel config-panel
         :component component-panel]))))

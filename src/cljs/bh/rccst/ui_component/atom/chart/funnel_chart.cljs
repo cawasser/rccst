@@ -15,29 +15,29 @@
   (r/atom utils/meta-tabular-data))
 
 (defn local-config [data]
-      (let [d (get @data :data)
-            fields (get-in @data [:metadata :fields])]
+  (let [d (get @data :data)
+        fields (get-in @data [:metadata :fields])]
 
-           (merge
-             ; process options for :name
-             (->> fields
-                  (filter (fn [[k v]] (= :string v)))
-                  keys
-                  ((fn [m]
-                       {:name {:keys m :chosen (first m)}})))
+    (merge
+      ; process options for :name
+      (->> fields
+        (filter (fn [[k v]] (= :string v)))
+        keys
+        ((fn [m]
+           {:name {:keys m :chosen (first m)}})))
 
-             ; process :name to map up the :colors
-             (->> d
-                  (map :name)
-                  (#(zipmap % ui-utils/default-stroke-fill-colors))
-                  (assoc {} :colors))
+      ; process :name to map up the :colors
+      (->> d
+        (map :name)
+        (#(zipmap % ui-utils/default-stroke-fill-colors))
+        (assoc {} :colors))
 
-             ; process options for :value
-             (->> fields
-                  (filter (fn [[k v]] (= :number v)))
-                  keys
-                  ((fn [m]
-                       {:value {:keys m :chosen (first m)}}))))))
+      ; process options for :value
+      (->> fields
+        (filter (fn [[k v]] (= :number v)))
+        keys
+        ((fn [m]
+           {:value {:keys m :chosen (first m)}}))))))
 
 
 (defn config
@@ -59,18 +59,18 @@
   "
   [chart-id data]
 
-      (merge
-        ui-utils/default-pub-sub
-        utils/default-config
-        (ui-utils/config-tab-panel chart-id)
-        (local-config data)))
+  (merge
+    ui-utils/default-pub-sub
+    utils/default-config
+    (ui-utils/config-tab-panel chart-id)
+    (local-config data)))
 
 
-        ;{:tab-panel {:value     (keyword chart-id "config")
-        ;             :data-path [:widgets (keyword chart-id) :tab-panel]}
-        ; :colors    (zipmap (map :name utils/paired-data)
-        ;              ["#8884d8" "#83a6ed" "#8dd1e1"
-        ;               "#82ca9d" "#a4de6c" "#d7e62b"])}
+;{:tab-panel {:value     (keyword chart-id "config")
+;             :data-path [:widgets (keyword chart-id) :tab-panel]}
+; :colors    (zipmap (map :name utils/paired-data)
+;              ["#8884d8" "#83a6ed" "#8dd1e1"
+;               "#82ca9d" "#a4de6c" "#d7e62b"])}
 
 
 (defn- color-anchors
@@ -136,24 +136,24 @@
 
     (fn [data chart-id]
       ;(log/info "configurable-funnel-chart" @config)
-       [:> FunnelChart {:height 400 :width 500 :label true}
+      [:> FunnelChart {:height 400 :width 500 :label true}
 
-        (utils/non-gridded-chart-components chart-id)
+       (utils/non-gridded-chart-components chart-id)
 
-        [:> Funnel {:dataKey           (ui-utils/resolve-sub subscriptions [:value :chosen])
-                    :nameKey           (ui-utils/resolve-sub subscriptions [:name :chosen])
-                    :label             true
-                    :data              (get @data :data)
-                    :isAnimationActive @isAnimationActive?}
-         (doall
-           (map-indexed
-             (fn [idx {name :name}]
-               ^{:key (str idx name)}
-               [:> Cell {:key  (str "cell-" idx)
-                         :fill (or (ui-utils/resolve-sub subscriptions [:colors name])
-                                   (ui-utils/get-color 0))}])
-             (get @data :data)))
-         [:> LabelList {:position :right :fill "#000000" :stroke "none" :dataKey (ui-utils/resolve-sub subscriptions [:value :chosen])}]]])))
+       [:> Funnel {:dataKey           (ui-utils/resolve-sub subscriptions [:value :chosen])
+                   :nameKey           (ui-utils/resolve-sub subscriptions [:name :chosen])
+                   :label             true
+                   :data              (get @data :data)
+                   :isAnimationActive @isAnimationActive?}
+        (doall
+          (map-indexed
+            (fn [idx {name :name}]
+              ^{:key (str idx name)}
+              [:> Cell {:key  (str "cell-" idx)
+                        :fill (or (ui-utils/resolve-sub subscriptions [:colors name])
+                                (ui-utils/get-color 0))}])
+            (get @data :data)))
+        [:> LabelList {:position :right :fill "#000000" :stroke "none" :dataKey (ui-utils/resolve-sub subscriptions [:value :chosen])}]]])))
 
 
 (def source-code `[:> FunnelChart {:height 400 :width 500}
@@ -164,28 +164,31 @@
                                :isAnimationActive @isAnimationActive?}]])
 
 (defn component
-      ([data component-id]
-       [component data component-id ""])
+  ([data component-id]
+   [component data component-id ""])
 
-      ([data component-id container-id]
+  ([data component-id container-id]
 
-       ;(log/info "funnel-chart" @data)
+   ;(log/info "funnel-chart" @data)
 
-       (let [id (r/atom nil)]
+   (let [id (r/atom nil)]
 
-              (fn []
-                  (when (nil? @id)
-                        (reset! id component-id)
-                        (ui-utils/init-widget @id (config @id data))
-                        (ui-utils/dispatch-local @id [:container] container-id))
+     (fn []
+       (when (nil? @id)
+         (reset! id component-id)
+         (ui-utils/init-widget @id (config @id data))
+         (ui-utils/dispatch-local @id [:container] container-id))
 
-                  ;(log/info "component" @id)
+       ;(log/info "component" @id)
 
-                  [c/configurable-chart
-                   :data data
-                   :id @id
-                   :data-panel utils/meta-tabular-data-panel
-                   :config-panel config-panel
-                   :component component-panel]))))
+       [c/configurable-chart
+        :data data
+        :id @id
+        :config (config component-id data)
+        :component-id component-id
+        :container-id container-id
+        :data-panel utils/meta-tabular-data-panel
+        :config-panel config-panel
+        :component component-panel]))))
 
 
