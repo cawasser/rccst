@@ -193,7 +193,6 @@
     :container-id container-id
     :data-panel utils/meta-tabular-data-panel
     :config-panel config-panel
-
     :component-panel component-panel]))
 
 
@@ -210,7 +209,6 @@
   "
   ([data component-id]
    [component data component-id ""])
-
 
   ([data component-id container-id]
    [c/base-chart

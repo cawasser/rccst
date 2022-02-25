@@ -1,8 +1,7 @@
 (ns bh.rccst.views.atom.example.chart.sankey-chart
-  (:require [taoensso.timbre :as log]
-
-            [bh.rccst.ui-component.atom.chart.sankey-chart :as chart]
-            [bh.rccst.ui-component.molecule.example :as example]))
+  (:require [bh.rccst.ui-component.atom.chart.sankey-chart :as chart]
+            [bh.rccst.ui-component.molecule.example :as example]
+            [taoensso.timbre :as log]))
 
 
 (defn example []
@@ -17,7 +16,7 @@
 ***AND*** the source for the [custom node](https://github.com/recharts/recharts/blob/master/demo/component/DemoSankeyNode.tsx) to understand how this all works."
 
      :data chart/sample-data
-     :component chart/component
+     :component chart/configurable-component
      :component-id (str widget-id "/sankey-chart")
      :source-code chart/source-code]))
 

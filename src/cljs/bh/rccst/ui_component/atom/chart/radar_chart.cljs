@@ -10,7 +10,7 @@
 
 (def sample-data (r/atom {:metadata {:type   :tabular
                                      :id     :subject
-                                     ;:domain :fullMark
+                                     :domain :fullMark
                                      :fields {:subject :string :A :number :B :number :fullMark :number}}
                           :data     [{:subject "Math" :A 120 :B 110 :fullMark 150}
                                      {:subject "Chinese" :A 98 :B 130 :fullMark 150}
@@ -20,36 +20,36 @@
                                      {:subject "Literature" :A 98 :B 105 :fullMark 150}]}))
 
 
-
 (defn- get-range-across-fields [data]
-       (let [source-data (get-in @data [:data])
-             all-values (->> (get-in @data [:metadata :fields])
-                             (filter (fn [[k v]] (= :number v)))
-                             keys
-                             (map-indexed (fn [idx a] (map #(a %) source-data)))
-                             (reduce into)
-                             (distinct))
-             domainMin (apply min all-values)
-             domainMax (apply max all-values)]
-            (log/info "domain min = " domainMin, "domain max = " domainMax)
-            (if (= domainMin domainMax)
-              {:domain [0 domainMax]}
-              {:domain [domainMin domainMax]})))
+  (let [source-data (get-in @data [:data])
+        all-values (->> (get-in @data [:metadata :fields])
+                     (filter (fn [[k v]] (= :number v)))
+                     keys
+                     (map-indexed (fn [idx a] (map #(a %) source-data)))
+                     (reduce into)
+                     (distinct))
+        domainMin (apply min all-values)
+        domainMax (apply max all-values)]
+    (log/info "domain min = " domainMin, "domain max = " domainMax)
+    (if (= domainMin domainMax)
+      {:domain [0 domainMax]}
+      {:domain [domainMin domainMax]})))
+
 
 (defn- get-field-range [field data]
-       (let [source-data (get-in @data [:data])
-             domainMin (reduce min (map #(field %) source-data))
-             domainMax (reduce max (map #(field %) source-data))]
-            (if (= domainMin domainMax)
-              {:domain [0 domainMax]}
-              {:domain [domainMin domainMax]})))
+  (let [source-data (get-in @data [:data])
+        domainMin (reduce min (map #(field %) source-data))
+        domainMax (reduce max (map #(field %) source-data))]
+    (if (= domainMin domainMax)
+      {:domain [0 domainMax]}
+      {:domain [domainMin domainMax]})))
 
 
 (defn- domain-range [data]
-       (let [domainField (get-in @data [:metadata :domain])]
-            (if (nil? domainField)
-              (get-range-across-fields data)
-              (get-field-range domainField data))))
+  (let [domainField (get-in @data [:metadata :domain])]
+    (if (nil? domainField)
+      (get-range-across-fields data)
+      (get-field-range domainField data))))
 
 
 (defn local-config
@@ -117,7 +117,8 @@
       {:tab-panel {:value     (keyword chart-id "config")
                    :data-path [:widgets (keyword chart-id) :tab-panel]}}
 
-      (local-config data))))
+      (local-config data))
+    (assoc-in [:fullMark :include] false)))
 
 
 (defn- radar-config [chart-id label path position]
@@ -127,6 +128,7 @@
               [utils/color-config chart-id ":fill" (conj path :fill) position]
               [utils/color-config chart-id ":stroke" (conj path :stroke) position]
               [utils/slider-config chart-id 0 1 0.1 (conj path :fillOpacity)]]])
+
 
 (defn- make-radar-config [chart-id data]
   (->> (get-in @data [:metadata :fields])
@@ -159,6 +161,7 @@
                :style ui-utils/h-wrap
                :gap "10px"
                :children (make-radar-config chart-id data)]]])
+
 
 (defn- make-radar-display [chart-id data subscriptions]
   (->> (get-in @data [:metadata :fields])
@@ -198,8 +201,34 @@
 
        (make-radar-display chart-id data subscriptions)])))
 
-(defn component
+
+(defn configurable-component
   "the chart to draw, taking cues from the settings of the configuration panel
+
+  the component creates its own ID (a random-uuid) to hold the local state. This way multiple charts
+  can be placed inside the same outer container/composite
+
+  ---
+
+  - data : (atom) any data shown by the component's ui
+  - container-id : (string) name of the container this chart is inside of
+  "
+  ([data component-id]
+   [configurable-component data component-id ""])
+
+  ([data component-id container-id]
+   [c/base-chart
+    :data data
+    :config (config component-id data)
+    :component-id component-id
+    :container-id container-id
+    :data-panel utils/dummy-data-panel
+    :config-panel config-panel
+    :component-panel component-panel]))
+
+
+(defn component
+  "the chart to draw. this variant does NOT provide a configuration panel
 
   the component creates its own ID (a random-uuid) to hold the local state. This way multiple charts
   can be placed inside the same outer container/composite
@@ -212,29 +241,18 @@
   ([data component-id]
    [component data component-id ""])
 
-
   ([data component-id container-id]
+   [c/base-chart
+    :data data
+    :config (config component-id data)
+    :component-id component-id
+    :container-id container-id
+    :component-panel component-panel]))
 
-   (let [id (r/atom nil)]
 
-     (fn []
-       (when (nil? @id)
-         (reset! id component-id)
-         (ui-utils/init-widget @id (config @id data))
-         (ui-utils/dispatch-local @id [:container] container-id))
 
-       ;(log/info "component" @id)
 
-       [c/configurable-chart
-        :data data
-        :id @id
-        :config (config component-id data)
-        :component-id component-id
-        :container-id container-id
-        :data-panel utils/dummy-data-panel
-        :config-panel config-panel
-        :component component-panel]))))
-
+; explore the data fields
 (comment
   (def domainField :fullMark)
   (def source-data (get-in @sample-data [:data]))
@@ -252,11 +270,11 @@
 
   (def source-data (get-in @sample-data [:data]))
   (->> (get-in @sample-data [:metadata :fields])
-       (filter (fn [[k v]] (= :number v)))
-       keys
-       (map-indexed (fn [idx a] (map #(a %) source-data)))
-       (reduce into)
-       (distinct))
+    (filter (fn [[k v]] (= :number v)))
+    keys
+    (map-indexed (fn [idx a] (map #(a %) source-data)))
+    (reduce into)
+    (distinct))
 
   (def fieldNames (get-in @sample-data [:metadata :fields]))
   (def numFieldsOnly (filter (fn [[k v]] (= :number v)) fieldNames))
@@ -264,25 +282,30 @@
   (def res (map-indexed (fn [idx a] (a source-data)) keysOnly))
   ())
 
+
+; compute the range for the domain (scale of the axis)
 (comment
+  (def data sample-data)
   (def source-data (get-in @data [:data]))
   (def all-values (->> (get-in @data [:metadata :fields])
-                       (filter (fn [[k v]] (= :number v)))
-                       keys
-                       (map-indexed (fn [idx a] (map #(a %) source-data)))
-                       (reduce into)
-                       (distinct)))
+                    (filter (fn [[k v]] (= :number v)))
+                    keys
+                    (map-indexed (fn [idx a] (map #(a %) source-data)))
+                    (reduce into)
+                    (distinct)))
   (def domainMin (apply min all-values))
   (def domainMax (apply max all-values))
 
   (->> (get-in @data [:metadata :fields])
-       (filter (fn [[k v]] (= :number v)))
-       keys
-       (map-indexed (fn [idx a] (map #(a %) source-data)))
-       (reduce into)
-       (distinct))
+    (filter (fn [[k v]] (= :number v)))
+    keys
+    (map-indexed (fn [idx a] (map #(a %) source-data)))
+    (reduce into)
+    (distinct))
   ())
 
+
+; defs for repl testing
 (comment
   (def chart-id "radar-chart-demo/radar-chart")
   (def data sample-data)
