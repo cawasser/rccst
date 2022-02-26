@@ -181,10 +181,13 @@
 (defn local-config [data component-id]
   {:components [[[line-chart/component
                   :data data
-                  :component-id (str component-id "/line-chart")
+                  :component-id (ui-utils/path->keyword component-id "line-chart")
                   :container-id component-id]
                  [config-panel data component-id]
-                 [bar-chart/component data (str component-id "/bar-chart") component-id]]]
+                 [bar-chart/component
+                  :data data
+                  :component-id (ui-utils/path->keyword component-id "bar-chart")
+                  :container-id component-id]]]
    :blackboard (merge {:brush false}
                  (->> (get-in @data [:metadata :fields])
                    (filter (fn [[k v]] (= :number v)))
@@ -213,10 +216,7 @@
 
 
 (defn component
-  ([data component-id]
-   [component data component-id ""])
-
-  ([data component-id container-id]
+  ([& {:keys [data component-id container-id]}]
 
    ;(log/info "multi-chart" @data)
 

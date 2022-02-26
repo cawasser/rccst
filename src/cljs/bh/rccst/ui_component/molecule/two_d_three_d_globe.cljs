@@ -50,10 +50,7 @@
 
 
 (defn component
-  ([data component-id]
-   [component data component-id ""])
-
-  ([data component-id container-id]
+  ([& {:keys [data component-id container-id]}]
 
    ;(log/info "two-2-three-3-globe" @data)
 
