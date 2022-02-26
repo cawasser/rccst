@@ -3,14 +3,145 @@
             [bh.rccst.ui-component.atom.chart.line-chart :as line-chart]
             [bh.rccst.ui-component.atom.chart.utils :as utils]
             [bh.rccst.ui-component.molecule.composite :as c]
+            [bh.rccst.ui-component.registry :as registry]
             [bh.rccst.ui-component.utils :as ui-utils]
             [re-com.core :as rc]
+            [re-frame.core :as re-frame]
             [reagent.core :as r]
             [taoensso.timbre :as log]
+
             [woolybear.ad.containers :as containers]))
 
 
 (def sample-data line-chart/sample-data)
+
+(declare config-panel)
+
+(def composite-def
+  "
+  "
+  {; the ui components (looked up in a registry), mapped to local names
+   :components {:line-chart   :chart/line-chart
+                :bar-chart    :chart/bar-chart
+                :config-panel config-panel}
+
+   ; all remote data sources (mapped to a local name)
+   ; TODO: might replace this with some meta-data so the USER can select appropriate data source
+   :sources    {:tabular-data :source/sequence-of-measurements
+                :dag-data :source/dag-data}
+
+   ; links - how the different components get their data and if they publish or
+   ; subscribe to the composite
+   :links      {:line-chart   {:data :tabular-data}
+                :bar-chart    {:data :tabular-data}
+                :config-panel {:data :tabular-data}}
+
+   ; the physical layout of the components on the display
+   :layout     [[:line-chart :config-panel :bar-chart]]})
+
+
+; explore composite-def and the various registries
+;
+; i.e., we want to create something like this:
+;
+;    [[[line-chart/component data (str component-id "/line-chart") component-id]
+;      [config-panel data component-id]
+;      [bar-chart/component data (str component-id "/bar-chart") component-id]})))
+;
+(comment
+  ; dummy login so subscription work at all
+  (re-frame/dispatch [:bh.rccst.events/login "string" "string"])
+
+  ; resolve the ui-components
+  (def resolved-components
+    (->> composite-def
+      :components
+      (map (fn [[name component]]
+             {name [(or (get registry/ui-component-registry component)
+                      component)]}))
+      (into {})))
+
+  ; get data from the server
+  (def resolved-sources
+    (->> composite-def
+      :sources
+      (map (fn [[name source]]
+             (re-frame/dispatch [:bh.rccst.events/subscribe-to #{source}])
+             {name (or (re-frame/subscribe [:bh.rccst.subs/source source])
+                     (r/atom []))}))
+      (into {})))
+
+
+  ; build up the layout
+  ;
+  ; i.e., we want to create something like this:
+  ;
+  ;    [[[line-chart/component data (str component-id "/line-chart") component-id]
+  ;      [config-panel data component-id]
+  ;      [bar-chart/component data (str component-id "/bar-chart") component-id]})))
+  ;
+  ; let's start with :line-chart
+  ;
+  ; first we need to get the correct data source
+  (def component :line-chart)
+  (def sources (get-in composite-def [:links component]))
+
+  (conj (get resolved-components component)
+    (get resolved-sources source)
+    (ui-utils/path->keyword "dummy" component)
+    "dummy")
+
+
+  (defn process-sources [sources]
+    (->> sources
+      (mapcat (fn [[name source]]
+                (println name source)
+                [name (get resolved-sources source)]))
+      flatten
+      (into [])))
+
+  (get resolved-sources :tabular-data)
+
+  (process-sources sources)
+  (process-sources {:data :tabular-data})
+
+  (conj [(get resolved-components component)]
+    (process-sources sources)
+    [:component-ui (ui-utils/path->keyword "dummy" component)]
+    [:container-id "dummy"])
+
+  (defn process-columns [id row]
+    (->> row
+      (map (fn [component]
+             (let [sources (get-in composite-def [:links component :source])]
+               (into []
+                 (flatten
+                   (conj (get resolved-components component)
+                     (process-sources sources)
+                     [:component-ui (ui-utils/path->keyword "dummy" component)]
+                     [:container-id "dummy"]))))))
+      (into [])))
+
+
+  (defn process-rows [id layout]
+    (->> layout
+      (map (fn [row]
+             (process-columns id row)))
+      (into [])))
+
+
+  (process-columns "dummy" [:line-chart :config-panel :bar-chart])
+  (process-rows "dummy" (:layout composite-def))
+
+
+  ; next, process them all
+  (->> composite-def
+    :layout
+    (process-rows "dummy"))
+
+
+  ())
+
 
 
 (def source-code '[:div])
@@ -35,7 +166,7 @@
     (into [])))
 
 
-(defn- config-panel [component-id data]
+(defn- config-panel [data component-id]
   [containers/v-scroll-pane
    {:height "400px"}
    [rc/v-box :src (rc/at)
@@ -48,8 +179,11 @@
 
 
 (defn local-config [data component-id]
-  {:components [[[line-chart/component data (str component-id "/line-chart") component-id]
-                 [config-panel component-id data]
+  {:components [[[line-chart/component
+                  :data data
+                  :component-id (str component-id "/line-chart")
+                  :container-id component-id]
+                 [config-panel data component-id]
                  [bar-chart/component data (str component-id "/bar-chart") component-id]]]
    :blackboard (merge {:brush false}
                  (->> (get-in @data [:metadata :fields])
@@ -57,7 +191,7 @@
                    keys
                    (map-indexed (fn [idx a]
                                   {a {:include true
-                                      :stroke    (ui-utils/get-color idx)
+                                      :stroke  (ui-utils/get-color idx)
                                       :fill    (ui-utils/get-color idx)
                                       :stackId ""}}))
                    (into {})))})

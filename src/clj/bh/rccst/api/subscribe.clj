@@ -46,5 +46,5 @@
       :body [{:keys [user-id data-sources]} SubscribeRequest]
       :summary "subscribe to a data-source (by its keyword name)"
       (do
-        (log/info "/data-source")
+        (log/info "/data-source" user-id data-sources)
         (c/wrapper (subscribe user-id data-sources))))))

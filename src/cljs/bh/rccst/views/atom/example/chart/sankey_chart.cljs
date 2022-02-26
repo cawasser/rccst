@@ -1,14 +1,15 @@
 (ns bh.rccst.views.atom.example.chart.sankey-chart
   (:require [bh.rccst.ui-component.atom.chart.sankey-chart :as chart]
             [bh.rccst.ui-component.molecule.example :as example]
+            [bh.rccst.ui-component.utils :as utils]
             [taoensso.timbre :as log]))
 
 
 (defn example []
-  (let [widget-id "sankey-chart-demo"]
+  (let [container-id "sankey-chart-demo"]
     [example/component-example
      :title "Sankey Chart"
-     :widget-id widget-id
+     :widget-id container-id
      :description "A simple Sankey Chart built using [Recharts](https://recharts.org/en-US/api/Sankey)
 
 > Note: the API page for Sankey is woefully incomplete, it does NOT explain how to build the
@@ -17,6 +18,6 @@
 
      :data chart/sample-data
      :component chart/configurable-component
-     :component-id (str widget-id "/sankey-chart")
+     :component-id (utils/path->keyword container-id "sankey-chart")
      :source-code chart/source-code]))
 

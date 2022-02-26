@@ -14,6 +14,7 @@
   "the Funnel Chart works best with \"paired data\" so we return the paired-data from utils"
   (r/atom utils/meta-tabular-data))
 
+
 (defn local-config [data]
   (let [d (get @data :data)
         fields (get-in @data [:metadata :fields])]
@@ -167,24 +168,18 @@
 (defn configurable-component
   "the chart to draw, taking cues from the settings of the configuration panel
 
-  the component creates its own ID (a random-uuid) to hold the local state. This way multiple charts
-  can be placed inside the same outer container/composite
-
   ---
 
-  - data : (atom) any data shown by the component's ui
-  - container-id : (string) name of the container this chart is inside of
+  - :data : (atom) any data shown by the component's ui
+  - :component-id : (string) name of this component\n
+  - :container-id : (string) name of the container this chart is inside of
   "
-  ([data component-id]
-   [configurable-component data component-id ""])
-
-  ([data component-id container-id]
-   ;(log/info "funnel-chart" @data)
+  ([& {:keys [data component-id container-id]}]
    [c/base-chart
     :data data
     :config (config component-id data)
     :component-id component-id
-    :container-id container-id
+    :container-id (or container-id "")
     :data-panel utils/meta-tabular-data-panel
     :config-panel config-panel
 
@@ -194,26 +189,18 @@
 (defn component
   "the chart to draw. this variant does NOT provide a configuration panel
 
-  the component creates its own ID (a random-uuid) to hold the local state. This way multiple charts
-  can be placed inside the same outer container/composite
-
   ---
 
-  - data : (atom) any data shown by the component's ui
-  - container-id : (string) name of the container this chart is inside of
+  - :data : (atom) any data shown by the component's ui
+  - :component-id : (string) name of this component
+  - :container-id : (string) name of the container this chart is inside of
   "
-  ([data component-id]
-   [component data component-id ""])
-
-  ([data component-id container-id]
-
-   ;(log/info "funnel-chart" @data)
-
+  ([& {:keys [data component-id container-id]}]
    [c/base-chart
     :data data
     :config (config component-id data)
     :component-id component-id
-    :container-id container-id
+    :container-id (or container-id "")
     :component-panel component-panel]))
 
 

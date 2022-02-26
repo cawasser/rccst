@@ -2,12 +2,9 @@
   (:require [bh.rccst.ui-component.atom.chart.utils :as utils]
             [bh.rccst.ui-component.atom.chart.wrapper :as c]
             [bh.rccst.ui-component.utils :as ui-utils]
-
             ["recharts" :refer [LineChart Line Brush]]
-            [re-com.core :as rc]
-
             [reagent.core :as r]
-            [taoensso.timbre :as log]))
+            [re-com.core :as rc]))
 
 
 (def sample-data
@@ -176,31 +173,41 @@
 
 
 (defn configurable-component
-  ([data component-id]
-   [configurable-component data component-id ""])
+  "the chart to draw, taking cues from the settings of the configuration panel
 
-  ([data component-id container-id]
+  ---
+
+  - :data : (atom) any data shown by the component's ui
+  - :component-id : (string) name of this component\n
+  - :container-id : (string) name of the container this chart is inside of
+  "
+  ([& {:keys [data component-id container-id]}]
    [c/base-chart
     :data data
     :config (config component-id data)
     :component-id component-id
-    :container-id container-id
+    :container-id (or container-id "")
     :data-panel utils/meta-tabular-data-panel
     :config-panel config-panel
     :component-panel component-panel]))
 
 
 (defn component
-  ([data component-id]
-   [component data component-id ""])
+  "the chart to draw. this variant does NOT provide a configuration panel
 
-  ([data component-id container-id]
+  ---
+
+  - :data : (atom) any data shown by the component's ui
+  - :component-id : (string) name of this component
+  - :container-id : (string) name of the container this chart is inside of
+  "
+  ([& {:keys [data component-id container-id]}]
    ;(log/info "line-chart component" container-id)
    [c/base-chart
     :data data
     :config (config component-id data)
     :component-id component-id
-    :container-id container-id
+    :container-id (or container-id "")
     :component-panel component-panel]))
 
 

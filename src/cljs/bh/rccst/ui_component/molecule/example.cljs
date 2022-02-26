@@ -9,7 +9,7 @@
 (defn component-example [& {:keys [title
                                    description
                                    data
-                                   widget-id
+                                   container-id
                                    component
                                    component-id
                                    source-code
@@ -24,28 +24,28 @@
     title
     description
     [layout/centered (or extra-classes {})
-     [component data component-id widget-id]]
+     [component :data data :component-id component-id :container-id container-id]]
     source-code))
 
 
-(defn example [& {:keys [title widget-id description
+(defn example [& {:keys [title container-id description
                          data config
                          data-panel config-panel component-panel
                          source-code]}]
 
   ;(log/info "example widget" title config)
 
-  (ui-utils/init-widget widget-id config)
+  (ui-utils/init-widget container-id config)
 
-  (let [config-key (keyword widget-id "config")
-        data-key (keyword widget-id "data")
-        tab-panel (keyword widget-id "tab-panel")
-        selected-tab (keyword widget-id "tab-panel.value")]
+  (let [config-key (keyword container-id "config")
+        data-key (keyword container-id "data")
+        tab-panel (keyword container-id "tab-panel")
+        selected-tab (keyword container-id "tab-panel.value")]
     (bcu/configurable-demo
       title
       description
       [config-key data-key tab-panel selected-tab]
       [data-panel data]
-      [config-panel data widget-id]
-      [component-panel data widget-id]
+      [config-panel data container-id]
+      [component-panel data container-id]
       source-code)))

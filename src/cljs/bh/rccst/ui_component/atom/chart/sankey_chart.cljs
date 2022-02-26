@@ -160,15 +160,12 @@
   - chart-id : (string) unique identifier of this chart insatnce within this container
   - container-id : (string) name of the container this chart is inside of
   "
-  ([data component-id]
-   [configurable-component data component-id ""])
-
-  ([data component-id container-id]
+  ([& {:keys [data component-id container-id]}]
    [c/base-chart
     :data data
     :config (config component-id data)
     :component-id component-id
-    :container-id container-id
+    :container-id (or container-id "")
     :data-panel utils/dag-data-panel
     :config-panel config-panel
     :component-panel component-panel]))
@@ -180,18 +177,15 @@
   ---
 
   - data : (atom) any data shown by the component's ui
-  - chart-id : (string) unique identifier of this chart insatnce within this container
+  - component-id : (string) unique identifier of this chart instance within this container
   - container-id : (string) name of the container this chart is inside of
   "
-  ([data component-id]
-   [component data component-id ""])
-
-  ([data component-id container-id]
+  ([& {:keys [data component-id container-id]}]
    [c/base-chart
     :data data
     :config (config component-id data)
     :component-id component-id
-    :container-id container-id
+    :container-id (or container-id "")
     :component-panel component-panel]))
 
 

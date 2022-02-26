@@ -45,8 +45,12 @@
 
 (re-frame/reg-event-fx
   :bh.rccst.events/login-success
-  (fn-traced [{:keys [db]} [_ {:keys [logged-in user-id uuid]}]]
-    (log/info ":bh.rccst.events/login-success" db logged-in user-id uuid)
+  (fn-traced [{:keys [db]} [_ {:keys [logged-in user-id uuid] :as result}]]
+    (log/info ":bh.rccst.events/login-success" db
+      "///" logged-in
+      "///" user-id
+      "///" uuid
+      "///" result)
     {:dispatch [::pub-sub/start user-id]
      :db (assoc db
            :logged-in? logged-in
@@ -61,3 +65,10 @@
           [:dispatch [::pub-sub/cancel-all]]]
      :db (assoc db :logged-in? false)}))
 
+
+
+; try out the calls to the server
+(comment
+  (re-frame/dispatch [:bh.rccst.events/login "string" "string"])
+
+  ())

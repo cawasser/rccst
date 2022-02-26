@@ -130,24 +130,18 @@
 (defn configurable-component
   "the chart to draw, taking cues from the settings of the configuration panel
 
-  the component creates its own ID (a random-uuid) to hold the local state. This way multiple charts
-  can be placed inside the same outer container/composite
-
   ---
 
-  - data : (atom) any data shown by the component's ui
-  - chart-id : (string) unique identifier for this chart instance within this container
-  - container-id : (string) name of the container this chart is inside of
+  - :data : (atom) any data shown by the component's ui
+  - :component-id : (string) unique identifier for this chart instance within this container
+  - :container-id : (string) name of the container this chart is inside of
   "
-  ([data component-id]
-   [configurable-component data component-id ""])
-
-  ([data component-id container-id]
+  ([& {:keys [data component-id container-id]}]
    [c/base-chart
     :data data
     :config (config component-id data)
     :component-id component-id
-    :container-id container-id
+    :container-id (or container-id "")
     :data-panel utils/hierarchy-data-panel
     :config-panel config-panel
     :component-panel component-panel]))
@@ -156,25 +150,18 @@
 (defn component
   "the chart to draw. this variant does NOT provide a configuration panel
 
-  the component creates its own ID (a random-uuid) to hold the local state. This way multiple charts
-  can be placed inside the same outer container/composite
-
   ---
 
-  - data : (atom) any data shown by the component's ui
-  - chart-id : (string) unique identifier for this chart instance within this container
-  - container-id : (string) name of the container this chart is inside of
+  - :data : (atom) any data shown by the component's ui
+  - :component-id : (string) unique identifier for this chart instance within this container
+  - :container-id : (string) name of the container this chart is inside of
   "
-  ([data component-id]
-   [component data component-id ""])
-
-
-  ([data component-id container-id]
+  ([& {:keys [data component-id container-id]}]
    [c/base-chart
     :data data
     :config (config component-id data)
     :component-id component-id
-    :container-id container-id
+    :container-id (or container-id "")
     :component-panel component-panel]))
 
 
