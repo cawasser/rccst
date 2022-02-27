@@ -21,14 +21,14 @@
   "
   "
   {; the ui components (looked up in a registry), mapped to local names
-   :components {:line-chart   :chart/line-chart
-                :bar-chart    :chart/bar-chart
-                :config-panel config-panel}
+   :components {:line-chart {:type :chart/line-chart :configurable false}
+                :bar-chart {:type :chart/bar-chart :configurable false}
+                :config-panel {:type config-panel}}
 
    ; all remote data sources (mapped to a local name)
    ; TODO: might replace this with some meta-data so the USER can select appropriate data source
    :sources    {:tabular-data :source/sequence-of-measurements
-                :dag-data :source/dag-data}
+                :dag-data     :source/dag-data}
 
    ; links - how the different components get their data and if they publish or
    ; subscribe to the composite
@@ -38,6 +38,29 @@
 
    ; the physical layout of the components on the display
    :layout     [[:line-chart :config-panel :bar-chart]]})
+
+
+(comment
+  (:components composite-def)
+  (def meta-data (get-in composite-def [:components :line-chart]))
+  (get registry/ui-component-registry (get-in meta-data [:type]))
+
+  (->> (get registry/ui-component-registry (get-in meta-data [:type]))
+    :sources
+    keys)
+
+
+
+  (->> composite-def
+    :sources
+    keys
+    (map (fn [name]
+           (re-frame/dispatch [:bh.rccst.events/subscribe-to #{name}])
+           {name (or (re-frame/subscribe [:bh.rccst.subs/source name])
+                   (r/atom []))}))
+    (into {}))
+
+  ())
 
 
 ; explore composite-def and the various registries
@@ -56,18 +79,20 @@
   (def resolved-components
     (->> composite-def
       :components
-      (map (fn [[name component]]
-             {name [(or (get registry/ui-component-registry component)
-                      component)]}))
+      (map (fn [[name meta-data]]
+             {name [(or (->> (get registry/ui-component-registry (get-in meta-data [:type]))
+                          :component)
+                      (:type meta-data))]}))
       (into {})))
 
   ; get data from the server
   (def resolved-sources
     (->> composite-def
       :sources
-      (map (fn [[name source]]
-             (re-frame/dispatch [:bh.rccst.events/subscribe-to #{source}])
-             {name (or (re-frame/subscribe [:bh.rccst.subs/source source])
+      keys
+      (map (fn [name]
+             (re-frame/dispatch [:bh.rccst.events/subscribe-to #{name}])
+             {name (or (re-frame/subscribe [:bh.rccst.subs/source name])
                      (r/atom []))}))
       (into {})))
 
@@ -86,11 +111,7 @@
   (def component :line-chart)
   (def sources (get-in composite-def [:links component]))
 
-  (conj (get resolved-components component)
-    (get resolved-sources source)
-    (ui-utils/path->keyword "dummy" component)
-    "dummy")
-
+  (get-in composite-def [:links component])
 
   (defn process-sources [sources]
     (->> sources
@@ -105,23 +126,26 @@
   (process-sources sources)
   (process-sources {:data :tabular-data})
 
-  (conj [(get resolved-components component)]
-    (process-sources sources)
-    [:component-ui (ui-utils/path->keyword "dummy" component)]
-    [:container-id "dummy"])
+  (flatten (conj [(get resolved-components component)]
+             (process-sources sources)
+             [:component-ui (ui-utils/path->keyword "dummy" component)]
+             [:container-id "dummy"]))
+
+
+
+  (defn process-component [id component]
+    (let [sources (get-in composite-def [:links component])]
+      (flatten
+        (conj (get resolved-components component)
+          (process-sources sources)
+          [:component-ui (ui-utils/path->keyword id component)]
+          [:container-id id]))))
 
   (defn process-columns [id row]
     (->> row
       (map (fn [component]
-             (let [sources (get-in composite-def [:links component :source])]
-               (into []
-                 (flatten
-                   (conj (get resolved-components component)
-                     (process-sources sources)
-                     [:component-ui (ui-utils/path->keyword "dummy" component)]
-                     [:container-id "dummy"]))))))
+             (process-component id component)))
       (into [])))
-
 
   (defn process-rows [id layout]
     (->> layout
@@ -130,6 +154,7 @@
       (into [])))
 
 
+  (process-component "dummy" :line-chart)
   (process-columns "dummy" [:line-chart :config-panel :bar-chart])
   (process-rows "dummy" (:layout composite-def))
 

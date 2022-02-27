@@ -12,15 +12,15 @@
             [bh.rccst.ui-component.atom.chart.treemap-chart :as treemap-chart]))
 
 
-(def registry {:chart/area-chart        {:component area-chart/component :sources [:data] :pubs nil :subs nil}
-               :chart/bar-chart         {:component bar-chart/component :sources [:data] :pubs nil :subs nil}
-               :chart/colored-pie-chart {:component colored-pie-chart/component :sources [:data] :pubs nil :subs nil}
-               :chart/funnel-chart      {:component funnel-chart/component :sources [:data] :pubs nil :subs nil}
-               :chart/line-chart        {:component line-chart/component :sources [:data] :pubs nil :subs nil}
-               :chart/pie-chart         {:component pie-chart/component :sources [:data] :pubs nil :subs nil}
-               :chart/radar-chart       {:component radar-chart/component :sources [:data] :pubs nil :subs nil}
-               :chart/radial-bar-chart  {:component radial-bar-chart/component :sources [:data] :pubs nil :subs nil}
-               :chart/sankey-chart      {:component sankey-chart/component :sources [:data] :pubs nil :subs nil}
-               :chart/scatter-chart     {:component scatter-chart/component :sources [:data] :pubs nil :subs nil}
-               :chart/treemap-chart     {:component treemap-chart/component :sources [:data] :pubs nil :subs nil}})
+(def registry {:chart/area-chart        area-chart/meta-data
+               :chart/bar-chart         bar-chart/meta-data
+               :chart/colored-pie-chart colored-pie-chart/meta-data
+               :chart/funnel-chart      funnel-chart/meta-data
+               :chart/line-chart        line-chart/meta-data
+               :chart/pie-chart         pie-chart/meta-data
+               :chart/radar-chart       radar-chart/meta-data
+               :chart/radial-bar-chart  radial-bar-chart/meta-data
+               :chart/sankey-chart      sankey-chart/meta-data
+               :chart/scatter-chart     scatter-chart/meta-data
+               :chart/treemap-chart     treemap-chart/meta-data})
 

@@ -133,3 +133,11 @@
     :component-id component-id
     :container-id (or container-id "")
     :component-panel component-panel]))
+
+
+(def meta-data {:component component
+                :configurable-component configurable-component
+                :sources {:data :source-type/meta-tabular}
+                :pubs []
+                :subs []})
+

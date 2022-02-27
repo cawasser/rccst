@@ -165,6 +165,14 @@
     :component-panel component-panel]))
 
 
+(def meta-data {:component component
+                :configurable-component configurable-component
+                :sources {:data :source-type/meta-hierarchy}
+                :pubs []
+                :subs []})
+
+
+
 (comment
   (def component-id "treemap-chart-demo")
 

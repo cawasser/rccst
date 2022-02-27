@@ -237,3 +237,10 @@
     (into [:<>]))
 
   ())
+
+
+(def meta-data {:component component
+                :configurable-component configurable-component
+                :sources {:data :source-type/meta-tabular}
+                :pubs []
+                :subs []})
