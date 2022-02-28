@@ -4,7 +4,7 @@
             [bh.rccst.ui-component.utils :as ui-utils]
             [bh.rccst.ui-component.atom.chart.utils.example-data :as data]
 
-            ["recharts" :refer [Sankey Tooltip Layer Rectangle]]
+            ["recharts" :refer [ResponsiveContainer Sankey Tooltip Layer Rectangle]]
             [re-com.core :as rc]
             [reagent.core :as r]
             [taoensso.timbre :as log]))
@@ -139,17 +139,18 @@
         curve (ui-utils/subscribe-local component-id [:link :curve])]
 
     (fn []
-      [:> Sankey
-       {:width         500 :height 400
-        :node          (partial complex-node 500 @node-fill @node-stroke)
-        :data          @data
-        :margin        {:top 20 :bottom 20 :left 20 :right 20}
-        :nodeWidth     10
-        :nodePadding   60
-        :linkCurvature @curve
-        :iterations    64
-        :link          {:stroke @link-stroke}}
-       (when @tooltip? [:> Tooltip])])))
+      [:> ResponsiveContainer
+       [:> Sankey
+        {:width         500 :height 400
+         :node          (partial complex-node 500 @node-fill @node-stroke)
+         :data          @data
+         :margin        {:top 20 :bottom 20 :left 20 :right 20}
+         :nodeWidth     10
+         :nodePadding   60
+         :linkCurvature @curve
+         :iterations    64
+         :link          {:stroke @link-stroke}}
+        (when @tooltip? [:> Tooltip])]])))
 
 
 (defn configurable-component

@@ -5,7 +5,7 @@
             [bh.rccst.ui-component.utils :as ui-utils]
             [re-com.core :as rc]
             [reagent.core :as r]
-            ["recharts" :refer [ScatterChart Scatter Brush]]))
+            ["recharts" :refer [ResponsiveContainer ScatterChart Scatter Brush]]))
 
 
 (def sample-data
@@ -89,20 +89,21 @@
     (fn []
       ;(log/info "configurable-Scatter-chart" @config @data)
 
-      [:> ScatterChart {:width 400 :height 400}
+      [:> ResponsiveContainer
+       [:> ScatterChart {:width 400 :height 400}
 
-       (utils/standard-chart-components component-id)
+        (utils/standard-chart-components component-id)
 
-       (when @brush? [:> Brush])
+        (when @brush? [:> Brush])
 
-       ;; TODO: looks like we need to add more attributes to x- & y-axis
-       ;;
-       ;(when @x-axis? [:> XAxis {:type "number" :dataKey @x-axis-dataKey :name "stature" :unit "cm"}])
-       ;(when @y-axis? [:> YAxis {:type "number" :dataKey @y-axis-dataKey :name "weight" :unit "kg"}])
+        ;; TODO: looks like we need to add more attributes to x- & y-axis
+        ;;
+        ;(when @x-axis? [:> XAxis {:type "number" :dataKey @x-axis-dataKey :name "stature" :unit "cm"}])
+        ;(when @y-axis? [:> YAxis {:type "number" :dataKey @y-axis-dataKey :name "weight" :unit "kg"}])
 
-       [:> Scatter {:name              "tempScatter" :data @data
-                    :isAnimationActive @isAnimationActive?
-                    :fill              @scatter-dot-fill}]])))
+        [:> Scatter {:name              "tempScatter" :data @data
+                     :isAnimationActive @isAnimationActive?
+                     :fill              @scatter-dot-fill}]]])))
 
 
 (defn configurable-component

@@ -5,7 +5,7 @@
             [bh.rccst.ui-component.utils :as ui-utils]
             [re-com.core :as rc]
             [reagent.core :as r]
-            ["recharts" :refer [Treemap]]))
+            ["recharts" :refer [ResponsiveContainer Treemap]]))
 
 
 (def sample-data
@@ -116,14 +116,15 @@
         fill               (ui-utils/subscribe-local component-id [:fill :color])]
 
     (fn []
-      [:> Treemap
-       {:width             400 :height 400
-        :data              @data
-        :dataKey           "size"
-        :isAnimationActive @isAnimationActive?
-        :ratio             default-ratio
-        :stroke            @stroke
-        :fill              @fill}])))
+      [:> ResponsiveContainer
+       [:> Treemap
+        {:width             400 :height 400
+         :data              @data
+         :dataKey           "size"
+         :isAnimationActive @isAnimationActive?
+         :ratio             default-ratio
+         :stroke            @stroke
+         :fill              @fill}]])))
 
 
 (defn configurable-component

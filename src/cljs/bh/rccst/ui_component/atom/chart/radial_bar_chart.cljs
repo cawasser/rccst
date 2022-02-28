@@ -1,6 +1,6 @@
 (ns bh.rccst.ui-component.atom.chart.radial-bar-chart
   (:require [bh.rccst.ui-component.atom.chart.utils :as utils]
-            ["recharts" :refer [RadialBarChart RadialBar Legend Tooltip]]
+            ["recharts" :refer [ResponsiveContainer RadialBarChart RadialBar Legend Tooltip]]
             [bh.rccst.ui-component.atom.chart.wrapper :as c]
             [bh.rccst.ui-component.utils :as ui-utils]
             [re-com.core :as rc]
@@ -80,22 +80,23 @@
         radial-uv? (ui-utils/subscribe-local component-id [:radial-uv :include])]
 
     (fn []
-      [:> RadialBarChart {:width       400
-                          :height      400
-                          :innerRadius "10%"
-                          :outerRadius "80%"
-                          :data        @data
-                          :startAngle  180
-                          :endAngle    0}
+      [:> ResponsiveContainer
+       [:> RadialBarChart {:width       400
+                           :height      400
+                           :innerRadius "10%"
+                           :outerRadius "80%"
+                           :data        @data
+                           :startAngle  180
+                           :endAngle    0}
 
-       ;(utils/non-gridded-chart-components widget-id)
+        ;(utils/non-gridded-chart-components widget-id)
 
-       (when @radial-uv? [:> RadialBar {:minAngle   15
-                                        :label      {:fill "#666", :position "insideStart"}
-                                        :background {:clockWise true}
-                                        :dataKey    :uv}])
-       [:> Legend {:iconSize 10 :width 120 :height 140 :layout "vertical" :verticalAlign "middle" :align "right"}]
-       [:> Tooltip]])))
+        (when @radial-uv? [:> RadialBar {:minAngle   15
+                                         :label      {:fill "#666", :position "insideStart"}
+                                         :background {:clockWise true}
+                                         :dataKey    :uv}])
+        [:> Legend {:iconSize 10 :width 120 :height 140 :layout "vertical" :verticalAlign "middle" :align "right"}]
+        [:> Tooltip]]])))
 
 
 (defn configurable-component

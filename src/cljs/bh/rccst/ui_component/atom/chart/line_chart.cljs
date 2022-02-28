@@ -3,7 +3,7 @@
             [bh.rccst.ui-component.atom.chart.utils.example-data :as data]
             [bh.rccst.ui-component.atom.chart.wrapper :as c]
             [bh.rccst.ui-component.utils :as ui-utils]
-            ["recharts" :refer [LineChart Line Brush]]
+            ["recharts" :refer [ResponsiveContainer LineChart Line Brush]]
             [re-com.core :as rc]
             [reagent.core :as r]))
 
@@ -160,14 +160,14 @@
         subscriptions      (ui-utils/override-subs container-id local-subs override-subs)]
 
     (fn []
-      ;[:div "line Chart"]
-      [:> LineChart {:width 400 :height 400 :data (get @data :data)}
+      [:> ResponsiveContainer
+       [:> LineChart {:width 400 :height 400 :data (get @data :data)}
 
-       (utils/standard-chart-components component-id)
+        (utils/standard-chart-components component-id)
 
-       (when (ui-utils/resolve-sub subscriptions [:brush]) [:> Brush])
+        (when (ui-utils/resolve-sub subscriptions [:brush]) [:> Brush])
 
-       (make-line-display component-id data subscriptions isAnimationActive?)])))
+        (make-line-display component-id data subscriptions isAnimationActive?)]])))
 
 
 (def source-code '[:> LineChart {:width 400 :height 400 :data @data}])

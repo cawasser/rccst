@@ -1,5 +1,6 @@
 (ns bh.rccst.ui-component.atom.chart.funnel-chart
-  (:require ["recharts" :refer [FunnelChart Funnel Cell LabelList XAxis YAxis CartesianGrid Tooltip Brush]]
+  (:require ["recharts" :refer [ResponsiveContainer FunnelChart Funnel Cell LabelList
+                                XAxis YAxis CartesianGrid Tooltip Brush]]
             [bh.rccst.ui-component.atom.chart.utils :as utils]
             [bh.rccst.ui-component.atom.chart.utils.example-data :as data]
             [bh.rccst.ui-component.atom.chart.wrapper :as c]
@@ -138,24 +139,25 @@
 
     (fn [data chart-id]
       ;(log/info "configurable-funnel-chart" @config)
-      [:> FunnelChart {:height 400 :width 500 :label true}
+      [:> ResponsiveContainer
+       [:> FunnelChart {:label true}
 
-       (utils/non-gridded-chart-components chart-id)
+        (utils/non-gridded-chart-components chart-id)
 
-       [:> Funnel {:dataKey           (ui-utils/resolve-sub subscriptions [:value :chosen])
-                   :nameKey           (ui-utils/resolve-sub subscriptions [:name :chosen])
-                   :label             true
-                   :data              (get @data :data)
-                   :isAnimationActive @isAnimationActive?}
-        (doall
-          (map-indexed
-            (fn [idx {name :name}]
-              ^{:key (str idx name)}
-              [:> Cell {:key  (str "cell-" idx)
-                        :fill (or (ui-utils/resolve-sub subscriptions [:colors name])
-                                (ui-utils/get-color 0))}])
-            (get @data :data)))
-        [:> LabelList {:position :right :fill "#000000" :stroke "none" :dataKey (ui-utils/resolve-sub subscriptions [:value :chosen])}]]])))
+        [:> Funnel {:dataKey           (ui-utils/resolve-sub subscriptions [:value :chosen])
+                    :nameKey           (ui-utils/resolve-sub subscriptions [:name :chosen])
+                    :label             true
+                    :data              (get @data :data)
+                    :isAnimationActive @isAnimationActive?}
+         (doall
+           (map-indexed
+             (fn [idx {name :name}]
+               ^{:key (str idx name)}
+               [:> Cell {:key  (str "cell-" idx)
+                         :fill (or (ui-utils/resolve-sub subscriptions [:colors name])
+                                 (ui-utils/get-color 0))}])
+             (get @data :data)))
+         [:> LabelList {:position :right :fill "#000000" :stroke "none" :dataKey (ui-utils/resolve-sub subscriptions [:value :chosen])}]]]])))
 
 
 (def source-code `[:> FunnelChart {:height 400 :width 500}

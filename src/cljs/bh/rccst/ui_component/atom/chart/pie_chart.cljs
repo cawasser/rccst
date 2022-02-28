@@ -4,7 +4,7 @@
             [bh.rccst.ui-component.atom.chart.wrapper :as c]
             [bh.rccst.ui-component.utils :as ui-utils]
 
-            ["recharts" :refer [PieChart Pie]]
+            ["recharts" :refer [ResponsiveContainer PieChart Pie]]
             [re-com.core :as rc]
             [reagent.core :as r]
             [taoensso.timbre :as log]))
@@ -111,16 +111,17 @@
         subscriptions (ui-utils/build-subs component-id (local-config data))]
 
     (fn []
-      [:> PieChart {:width 400 :height 400 :label true}
+      [:> ResponsiveContainer
+       [:> PieChart {:width 400 :height 400 :label true}
 
-       (utils/non-gridded-chart-components component-id)
+        (utils/non-gridded-chart-components component-id)
 
-       [:> Pie {:dataKey           (ui-utils/resolve-sub subscriptions [:value :chosen])
-                :nameKey           (ui-utils/resolve-sub subscriptions [:name :chosen])
-                :data              (get @data :data)
-                :fill              (ui-utils/resolve-sub subscriptions [:fill])
-                :label             true
-                :isAnimationActive @isAnimationActive?}]])))
+        [:> Pie {:dataKey           (ui-utils/resolve-sub subscriptions [:value :chosen])
+                 :nameKey           (ui-utils/resolve-sub subscriptions [:name :chosen])
+                 :data              (get @data :data)
+                 :fill              (ui-utils/resolve-sub subscriptions [:fill])
+                 :label             true
+                 :isAnimationActive @isAnimationActive?}]]])))
 
 
 (defn configurable-component

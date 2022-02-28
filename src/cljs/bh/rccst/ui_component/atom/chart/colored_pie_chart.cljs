@@ -2,7 +2,7 @@
   (:require [bh.rccst.ui-component.atom.chart.utils :as utils]
             [bh.rccst.ui-component.atom.chart.utils.example-data :as data]
             [bh.rccst.ui-component.atom.chart.wrapper :as c]
-            ["recharts" :refer [PieChart Pie Cell]]
+            ["recharts" :refer [ResponsiveContainer PieChart Pie Cell]]
             [bh.rccst.ui-component.utils :as ui-utils]
             [re-com.core :as rc]
             [reagent.core :as r]))
@@ -149,23 +149,24 @@
         subscriptions      (ui-utils/build-subs chart-id (local-config data))]
 
     (fn [data chart-id]
-      [:> PieChart {:width 400 :height 400 :label true}
+      [:> ResponsiveContainer
+       [:> PieChart {:label true}
 
-       (utils/non-gridded-chart-components chart-id)
+        (utils/non-gridded-chart-components chart-id)
 
-       [:> Pie {:dataKey           (ui-utils/resolve-sub subscriptions [:value :chosen])
-                :nameKey           (ui-utils/resolve-sub subscriptions [:name :chosen])
-                :data              (get @data :data)
-                :label             true
-                :isAnimationActive @isAnimationActive?}
-        (doall
-          (map-indexed
-            (fn [idx {name :name}]
-              ^{:key (str idx name)}
-              [:> Cell {:key  (str "cell-" idx)
-                        :fill (or (ui-utils/resolve-sub subscriptions [:colors name])
-                                (ui-utils/get-color 0))}])
-            (get @data :data)))]])))
+        [:> Pie {:dataKey           (ui-utils/resolve-sub subscriptions [:value :chosen])
+                 :nameKey           (ui-utils/resolve-sub subscriptions [:name :chosen])
+                 :data              (get @data :data)
+                 :label             true
+                 :isAnimationActive @isAnimationActive?}
+         (doall
+           (map-indexed
+             (fn [idx {name :name}]
+               ^{:key (str idx name)}
+               [:> Cell {:key  (str "cell-" idx)
+                         :fill (or (ui-utils/resolve-sub subscriptions [:colors name])
+                                 (ui-utils/get-color 0))}])
+             (get @data :data)))]]])))
 
 
 (defn configurable-component

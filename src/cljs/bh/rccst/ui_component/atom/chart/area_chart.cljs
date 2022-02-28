@@ -3,7 +3,7 @@
             [bh.rccst.ui-component.atom.chart.wrapper :as c]
             [bh.rccst.ui-component.utils :as ui-utils]
             [bh.rccst.ui-component.atom.chart.utils.example-data :as data]
-            ["recharts" :refer [AreaChart Area Brush]]
+            ["recharts" :refer [ResponsiveContainer AreaChart Area Brush]]
             [re-com.core :as rc]
             [reagent.core :as r]
             [taoensso.timbre :as log]))
@@ -177,13 +177,14 @@
 
     (fn []
       ;[c/chart
-      [:> AreaChart {:width 400 :height 400 :data (get @data :data)}
+      [:> ResponsiveContainer
+       [:> AreaChart {:width "100%" :height "100%" :data (get @data :data)}
 
-       (utils/standard-chart-components chart-id)
+        (utils/standard-chart-components chart-id)
 
-       (when (ui-utils/resolve-sub subscriptions [:brush]) [:> Brush])
+        (when (ui-utils/resolve-sub subscriptions [:brush]) [:> Brush])
 
-       (make-area-display chart-id data subscriptions isAnimationActive?)])))
+        (make-area-display chart-id data subscriptions isAnimationActive?)]])))
 
 
 (defn configurable-component

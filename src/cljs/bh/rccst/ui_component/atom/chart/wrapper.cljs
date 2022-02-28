@@ -47,6 +47,8 @@
                   [layout/centered {:extra-classes :is-one-third}
                    [rc/h-box :src (rc/at)
                     :gap "5px"
+                    :width "600px"
+                    :height "600px"
                     :children (conj
                                 (if @open?
                                   [[layout/centered {:extra-classes :is-one-third}

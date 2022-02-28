@@ -1,6 +1,7 @@
 (ns bh.rccst.ui-component.atom.chart.radar-chart
   (:require [bh.rccst.ui-component.atom.chart.utils :as utils]
-            ["recharts" :refer [RadarChart PolarGrid PolarAngleAxis PolarRadiusAxis Radar]]
+            ["recharts" :refer [ResponsiveContainer RadarChart PolarGrid
+                                PolarAngleAxis PolarRadiusAxis Radar]]
             [bh.rccst.ui-component.atom.chart.wrapper :as c]
             [bh.rccst.ui-component.utils :as ui-utils]
             [re-com.core :as rc]
@@ -192,14 +193,15 @@
         subscriptions (ui-utils/build-subs chart-id (local-config data))]
 
     (fn []
-      [:> RadarChart {:width 400 :height 400 :data (get @data :data)}
-       [:> PolarGrid]
-       [:> PolarAngleAxis {:dataKey :subject}]
-       [:> PolarRadiusAxis {:angle "30" :domain (ui-utils/resolve-sub subscriptions [:domain])}]
+      [:> ResponsiveContainer
+       [:> RadarChart {:width 400 :height 400 :data (get @data :data)}
+        [:> PolarGrid]
+        [:> PolarAngleAxis {:dataKey :subject}]
+        [:> PolarRadiusAxis {:angle "30" :domain (ui-utils/resolve-sub subscriptions [:domain])}]
 
-       (utils/non-gridded-chart-components chart-id)
+        (utils/non-gridded-chart-components chart-id)
 
-       (make-radar-display chart-id data subscriptions)])))
+        (make-radar-display chart-id data subscriptions)]])))
 
 
 (defn configurable-component

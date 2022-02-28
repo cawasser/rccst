@@ -67,6 +67,7 @@
     flatten
     (apply conj [])
     (map name)
+    (map #(clojure.string/replace % #" " "-"))
     (clojure.string/join ".")
     (keyword id)))
 
