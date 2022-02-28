@@ -3,10 +3,8 @@
             [bh.rccst.ui-component.atom.chart.line-chart :as line-chart]
             [bh.rccst.ui-component.atom.chart.utils :as utils]
             [bh.rccst.ui-component.molecule.composite :as c]
-            [bh.rccst.ui-component.registry :as registry]
             [bh.rccst.ui-component.utils :as ui-utils]
             [re-com.core :as rc]
-            [re-frame.core :as re-frame]
             [reagent.core :as r]
             [taoensso.timbre :as log]
 
@@ -15,20 +13,45 @@
 
 (def sample-data line-chart/sample-data)
 
+
 (declare config-panel)
 
+
 (def composite-def
-  "
+  "this data structure defines the composite in terms of the:
+
+  - :components - the subcomponents, like tables, charts, and such used for the actual UI
+  - :source     - the data sources (from the system) that provide the information to present,
+                  there may be more than one, which all the components share as necessary
+  - :blackboard - (under construction)
+  - :links      - linkages between the components and the data sources
+  - :layout     - a \"DSL\" which defined how the components are to be organized on the display,
+                  treated as a grid of rows and columns
+
+
   "
   {; the ui components (looked up in a registry), mapped to local names
-   :components {:line-chart {:type :chart/line-chart :configurable false}
-                :bar-chart {:type :chart/bar-chart :configurable false}
+   :components {:line-chart   {:type :chart/line-chart :configurable false}
+                :bar-chart    {:type :chart/bar-chart :configurable false}
                 :config-panel {:type config-panel}}
 
    ; all remote data sources (mapped to a local name)
    ; TODO: might replace this with some meta-data so the USER can select appropriate data source
    :sources    {:tabular-data :source/sequence-of-measurements
                 :dag-data     :source/dag-data}
+
+   ; what does the blackboard support?
+   ;
+   ; (or should that be determined by the components themselves?)
+   ;
+   :blackboard [{:brush false}
+                {:tabular-data {:metadata [:number]
+                                :fields   [[:include :boolean true]
+                                           [:stroke :color :default]
+                                           [:fill :color :default]
+                                           [:stackId :string ""]]}}
+                {:dag-data {:metadata [:nodes :links]
+                            :fields   []}}]
 
    ; links - how the different components get their data and if they publish or
    ; subscribe to the composite
@@ -38,135 +61,6 @@
 
    ; the physical layout of the components on the display
    :layout     [[:line-chart :config-panel :bar-chart]]})
-
-
-(comment
-  (:components composite-def)
-  (def meta-data (get-in composite-def [:components :line-chart]))
-  (get registry/ui-component-registry (get-in meta-data [:type]))
-
-  (->> (get registry/ui-component-registry (get-in meta-data [:type]))
-    :sources
-    keys)
-
-
-
-  (->> composite-def
-    :sources
-    keys
-    (map (fn [name]
-           (re-frame/dispatch [:bh.rccst.events/subscribe-to #{name}])
-           {name (or (re-frame/subscribe [:bh.rccst.subs/source name])
-                   (r/atom []))}))
-    (into {}))
-
-  ())
-
-
-; explore composite-def and the various registries
-;
-; i.e., we want to create something like this:
-;
-;    [[[line-chart/component data (str component-id "/line-chart") component-id]
-;      [config-panel data component-id]
-;      [bar-chart/component data (str component-id "/bar-chart") component-id]})))
-;
-(comment
-  ; dummy login so subscription work at all
-  (re-frame/dispatch [:bh.rccst.events/login "string" "string"])
-
-  ; resolve the ui-components
-  (def resolved-components
-    (->> composite-def
-      :components
-      (map (fn [[name meta-data]]
-             {name [(or (->> (get registry/ui-component-registry (get-in meta-data [:type]))
-                          :component)
-                      (:type meta-data))]}))
-      (into {})))
-
-  ; get data from the server
-  (def resolved-sources
-    (->> composite-def
-      :sources
-      keys
-      (map (fn [name]
-             (re-frame/dispatch [:bh.rccst.events/subscribe-to #{name}])
-             {name (or (re-frame/subscribe [:bh.rccst.subs/source name])
-                     (r/atom []))}))
-      (into {})))
-
-
-  ; build up the layout
-  ;
-  ; i.e., we want to create something like this:
-  ;
-  ;    [[[line-chart/component data (str component-id "/line-chart") component-id]
-  ;      [config-panel data component-id]
-  ;      [bar-chart/component data (str component-id "/bar-chart") component-id]})))
-  ;
-  ; let's start with :line-chart
-  ;
-  ; first we need to get the correct data source
-  (def component :line-chart)
-  (def sources (get-in composite-def [:links component]))
-
-  (get-in composite-def [:links component])
-
-  (defn process-sources [sources]
-    (->> sources
-      (mapcat (fn [[name source]]
-                (println name source)
-                [name (get resolved-sources source)]))
-      flatten
-      (into [])))
-
-  (get resolved-sources :tabular-data)
-
-  (process-sources sources)
-  (process-sources {:data :tabular-data})
-
-  (flatten (conj [(get resolved-components component)]
-             (process-sources sources)
-             [:component-ui (ui-utils/path->keyword "dummy" component)]
-             [:container-id "dummy"]))
-
-
-
-  (defn process-component [id component]
-    (let [sources (get-in composite-def [:links component])]
-      (flatten
-        (conj (get resolved-components component)
-          (process-sources sources)
-          [:component-ui (ui-utils/path->keyword id component)]
-          [:container-id id]))))
-
-  (defn process-columns [id row]
-    (->> row
-      (map (fn [component]
-             (process-component id component)))
-      (into [])))
-
-  (defn process-rows [id layout]
-    (->> layout
-      (map (fn [row]
-             (process-columns id row)))
-      (into [])))
-
-
-  (process-component "dummy" :line-chart)
-  (process-columns "dummy" [:line-chart :config-panel :bar-chart])
-  (process-rows "dummy" (:layout composite-def))
-
-
-  ; next, process them all
-  (->> composite-def
-    :layout
-    (process-rows "dummy"))
-
-
-  ())
-
 
 
 (def source-code '[:div])

@@ -4,7 +4,7 @@
             [woolybear.packs.flex-panel :as flex]
             [re-com.core :as rc]
 
-            [bh.rccst.ui-component.flippable-card :as flippable]))
+            [bh.rccst.ui-component.atom.card.flippable-card :as flippable]))
 
 
 (def image-style {:width        "170px" :height "170px"
