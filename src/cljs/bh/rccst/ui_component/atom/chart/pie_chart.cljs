@@ -111,16 +111,16 @@
 
     (fn [data component-id container-id ui]
       [:> ResponsiveContainer
-       [:> PieChart {:width 400 :height 400 :label true}
+         [:> PieChart {:label (utils/override true ui :label)}
 
-        (utils/non-gridded-chart-components component-id ui)
+          (utils/non-gridded-chart-components component-id ui)
 
-        [:> Pie {:dataKey           (ui-utils/resolve-sub subscriptions [:value :chosen])
-                 :nameKey           (ui-utils/resolve-sub subscriptions [:name :chosen])
-                 :data              (get @data :data)
-                 :fill              (ui-utils/resolve-sub subscriptions [:fill])
-                 :label             true
-                 :isAnimationActive @isAnimationActive?}]]])))
+          [:> Pie {:dataKey           (ui-utils/resolve-sub subscriptions [:value :chosen])
+                   :nameKey           (ui-utils/resolve-sub subscriptions [:name :chosen])
+                   :data              (get @data :data)
+                   :fill              (ui-utils/resolve-sub subscriptions [:fill])
+                   :label             (utils/override true ui :label)
+                   :isAnimationActive @isAnimationActive?}]]])))
 
 
 (defn configurable-component
@@ -153,13 +153,14 @@
   - :component-id : (string) name of this chart
   - :container-id : (string) name of the container this chart is inside of
   "
-  ([& {:keys [data component-id container-id]}]
-   [c/base-chart
-    :data data
-    :config (config component-id data)
-    :component-id component-id
-    :container-id (or container-id "")
-    :component-panel component-panel]))
+  [& {:keys [data component-id container-id ui]}]
+  [c/base-chart
+   :data data
+   :config (config component-id data)
+   :component-id component-id
+   :container-id (or container-id "")
+   :component-panel component-panel
+   :ui ui])
 
 
 (def meta-data {:component              component

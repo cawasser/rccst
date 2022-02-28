@@ -1,15 +1,15 @@
 (ns bh.rccst.ui-component.atom.chart.utils
-  (:require [taoensso.timbre :as log]
+  (:require [bh.rccst.events :as events]
+            [bh.rccst.ui-component.table :as table]
+            [bh.rccst.ui-component.utils :as u]
             [re-com.core :as rc]
-            [re-frame.core :as re-frame]
-            [reagent.core :as r]
 
             ["recharts" :refer [XAxis YAxis CartesianGrid Tooltip Legend]]
             ["react-colorful" :refer [HexColorPicker]]
 
-            [bh.rccst.events :as events]
-            [bh.rccst.ui-component.utils :as u]
-            [bh.rccst.ui-component.table :as table]
+            [re-frame.core :as re-frame]
+            [reagent.core :as r]
+            [taoensso.timbre :as log]
 
             [woolybear.packs.tab-panel :as tab-panel]))
 
@@ -21,12 +21,12 @@
   (let [formal-id (keyword base-id)
         data-path [formal-id :tab-panel]
         config-id (keyword base-id "config")
-        data-id (keyword base-id "data")
-        db-id (keyword "db" base-id)
-        tab-id (keyword base-id "tab-panel")
-        value-id (keyword base-id "value")
-        init-db {:tab-panel (tab-panel/mk-tab-panel-data
-                              data-path config-id)}]
+        data-id   (keyword base-id "data")
+        db-id     (keyword "db" base-id)
+        tab-id    (keyword base-id "tab-panel")
+        value-id  (keyword base-id "value")
+        init-db   {:tab-panel (tab-panel/mk-tab-panel-data
+                                data-path config-id)}]
 
     (re-frame/reg-sub
       db-id
@@ -158,9 +158,9 @@
 
 
 (defn column-picker [data widget-id label path]
-  (let [model (u/subscribe-local widget-id path)
+  (let [model    (u/subscribe-local widget-id path)
         headings (apply set (map keys (get @data :data)))
-        btns (mapv (fn [h] {:id h :label h}) headings)]
+        btns     (mapv (fn [h] {:id h :label h}) headings)]
     (fn [data widget-id label path]
       [rc/h-box :src (rc/at)
        :gap "5px"
@@ -306,11 +306,11 @@
   "
   [widget-id label path]
   (let [model (u/subscribe-local widget-id path)
-        btns [{:id "auto" :label "auto"}
-              {:id "linear" :label "linear"}
-              {:id "pow" :label "pow"}
-              {:id "sqrt" :label "sqrt"}
-              {:id "log" :label "log"}]]
+        btns  [{:id "auto" :label "auto"}
+               {:id "linear" :label "linear"}
+               {:id "pow" :label "pow"}
+               {:id "sqrt" :label "sqrt"}
+               {:id "log" :label "log"}]]
     (fn [widget-id label path]
       [rc/h-box :src (rc/at)
        :children [[rc/box :src (rc/at) :align :start :child [:code label]]
@@ -335,8 +335,8 @@
   "
   [widget-id path]
   (let [model (u/subscribe-local widget-id path)
-        btns [{:id "horizontal" :label "horizontal"}
-              {:id "vertical" :label "vertical"}]]
+        btns  [{:id "horizontal" :label "horizontal"}
+               {:id "vertical" :label "vertical"}]]
     (fn [widget-id path]
       [rc/h-box :src (rc/at)
        :children [[rc/box :src (rc/at) :align :start :child [:code ":layout"]]
@@ -361,9 +361,9 @@
   "
   [widget-id path]
   (let [model (u/subscribe-local widget-id path)
-        btns [{:id "left" :label "left"}
-              {:id "center" :label "center"}
-              {:id "right" :label "right"}]]
+        btns  [{:id "left" :label "left"}
+               {:id "center" :label "center"}
+               {:id "right" :label "right"}]]
     (fn [widget-id path]
       [rc/h-box :src (rc/at)
        :children [[rc/box :src (rc/at) :align :start :child [:code ":align"]]
@@ -388,9 +388,9 @@
   "
   [widget-id path]
   (let [model (u/subscribe-local widget-id path)
-        btns [{:id "top" :label "top"}
-              {:id "middle" :label "middle"}
-              {:id "bottom" :label "bottom"}]]
+        btns  [{:id "top" :label "top"}
+               {:id "middle" :label "middle"}
+               {:id "bottom" :label "bottom"}]]
     (fn [widget-id path]
       [rc/h-box :src (rc/at)
        :children [[rc/box :src (rc/at) :align :start :child [:code ":verticalAlign"]]
@@ -403,8 +403,8 @@
 
 
 (defn color-config [widget-id label path & [position]]
-  (let [showing? (r/atom false)
-        p (or position :right-center)
+  (let [showing?         (r/atom false)
+        p                (or position :right-center)
         background-color (u/subscribe-local widget-id path)]
     (fn [widget-id label path & [position]]
       [rc/popover-anchor-wrapper :src (rc/at)
@@ -489,12 +489,12 @@
 
 (defn option [chart-id label path-root]
   (let [chosen-path (conj path-root :chosen)
-        keys-path (conj path-root :keys)
-        chosen (u/subscribe-local chart-id chosen-path)
-        keys (u/subscribe-local chart-id keys-path)
-        btns (->> @keys
-               (map (fn [k]
-                      {:id k :label k})))]
+        keys-path   (conj path-root :keys)
+        chosen      (u/subscribe-local chart-id chosen-path)
+        keys        (u/subscribe-local chart-id keys-path)
+        btns        (->> @keys
+                      (map (fn [k]
+                             {:id k :label k})))]
 
     ;(log/info "option" @keys @chosen btns)
 
@@ -556,45 +556,49 @@
 ;; region
 
 
-(defn- override [s ui tag]
-  (if (and (seq ui) (not (empty? (first ui))))
-    (get (first ui) tag)
+(defn override [s ui tag]
+  ;(log/info "override" s "///" ui "///" tag)
+  (if (and
+        (seq ui)
+        (not (empty? ui))
+        (contains? (into #{} (keys ui)) tag))
+    (get ui tag)
     s))
 
 
-(defn standard-chart-components [widget-id & ui]
+(defn standard-chart-components [component-id ui]
 
-  ;(log/info "standard-chart-components" widget-id ui)
+  ;(log/info "standard-chart-components" component-id ui)
 
-  (let [grid? (u/subscribe-local widget-id [:grid :include])
-        grid-dash (u/subscribe-local widget-id [:grid :strokeDasharray :dash])
-        grid-space (u/subscribe-local widget-id [:grid :strokeDasharray :space])
-        grid-stroke (u/subscribe-local widget-id [:grid :stroke])
+  (let [grid?                (u/subscribe-local component-id [:grid :include])
+        grid-dash            (u/subscribe-local component-id [:grid :strokeDasharray :dash])
+        grid-space           (u/subscribe-local component-id [:grid :strokeDasharray :space])
+        grid-stroke          (u/subscribe-local component-id [:grid :stroke])
 
-        x-axis? (u/subscribe-local widget-id [:x-axis :include])
-        x-axis-dataKey (u/subscribe-local widget-id [:x-axis :dataKey])
-        x-axis-orientation (u/subscribe-local widget-id [:x-axis :orientation])
-        x-axis-scale (u/subscribe-local widget-id [:x-axis :scale])
+        x-axis?              (u/subscribe-local component-id [:x-axis :include])
+        x-axis-dataKey       (u/subscribe-local component-id [:x-axis :dataKey])
+        x-axis-orientation   (u/subscribe-local component-id [:x-axis :orientation])
+        x-axis-scale         (u/subscribe-local component-id [:x-axis :scale])
 
-        y-axis? (u/subscribe-local widget-id [:y-axis :include])
-        y-axis-dataKey (u/subscribe-local widget-id [:y-axis :dataKey])
-        y-axis-orientation (u/subscribe-local widget-id [:y-axis :orientation])
-        y-axis-scale (u/subscribe-local widget-id [:y-axis :scale])
+        y-axis?              (u/subscribe-local component-id [:y-axis :include])
+        y-axis-dataKey       (u/subscribe-local component-id [:y-axis :dataKey])
+        y-axis-orientation   (u/subscribe-local component-id [:y-axis :orientation])
+        y-axis-scale         (u/subscribe-local component-id [:y-axis :scale])
 
-        tooltip? (u/subscribe-local widget-id [:tooltip :include])
+        tooltip?             (u/subscribe-local component-id [:tooltip :include])
 
-        legend? (u/subscribe-local widget-id [:legend :include])
-        legend-layout (u/subscribe-local widget-id [:legend :layout])
-        legend-align (u/subscribe-local widget-id [:legend :align])
-        legend-verticalAlign (u/subscribe-local widget-id [:legend :verticalAlign])]
+        legend?              (u/subscribe-local component-id [:legend :include])
+        legend-layout        (u/subscribe-local component-id [:legend :layout])
+        legend-align         (u/subscribe-local component-id [:legend :align])
+        legend-verticalAlign (u/subscribe-local component-id [:legend :verticalAlign])]
 
     [:<>
      (when (override @grid? ui :grid) [:> CartesianGrid {:strokeDasharray (strokeDasharray @grid-dash @grid-space)
                                                          :stroke          @grid-stroke}])
 
-     (when (override @x-axis? ui :x-axis)  [:> XAxis {:dataKey     @x-axis-dataKey
-                                                      :orientation @x-axis-orientation
-                                                      :scale       @x-axis-scale}])
+     (when (override @x-axis? ui :x-axis) [:> XAxis {:dataKey     @x-axis-dataKey
+                                                     :orientation @x-axis-orientation
+                                                     :scale       @x-axis-scale}])
 
      (when (override @y-axis? ui :y-axis) [:> YAxis {:dataKey     @y-axis-dataKey
                                                      :orientation @y-axis-orientation
@@ -607,12 +611,14 @@
                                                       :verticalAlign @legend-verticalAlign}])]))
 
 
-(defn non-gridded-chart-components [widget-id & ui]
-  (let [tooltip? (u/subscribe-local widget-id [:tooltip :include])
-        legend? (u/subscribe-local widget-id [:legend :include])
-        legend-layout (u/subscribe-local widget-id [:legend :layout])
-        legend-align (u/subscribe-local widget-id [:legend :align])
-        legend-verticalAlign (u/subscribe-local widget-id [:legend :verticalAlign])]
+(defn non-gridded-chart-components [component-id ui]
+  (let [tooltip?             (u/subscribe-local component-id [:tooltip :include])
+        legend?              (u/subscribe-local component-id [:legend :include])
+        legend-layout        (u/subscribe-local component-id [:legend :layout])
+        legend-align         (u/subscribe-local component-id [:legend :align])
+        legend-verticalAlign (u/subscribe-local component-id [:legend :verticalAlign])]
+
+    ;(log/info "non-gridded-chart-components" component-id ui)
 
     [:<>
      (when (override @tooltip? ui :tooltip) [:> Tooltip])
@@ -626,21 +632,27 @@
 
 ; workout the override logic for chart elements like grid, legend, etc.
 (comment
-  (def ui [{:tooltip false}])
+  (def ui {:tooltip false})
   (def ui nil)
-  (def ui '(""))
-  (def ui '({:grid false, :x-axis false, :y-axis false, :legend false, :tooltip false}))
+  (def ui "")
+  (def ui {:grid false, :x-axis false, :y-axis false, :legend false, :tooltip false})
   (def tag :tooltip)
+  (def tag :grid)
   (def tooltip? (r/atom true))
   (def grid? (r/atom true))
   (def s @tooltip?)
   (def s @grid?)
 
+  (first ui)
+
   (if (and (seq ui) (not (empty? (first ui)))) true false)
 
 
-  (if (and (seq ui) (not (empty? (first ui))))
-    (get (first ui) tag)
+  (if (and
+        (seq ui)
+        (not (empty? ui))
+        (contains? (into #{} (keys ui)) tag))
+    (get ui tag)
     s)
 
 

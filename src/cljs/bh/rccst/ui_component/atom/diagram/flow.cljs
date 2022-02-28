@@ -3,6 +3,8 @@
             [bh.rccst.ui-component.atom.chart.area-chart :as area-chart]
             [bh.rccst.ui-component.atom.chart.bar-chart :as bar-chart]
             [bh.rccst.ui-component.atom.chart.line-chart :as line-chart]
+            [bh.rccst.ui-component.atom.oz.bar-chart :as oz-bar-chart]
+            [bh.rccst.ui-component.atom.chart.colored-pie-chart :as pie-chart]
             [bh.rccst.ui-component.utils :as ui-utils]
             [reagent.core :as r]
             [taoensso.timbre :as log]
@@ -17,14 +19,16 @@
   (r/atom [{:id        "viirs-5"
             :el-type   :node
             :type      "globe"
-            :data      {:sensor "viirs-5"}
+            :data      {:label "viirs-5"
+                        :chart  pie-chart/component}
             :draggable false
             :position  (diagram-cell 0 1)}
 
            {:id        "abi-meso-11"
             :el-type   :node
             :type      "globe"
-            :data      {:sensor "abi-meso-11"}
+            :data      {:label "abi-meso-11"
+                        :chart  pie-chart/component}
             :draggable false
             :position  (diagram-cell 0 0)}
 
@@ -51,7 +55,7 @@
             :type      "processing-center"
             :data      {:label "NSOF Suitland"
                         :image "/images/icons/processing-center.png"
-                        :chart  line-chart/component}
+                        :chart line-chart/component}
             :draggable false
             :position  (diagram-cell 3 0)}
 
@@ -69,7 +73,7 @@
             :type      "downlink-terminal"
             :data      {:label "Svalbaard/McMurdo"
                         :image "/images/icons/downlink-terminal.png"
-                        :chart  bar-chart/component}
+                        :chart bar-chart/component}
             :draggable false
             :position  (diagram-cell 2 1)}
 
@@ -88,11 +92,13 @@
             :style {:stroke-width 5} :animated true}]))
 
 
-(def data-sources {"GOES East"   area-chart/sample-data
-                   "NOAA XX"     area-chart/sample-data
-                   "Wallops"     bar-chart/sample-data
+(def data-sources {"GOES East"         area-chart/sample-data
+                   "NOAA XX"           area-chart/sample-data
+                   "Wallops"           bar-chart/sample-data
                    "Svalbaard/McMurdo" bar-chart/sample-data
-                   "NSOF Suitland" line-chart/sample-data})
+                   "NSOF Suitland"     line-chart/sample-data
+                   "viirs-5"           pie-chart/sample-data
+                   "abi-meso-11"       pie-chart/sample-data})
 
 
 (def source-code '[:> ReactFlowProvider
@@ -115,7 +121,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; region
-(def default-background "#9CA8B3")
+(def default-background "#dcdcdc")
 (def default-color "#FF")
 (def card-style {:width "100px" :height "150px"})
 (def handle-style {:width "8px" :height "8px" :borderRadius "50%"})
@@ -139,11 +145,21 @@
 ;; endregion
 
 
-(defn- globe-node [props & {:keys [label]}]
+(defn- globe-node [props & {:keys [data label image chart]}]
   [card/card
    :style card-style
-   :front [:div {:style card-style} label]
-   :back [:div {:style card-style} "GLOBE"]])
+   :front [:div#entity-card {:style (merge node-style-square props)}
+           [:img {:style (merge image-style
+                           {:background-color default-background}
+                           props)
+                  :src   image}]
+           [:div.subtitle.is-3 {:style label-style} label]]
+   :back [:div {:style (merge node-style-square props)}
+          [chart
+           :data data
+           :component-id (ui-utils/path->keyword "diagram" label "chart")
+           :container-id (ui-utils/path->keyword "diagram" label)
+           :ui {:legend false :tooltip false :label false}]]])
 
 
 (defn- platform-node [props & {:keys [data label image chart]}]
@@ -160,8 +176,20 @@
            :data data
            :component-id (ui-utils/path->keyword "diagram" label "chart")
            :container-id (ui-utils/path->keyword "diagram" label)
-           :ui {:grid false :x-axis false :y-axis false
+           :ui {:x-axis false :y-axis false
                 :legend false :tooltip false}]]])
+
+
+(comment
+  (def data area-chart/sample-data)
+
+  (assoc @data
+    :data
+    (map (fn [r]
+           (dissoc r :pv :tv :d))
+      (:data @data)))
+  ())
+
 
 
 (defn- downlink-node [props & {:keys [data label image chart]}]
@@ -178,7 +206,7 @@
            :data data
            :component-id (ui-utils/path->keyword "diagram" label "chart")
            :container-id (ui-utils/path->keyword "diagram" label)
-           :ui {:grid false :x-axis false :y-axis false
+           :ui {:grid   false :x-axis false :y-axis false
                 :legend false :tooltip false}]]])
 
 
@@ -196,7 +224,7 @@
            :data data
            :component-id (ui-utils/path->keyword "diagram" label "chart")
            :container-id (ui-utils/path->keyword "diagram" label)
-           :ui {:grid false :x-axis false :y-axis false
+           :ui {:grid   false :x-axis false :y-axis false
                 :legend false :tooltip false}]]])
 
 
@@ -208,7 +236,7 @@
         id     (get data "id")
         source (get sources label)]
 
-    (log/info "node" id label (if source @source {}))
+    ;(log/info "node" id label (if source @source {}))
 
     (r/as-element
       [:div#node-card {:style (merge card-style {:margin 0})}
@@ -228,7 +256,7 @@
    [:> ReactFlowProvider
     [:> ReactFlow {:className        component-id
                    :elements         @data
-                   :nodeTypes        {"globe"             (partial node globe-node)
+                   :nodeTypes        {"globe"             (partial node globe-node data-sources)
                                       "platform"          (partial node platform-node data-sources)
                                       "downlink-terminal" (partial node downlink-node data-sources)
                                       "processing-center" (partial node processing-node data-sources)}

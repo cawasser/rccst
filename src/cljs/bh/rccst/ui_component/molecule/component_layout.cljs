@@ -81,6 +81,7 @@
 (defn layout [components]
   [rc/v-box
    :gap "5px"
+   :height "400px"
    :children (doall
                (map (fn [row]
                       [rc/h-box

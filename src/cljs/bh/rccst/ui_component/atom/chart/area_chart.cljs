@@ -170,20 +170,23 @@
   - data : (atom) any data used by the component's ui
   - widget-id : (string) unique identifier for this specific widget
   "
-  [data chart-id container-id ui]
-  (let [container          (ui-utils/subscribe-local chart-id [:container])
-        isAnimationActive? (ui-utils/subscribe-local chart-id [:isAnimationActive])
-        subscriptions      (ui-utils/build-subs chart-id (local-config data))]
+  [data component-id container-id ui]
+  (let [container          (ui-utils/subscribe-local component-id [:container])
+        isAnimationActive? (ui-utils/subscribe-local component-id [:isAnimationActive])
+        subscriptions      (ui-utils/build-subs component-id (local-config data))]
 
-    (fn []
+    (fn [data component-id container-id ui]
+
+      (log/info "area-chart" component-id "///" ui)
+
       [:> ResponsiveContainer
-       [:> AreaChart {:width "100%" :height "100%" :data (get @data :data)}
+       [:> AreaChart {:data (get @data :data)}
 
-        (utils/standard-chart-components chart-id ui)
+        (utils/standard-chart-components component-id ui)
 
         (when (ui-utils/resolve-sub subscriptions [:brush]) [:> Brush])
 
-        (make-area-display chart-id data subscriptions isAnimationActive?)]])))
+        (make-area-display component-id data subscriptions isAnimationActive?)]])))
 
 
 (defn configurable-component
@@ -238,6 +241,23 @@
    :ui ui])
 
 
+(def meta-data {:component              component
+                :configurable-component configurable-component
+                :sources                {:data :source-type/meta-tabular}
+                :pubs                   [{:selection :string}]
+                :subs                   [{:highlight :string}]})
+
+
+(comment
+  (def ui {:x-axis false :y-axis false
+           :legend false :tooltip false})
+  (def component-id "diagram/GOES-East.chart")
+
+  (utils/standard-chart-components component-id ui)
+
+  ())
+
+
 (comment
   (do
     (def chart-id "area-chart-demo/area-chart")
@@ -264,10 +284,3 @@
 
   ())
 
-
-
-(def meta-data {:component              component
-                :configurable-component configurable-component
-                :sources                {:data :source-type/meta-tabular}
-                :pubs                   []
-                :subs                   []})

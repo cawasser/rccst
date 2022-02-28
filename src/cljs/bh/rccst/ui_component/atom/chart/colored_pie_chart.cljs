@@ -5,7 +5,8 @@
             ["recharts" :refer [ResponsiveContainer PieChart Pie Cell]]
             [bh.rccst.ui-component.utils :as ui-utils]
             [re-com.core :as rc]
-            [reagent.core :as r]))
+            [reagent.core :as r]
+            [taoensso.timbre :as log]))
 
 
 (def sample-data
@@ -148,16 +149,19 @@
   (let [isAnimationActive? (ui-utils/subscribe-local component-id [:isAnimationActive])
         subscriptions      (ui-utils/build-subs component-id (local-config data))]
 
-    (fn [data chart-id]
+    (fn [data component-id container-id ui]
+
+      (log/info "colored-pie-chart" component-id "///" ui)
+
       [:> ResponsiveContainer
-       [:> PieChart {:label true}
+       [:> PieChart {:label true} (utils/override true ui :label)
 
         (utils/non-gridded-chart-components component-id ui)
 
         [:> Pie {:dataKey           (ui-utils/resolve-sub subscriptions [:value :chosen])
                  :nameKey           (ui-utils/resolve-sub subscriptions [:name :chosen])
                  :data              (get @data :data)
-                 :label             true
+                 :label             (utils/override true ui :label)
                  :isAnimationActive @isAnimationActive?}
          (doall
            (map-indexed
@@ -167,6 +171,12 @@
                          :fill (or (ui-utils/resolve-sub subscriptions [:colors name])
                                  (ui-utils/get-color 0))}])
              (get @data :data)))]]])))
+
+
+(comment
+  (def ui '({:legend false :tooltip false :label false}))
+
+  ())
 
 
 (defn configurable-component

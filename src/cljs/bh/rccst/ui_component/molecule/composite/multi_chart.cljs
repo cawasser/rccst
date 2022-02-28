@@ -21,9 +21,7 @@
   "this data structure defines the composite in terms of the:
 
   - :components - the subcomponents, like tables, charts, and such used for the actual UI
-  - :source     - the data sources (from the system) that provide the information to present,
-                  there may be more than one, which all the components share as necessary
-  - :blackboard - (under construction)
+  - :topics     - remote data sources (mapped to a local name) along with internal pub/sub \"topics\"
   - :links      - linkages between the components and the data sources
   - :layout     - a \"DSL\" which defined how the components are to be organized on the display,
                   treated as a grid of rows and columns
@@ -35,29 +33,24 @@
                 :bar-chart    {:type :chart/bar-chart :configurable false}
                 :config-panel {:type config-panel}}
 
-   ; all remote data sources (mapped to a local name)
-   ; TODO: might replace this with some meta-data so the USER can select appropriate data source
-   :sources    {:tabular-data :source/sequence-of-measurements
-                :dag-data     :source/dag-data}
-
-   ; what does the blackboard support?
-   ;
-   ; (or should that be determined by the components themselves?)
-   ;
-   :blackboard [{:brush false}
-                {:tabular-data {:metadata [:number]
-                                :fields   [[:include :boolean true]
-                                           [:stroke :color :default]
-                                           [:fill :color :default]
-                                           [:stackId :string ""]]}}
-                {:dag-data {:metadata [:nodes :links]
-                            :fields   []}}]
+   ; remote data sources (mapped to a local name) along with internal pub/sub "topics"
+   :topics    {:tabular-data [:remote :source-type/meta-tabular :source/sequence-of-measurements]
+               :server-time  [:remote :time :source/server-time]
+               :dag-data     [:remote :source-type/meta-dag :source/dag-data]
+               :selected     [:local :string]
+               :active-aoi   [:local :string]
+               :current-time [:local :time]}
 
    ; links - how the different components get their data and if they publish or
    ; subscribe to the composite
-   :links      {:line-chart   {:data :tabular-data}
-                :bar-chart    {:data :tabular-data}
-                :config-panel {:data :tabular-data}}
+   :links      {:line-chart   {:subs {:data :tabular-data
+                                      :selection :selected
+                                      :time :current-time}}
+                :bar-chart    {:subs {:data :tabular-data
+                                      :time :current-time}}
+                :config-panel {:subs {:data :tabular-data}}
+                :time-slider  {:pubs {:time :current-time}
+                               :subs {:time :current-time}}}
 
    ; the physical layout of the components on the display
    :layout     [[:line-chart :config-panel :bar-chart]]})
@@ -87,10 +80,11 @@
 
 (defn- config-panel [data component-id]
   [containers/v-scroll-pane
-   {:height "400px"}
+   {:width "200px"
+    :height "400px"}
    [rc/v-box :src (rc/at)
-    :width "200px"
-    :height "400px"
+    ;:width "200px"
+    ;:height "100%"
     :gap "2px"
     :children (apply merge
                 [[utils/boolean-config component-id ":brush?" [:blackboard :brush]]]
@@ -98,15 +92,18 @@
 
 
 (defn local-config [data component-id]
-  {:components [[[line-chart/component
-                  :data data
-                  :component-id (ui-utils/path->keyword component-id "line-chart")
-                  :container-id component-id]
-                 [config-panel data component-id]
-                 [bar-chart/component
-                  :data data
-                  :component-id (ui-utils/path->keyword component-id "bar-chart")
-                  :container-id component-id]]]
+  {:components [[[:div {:style {:width "400px"}}
+                  [line-chart/component
+                   :data data
+                   :component-id (ui-utils/path->keyword component-id "line-chart")
+                   :container-id component-id]]
+                 [:div {:style {:width "150px"}}
+                  [config-panel data component-id]]
+                 [:div {:style {:width "400px"}}
+                  [bar-chart/component
+                   :data data
+                   :component-id (ui-utils/path->keyword component-id "bar-chart")
+                   :container-id component-id]]]]
    :blackboard (merge {:brush false}
                  (->> (get-in @data [:metadata :fields])
                    (filter (fn [[k v]] (= :number v)))
@@ -131,11 +128,12 @@
     (fn [data component-id container-id]
       [c/composite
        :id component-id
-       :components (ui-utils/resolve-sub subscriptions [:components])])))
+       :components (ui-utils/resolve-sub subscriptions [:components])
+       :ui {}])))
 
 
 (defn component
-  ([& {:keys [data component-id container-id]}]
+  ([& {:keys [data component-id container-id ui]}]
 
    ;(log/info "multi-chart" @data)
 
@@ -149,7 +147,7 @@
 
        ;(log/info "multi-chart" @id (config @id data))
 
-       [component-panel data @id container-id]))))
+       [component-panel data @id container-id ui]))))
 
 
 

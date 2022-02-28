@@ -20,7 +20,8 @@
     (into {})))
 
 
-; get data from the server
+; TODO!!!!
+; get data from the topics
 (defn- resolved-sources [composite-def]
   (->> composite-def
     :sources

@@ -92,7 +92,7 @@
       [:> ResponsiveContainer
        [:> ScatterChart
 
-        (utils/standard-chart-components component-id)
+        (utils/standard-chart-components component-id ui)
 
         (when @brush? [:> Brush])
 
