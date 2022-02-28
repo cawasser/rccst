@@ -4,8 +4,7 @@
             [bh.rccst.ui-component.atom.chart.wrapper :as c]
             [bh.rccst.ui-component.utils :as ui-utils]
             [re-com.core :as rc]
-            [reagent.core :as r]
-            [taoensso.timbre :as log]))
+            [reagent.core :as r]))
 
 
 (def sample-data (r/atom [{:name "18-24", :uv 31.47, :pv 2400, :fill "#8884d8"}
@@ -75,21 +74,19 @@
   - data : (atom) any data used by the component's ui
   - widget-id : (string) unique identifier for this specific widget
   "
-  [data component-id]
-  (let [container (ui-utils/subscribe-local component-id [:container])
+  [data component-id container-id ui]
+  (let [container  (ui-utils/subscribe-local component-id [:container])
         radial-uv? (ui-utils/subscribe-local component-id [:radial-uv :include])]
 
-    (fn []
+    (fn [data component-id container-id ui]
       [:> ResponsiveContainer
-       [:> RadialBarChart {:width       400
-                           :height      400
-                           :innerRadius "10%"
+       [:> RadialBarChart {:innerRadius "10%"
                            :outerRadius "80%"
                            :data        @data
                            :startAngle  180
                            :endAngle    0}
 
-        ;(utils/non-gridded-chart-components widget-id)
+        ;(utils/non-gridded-chart-components component-id ui)
 
         (when @radial-uv? [:> RadialBar {:minAngle   15
                                          :label      {:fill "#666", :position "insideStart"}
@@ -107,15 +104,16 @@
   - data : (atom) any data shown by the component's ui
   - :component-id : (string) name of this chart\n  - container-id : (string) name of the container this chart is inside of
   "
-  ([& {:keys [data component-id container-id]}]
-   [c/base-chart
-    :data data
-    :config (config component-id data)
-    :component-id component-id
-    :container-id (or container-id "")
-    :data-panel utils/tabular-data-panel
-    :config-panel config-panel
-    :component-panel component-panel]))
+  [& {:keys [data component-id container-id ui]}]
+  [c/base-chart
+   :data data
+   :config (config component-id data)
+   :component-id component-id
+   :container-id (or container-id "")
+   :data-panel utils/tabular-data-panel
+   :config-panel config-panel
+   :component-panel component-panel
+   :ui ui])
 
 
 (defn component
@@ -127,18 +125,19 @@
   - :component-id : (string) name of this chart
   - :container-id : (string) name of the container this chart is inside of
   "
-  ([& {:keys [data component-id container-id]}]
-   [c/base-chart
-    :data data
-    :config (config component-id data)
-    :component-id component-id
-    :container-id (or container-id "")
-    :component-panel component-panel]))
+  [& {:keys [data component-id container-id ui]}]
+  [c/base-chart
+   :data data
+   :config (config component-id data)
+   :component-id component-id
+   :container-id (or container-id "")
+   :component-panel component-panel
+   :ui ui])
 
 
-(def meta-data {:component component
+(def meta-data {:component              component
                 :configurable-component configurable-component
-                :sources {:data :source-type/meta-tabular}
-                :pubs []
-                :subs []})
+                :sources                {:data :source-type/meta-tabular}
+                :pubs                   []
+                :subs                   []})
 

@@ -1,8 +1,8 @@
 (ns bh.rccst.ui-component.atom.chart.area-chart
   (:require [bh.rccst.ui-component.atom.chart.utils :as utils]
+            [bh.rccst.ui-component.atom.chart.utils.example-data :as data]
             [bh.rccst.ui-component.atom.chart.wrapper :as c]
             [bh.rccst.ui-component.utils :as ui-utils]
-            [bh.rccst.ui-component.atom.chart.utils.example-data :as data]
             ["recharts" :refer [ResponsiveContainer AreaChart Area Brush]]
             [re-com.core :as rc]
             [reagent.core :as r]
@@ -13,7 +13,7 @@
   "the Area Chart works best with \"tabular data\" so we return the tabular-data from utils,
   and we mix-in a fourth column just to show how it can be done"
   (let [source data/meta-tabular-data
-        data (get source :data)
+        data   (get source :data)
         fields (get-in source [:metadata :fields])]
     (-> source
       (assoc
@@ -47,7 +47,7 @@
       (map-indexed (fn [idx a]
                      {a {:include true
                          :fill    (ui-utils/get-color idx)
-                         :stroke    (ui-utils/get-color idx)
+                         :stroke  (ui-utils/get-color idx)
                          :stackId ""}}))
       (into {}))))
 
@@ -170,17 +170,16 @@
   - data : (atom) any data used by the component's ui
   - widget-id : (string) unique identifier for this specific widget
   "
-  [data chart-id]
-  (let [container (ui-utils/subscribe-local chart-id [:container])
+  [data chart-id container-id ui]
+  (let [container          (ui-utils/subscribe-local chart-id [:container])
         isAnimationActive? (ui-utils/subscribe-local chart-id [:isAnimationActive])
-        subscriptions (ui-utils/build-subs chart-id (local-config data))]
+        subscriptions      (ui-utils/build-subs chart-id (local-config data))]
 
     (fn []
-      ;[c/chart
       [:> ResponsiveContainer
        [:> AreaChart {:width "100%" :height "100%" :data (get @data :data)}
 
-        (utils/standard-chart-components chart-id)
+        (utils/standard-chart-components chart-id ui)
 
         (when (ui-utils/resolve-sub subscriptions [:brush]) [:> Brush])
 
@@ -199,15 +198,19 @@
   - component-id : (string) unique id of this chart within its container
   - container-id : (string, optional) name of the container this chart is inside of
   "
-  ([& {:keys [data component-id container-id]}]
-   [c/base-chart
-    :data data
-    :config (config component-id data)
-    :component-id component-id
-    :container-id (or container-id "")
-    :data-panel utils/meta-tabular-data-panel
-    :config-panel config-panel
-    :component-panel component-panel]))
+  [& {:keys [data component-id container-id ui]}]
+
+  ;(log/info "area-chart configurable-component" @data component-id container-id ui)
+
+  [c/base-chart
+   :data data
+   :config (config component-id data)
+   :component-id component-id
+   :container-id (or container-id "")
+   :data-panel utils/meta-tabular-data-panel
+   :config-panel config-panel
+   :component-panel component-panel
+   :ui ui])
 
 
 (defn component
@@ -222,13 +225,17 @@
   - component-id : (string) unique id of this chart within its container
   - container-id : (string, optional) name of the container this chart is inside of
   "
-  ([& {:keys [data component-id container-id]}]
-   [c/base-chart
-    :data data
-    :config (config component-id data)
-    :component-id component-id
-    :container-id container-id
-    :component-panel component-panel]))
+  [& {:keys [data component-id container-id ui]}]
+
+  (log/info "area-chart component" @data component-id container-id ui)
+
+  [c/base-chart
+   :data data
+   :config (config component-id data)
+   :component-id component-id
+   :container-id container-id
+   :component-panel component-panel
+   :ui ui])
 
 
 (comment
@@ -259,8 +266,8 @@
 
 
 
-(def meta-data {:component component
+(def meta-data {:component              component
                 :configurable-component configurable-component
-                :sources {:data :source-type/meta-tabular}
-                :pubs []
-                :subs []})
+                :sources                {:data :source-type/meta-tabular}
+                :pubs                   []
+                :subs                   []})

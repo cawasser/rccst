@@ -188,20 +188,20 @@
   - data : (atom) any data used by the component's ui
   - widget-id : (string) unique identifier for this specific widget
   "
-  [data chart-id]
-  (let [container     (ui-utils/subscribe-local chart-id [:container])
-        subscriptions (ui-utils/build-subs chart-id (local-config data))]
+  [data component-id container-id ui]
+  (let [container     (ui-utils/subscribe-local component-id [:container])
+        subscriptions (ui-utils/build-subs component-id (local-config data))]
 
-    (fn []
+    (fn [data component-id container-id ui]
       [:> ResponsiveContainer
-       [:> RadarChart {:width 400 :height 400 :data (get @data :data)}
+       [:> RadarChart {:data (get @data :data)}
         [:> PolarGrid]
         [:> PolarAngleAxis {:dataKey :subject}]
         [:> PolarRadiusAxis {:angle "30" :domain (ui-utils/resolve-sub subscriptions [:domain])}]
 
-        (utils/non-gridded-chart-components chart-id)
+        (utils/non-gridded-chart-components component-id ui)
 
-        (make-radar-display chart-id data subscriptions)]])))
+        (make-radar-display component-id data subscriptions)]])))
 
 
 (defn configurable-component
@@ -216,15 +216,16 @@
   - :component-id : (string) name of this chart
   - container-id : (string) name of the container this chart is inside of
   "
-  ([& {:keys [data component-id container-id]}]
-   [c/base-chart
-    :data data
-    :config (config component-id data)
-    :component-id component-id
-    :container-id (or container-id "")
-    :data-panel utils/dummy-data-panel
-    :config-panel config-panel
-    :component-panel component-panel]))
+  [& {:keys [data component-id container-id ui]}]
+  [c/base-chart
+   :data data
+   :config (config component-id data)
+   :component-id component-id
+   :container-id (or container-id "")
+   :data-panel utils/dummy-data-panel
+   :config-panel config-panel
+   :component-panel component-panel
+   :ui ui])
 
 
 (defn component
@@ -236,13 +237,14 @@
   - :component-id : (string) name of this chart
   - :container-id : (string) name of the container this chart is inside of
   "
-  ([& {:keys [data component-id container-id]}]
-   [c/base-chart
-    :data data
-    :config (config component-id data)
-    :component-id component-id
-    :container-id (or container-id "")
-    :component-panel component-panel]))
+  [& {:keys [data component-id container-id ui]}]
+  [c/base-chart
+   :data data
+   :config (config component-id data)
+   :component-id component-id
+   :container-id (or container-id "")
+   :component-panel component-panel
+   :ui ui])
 
 
 (def meta-data {:component              component

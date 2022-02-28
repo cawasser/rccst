@@ -555,7 +555,17 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; region
 
-(defn standard-chart-components [widget-id]
+
+(defn- override [s ui tag]
+  (if (and (seq ui) (not (empty? (first ui))))
+    (get (first ui) tag)
+    s))
+
+
+(defn standard-chart-components [widget-id & ui]
+
+  ;(log/info "standard-chart-components" widget-id ui)
+
   (let [grid? (u/subscribe-local widget-id [:grid :include])
         grid-dash (u/subscribe-local widget-id [:grid :strokeDasharray :dash])
         grid-space (u/subscribe-local widget-id [:grid :strokeDasharray :space])
@@ -579,25 +589,25 @@
         legend-verticalAlign (u/subscribe-local widget-id [:legend :verticalAlign])]
 
     [:<>
-     (when @grid? [:> CartesianGrid {:strokeDasharray (strokeDasharray @grid-dash @grid-space)
-                                     :stroke          @grid-stroke}])
+     (when (override @grid? ui :grid) [:> CartesianGrid {:strokeDasharray (strokeDasharray @grid-dash @grid-space)
+                                                         :stroke          @grid-stroke}])
 
-     (when @x-axis? [:> XAxis {:dataKey     @x-axis-dataKey
-                               :orientation @x-axis-orientation
-                               :scale       @x-axis-scale}])
+     (when (override @x-axis? ui :x-axis)  [:> XAxis {:dataKey     @x-axis-dataKey
+                                                      :orientation @x-axis-orientation
+                                                      :scale       @x-axis-scale}])
 
-     (when @y-axis? [:> YAxis {:dataKey     @y-axis-dataKey
-                               :orientation @y-axis-orientation
-                               :scale       @y-axis-scale}])
+     (when (override @y-axis? ui :y-axis) [:> YAxis {:dataKey     @y-axis-dataKey
+                                                     :orientation @y-axis-orientation
+                                                     :scale       @y-axis-scale}])
 
-     (when @tooltip? [:> Tooltip])
+     (when (override @tooltip? ui :tooltip) [:> Tooltip])
 
-     (when @legend? [:> Legend {:layout        @legend-layout
-                                :align         @legend-align
-                                :verticalAlign @legend-verticalAlign}])]))
+     (when (override @legend? ui :legend) [:> Legend {:layout        @legend-layout
+                                                      :align         @legend-align
+                                                      :verticalAlign @legend-verticalAlign}])]))
 
 
-(defn non-gridded-chart-components [widget-id]
+(defn non-gridded-chart-components [widget-id & ui]
   (let [tooltip? (u/subscribe-local widget-id [:tooltip :include])
         legend? (u/subscribe-local widget-id [:legend :include])
         legend-layout (u/subscribe-local widget-id [:legend :layout])
@@ -605,11 +615,39 @@
         legend-verticalAlign (u/subscribe-local widget-id [:legend :verticalAlign])]
 
     [:<>
-     (when @tooltip? [:> Tooltip])
+     (when (override @tooltip? ui :tooltip) [:> Tooltip])
 
-     (when @legend? [:> Legend {:layout        @legend-layout
-                                :align         @legend-align
-                                :verticalAlign @legend-verticalAlign}])]))
+     (when (override @legend? ui :legend) [:> Legend {:layout        @legend-layout
+                                                      :align         @legend-align
+                                                      :verticalAlign @legend-verticalAlign}])]))
 
 ;; endregion
 
+
+; workout the override logic for chart elements like grid, legend, etc.
+(comment
+  (def ui [{:tooltip false}])
+  (def ui nil)
+  (def ui '(""))
+  (def ui '({:grid false, :x-axis false, :y-axis false, :legend false, :tooltip false}))
+  (def tag :tooltip)
+  (def tooltip? (r/atom true))
+  (def grid? (r/atom true))
+  (def s @tooltip?)
+  (def s @grid?)
+
+  (if (and (seq ui) (not (empty? (first ui)))) true false)
+
+
+  (if (and (seq ui) (not (empty? (first ui))))
+    (get (first ui) tag)
+    s)
+
+
+  (if nil true false)
+  (or true nil)
+
+  (override @tooltip? ui :tooltip)
+  (override @grid? ui :grid)
+
+  ())

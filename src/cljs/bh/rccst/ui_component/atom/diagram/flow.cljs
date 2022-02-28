@@ -1,5 +1,9 @@
 (ns bh.rccst.ui-component.atom.diagram.flow
   (:require [bh.rccst.ui-component.atom.card.flippable-card :as card]
+            [bh.rccst.ui-component.atom.chart.area-chart :as area-chart]
+            [bh.rccst.ui-component.atom.chart.bar-chart :as bar-chart]
+            [bh.rccst.ui-component.atom.chart.line-chart :as line-chart]
+            [bh.rccst.ui-component.utils :as ui-utils]
             [reagent.core :as r]
             [taoensso.timbre :as log]
             ["react-flow-renderer" :refer (ReactFlowProvider MiniMap Controls Handle) :default ReactFlow]))
@@ -14,7 +18,6 @@
             :el-type   :node
             :type      "globe"
             :data      {:sensor "viirs-5"}
-            ;:dragHandle "drag-handle"
             :draggable false
             :position  (diagram-cell 0 1)}
 
@@ -22,7 +25,6 @@
             :el-type   :node
             :type      "globe"
             :data      {:sensor "abi-meso-11"}
-            ;:dragHandle "drag-handle"
             :draggable false
             :position  (diagram-cell 0 0)}
 
@@ -30,8 +32,8 @@
             :el-type   :node
             :type      "platform"
             :data      {:label "GOES East"
-                        :image "/images/icons/Weather-Satellite-PNG-Clipart.png"}
-            ;:dragHandle "drag-handle"
+                        :image "/images/icons/Weather-Satellite-PNG-Clipart.png"
+                        :chart area-chart/component}
             :draggable false
             :position  (diagram-cell 1 0)}
 
@@ -39,7 +41,8 @@
             :el-type   :node
             :type      "downlink-terminal"
             :data      {:label "Wallops"
-                        :image "/images/icons/downlink-terminal.png"}
+                        :image "/images/icons/downlink-terminal.png"
+                        :chart bar-chart/component}
             :draggable false
             :position  (diagram-cell 2 0)}
 
@@ -47,7 +50,8 @@
             :el-type   :node
             :type      "processing-center"
             :data      {:label "NSOF Suitland"
-                        :image "/images/icons/processing-center.png"}
+                        :image "/images/icons/processing-center.png"
+                        :chart  line-chart/component}
             :draggable false
             :position  (diagram-cell 3 0)}
 
@@ -55,7 +59,8 @@
             :el-type   :node
             :type      "platform"
             :data      {:label "NOAA XX"
-                        :image "/images/icons/Weather-Satellite-PNG-Clipart.png"}
+                        :image "/images/icons/Weather-Satellite-PNG-Clipart.png"
+                        :chart area-chart/component}
             :draggable false
             :position  (diagram-cell 1 1)}
 
@@ -63,7 +68,8 @@
             :el-type   :node
             :type      "downlink-terminal"
             :data      {:label "Svalbaard/McMurdo"
-                        :image "/images/icons/downlink-terminal.png"}
+                        :image "/images/icons/downlink-terminal.png"
+                        :chart  bar-chart/component}
             :draggable false
             :position  (diagram-cell 2 1)}
 
@@ -82,6 +88,13 @@
             :style {:stroke-width 5} :animated true}]))
 
 
+(def data-sources {"GOES East"   area-chart/sample-data
+                   "NOAA XX"     area-chart/sample-data
+                   "Wallops"     bar-chart/sample-data
+                   "Svalbaard/McMurdo" bar-chart/sample-data
+                   "NSOF Suitland" line-chart/sample-data})
+
+
 (def source-code '[:> ReactFlowProvider
                    [:> ReactFlow {:className        component-id
                                   :elements         @data
@@ -94,23 +107,116 @@
                     [:> Controls]]])
 
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;
+; STYLES
+;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; region
+(def default-background "#9CA8B3")
+(def default-color "#FF")
 (def card-style {:width "100px" :height "150px"})
 (def handle-style {:width "8px" :height "8px" :borderRadius "50%"})
+(def image-style {:width        "75px" :height "75px"
+                  :display      :block
+                  :margin-left  :auto
+                  :margin-right :auto})
+(def label-style {:margin-top "10px" :margin-bottom "5px"
+                  :text-align :center})
+(def node-style-globe {:width         "100px" :height "100px"
+                       :border-radius "50%"
+                       :overflow      "hidden"})
+(def node-style-square {:width           "100px" :height "150px"
+                        :overflow        "hidden"
+                        :background      default-background
+                        :color           default-color
+                        :display         :flex
+                        :flex-direction  :column
+                        :justify-content :center
+                        :align-items     :center})
+;; endregion
 
 
-(defn- node [d]
-  (let [data  (js->clj d)
-        label (get-in data ["data" "label"])
-        id    (get data "id")]
-    (log/info "node" data)
+(defn- globe-node [props & {:keys [label]}]
+  [card/card
+   :style card-style
+   :front [:div {:style card-style} label]
+   :back [:div {:style card-style} "GLOBE"]])
+
+
+(defn- platform-node [props & {:keys [data label image chart]}]
+  [card/card
+   :style card-style
+   :front [:div#entity-card {:style (merge node-style-square props)}
+           [:img {:style (merge image-style
+                           {:background-color default-background}
+                           props)
+                  :src   image}]
+           [:div.subtitle.is-3 {:style label-style} label]]
+   :back [:div {:style (merge node-style-square props)}
+          [chart
+           :data data
+           :component-id (ui-utils/path->keyword "diagram" label "chart")
+           :container-id (ui-utils/path->keyword "diagram" label)
+           :ui {:grid false :x-axis false :y-axis false
+                :legend false :tooltip false}]]])
+
+
+(defn- downlink-node [props & {:keys [data label image chart]}]
+  [card/card
+   :style card-style
+   :front [:div#entity-card {:style (merge node-style-square props)}
+           [:img {:style (merge image-style
+                           {:background-color default-background}
+                           props)
+                  :src   image}]
+           [:div.subtitle.is-3 {:style label-style} label]]
+   :back [:div {:style (merge node-style-square props)}
+          [chart
+           :data data
+           :component-id (ui-utils/path->keyword "diagram" label "chart")
+           :container-id (ui-utils/path->keyword "diagram" label)
+           :ui {:grid false :x-axis false :y-axis false
+                :legend false :tooltip false}]]])
+
+
+(defn- processing-node [props & {:keys [data label image chart]}]
+  [card/card
+   :style card-style
+   :front [:div#entity-card {:style (merge node-style-square props)}
+           [:img {:style (merge image-style
+                           {:background-color default-background}
+                           props)
+                  :src   image}]
+           [:div.subtitle.is-3 {:style label-style} label]]
+   :back [:div {:style (merge node-style-square props)}
+          [chart
+           :data data
+           :component-id (ui-utils/path->keyword "diagram" label "chart")
+           :container-id (ui-utils/path->keyword "diagram" label)
+           :ui {:grid false :x-axis false :y-axis false
+                :legend false :tooltip false}]]])
+
+
+(defn- node [type sources d]
+  (let [data   (js->clj d)
+        label  (get-in data ["data" "label"])
+        image  (get-in data ["data" "image"])
+        chart  (get-in data ["data" "chart"])
+        id     (get data "id")
+        source (get sources label)]
+
+    (log/info "node" id label (if source @source {}))
+
     (r/as-element
-      [:div#node-card {:style card-style}
-       [card/card
-        :style card-style
-        :front [:div {:style card-style}
-                label]
-        :back [:div {:style card-style}
-               "back"]]
+      [:div#node-card {:style (merge card-style {:margin 0})}
+       [type {:margin 0}
+        :data source
+        :label label
+        :image image
+        :chart chart]
        [:> Handle {:id    (str id "-out") :type "source" :position "right"
                    :style handle-style}]
        [:> Handle {:id    (str id "-in") :type "target" :position "left"
@@ -122,13 +228,14 @@
    [:> ReactFlowProvider
     [:> ReactFlow {:className        component-id
                    :elements         @data
-                   :nodeTypes        {"globe"             node
-                                      "platform"          node
-                                      "downlink-terminal" node
-                                      "processing-center" node}
+                   :nodeTypes        {"globe"             (partial node globe-node)
+                                      "platform"          (partial node platform-node data-sources)
+                                      "downlink-terminal" (partial node downlink-node data-sources)
+                                      "processing-center" (partial node processing-node data-sources)}
                    :edgeTypes        {}
                    :zoomOnScroll     false
                    :preventScrolling false
                    :onConnect        #()}
      [:> MiniMap]
      [:> Controls]]]])
+

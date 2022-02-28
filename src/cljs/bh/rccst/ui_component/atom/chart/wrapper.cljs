@@ -20,7 +20,7 @@
 
   Returns : (hiccup) the Reagent component representing the entire 'package' (component + config-panel + button)
   "
-  [& {:keys [data component-id container-id config-panel data-panel component]}]
+  [& {:keys [data component-id container-id config-panel data-panel component ui]}]
   (let [open? (r/atom false)
         config-key (keyword component-id "config")
         data-key (keyword component-id "data")
@@ -28,10 +28,11 @@
         selected-tab (keyword component-id "tab-panel.value")
         chart-events [config-key data-key tab-panel selected-tab]]
 
+    (log/info "configurable-chart-2" component-id "///" container-id "///" ui)
+
     (ui-utils/dispatch-local component-id [:container] container-id)
 
-    (fn [& {:keys [data component-id config-panel component]}]
-      ;(log/info "configurable-chart-2" id config-panel component)
+    (fn [& {:keys [data component-id config-panel component ui]}]
       [rc/v-box :src (rc/at)
        :gap "2px"
        :children [[rc/h-box :src (rc/at)
@@ -52,24 +53,27 @@
                     :children (conj
                                 (if @open?
                                   [[layout/centered {:extra-classes :is-one-third}
-                                    [ui-utils/chart-config
-                                     chart-events
-                                     [data-panel data]
-                                     [config-panel data component-id]]]]
+                                    [:div {:width "75%"}
+                                     [ui-utils/chart-config
+                                      chart-events
+                                      [data-panel data]
+                                      [config-panel data component-id]]]]]
                                   [])
-                                [component data component-id container-id])]]]])))
+                                [component data component-id container-id ui])]]]])))
 
 
-(defn chart [& {:keys [data component-id container-id component]}]
+(defn chart [& {:keys [data component-id container-id component ui]}]
   (ui-utils/dispatch-local component-id [:container] container-id)
-  ;(log/info "chart" component-id "///" container-id "///" @(ui-utils/subscribe-local component-id [:container]))
+  (log/info "chart" component-id "///" container-id "///" ui
+    "///" @(ui-utils/subscribe-local component-id [:container]))
 
-  [component data component-id container-id])
+  [component data component-id container-id ui])
 
 
 (defn base-chart [& {:keys [data config
                             component-id container-id
-                            data-panel config-panel component-panel]}]
+                            data-panel config-panel component-panel
+                            ui]}]
 
   ;(log/info "base-chart"
   ;  data component-id container-id
@@ -89,7 +93,8 @@
          :data data
          :component-id @id
          :container-id container-id
-         :component component-panel]
+         :component component-panel
+         :ui ui]
 
         [configurable-chart
          :data data
@@ -97,7 +102,8 @@
          :container-id container-id
          :data-panel data-panel
          :config-panel config-panel
-         :component component-panel]))))
+         :component component-panel
+         :ui ui]))))
 
 
 

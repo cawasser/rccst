@@ -1,13 +1,12 @@
 (ns bh.rccst.ui-component.atom.chart.sankey-chart
   (:require [bh.rccst.ui-component.atom.chart.utils :as utils]
+            [bh.rccst.ui-component.atom.chart.utils.example-data :as data]
             [bh.rccst.ui-component.atom.chart.wrapper :as c]
             [bh.rccst.ui-component.utils :as ui-utils]
-            [bh.rccst.ui-component.atom.chart.utils.example-data :as data]
 
             ["recharts" :refer [ResponsiveContainer Sankey Tooltip Layer Rectangle]]
             [re-com.core :as rc]
-            [reagent.core :as r]
-            [taoensso.timbre :as log]))
+            [reagent.core :as r]))
 
 
 (def sample-data
@@ -131,18 +130,17 @@
   - chart-id : (string) unique identifier for this chart instance within this container
   - container-id : (string) name of the container this chart is inside of
   "
-  [data component-id]
-  (let [tooltip? (ui-utils/subscribe-local component-id [:tooltip :include])
-        node-fill (ui-utils/subscribe-local component-id [:node :fill])
+  [data component-id container-ui ui]
+  (let [tooltip?    (ui-utils/subscribe-local component-id [:tooltip :include])
+        node-fill   (ui-utils/subscribe-local component-id [:node :fill])
         node-stroke (ui-utils/subscribe-local component-id [:node :stroke])
         link-stroke (ui-utils/subscribe-local component-id [:link :stroke])
-        curve (ui-utils/subscribe-local component-id [:link :curve])]
+        curve       (ui-utils/subscribe-local component-id [:link :curve])]
 
-    (fn []
+    (fn [data component-id container-ui ui]
       [:> ResponsiveContainer
        [:> Sankey
-        {:width         500 :height 400
-         :node          (partial complex-node 500 @node-fill @node-stroke)
+        {:node          (partial complex-node 500 @node-fill @node-stroke)
          :data          @data
          :margin        {:top 20 :bottom 20 :left 20 :right 20}
          :nodeWidth     10
@@ -162,15 +160,16 @@
   - chart-id : (string) unique identifier of this chart insatnce within this container
   - container-id : (string) name of the container this chart is inside of
   "
-  ([& {:keys [data component-id container-id]}]
-   [c/base-chart
-    :data data
-    :config (config component-id data)
-    :component-id component-id
-    :container-id (or container-id "")
-    :data-panel utils/dag-data-panel
-    :config-panel config-panel
-    :component-panel component-panel]))
+  [& {:keys [data component-id container-id ui]}]
+  [c/base-chart
+   :data data
+   :config (config component-id data)
+   :component-id component-id
+   :container-id (or container-id "")
+   :data-panel utils/dag-data-panel
+   :config-panel config-panel
+   :component-panel component-panel
+   :ui ui])
 
 
 (defn component
@@ -182,20 +181,21 @@
   - component-id : (string) unique identifier of this chart instance within this container
   - container-id : (string) name of the container this chart is inside of
   "
-  ([& {:keys [data component-id container-id]}]
-   [c/base-chart
-    :data data
-    :config (config component-id data)
-    :component-id component-id
-    :container-id (or container-id "")
-    :component-panel component-panel]))
+  [& {:keys [data component-id container-id ui]}]
+  [c/base-chart
+   :data data
+   :config (config component-id data)
+   :component-id component-id
+   :container-id (or container-id "")
+   :component-panel component-panel
+   :ui ui])
 
 
-(def meta-data {:component component
+(def meta-data {:component              component
                 :configurable-component configurable-component
-                :sources {:data :source-type/meta-dag}
-                :pubs []
-                :subs []})
+                :sources                {:data :source-type/meta-dag}
+                :pubs                   []
+                :subs                   []})
 
 
 

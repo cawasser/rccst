@@ -149,7 +149,7 @@
   - chart-id : (string) unique identifier for this chart instance within this container
   - container-id : (string) name of the container this chart is inside of
   "
-  [data component-id container-id]
+  [data component-id container-id ui]
 
   ;(log/info "component-panel" chart-id "///" @(ui-utils/subscribe-local chart-id [:container]))
 
@@ -159,11 +159,11 @@
         local-subs         (ui-utils/build-subs component-id (local-config data))
         subscriptions      (ui-utils/override-subs container-id local-subs override-subs)]
 
-    (fn []
+    (fn [data component-id container-id ui]
       [:> ResponsiveContainer
        [:> LineChart {:width 400 :height 400 :data (get @data :data)}
 
-        (utils/standard-chart-components component-id)
+        (utils/standard-chart-components component-id ui)
 
         (when (ui-utils/resolve-sub subscriptions [:brush]) [:> Brush])
 
@@ -182,15 +182,16 @@
   - :component-id : (string) name of this component\n
   - :container-id : (string) name of the container this chart is inside of
   "
-  ([& {:keys [data component-id container-id]}]
-   [c/base-chart
-    :data data
-    :config (config component-id data)
-    :component-id component-id
-    :container-id (or container-id "")
-    :data-panel utils/meta-tabular-data-panel
-    :config-panel config-panel
-    :component-panel component-panel]))
+  [& {:keys [data component-id container-id ui]}]
+  [c/base-chart
+   :data data
+   :config (config component-id data)
+   :component-id component-id
+   :container-id (or container-id "")
+   :data-panel utils/meta-tabular-data-panel
+   :config-panel config-panel
+   :component-panel component-panel
+   :ui ui])
 
 
 (defn component
@@ -202,14 +203,15 @@
   - :component-id : (string) name of this component
   - :container-id : (string) name of the container this chart is inside of
   "
-  ([& {:keys [data component-id container-id]}]
-   ;(log/info "line-chart component" container-id)
-   [c/base-chart
-    :data data
-    :config (config component-id data)
-    :component-id component-id
-    :container-id (or container-id "")
-    :component-panel component-panel]))
+  [& {:keys [data component-id container-id ui]}]
+  ;(log/info "line-chart component" container-id)
+  [c/base-chart
+   :data data
+   :config (config component-id data)
+   :component-id component-id
+   :container-id (or container-id "")
+   :component-panel component-panel
+   :ui ui])
 
 
 (def meta-data {:component              component

@@ -6,10 +6,7 @@
             [bh.rccst.ui-component.atom.chart.wrapper :as c]
             [bh.rccst.ui-component.utils :as ui-utils]
             [re-com.core :as rc]
-            [reagent.core :as r]
-            [taoensso.timbre :as log]
-            [woolybear.ad.buttons :as buttons]
-            [woolybear.ad.icons :as icons]))
+            [reagent.core :as r]))
 
 
 (def sample-data
@@ -18,7 +15,7 @@
 
 
 (defn local-config [data]
-  (let [d (get @data :data)
+  (let [d      (get @data :data)
         fields (get-in @data [:metadata :fields])]
 
     (merge
@@ -133,16 +130,16 @@
   - data : (atom) any data shown by the component's ui
   - chart-id : (string) unique identifier for this chart instance
   "
-  [data chart-id]
-  (let [isAnimationActive? (ui-utils/subscribe-local chart-id [:isAnimationActive])
-        subscriptions (ui-utils/build-subs chart-id (local-config data))]
+  [data component-id container-id ui]
+  (let [isAnimationActive? (ui-utils/subscribe-local component-id [:isAnimationActive])
+        subscriptions      (ui-utils/build-subs component-id (local-config data))]
 
-    (fn [data chart-id]
+    (fn [data component-id]
       ;(log/info "configurable-funnel-chart" @config)
       [:> ResponsiveContainer
        [:> FunnelChart {:label true}
 
-        (utils/non-gridded-chart-components chart-id)
+        (utils/non-gridded-chart-components component-id ui)
 
         [:> Funnel {:dataKey           (ui-utils/resolve-sub subscriptions [:value :chosen])
                     :nameKey           (ui-utils/resolve-sub subscriptions [:name :chosen])
@@ -177,16 +174,16 @@
   - :component-id : (string) name of this component\n
   - :container-id : (string) name of the container this chart is inside of
   "
-  ([& {:keys [data component-id container-id]}]
-   [c/base-chart
-    :data data
-    :config (config component-id data)
-    :component-id component-id
-    :container-id (or container-id "")
-    :data-panel utils/meta-tabular-data-panel
-    :config-panel config-panel
-
-    :component-panel component-panel]))
+  [& {:keys [data component-id container-id ui]}]
+  [c/base-chart
+   :data data
+   :config (config component-id data)
+   :component-id component-id
+   :container-id (or container-id "")
+   :data-panel utils/meta-tabular-data-panel
+   :config-panel config-panel
+   :component-panel component-panel
+   :ui ui])
 
 
 (defn component
@@ -198,20 +195,21 @@
   - :component-id : (string) name of this component
   - :container-id : (string) name of the container this chart is inside of
   "
-  ([& {:keys [data component-id container-id]}]
-   [c/base-chart
-    :data data
-    :config (config component-id data)
-    :component-id component-id
-    :container-id (or container-id "")
-    :component-panel component-panel]))
+  [& {:keys [data component-id container-id ui]}]
+  [c/base-chart
+   :data data
+   :config (config component-id data)
+   :component-id component-id
+   :container-id (or container-id "")
+   :component-panel component-panel
+   :ui ui])
 
 
-(def meta-data {:component component
+(def meta-data {:component              component
                 :configurable-component configurable-component
-                :sources {:data :source-type/meta-tabular}
-                :pubs []
-                :subs []})
+                :sources                {:data :source-type/meta-tabular}
+                :pubs                   []
+                :subs                   []})
 
 
 

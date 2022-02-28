@@ -77,7 +77,7 @@
   - data : (atom) any data shown by the component's ui
   - widget-id : (string) unique identifier for this specific widget instance
   "
-  [data component-id]
+  [data component-id container-id ui]
   (let [scatter-dot-fill   (ui-utils/subscribe-local component-id [:fill :color])
         x-axis?            (ui-utils/subscribe-local component-id [:x-axis :include])
         x-axis-dataKey     (ui-utils/subscribe-local component-id [:x-axis :dataKey])
@@ -86,11 +86,11 @@
         isAnimationActive? (ui-utils/subscribe-local component-id [:isAnimationActive])
         brush?             (ui-utils/subscribe-local component-id [:brush])]
 
-    (fn []
+    (fn [data component-id container-id ui]
       ;(log/info "configurable-Scatter-chart" @config @data)
 
       [:> ResponsiveContainer
-       [:> ScatterChart {:width 400 :height 400}
+       [:> ScatterChart
 
         (utils/standard-chart-components component-id)
 

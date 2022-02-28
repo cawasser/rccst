@@ -153,7 +153,7 @@
   - data : (atom) any data used by the component's ui
   - widget-id : (string) unique identifier for this specific widget
   "
-  [data component-id container-id]
+  [data component-id container-id ui]
   (let [container          (ui-utils/subscribe-local component-id [:container])
         isAnimationActive? (ui-utils/subscribe-local component-id [:isAnimationActive])
         override-subs      @(ui-utils/subscribe-local component-id [:sub])
@@ -164,7 +164,7 @@
       [:> ResponsiveContainer
        [:> BarChart {:data (get @data :data)}
 
-        (utils/standard-chart-components component-id)
+        (utils/standard-chart-components component-id ui)
 
         (when (ui-utils/resolve-sub subscriptions [:brush]) [:> Brush])
 
@@ -182,7 +182,7 @@
   - data : (atom) any data shown by the component's ui
   - container-id : (string) name of the container this chart is inside of
   "
-  ([& {:keys [data component-id container-id]}]
+  ([& {:keys [data component-id container-id ui]}]
    [c/base-chart
     :data data
     :config (config component-id data)
@@ -190,7 +190,8 @@
     :container-id (or container-id "")
     :data-panel utils/meta-tabular-data-panel
     :config-panel config-panel
-    :component-panel component-panel]))
+    :component-panel component-panel
+    :ui ui]))
 
 
 (defn component
@@ -204,13 +205,14 @@
   - data : (atom) any data shown by the component's ui
   - container-id : (string) name of the container this chart is inside of
   "
-  ([& {:keys [data component-id container-id]}]
+  ([& {:keys [data component-id container-id ui]}]
    [c/base-chart
     :data data
     :config (config component-id data)
     :component-id component-id
     :container-id (or container-id "")
-    :component-panel component-panel]))
+    :component-panel component-panel
+    :ui ui]))
 
 
 (comment

@@ -109,17 +109,16 @@
   - data : (atom) any data shown by the component's ui
   - widget-id : (string) unique identifier for this widget instance
   "
-  [data component-id]
+  [data component-id container-id ui]
   (let [;ratio (ui-utils/subscribe-local widget-id [:ratio :include])
         isAnimationActive? (ui-utils/subscribe-local component-id [:isAnimationActive])
         stroke             (ui-utils/subscribe-local component-id [:stroke :color])
         fill               (ui-utils/subscribe-local component-id [:fill :color])]
 
-    (fn []
+    (fn [data component-id container-id ui]
       [:> ResponsiveContainer
        [:> Treemap
-        {:width             400 :height 400
-         :data              @data
+        {:data              @data
          :dataKey           "size"
          :isAnimationActive @isAnimationActive?
          :ratio             default-ratio
@@ -136,15 +135,16 @@
   - :component-id : (string) unique identifier for this chart instance within this container
   - :container-id : (string) name of the container this chart is inside of
   "
-  ([& {:keys [data component-id container-id]}]
-   [c/base-chart
-    :data data
-    :config (config component-id data)
-    :component-id component-id
-    :container-id (or container-id "")
-    :data-panel utils/hierarchy-data-panel
-    :config-panel config-panel
-    :component-panel component-panel]))
+  [& {:keys [data component-id container-id ui]}]
+  [c/base-chart
+   :data data
+   :config (config component-id data)
+   :component-id component-id
+   :container-id (or container-id "")
+   :data-panel utils/hierarchy-data-panel
+   :config-panel config-panel
+   :component-panel component-panel
+   :ui ui])
 
 
 (defn component
@@ -156,13 +156,14 @@
   - :component-id : (string) unique identifier for this chart instance within this container
   - :container-id : (string) name of the container this chart is inside of
   "
-  ([& {:keys [data component-id container-id]}]
-   [c/base-chart
-    :data data
-    :config (config component-id data)
-    :component-id component-id
-    :container-id (or container-id "")
-    :component-panel component-panel]))
+  [& {:keys [data component-id container-id ui]}]
+  [c/base-chart
+   :data data
+   :config (config component-id data)
+   :component-id component-id
+   :container-id (or container-id "")
+   :component-panel component-panel
+   :ui ui])
 
 
 (def meta-data {:component              component
