@@ -1,18 +1,16 @@
 (ns bh.rccst.ui-component.atom.chart.scatter-chart
   (:require [bh.rccst.ui-component.atom.chart.utils :as utils]
+            [bh.rccst.ui-component.atom.chart.utils.example-data :as data]
             [bh.rccst.ui-component.atom.chart.wrapper :as c]
             [bh.rccst.ui-component.utils :as ui-utils]
-
-            ["recharts" :refer [ScatterChart Scatter Brush]]
-
             [re-com.core :as rc]
             [reagent.core :as r]
-            [taoensso.timbre :as log]))
+            ["recharts" :refer [ScatterChart Scatter Brush]]))
 
 
 (def sample-data
   "the Scatter Chart works best with \"triplet data\" so we return the triplet-data from utils"
-  (r/atom utils/triplet-data))
+  (r/atom data/triplet-data))
 
 
 (defn config
@@ -80,13 +78,13 @@
   - widget-id : (string) unique identifier for this specific widget instance
   "
   [data component-id]
-  (let [scatter-dot-fill (ui-utils/subscribe-local component-id [:fill :color])
-        x-axis? (ui-utils/subscribe-local component-id [:x-axis :include])
-        x-axis-dataKey (ui-utils/subscribe-local component-id [:x-axis :dataKey])
-        y-axis? (ui-utils/subscribe-local component-id [:y-axis :include])
-        y-axis-dataKey (ui-utils/subscribe-local component-id [:y-axis :dataKey])
+  (let [scatter-dot-fill   (ui-utils/subscribe-local component-id [:fill :color])
+        x-axis?            (ui-utils/subscribe-local component-id [:x-axis :include])
+        x-axis-dataKey     (ui-utils/subscribe-local component-id [:x-axis :dataKey])
+        y-axis?            (ui-utils/subscribe-local component-id [:y-axis :include])
+        y-axis-dataKey     (ui-utils/subscribe-local component-id [:y-axis :dataKey])
         isAnimationActive? (ui-utils/subscribe-local component-id [:isAnimationActive])
-        brush? (ui-utils/subscribe-local component-id [:brush])]
+        brush?             (ui-utils/subscribe-local component-id [:brush])]
 
     (fn []
       ;(log/info "configurable-Scatter-chart" @config @data)
@@ -148,9 +146,9 @@
     :component-panel component-panel]))
 
 
-(def meta-data {:component component
+(def meta-data {:component              component
                 :configurable-component configurable-component
-                :sources {:data :source-type/meta-tabular}
-                :pubs []
-                :subs []})
+                :sources                {:data :source-type/meta-tabular}
+                :pubs                   []
+                :subs                   []})
 

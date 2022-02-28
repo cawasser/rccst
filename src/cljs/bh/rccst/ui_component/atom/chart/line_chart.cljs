@@ -1,15 +1,16 @@
 (ns bh.rccst.ui-component.atom.chart.line-chart
   (:require [bh.rccst.ui-component.atom.chart.utils :as utils]
+            [bh.rccst.ui-component.atom.chart.utils.example-data :as data]
             [bh.rccst.ui-component.atom.chart.wrapper :as c]
             [bh.rccst.ui-component.utils :as ui-utils]
             ["recharts" :refer [LineChart Line Brush]]
-            [reagent.core :as r]
-            [re-com.core :as rc]))
+            [re-com.core :as rc]
+            [reagent.core :as r]))
 
 
 (def sample-data
   "the Line Chart works best with \"tabular data\" so we return the tabular-data from utils"
-  (r/atom utils/meta-tabular-data))
+  (r/atom data/meta-tabular-data))
 
 
 (defn local-config
@@ -152,11 +153,11 @@
 
   ;(log/info "component-panel" chart-id "///" @(ui-utils/subscribe-local chart-id [:container]))
 
-  (let [container @(ui-utils/subscribe-local component-id [:container])
+  (let [container          @(ui-utils/subscribe-local component-id [:container])
         isAnimationActive? (ui-utils/subscribe-local component-id [:isAnimationActive])
-        override-subs @(ui-utils/subscribe-local component-id [:sub])
-        local-subs (ui-utils/build-subs component-id (local-config data))
-        subscriptions (ui-utils/override-subs container-id local-subs override-subs)]
+        override-subs      @(ui-utils/subscribe-local component-id [:sub])
+        local-subs         (ui-utils/build-subs component-id (local-config data))
+        subscriptions      (ui-utils/override-subs container-id local-subs override-subs)]
 
     (fn []
       ;[:div "line Chart"]
@@ -211,11 +212,11 @@
     :component-panel component-panel]))
 
 
-(def meta-data {:component component
+(def meta-data {:component              component
                 :configurable-component configurable-component
-                :sources {:data :source-type/meta-tabular}
-                :pubs []
-                :subs []})
+                :sources                {:data :source-type/meta-tabular}
+                :pubs                   []
+                :subs                   []})
 
 
 

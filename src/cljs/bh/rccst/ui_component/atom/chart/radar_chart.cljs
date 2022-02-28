@@ -22,14 +22,14 @@
 
 (defn- get-range-across-fields [data]
   (let [source-data (get-in @data [:data])
-        all-values (->> (get-in @data [:metadata :fields])
-                     (filter (fn [[k v]] (= :number v)))
-                     keys
-                     (map-indexed (fn [idx a] (map #(a %) source-data)))
-                     (reduce into)
-                     (distinct))
-        domainMin (apply min all-values)
-        domainMax (apply max all-values)]
+        all-values  (->> (get-in @data [:metadata :fields])
+                      (filter (fn [[k v]] (= :number v)))
+                      keys
+                      (map-indexed (fn [idx a] (map #(a %) source-data)))
+                      (reduce into)
+                      (distinct))
+        domainMin   (apply min all-values)
+        domainMax   (apply max all-values)]
     (log/info "domain min = " domainMin, "domain max = " domainMax)
     (if (= domainMin domainMax)
       {:domain [0 domainMax]}
@@ -38,8 +38,8 @@
 
 (defn- get-field-range [field data]
   (let [source-data (get-in @data [:data])
-        domainMin (reduce min (map #(field %) source-data))
-        domainMax (reduce max (map #(field %) source-data))]
+        domainMin   (reduce min (map #(field %) source-data))
+        domainMax   (reduce max (map #(field %) source-data))]
     (if (= domainMin domainMax)
       {:domain [0 domainMax]}
       {:domain [domainMin domainMax]})))
@@ -188,7 +188,7 @@
   - widget-id : (string) unique identifier for this specific widget
   "
   [data chart-id]
-  (let [container (ui-utils/subscribe-local chart-id [:container])
+  (let [container     (ui-utils/subscribe-local chart-id [:container])
         subscriptions (ui-utils/build-subs chart-id (local-config data))]
 
     (fn []
@@ -243,11 +243,11 @@
     :component-panel component-panel]))
 
 
-(def meta-data {:component component
+(def meta-data {:component              component
                 :configurable-component configurable-component
-                :sources {:data :source-type/meta-tabular}
-                :pubs []
-                :subs []})
+                :sources                {:data :source-type/meta-tabular}
+                :pubs                   []
+                :subs                   []})
 
 
 

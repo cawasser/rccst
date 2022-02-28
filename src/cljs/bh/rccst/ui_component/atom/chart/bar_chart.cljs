@@ -3,6 +3,7 @@
             ["recharts" :refer [BarChart Bar Brush]]
             [bh.rccst.ui-component.atom.chart.wrapper :as c]
             [bh.rccst.ui-component.utils :as ui-utils]
+            [bh.rccst.ui-component.atom.chart.utils.example-data :as data]
 
             [re-com.core :as rc]
             [reagent.core :as r]
@@ -12,7 +13,7 @@
 (def sample-data
   "the Bar Chart works best with \"tabular data\" so we return the tabular-data from utils,
   and we mix-in a fourth column just to show how it can be done"
-  (let [source utils/meta-tabular-data
+  (let [source data/meta-tabular-data
         data (get source :data)
         fields (get-in source [:metadata :fields])]
     (-> source

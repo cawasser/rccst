@@ -1,6 +1,7 @@
 (ns bh.rccst.ui-component.atom.chart.funnel-chart
   (:require ["recharts" :refer [FunnelChart Funnel Cell LabelList XAxis YAxis CartesianGrid Tooltip Brush]]
             [bh.rccst.ui-component.atom.chart.utils :as utils]
+            [bh.rccst.ui-component.atom.chart.utils.example-data :as data]
             [bh.rccst.ui-component.atom.chart.wrapper :as c]
             [bh.rccst.ui-component.utils :as ui-utils]
             [re-com.core :as rc]
@@ -12,7 +13,7 @@
 
 (def sample-data
   "the Funnel Chart works best with \"paired data\" so we return the paired-data from utils"
-  (r/atom utils/meta-tabular-data))
+  (r/atom data/meta-tabular-data))
 
 
 (defn local-config [data]

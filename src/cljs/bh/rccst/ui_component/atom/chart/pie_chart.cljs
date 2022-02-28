@@ -1,5 +1,6 @@
 (ns bh.rccst.ui-component.atom.chart.pie-chart
   (:require [bh.rccst.ui-component.atom.chart.utils :as utils]
+            [bh.rccst.ui-component.atom.chart.utils.example-data :as data]
             [bh.rccst.ui-component.atom.chart.wrapper :as c]
             [bh.rccst.ui-component.utils :as ui-utils]
 
@@ -13,7 +14,7 @@
   "the Pie Chart works best with \"paired data\" so we return the paired-data from utils"
 
   ; switching to tabular data to work out the UI logic
-  (r/atom utils/meta-tabular-data))
+  (r/atom data/meta-tabular-data))
 
 
 (defn local-config [data]

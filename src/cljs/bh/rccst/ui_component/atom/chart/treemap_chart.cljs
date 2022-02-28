@@ -1,17 +1,16 @@
 (ns bh.rccst.ui-component.atom.chart.treemap-chart
-  (:require [taoensso.timbre :as log]
+  (:require [bh.rccst.ui-component.atom.chart.utils :as utils]
+            [bh.rccst.ui-component.atom.chart.utils.example-data :as data]
+            [bh.rccst.ui-component.atom.chart.wrapper :as c]
+            [bh.rccst.ui-component.utils :as ui-utils]
             [re-com.core :as rc]
             [reagent.core :as r]
-
-            ["recharts" :refer [Treemap]]
-            [bh.rccst.ui-component.utils :as ui-utils]
-            [bh.rccst.ui-component.atom.chart.utils :as utils]
-            [bh.rccst.ui-component.atom.chart.wrapper :as c]))
+            ["recharts" :refer [Treemap]]))
 
 
 (def sample-data
   "the Treemap Chart works best with \"hierarchical data\" so we return the hierarchy-data from utils"
-  (r/atom utils/hierarchy-data))
+  (r/atom data/hierarchy-data))
 
 
 (def default-ratio (/ 4 3))
@@ -39,14 +38,14 @@
   [component-id data]
   (merge
     ui-utils/default-pub-sub
-    {:tab-panel {:value     (keyword component-id "config")
-                 :data-path [:widgets (keyword component-id) :tab-panel]}
+    {:tab-panel         {:value     (keyword component-id "config")
+                         :data-path [:widgets (keyword component-id) :tab-panel]}
      :isAnimationActive true
-     :ratio  {:include true
-              :n 4
-              :d 3}
-     :stroke  {:color "#ffffff"}
-     :fill {:color "#8884d8"}}))
+     :ratio             {:include true
+                         :n       4
+                         :d       3}
+     :stroke            {:color "#ffffff"}
+     :fill              {:color "#8884d8"}}))
 
 
 (defn- ratio-config
@@ -93,13 +92,13 @@
 
 
 (def source-code `[:> Treemap
-                   {:width 400 :height 400
-                    :data @data
-                    :dataKey "size"
+                   {:width             400 :height 400
+                    :data              @data
+                    :dataKey           "size"
                     :isAnimationActive true
-                    :ratio (/ 4 3)
-                    :stroke "#ffffff"
-                    :fill "#8884d8"}])
+                    :ratio             (/ 4 3)
+                    :stroke            "#ffffff"
+                    :fill              "#8884d8"}])
 
 
 (defn- component-panel
@@ -113,18 +112,18 @@
   [data component-id]
   (let [;ratio (ui-utils/subscribe-local widget-id [:ratio :include])
         isAnimationActive? (ui-utils/subscribe-local component-id [:isAnimationActive])
-        stroke (ui-utils/subscribe-local component-id [:stroke :color])
-        fill (ui-utils/subscribe-local component-id [:fill :color])]
+        stroke             (ui-utils/subscribe-local component-id [:stroke :color])
+        fill               (ui-utils/subscribe-local component-id [:fill :color])]
 
     (fn []
       [:> Treemap
-       {:width 400 :height 400
-        :data @data
-        :dataKey "size"
+       {:width             400 :height 400
+        :data              @data
+        :dataKey           "size"
         :isAnimationActive @isAnimationActive?
-        :ratio default-ratio
-        :stroke @stroke
-        :fill @fill}])))
+        :ratio             default-ratio
+        :stroke            @stroke
+        :fill              @fill}])))
 
 
 (defn configurable-component
@@ -165,11 +164,11 @@
     :component-panel component-panel]))
 
 
-(def meta-data {:component component
+(def meta-data {:component              component
                 :configurable-component configurable-component
-                :sources {:data :source-type/meta-hierarchy}
-                :pubs []
-                :subs []})
+                :sources                {:data :source-type/meta-hierarchy}
+                :pubs                   []
+                :subs                   []})
 
 
 

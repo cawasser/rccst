@@ -1,21 +1,20 @@
 (ns bh.rccst.ui-component.atom.chart.colored-pie-chart
-  (:require [taoensso.timbre :as log]
-            [re-com.core :as rc]
-            [reagent.core :as r]
-
+  (:require [bh.rccst.ui-component.atom.chart.utils :as utils]
+            [bh.rccst.ui-component.atom.chart.utils.example-data :as data]
+            [bh.rccst.ui-component.atom.chart.wrapper :as c]
             ["recharts" :refer [PieChart Pie Cell]]
             [bh.rccst.ui-component.utils :as ui-utils]
-            [bh.rccst.ui-component.atom.chart.utils :as utils]
-            [bh.rccst.ui-component.atom.chart.wrapper :as c]))
+            [re-com.core :as rc]
+            [reagent.core :as r]))
 
 
 (def sample-data
   "the Pie Chart works best with \"paired data\" so we return the paired-data from utils"
-  (r/atom utils/meta-tabular-data))
+  (r/atom data/meta-tabular-data))
 
 
 (defn local-config [data]
-  (let [d (get @data :data)
+  (let [d      (get @data :data)
         fields (get-in @data [:metadata :fields])]
 
     (merge
@@ -45,9 +44,9 @@
   (def d (get @data :data))
 
   (->> d
-    (map :name ,)
-    (#(zipmap % ui-utils/default-stroke-fill-colors) ,)
-    (assoc {} :colors ,))
+    (map :name,)
+    (#(zipmap % ui-utils/default-stroke-fill-colors),)
+    (assoc {} :colors,))
 
   (as-> d x
     (map :name x)
@@ -91,7 +90,7 @@
   [:<>
    (doall
      (map (fn [[id _]]
-            ^{:key id}[utils/color-config-text chart-id id [:colors id] :right-above])
+            ^{:key id} [utils/color-config-text chart-id id [:colors id] :right-above])
        @(ui-utils/subscribe-local chart-id [:colors])))])
 
 
@@ -147,23 +146,23 @@
   "
   [data chart-id]
   (let [isAnimationActive? (ui-utils/subscribe-local chart-id [:isAnimationActive])
-        subscriptions (ui-utils/build-subs chart-id (local-config data))]
+        subscriptions      (ui-utils/build-subs chart-id (local-config data))]
 
     (fn [data chart-id]
       [:> PieChart {:width 400 :height 400 :label true}
 
        (utils/non-gridded-chart-components chart-id)
 
-       [:> Pie {:dataKey (ui-utils/resolve-sub subscriptions [:value :chosen])
-                :nameKey (ui-utils/resolve-sub subscriptions [:name :chosen])
-                :data (get @data :data)
-                :label true
+       [:> Pie {:dataKey           (ui-utils/resolve-sub subscriptions [:value :chosen])
+                :nameKey           (ui-utils/resolve-sub subscriptions [:name :chosen])
+                :data              (get @data :data)
+                :label             true
                 :isAnimationActive @isAnimationActive?}
         (doall
           (map-indexed
             (fn [idx {name :name}]
               ^{:key (str idx name)}
-              [:> Cell {:key (str "cell-" idx)
+              [:> Cell {:key  (str "cell-" idx)
                         :fill (or (ui-utils/resolve-sub subscriptions [:colors name])
                                 (ui-utils/get-color 0))}])
             (get @data :data)))]])))
@@ -212,11 +211,11 @@
     :component-panel component-panel]))
 
 
-(def meta-data {:component component
+(def meta-data {:component              component
                 :configurable-component configurable-component
-                :sources {:data :source-type/meta-tabular}
-                :pubs []
-                :subs []})
+                :sources                {:data :source-type/meta-tabular}
+                :pubs                   []
+                :subs                   []})
 
 
 

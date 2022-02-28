@@ -2,6 +2,7 @@
   (:require [bh.rccst.ui-component.atom.chart.utils :as utils]
             [bh.rccst.ui-component.atom.chart.wrapper :as c]
             [bh.rccst.ui-component.utils :as ui-utils]
+            [bh.rccst.ui-component.atom.chart.utils.example-data :as data]
 
             ["recharts" :refer [Sankey Tooltip Layer Rectangle]]
             [re-com.core :as rc]
@@ -11,7 +12,7 @@
 
 (def sample-data
   "the Sankey Chart works best with \"directed acyclic graph data\" so we return the dag-data from utils"
-  (r/atom utils/dag-data))
+  (r/atom data/dag-data))
 
 
 (defn config
