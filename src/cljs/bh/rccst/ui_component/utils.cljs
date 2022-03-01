@@ -296,6 +296,35 @@
     ;(log/info "init-local-values" path)
     (re-frame/dispatch-sync path)))
 
+(declare process-locals)
+
+(defn- process-branch [accum root k v]
+  (do
+    ;(println "branch" v [root k] accum)
+    (as-> accum x
+      (conj x (if root
+                (if (vector? root)
+                  (conj root k)
+                  [root k])
+                [k]))
+      (apply conj x (process-locals []
+                      (if root
+                        (if (vector? root)
+                          (conj root k)
+                          [root k])
+                        k)
+                      v)))))
+
+
+(defn- process-leaf [accum root k]
+  (do
+    ;(println "leaf" root k accum)
+    (conj accum (if root
+                  (if (vector? root)
+                    (conj root k)
+                    [root k])
+                  [k]))))
+
 
 (defn process-locals
   "recursively walks through the 'tree' of values and computes the 'path vector' to reach each
@@ -338,28 +367,8 @@
       (let [[k v] (first tree)]
         ;(println "let" k v)
         (recur (if (map? v)
-                 (do
-                   ;(println "branch" v [root k] accum)
-                   (as-> accum x
-                     (conj x (if root
-                               (if (vector? root)
-                                 (conj root k)
-                                 [root k])
-                               [k]))
-                     (apply conj x (process-locals []
-                                     (if root
-                                       (if (vector? root)
-                                         (conj root k)
-                                         [root k])
-                                       k)
-                                     v))))
-                 (do
-                   ;(println "leaf" root k accum)
-                   (conj accum (if root
-                                 (if (vector? root)
-                                   (conj root k)
-                                   [root k])
-                                 [k]))))
+                 (process-branch accum root k v)
+                 (process-leaf accum root k))
           root
           (rest tree))))))
 
