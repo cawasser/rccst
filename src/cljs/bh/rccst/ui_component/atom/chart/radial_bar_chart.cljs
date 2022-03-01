@@ -1,11 +1,11 @@
 (ns bh.rccst.ui-component.atom.chart.radial-bar-chart
   (:require [bh.rccst.ui-component.atom.chart.utils :as utils]
-            ["recharts" :refer [RadialBarChart RadialBar Legend Tooltip]]
+            ["recharts" :refer [ResponsiveContainer RadialBarChart RadialBar Legend Tooltip]]
             [bh.rccst.ui-component.atom.chart.wrapper :as c]
             [bh.rccst.ui-component.utils :as ui-utils]
             [re-com.core :as rc]
-            [reagent.core :as r]
-            [taoensso.timbre :as log]))
+            [reagent.core :as r]))
+
 
 (def sample-data (r/atom [{:name "18-24", :uv 31.47, :pv 2400, :fill "#8884d8"}
                           {:name "25-29", :uv 26.69, :pv 4567, :fill "#83a6ed"}
@@ -74,64 +74,70 @@
   - data : (atom) any data used by the component's ui
   - widget-id : (string) unique identifier for this specific widget
   "
-  [data component-id]
-  (let [container (ui-utils/subscribe-local component-id [:container])
+  [data component-id container-id ui]
+  (let [container  (ui-utils/subscribe-local component-id [:container])
         radial-uv? (ui-utils/subscribe-local component-id [:radial-uv :include])]
 
-    (fn []
-      [:> RadialBarChart {:width       400
-                          :height      400
-                          :innerRadius "10%"
-                          :outerRadius "80%"
-                          :data        @data
-                          :startAngle  180
-                          :endAngle    0}
+    (fn [data component-id container-id ui]
+      [:> ResponsiveContainer
+       [:> RadialBarChart {:innerRadius "10%"
+                           :outerRadius "80%"
+                           :data        @data
+                           :startAngle  180
+                           :endAngle    0}
 
-       ;(utils/non-gridded-chart-components widget-id)
+        ;(utils/non-gridded-chart-components component-id ui)
 
-       (when @radial-uv? [:> RadialBar {:minAngle   15
-                                        :label      {:fill "#666", :position "insideStart"}
-                                        :background {:clockWise true}
-                                        :dataKey    :uv}])
-       [:> Legend {:iconSize 10 :width 120 :height 140 :layout "vertical" :verticalAlign "middle" :align "right"}]
-       [:> Tooltip]])))
+        (when @radial-uv? [:> RadialBar {:minAngle   15
+                                         :label      {:fill "#666", :position "insideStart"}
+                                         :background {:clockWise true}
+                                         :dataKey    :uv}])
+        [:> Legend {:iconSize 10 :width 120 :height 140 :layout "vertical" :verticalAlign "middle" :align "right"}]
+        [:> Tooltip]]])))
 
-(defn component
+
+(defn configurable-component
   "the chart to draw, taking cues from the settings of the configuration panel
-
-  the component creates its own ID (a random-uuid) to hold the local state. This way multiple charts
-  can be placed inside the same outer container/composite
 
   ---
 
   - data : (atom) any data shown by the component's ui
-  - container-id : (string) name of the container this chart is inside of
+  - :component-id : (string) name of this chart\n  - container-id : (string) name of the container this chart is inside of
   "
-  ([data component-id]
-   [component data component-id ""])
+  [& {:keys [data component-id container-id ui]}]
+  [c/base-chart
+   :data data
+   :config (config component-id data)
+   :component-id component-id
+   :container-id (or container-id "")
+   :data-panel utils/tabular-data-panel
+   :config-panel config-panel
+   :component-panel component-panel
+   :ui ui])
 
 
-  ([data component-id container-id]
+(defn component
+  "the chart to draw. this variant does NOT provide a configuration panel
 
-   (let [id (r/atom nil)]
+  ---
 
-     (fn []
-       (when (nil? @id)
-         (reset! id component-id)
-         (ui-utils/init-widget @id (config @id data))
-         (ui-utils/dispatch-local @id [:container] container-id))
-
-       ;(log/info "component" @id)
-
-       [c/configurable-chart
-        :data data
-        :id @id
-        :config (config component-id data)
-        :component-id component-id
-        :container-id container-id
-        :data-panel utils/tabular-data-panel
-        :config-panel config-panel
-        :component component-panel]))))
+  - :data : (atom) any data shown by the component's ui
+  - :component-id : (string) name of this chart
+  - :container-id : (string) name of the container this chart is inside of
+  "
+  [& {:keys [data component-id container-id ui]}]
+  [c/base-chart
+   :data data
+   :config (config component-id data)
+   :component-id component-id
+   :container-id (or container-id "")
+   :component-panel component-panel
+   :ui ui])
 
 
+(def meta-data {:component              component
+                :configurable-component configurable-component
+                :sources                {:data :source-type/meta-tabular}
+                :pubs                   []
+                :subs                   []})
 

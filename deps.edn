@@ -23,7 +23,25 @@
              ring/ring                                     {:mvn/version "1.9.4"}
              ring-middleware-format/ring-middleware-format {:mvn/version "0.7.4"}
              com.github.seancorfield/next.jdbc             {:mvn/version "1.2.761"}
-             selmer/selmer                                 {:mvn/version "1.12.48"}}
+             selmer/selmer                                 {:mvn/version "1.12.48"}
+
+             ; clojurescript dependencies (needed by Cursive since it doesn't
+             ; recognize shadow-cljs.edn)
+             reagent/reagent                               {:mvn/version "1.1.0"}
+             re-frame/re-frame                             {:mvn/version "1.2.0"}
+             binaryage/devtools                            {:mvn/version "1.0.4"}
+             cljs-ajax/cljs-ajax                           {:mvn/version "0.8.4"}
+             com.taoensso/timbre                           {:mvn/version "5.1.2"}
+             com.rpl/specter                               {:mvn/version "1.1.3"}
+             day8.re-frame/http-fx                         {:mvn/version "0.2.3"}
+             day8.re-frame/re-frame-10x                    {:mvn/version "1.2.1"}
+             day8.re-frame/tracing                         {:mvn/version "0.6.2"}
+             re-com/re-com                                 {:mvn/version "2.13.2"}
+             org.clojars.ertucetin/re-frame-flow           {:mvn/version "0.1.4"}
+             com.lucasbradstreet/cljs-uuid-utils           {:mvn/version "1.0.2"}
+
+             metasoarous/oz                                {:mvn/version "2.0.0-alpha2"}}
+
 
  :aliases   {:run         {:main-opts ["-m" "bh.rccst.core"]}
 

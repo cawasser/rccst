@@ -1,9 +1,8 @@
-(ns bh.rccst.views.atom.example.card
-  (:require [woolybear.ad.catalog.utils :as acu]
-            [woolybear.ad.layout :as layout]
-
+(ns bh.rccst.views.atom.example.card.card
+  (:require [bh.rccst.ui-component.atom.card.flippable-card :as flippable-card]
             [re-com.core :as rc]
-            [bh.rccst.ui-component.flippable-card :as flippable-card]))
+            [woolybear.ad.catalog.utils :as acu]
+            [woolybear.ad.layout :as layout]))
 
 (def default-background "#9CA8B3")
 (def default-color "#FF")

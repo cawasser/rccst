@@ -1,9 +1,8 @@
 (ns bh.rccst.views.atom.example.misc.hex-color-picker
-  (:require [bh.rccst.ui-component.utils :as ui-utils]
+  (:require [bh.rccst.ui-component.utils.color :as color]
             [re-com.core :as rc]
             [reagent.core :as r]
             [woolybear.ad.catalog.utils :as acu]
-
             [woolybear.ad.layout :as layout]
 
             ["react-colorful" :refer [HexColorPicker]]))
@@ -22,8 +21,8 @@
               [rc/button :src (rc/at)
                :label "Button"
                :style {:background-color @config
-                       :color            (ui-utils/best-text-color
-                                           (ui-utils/hex->rgba @config))}]]])
+                       :color            (color/best-text-color
+                                           (color/hex->rgba @config))}]]])
 
 
 (defn- component-panel [config]

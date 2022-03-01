@@ -1,18 +1,16 @@
 (ns bh.rccst.ui-component.atom.chart.scatter-chart
   (:require [bh.rccst.ui-component.atom.chart.utils :as utils]
+            [bh.rccst.ui-component.atom.chart.utils.example-data :as data]
             [bh.rccst.ui-component.atom.chart.wrapper :as c]
             [bh.rccst.ui-component.utils :as ui-utils]
-
-            ["recharts" :refer [ScatterChart Scatter Brush]]
-
             [re-com.core :as rc]
             [reagent.core :as r]
-            [taoensso.timbre :as log]))
+            ["recharts" :refer [ResponsiveContainer ScatterChart Scatter Brush]]))
 
 
 (def sample-data
   "the Scatter Chart works best with \"triplet data\" so we return the triplet-data from utils"
-  (r/atom utils/triplet-data))
+  (r/atom data/triplet-data))
 
 
 (defn config
@@ -79,57 +77,79 @@
   - data : (atom) any data shown by the component's ui
   - widget-id : (string) unique identifier for this specific widget instance
   "
-  [data component-id]
-  (let [scatter-dot-fill (ui-utils/subscribe-local component-id [:fill :color])
-        x-axis? (ui-utils/subscribe-local component-id [:x-axis :include])
-        x-axis-dataKey (ui-utils/subscribe-local component-id [:x-axis :dataKey])
-        y-axis? (ui-utils/subscribe-local component-id [:y-axis :include])
-        y-axis-dataKey (ui-utils/subscribe-local component-id [:y-axis :dataKey])
+  [data component-id container-id ui]
+  (let [scatter-dot-fill   (ui-utils/subscribe-local component-id [:fill :color])
+        x-axis?            (ui-utils/subscribe-local component-id [:x-axis :include])
+        x-axis-dataKey     (ui-utils/subscribe-local component-id [:x-axis :dataKey])
+        y-axis?            (ui-utils/subscribe-local component-id [:y-axis :include])
+        y-axis-dataKey     (ui-utils/subscribe-local component-id [:y-axis :dataKey])
         isAnimationActive? (ui-utils/subscribe-local component-id [:isAnimationActive])
-        brush? (ui-utils/subscribe-local component-id [:brush])]
+        brush?             (ui-utils/subscribe-local component-id [:brush])]
 
-    (fn []
+    (fn [data component-id container-id ui]
       ;(log/info "configurable-Scatter-chart" @config @data)
 
-      [:> ScatterChart {:width 400 :height 400}
+      [:> ResponsiveContainer
+       [:> ScatterChart
 
-       (utils/standard-chart-components component-id)
+        (utils/standard-chart-components component-id ui)
 
-       (when @brush? [:> Brush])
+        (when @brush? [:> Brush])
 
-       ;; TODO: looks like we need to add more attributes to x- & y-axis
-       ;;
-       ;(when @x-axis? [:> XAxis {:type "number" :dataKey @x-axis-dataKey :name "stature" :unit "cm"}])
-       ;(when @y-axis? [:> YAxis {:type "number" :dataKey @y-axis-dataKey :name "weight" :unit "kg"}])
+        ;; TODO: looks like we need to add more attributes to x- & y-axis
+        ;;
+        ;(when @x-axis? [:> XAxis {:type "number" :dataKey @x-axis-dataKey :name "stature" :unit "cm"}])
+        ;(when @y-axis? [:> YAxis {:type "number" :dataKey @y-axis-dataKey :name "weight" :unit "kg"}])
 
-       [:> Scatter {:name              "tempScatter" :data @data
-                    :isAnimationActive @isAnimationActive?
-                    :fill              @scatter-dot-fill}]])))
+        [:> Scatter {:name              "tempScatter" :data @data
+                     :isAnimationActive @isAnimationActive?
+                     :fill              @scatter-dot-fill}]]])))
+
+
+(defn configurable-component
+  "the chart to draw, taking cues from the settings of the configuration panel
+
+  the component creates its own ID (a random-uuid) to hold the local state. This way multiple charts
+  can be placed inside the same outer container/composite
+
+  ---
+
+  - :data : (atom) any data shown by the component's ui
+  - :component -id : (string) name of this chart
+  - :container-id : (string) name of the container this chart is inside of
+  "
+  ([& {:keys [data component-id container-id]}]
+   [c/base-chart
+    :data data
+    :config (config component-id data)
+    :component-id component-id
+    :container-id (or container-id "")
+    :data-panel utils/tabular-data-panel
+    :config-panel config-panel
+    :component-panel component-panel]))
+
 
 (defn component
-  ([data component-id]
-   [component data component-id ""])
+  "the chart to draw. this variant does NOT provide a configuration panel
+
+  ---
+
+  - :data : (atom) any data shown by the component's ui
+  - :component -id : (string) name of this chart
+  - :container-id : (string) name of the container this chart is inside of
+  "
+  ([& {:keys [data component-id container-id]}]
+   [c/base-chart
+    :data data
+    :config (config component-id data)
+    :component-id component-id
+    :container-id (or container-id "")
+    :component-panel component-panel]))
 
 
-  ([data component-id container-id]
-
-   (let [id (r/atom nil)]
-
-     (fn []
-       (when (nil? @id)
-         (reset! id component-id)
-         (ui-utils/init-widget @id (config @id data))
-         (ui-utils/dispatch-local @id [:container] container-id))
-
-       ;(log/info "component" @id)
-
-       [c/configurable-chart
-        :data data
-        :id @id
-        :config (config component-id data)
-        :component-id component-id
-        :container-id container-id
-        :data-panel utils/tabular-data-panel
-        :config-panel config-panel
-        :component component-panel]))))
+(def meta-data {:component              component
+                :configurable-component configurable-component
+                :sources                {:data :source-type/meta-tabular}
+                :pubs                   []
+                :subs                   []})
 

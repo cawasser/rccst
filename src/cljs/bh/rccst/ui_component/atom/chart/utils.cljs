@@ -1,17 +1,19 @@
 (ns bh.rccst.ui-component.atom.chart.utils
-  (:require [taoensso.timbre :as log]
+  (:require [bh.rccst.events :as events]
+            [bh.rccst.ui-component.table :as table]
+            [bh.rccst.ui-component.utils :as u]
+            [bh.rccst.ui-component.utils.color :as color]
             [re-com.core :as rc]
             [re-frame.core :as re-frame]
             [reagent.core :as r]
+            [taoensso.timbre :as log]
+            [woolybear.packs.tab-panel :as tab-panel]
 
             ["recharts" :refer [XAxis YAxis CartesianGrid Tooltip Legend]]
-            ["react-colorful" :refer [HexColorPicker]]
+            ["react-colorful" :refer [HexColorPicker]]))
 
-            [bh.rccst.events :as events]
-            [bh.rccst.ui-component.utils :as u]
-            [bh.rccst.ui-component.table :as table]
 
-            [woolybear.packs.tab-panel :as tab-panel]))
+(log/info "bh.rccst.ui-component.atom.chart.utils")
 
 
 (defn init-config-panel
@@ -21,12 +23,12 @@
   (let [formal-id (keyword base-id)
         data-path [formal-id :tab-panel]
         config-id (keyword base-id "config")
-        data-id (keyword base-id "data")
-        db-id (keyword "db" base-id)
-        tab-id (keyword base-id "tab-panel")
-        value-id (keyword base-id "value")
-        init-db {:tab-panel (tab-panel/mk-tab-panel-data
-                              data-path config-id)}]
+        data-id   (keyword base-id "data")
+        db-id     (keyword "db" base-id)
+        tab-id    (keyword base-id "tab-panel")
+        value-id  (keyword base-id "value")
+        init-db   {:tab-panel (tab-panel/mk-tab-panel-data
+                                data-path config-id)}]
 
     (re-frame/reg-sub
       db-id
@@ -47,162 +49,6 @@
 
     (re-frame/dispatch-sync [::events/init-locals formal-id init-db])))
 
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;
-; SOME EXAMPLE DATA
-;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; region
-
-(def tabular-data [{:name "Page A" :uv 4000 :pv 2400 :amt 2400}
-                   {:name "Page B" :uv 3000 :pv 1398 :amt 2210}
-                   {:name "Page C" :uv 2000 :pv 9800 :amt 2290}
-                   {:name "Page D" :uv 2780 :pv 3908 :amt 2000}
-                   {:name "Page A" :uv 1890 :pv 4800 :amt 2181}
-                   {:name "Page A" :uv 2390 :pv 3800 :amt 2500}
-                   {:name "Page G" :uv 3490 :pv 4300 :amt 2100}])
-
-(def tabular-data-org [{:name "Page A" :org "Alpha" :uv 4000 :pv 2400 :amt 2400}
-                       {:name "Page B" :org "Alpha" :uv 3000 :pv 1398 :amt 2210}
-                       {:name "Page C" :org "Bravo" :uv 2000 :pv 9800 :amt 2290}
-                       {:name "Page D" :org "Bravo" :uv 2780 :pv 3908 :amt 2000}
-                       {:name "Page A" :org "Charlie" :uv 1890 :pv 4800 :amt 2181}
-                       {:name "Page A" :org "Charlie" :uv 2390 :pv 3800 :amt 2500}
-                       {:name "Page G" :org "Charlie" :uv 3490 :pv 4300 :amt 2100}])
-
-(def meta-tabular-data
-  "docstring"
-  {:metadata {:type :tabular
-              :id :name
-              :fields {:name :string :uv :number :pv :number :tv :number :amt :number :owner :string}}
-   :data [{:name "Page A" :uv 4000 :pv 2400 :tv 1500 :amt 2400 :owner "Bob"}
-          {:name "Page B" :uv 3000 :pv 1398 :tv 1500 :amt 2210 :owner "Bob"}
-          {:name "Page C" :uv 2000 :pv 9800 :tv 1500 :amt 2290 :owner "Sally"}
-          {:name "Page D" :uv 2780 :pv 3908 :tv 1500 :amt 2000 :owner "Sally"}
-          {:name "Page E" :uv 1890 :pv 4800 :tv 1500 :amt 2181 :owner "Alex"}
-          {:name "Page F" :uv 2390 :pv 3800 :tv 1500 :amt 2500 :owner "Erin"}
-          {:name "Page G" :uv 3490 :pv 4300 :tv 1500 :amt 2100 :owner "Alvin"}]})
-
-(def some-other-tabular [{:id "Page A" :a 4000 :b 2400 :c 2400}
-                         {:id "Page B" :a 3000 :b 1398 :c 2210}
-                         {:id "Page C" :a 2000 :b 9800 :c 2290}
-                         {:id "Page D" :a 2780 :b 3908 :c 2000}
-                         {:id "Page E" :a 1890 :b 4800 :c 2181}
-                         {:id "Page F" :a 2390 :b 3800 :c 2500}
-                         {:id "Page G" :a 3490 :b 4300 :c 2100}])
-
-(def paired-data [{:name "Group A" :value 400}
-                  {:name "Group B" :value 300}
-                  {:name "Group C" :value 300}
-                  {:name "Group D" :value 200}
-                  {:name "Group E" :value 278}
-                  {:name "Group F" :value 189}])
-
-(def triplet-data [{:x 100 :y 200 :z 200}
-                   {:x 110 :y 280 :z 200}
-                   {:x 120 :y 100 :z 260}
-                   {:x 140 :y 250 :z 280}
-                   {:x 150 :y 400 :z 500}
-                   {:x 170 :y 300 :z 400}])
-
-(def hierarchy-data [{:name     "axis"
-                      :children [{:name "Axis" :size 24593}
-                                 {:name "Axes" :size 1302}
-                                 {:name "AxisGridLine" :size 652}
-                                 {:name "AxisLabel" :size 636}
-                                 {:name "CartesianAxes" :size 6703}]}
-                     {:name     "controls"
-                      :children [{:name "TooltipControl" :size 8435}
-                                 {:name "SelectionControl" :size 7862}
-                                 {:name "PanZoomControl" :size 5222}
-                                 {:name "HoverControl" :size 4896}
-                                 {:name "ControlList" :size 4665}
-                                 {:name "ClickControl" :size 3824}
-                                 {:name "ExpandControl" :size 2832}
-                                 {:name "DragControl" :size 2649}
-                                 {:name "AnchorControl" :size 2138}
-                                 {:name "Control" :size 1353}
-                                 {:name "IControl" :size 763}]}
-                     {:name     "data"
-                      :children [{:name "Data" :size 20544}
-                                 {:name "NodeSprite" :size 19382}
-                                 {:name "DataList" :size 19788}
-                                 {:name "DataSprite" :size 10349}
-                                 {:name "EdgeSprite" :size 3301}
-                                 {:name     "render"
-                                  :children [{:name "EdgeRenderer" :size 5569}
-                                             {:name "ShapeRenderer" :size 2247}
-                                             {:name "ArrowType" :size 698}
-                                             {:name "IRenderer" :size 353}]}
-                                 {:name "ScaleBinding" :size 11275}
-                                 {:name "TreeBuilder" :size 9930}
-                                 {:name "Tree" :size 7147}]}
-                     {:name     "events"
-                      :children [{:name "DataEvent" :size 7313}
-                                 {:name "SelectionEvent" :size 6880}
-                                 {:name "TooltipEvent" :size 3701}
-                                 {:name "VisualizationEvent" :size 2117}]}
-                     {:name     "legend"
-                      :children [{:name "Legend" :size 20859}
-                                 {:name "LegendRange" :size 10530}
-                                 {:name "LegendItem" :size 4614}]}
-                     {:name     "operator"
-                      :children [{:name     "distortion"
-                                  :children [{:name "Distortion" :size 6314}
-                                             {:name "BifocalDistortion" :size 4461}
-                                             {:name "FisheyeDistortion" :size 3444}]}
-                                 {:name     "encoder"
-                                  :children [{:name "PropertyEncoder" :size 4138}
-                                             {:name "Encoder" :size 4060}
-                                             {:name "ColorEncoder" :size 3179}
-                                             {:name "SizeEncoder" :size 1830}
-                                             {:name "ShapeEncoder" :size 1690}]}
-                                 {:name     "filter"
-                                  :children [{:name "FisheyeTreeFilter" :size 5219}
-                                             {:name "VisibilityFilter" :size 3509}
-                                             {:name "GraphDistanceFilter" :size 3165}]}
-                                 {:name "IOperator" :size 1286}
-                                 {:name     "label"
-                                  :children [{:name "Labeler" :size 9956}
-                                             {:name "RadialLabeler" :size 3899}
-                                             {:name "StackedAreaLabeler" :size 3202}]}
-                                 {:name     "layout"
-                                  :children [{:name "RadialTreeLayout" :size 12348}
-                                             {:name "NodeLinkTreeLayout" :size 12870}
-                                             {:name "CirclePackingLayout" :size 12003}
-                                             {:name "CircleLayout" :size 9317}
-                                             {:name "TreeMapLayout" :size 9191}
-                                             {:name "StackedAreaLayout" :size 9121}
-                                             {:name "Layout" :size 7881}
-                                             {:name "AxisLayout" :size 6725}
-                                             {:name "IcicleTreeLayout" :size 4864}
-                                             {:name "DendrogramLayout" :size 4853}
-                                             {:name "ForceDirectedLayout" :size 8411}
-                                             {:name "BundledEdgeRouter" :size 3727}
-                                             {:name "IndentedTreeLayout" :size 3174}
-                                             {:name "PieLayout" :size 2728}
-                                             {:name "RandomLayout" :size 870}]}
-                                 {:name "OperatorList" :size 5248}
-                                 {:name "OperatorSequence" :size 4190}
-                                 {:name "OperatorSwitch" :size 2581}
-                                 {:name "Operator" :size 2490}
-                                 {:name "SortOperator" :size 2023}]}])
-
-(def dag-data {:nodes [{:name "Visit"}
-                       {:name "Direct-Favourite"}
-                       {:name "Page-Click"}
-                       {:name "Detail-Favourite"}
-                       {:name "Lost"}]
-               :links [{:source 0 :target 1 :value 3728.3}
-                       {:source 0 :target 2 :value 354170}
-                       {:source 2 :target 3 :value 62429}
-                       {:source 2 :target 4 :value 291741}]})
-
-
-;; endregion
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -314,9 +160,9 @@
 
 
 (defn column-picker [data widget-id label path]
-  (let [model (u/subscribe-local widget-id path)
+  (let [model    (u/subscribe-local widget-id path)
         headings (apply set (map keys (get @data :data)))
-        btns (mapv (fn [h] {:id h :label h}) headings)]
+        btns     (mapv (fn [h] {:id h :label h}) headings)]
     (fn [data widget-id label path]
       [rc/h-box :src (rc/at)
        :gap "5px"
@@ -462,11 +308,11 @@
   "
   [widget-id label path]
   (let [model (u/subscribe-local widget-id path)
-        btns [{:id "auto" :label "auto"}
-              {:id "linear" :label "linear"}
-              {:id "pow" :label "pow"}
-              {:id "sqrt" :label "sqrt"}
-              {:id "log" :label "log"}]]
+        btns  [{:id "auto" :label "auto"}
+               {:id "linear" :label "linear"}
+               {:id "pow" :label "pow"}
+               {:id "sqrt" :label "sqrt"}
+               {:id "log" :label "log"}]]
     (fn [widget-id label path]
       [rc/h-box :src (rc/at)
        :children [[rc/box :src (rc/at) :align :start :child [:code label]]
@@ -491,8 +337,8 @@
   "
   [widget-id path]
   (let [model (u/subscribe-local widget-id path)
-        btns [{:id "horizontal" :label "horizontal"}
-              {:id "vertical" :label "vertical"}]]
+        btns  [{:id "horizontal" :label "horizontal"}
+               {:id "vertical" :label "vertical"}]]
     (fn [widget-id path]
       [rc/h-box :src (rc/at)
        :children [[rc/box :src (rc/at) :align :start :child [:code ":layout"]]
@@ -517,9 +363,9 @@
   "
   [widget-id path]
   (let [model (u/subscribe-local widget-id path)
-        btns [{:id "left" :label "left"}
-              {:id "center" :label "center"}
-              {:id "right" :label "right"}]]
+        btns  [{:id "left" :label "left"}
+               {:id "center" :label "center"}
+               {:id "right" :label "right"}]]
     (fn [widget-id path]
       [rc/h-box :src (rc/at)
        :children [[rc/box :src (rc/at) :align :start :child [:code ":align"]]
@@ -544,9 +390,9 @@
   "
   [widget-id path]
   (let [model (u/subscribe-local widget-id path)
-        btns [{:id "top" :label "top"}
-              {:id "middle" :label "middle"}
-              {:id "bottom" :label "bottom"}]]
+        btns  [{:id "top" :label "top"}
+               {:id "middle" :label "middle"}
+               {:id "bottom" :label "bottom"}]]
     (fn [widget-id path]
       [rc/h-box :src (rc/at)
        :children [[rc/box :src (rc/at) :align :start :child [:code ":verticalAlign"]]
@@ -559,8 +405,8 @@
 
 
 (defn color-config [widget-id label path & [position]]
-  (let [showing? (r/atom false)
-        p (or position :right-center)
+  (let [showing?         (r/atom false)
+        p                (or position :right-center)
         background-color (u/subscribe-local widget-id path)]
     (fn [widget-id label path & [position]]
       [rc/popover-anchor-wrapper :src (rc/at)
@@ -569,8 +415,8 @@
        :anchor [rc/button :src (rc/at)
                 :label label
                 :style {:background-color @background-color
-                        :color            (u/best-text-color
-                                            (u/hex->rgba @background-color))}
+                        :color            (color/best-text-color
+                                            (color/hex->rgba @background-color))}
                 :on-click #(swap! showing? not)]
        :popover [rc/popover-content-wrapper :src (rc/at)
                  :close-button? true
@@ -645,12 +491,12 @@
 
 (defn option [chart-id label path-root]
   (let [chosen-path (conj path-root :chosen)
-        keys-path (conj path-root :keys)
-        chosen (u/subscribe-local chart-id chosen-path)
-        keys (u/subscribe-local chart-id keys-path)
-        btns (->> @keys
-               (map (fn [k]
-                      {:id k :label k})))]
+        keys-path   (conj path-root :keys)
+        chosen      (u/subscribe-local chart-id chosen-path)
+        keys        (u/subscribe-local chart-id keys-path)
+        btns        (->> @keys
+                      (map (fn [k]
+                             {:id k :label k})))]
 
     ;(log/info "option" @keys @chosen btns)
 
@@ -711,61 +557,111 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; region
 
-(defn standard-chart-components [widget-id]
-  (let [grid? (u/subscribe-local widget-id [:grid :include])
-        grid-dash (u/subscribe-local widget-id [:grid :strokeDasharray :dash])
-        grid-space (u/subscribe-local widget-id [:grid :strokeDasharray :space])
-        grid-stroke (u/subscribe-local widget-id [:grid :stroke])
 
-        x-axis? (u/subscribe-local widget-id [:x-axis :include])
-        x-axis-dataKey (u/subscribe-local widget-id [:x-axis :dataKey])
-        x-axis-orientation (u/subscribe-local widget-id [:x-axis :orientation])
-        x-axis-scale (u/subscribe-local widget-id [:x-axis :scale])
-
-        y-axis? (u/subscribe-local widget-id [:y-axis :include])
-        y-axis-dataKey (u/subscribe-local widget-id [:y-axis :dataKey])
-        y-axis-orientation (u/subscribe-local widget-id [:y-axis :orientation])
-        y-axis-scale (u/subscribe-local widget-id [:y-axis :scale])
-
-        tooltip? (u/subscribe-local widget-id [:tooltip :include])
-
-        legend? (u/subscribe-local widget-id [:legend :include])
-        legend-layout (u/subscribe-local widget-id [:legend :layout])
-        legend-align (u/subscribe-local widget-id [:legend :align])
-        legend-verticalAlign (u/subscribe-local widget-id [:legend :verticalAlign])]
-
-    [:<>
-     (when @grid? [:> CartesianGrid {:strokeDasharray (strokeDasharray @grid-dash @grid-space)
-                                     :stroke          @grid-stroke}])
-
-     (when @x-axis? [:> XAxis {:dataKey     @x-axis-dataKey
-                               :orientation @x-axis-orientation
-                               :scale       @x-axis-scale}])
-
-     (when @y-axis? [:> YAxis {:dataKey     @y-axis-dataKey
-                               :orientation @y-axis-orientation
-                               :scale       @y-axis-scale}])
-
-     (when @tooltip? [:> Tooltip])
-
-     (when @legend? [:> Legend {:layout        @legend-layout
-                                :align         @legend-align
-                                :verticalAlign @legend-verticalAlign}])]))
+(defn override [s ui tag]
+  ;(log/info "override" s "///" ui "///" tag)
+  (if (and
+        (seq ui)
+        (not (empty? ui))
+        (contains? (into #{} (keys ui)) tag))
+    (get ui tag)
+    s))
 
 
-(defn non-gridded-chart-components [widget-id]
-  (let [tooltip? (u/subscribe-local widget-id [:tooltip :include])
-        legend? (u/subscribe-local widget-id [:legend :include])
-        legend-layout (u/subscribe-local widget-id [:legend :layout])
-        legend-align (u/subscribe-local widget-id [:legend :align])
-        legend-verticalAlign (u/subscribe-local widget-id [:legend :verticalAlign])]
+(defn standard-chart-components [component-id ui]
+
+  ;(log/info "standard-chart-components" component-id ui)
+
+  (let [grid?                (u/subscribe-local component-id [:grid :include])
+        grid-dash            (u/subscribe-local component-id [:grid :strokeDasharray :dash])
+        grid-space           (u/subscribe-local component-id [:grid :strokeDasharray :space])
+        grid-stroke          (u/subscribe-local component-id [:grid :stroke])
+
+        x-axis?              (u/subscribe-local component-id [:x-axis :include])
+        x-axis-dataKey       (u/subscribe-local component-id [:x-axis :dataKey])
+        x-axis-orientation   (u/subscribe-local component-id [:x-axis :orientation])
+        x-axis-scale         (u/subscribe-local component-id [:x-axis :scale])
+
+        y-axis?              (u/subscribe-local component-id [:y-axis :include])
+        y-axis-dataKey       (u/subscribe-local component-id [:y-axis :dataKey])
+        y-axis-orientation   (u/subscribe-local component-id [:y-axis :orientation])
+        y-axis-scale         (u/subscribe-local component-id [:y-axis :scale])
+
+        tooltip?             (u/subscribe-local component-id [:tooltip :include])
+
+        legend?              (u/subscribe-local component-id [:legend :include])
+        legend-layout        (u/subscribe-local component-id [:legend :layout])
+        legend-align         (u/subscribe-local component-id [:legend :align])
+        legend-verticalAlign (u/subscribe-local component-id [:legend :verticalAlign])]
 
     [:<>
-     (when @tooltip? [:> Tooltip])
+     (when (override @grid? ui :grid) [:> CartesianGrid {:strokeDasharray (strokeDasharray @grid-dash @grid-space)
+                                                         :stroke          @grid-stroke}])
 
-     (when @legend? [:> Legend {:layout        @legend-layout
-                                :align         @legend-align
-                                :verticalAlign @legend-verticalAlign}])]))
+     (when (override @x-axis? ui :x-axis) [:> XAxis {:dataKey     @x-axis-dataKey
+                                                     :orientation @x-axis-orientation
+                                                     :scale       @x-axis-scale}])
+
+     (when (override @y-axis? ui :y-axis) [:> YAxis {:dataKey     @y-axis-dataKey
+                                                     :orientation @y-axis-orientation
+                                                     :scale       @y-axis-scale}])
+
+     (when (override @tooltip? ui :tooltip) [:> Tooltip])
+
+     (when (override @legend? ui :legend) [:> Legend {:layout        @legend-layout
+                                                      :align         @legend-align
+                                                      :verticalAlign @legend-verticalAlign}])]))
+
+
+(defn non-gridded-chart-components [component-id ui]
+  (let [tooltip?             (u/subscribe-local component-id [:tooltip :include])
+        legend?              (u/subscribe-local component-id [:legend :include])
+        legend-layout        (u/subscribe-local component-id [:legend :layout])
+        legend-align         (u/subscribe-local component-id [:legend :align])
+        legend-verticalAlign (u/subscribe-local component-id [:legend :verticalAlign])]
+
+    ;(log/info "non-gridded-chart-components" component-id ui)
+
+    [:<>
+     (when (override @tooltip? ui :tooltip) [:> Tooltip])
+
+     (when (override @legend? ui :legend) [:> Legend {:layout        @legend-layout
+                                                      :align         @legend-align
+                                                      :verticalAlign @legend-verticalAlign}])]))
 
 ;; endregion
 
+
+; workout the override logic for chart elements like grid, legend, etc.
+(comment
+  (def ui {:tooltip false})
+  (def ui nil)
+  (def ui "")
+  (def ui {:grid false, :x-axis false, :y-axis false, :legend false, :tooltip false})
+  (def tag :tooltip)
+  (def tag :grid)
+  (def tooltip? (r/atom true))
+  (def grid? (r/atom true))
+  (def s @tooltip?)
+  (def s @grid?)
+
+  (first ui)
+
+  (if (and (seq ui) (not (empty? (first ui)))) true false)
+
+
+  (if (and
+        (seq ui)
+        (not (empty? ui))
+        (contains? (into #{} (keys ui)) tag))
+    (get ui tag)
+    s)
+
+
+  (if nil true false)
+  (or true nil)
+
+  (override @tooltip? ui :tooltip)
+  (override @grid? ui :grid)
+
+  ())

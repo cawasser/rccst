@@ -1,4 +1,4 @@
-(ns bh.rccst.ui-component.flippable-card)
+(ns bh.rccst.ui-component.atom.card.flippable-card)
 
 
 (def default-background "#9CA8B3")

@@ -1,14 +1,12 @@
 (ns bh.rccst.views.atom.example.re-com.popover
-  (:require [re-com.core :as rc]
+  (:require [bh.rccst.ui-component.atom.chart.area-chart :as area-chart]
+            [bh.rccst.ui-component.atom.chart.line-chart :as line-chart]
+            [bh.rccst.ui-component.atom.chart.sankey-chart :as sankey-chart]
+            [re-com.core :as rc]
             [reagent.core :as r]
             [taoensso.timbre :as log]
             [woolybear.ad.catalog.utils :as acu]
-            [woolybear.ad.layout :as layout]
-
-    ; we should wrap this into a ui-component
-            ["recharts" :refer [LineChart Line
-                                XAxis YAxis CartesianGrid
-                                Tooltip Legend]]))
+            [woolybear.ad.layout :as layout]))
 
 
 (defn button-anchor-example []
@@ -74,72 +72,62 @@
 
 
 
-(def data (r/atom [{:name "Page A" :uv 4000 :pv 2400 :amt 2400}
-                   {:name "Page B" :uv 3000 :pv 1398 :amt 2210}
-                   {:name "Page C" :uv 2000 :pv 9800 :amt 2290}
-                   {:name "Page D" :uv 2780 :pv 3908 :amt 2000}
-                   {:name "Page E" :uv 1890 :pv 4800 :amt 2181}
-                   {:name "Page F" :uv 2390 :pv 3800 :amt 2500}
-                   {:name "Page G" :uv 3490 :pv 4300 :amt 2100}]))
+(defn- line-chart-popover [data component-id]
+  (let [showing? (r/atom false)]
+    [rc/popover-anchor-wrapper :src (rc/at)
+     :showing? showing?
+     :position :above-left
+     :anchor [rc/button :src (rc/at)
+              :label "Line Chart"
+              :on-click #(swap! showing? not)]
+     :popover [rc/popover-content-wrapper :src (rc/at)
+               :title "A Line Chart"
+               :body [line-chart/component data component-id]]]))
+
+
+(defn- area-chart-popover [data component-id]
+  (let [showing? (r/atom false)]
+    [rc/popover-anchor-wrapper :src (rc/at)
+     :showing? showing?
+     :position :above-center
+     :anchor [rc/button :src (rc/at)
+              :label "Area Chart"
+              :on-click #(swap! showing? not)]
+     :popover [rc/popover-content-wrapper :src (rc/at)
+               :title "An Area Chart"
+               :body [area-chart/component data component-id]]]))
+
+
+(defn- sankey-chart-popover [data component-id]
+  (let [showing? (r/atom false)]
+    [rc/popover-anchor-wrapper :src (rc/at)
+     :showing? showing?
+     :position :above-center
+     :anchor [rc/button :src (rc/at)
+              :label "Sankey Chart"
+              :on-click #(swap! showing? not)]
+     :popover [rc/popover-content-wrapper :src (rc/at)
+               :title "A Sankey Chart"
+               :body [sankey-chart/component data component-id]]]))
 
 
 (defn chart-example []
-  (acu/demo "Popover (with very complex content)"
-    "Another simple `popover` from [Re-com](https://github.com/Day8/re-com), using a `hyperlink`
-    as the 'anchor', only now the content is an entire line-chart!"
+  (let [tabular-data line-chart/sample-data
+        dag-data sankey-chart/sample-data]
+    (acu/demo "Popover (with very complex content)"
+      "A few simple `popovers` from [Re-com](https://github.com/Day8/re-com), using a `hyperlink`
+    as the 'anchor', only now the content is an entire chart!"
 
-    [layout/centered {:extra-classes :width-50}
-     (let [showing? (r/atom false)]
-       [rc/popover-anchor-wrapper :src (rc/at)
-        :showing? showing?
-        :position :left-above
-        :anchor [rc/button :src (rc/at)
-                 :label "Line Chart"
-                 :on-click #(swap! showing? not)]
-        :popover [rc/popover-content-wrapper :src (rc/at)
-                  :title "A Line Chart"
-                  :body [:> LineChart {:width 400 :height 400 :data @data}
-                         [:> CartesianGrid {:strokeDasharray "3 3"}]
-                         [:> XAxis {:dataKey :name}]
-                         [:> YAxis]
-                         [:> Tooltip]
-                         [:> Line {:type              "monotone"
-                                   :dataKey           :uv
-                                   :isAnimationActive false
-                                   :stroke            "#8884d8"}]
-                         [:> Line {:type              "monotone"
-                                   :dataKey           :pv
-                                   :isAnimationActive false
-                                   :stroke            "#82ca9d"}]
-                         [:> Line {:type              "monotone"
-                                   :dataKey           :amt
-                                   :isAnimationActive false
-                                   :stroke            "#ff00ff"}]]]])]
+      [layout/centered {:extra-classes :width-50}
+       [rc/h-box :src (rc/at)
+        :gap "10px"
+        :children [[line-chart-popover tabular-data "popover/line-chart"]
+                   [area-chart-popover tabular-data "popover/area-chart"]
+                   [sankey-chart-popover dag-data "popover/sankey-chart"]]]]
 
-    '[layout/centered {:extra-classes :width-50}
-      (let [showing? (r/atom false)]
-        [rc/popover-anchor-wrapper :src (rc/at)
-         :showing? showing?
-         :position :left-above
-         :anchor [rc/button :src (rc/at)
-                  :label "Line Chart"
-                  :on-click #(swap! showing? not)]
-         :popover [rc/popover-content-wrapper :src (rc/at)
-                   :title "A Line Chart"
-                   :body [:> LineChart {:width 400 :height 400 :data @data}
-                          [:> CartesianGrid {:strokeDasharray "3 3"}]
-                          [:> XAxis {:dataKey :name}]
-                          [:> YAxis]
-                          [:> Tooltip]
-                          [:> Line {:type              "monotone"
-                                    :dataKey           :uv
-                                    :isAnimationActive false
-                                    :stroke            "#8884d8"}]
-                          [:> Line {:type              "monotone"
-                                    :dataKey           :pv
-                                    :isAnimationActive false
-                                    :stroke            "#82ca9d"}]
-                          [:> Line {:type              "monotone"
-                                    :dataKey           :amt
-                                    :isAnimationActive false
-                                    :stroke            "#ff00ff"}]]]])]))
+      '[layout/centered {:extra-classes :width-50}
+        [rc/h-box :src (rc/at)
+         :gap "10px"
+         :children [[line-chart-popover data "popover/line-chart"]
+                    [area-chart-popover data "popover/area-chart"]
+                    [sankey-chart-popover dag-data "popover/sankey-chart"]]]])))

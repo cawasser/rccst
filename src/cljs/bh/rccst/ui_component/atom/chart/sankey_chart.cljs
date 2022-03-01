@@ -1,17 +1,17 @@
 (ns bh.rccst.ui-component.atom.chart.sankey-chart
   (:require [bh.rccst.ui-component.atom.chart.utils :as utils]
+            [bh.rccst.ui-component.atom.chart.utils.example-data :as data]
             [bh.rccst.ui-component.atom.chart.wrapper :as c]
             [bh.rccst.ui-component.utils :as ui-utils]
 
-            ["recharts" :refer [Sankey Tooltip Layer Rectangle]]
+            ["recharts" :refer [ResponsiveContainer Sankey Tooltip Layer Rectangle]]
             [re-com.core :as rc]
-            [reagent.core :as r]
-            [taoensso.timbre :as log]))
+            [reagent.core :as r]))
 
 
 (def sample-data
   "the Sankey Chart works best with \"directed acyclic graph data\" so we return the dag-data from utils"
-  (r/atom utils/dag-data))
+  (r/atom data/dag-data))
 
 
 (defn config
@@ -130,28 +130,28 @@
   - chart-id : (string) unique identifier for this chart instance within this container
   - container-id : (string) name of the container this chart is inside of
   "
-  [data component-id]
-  (let [tooltip? (ui-utils/subscribe-local component-id [:tooltip :include])
-        node-fill (ui-utils/subscribe-local component-id [:node :fill])
+  [data component-id container-ui ui]
+  (let [tooltip?    (ui-utils/subscribe-local component-id [:tooltip :include])
+        node-fill   (ui-utils/subscribe-local component-id [:node :fill])
         node-stroke (ui-utils/subscribe-local component-id [:node :stroke])
         link-stroke (ui-utils/subscribe-local component-id [:link :stroke])
-        curve (ui-utils/subscribe-local component-id [:link :curve])]
+        curve       (ui-utils/subscribe-local component-id [:link :curve])]
 
-    (fn []
-      [:> Sankey
-       {:width         500 :height 400
-        :node          (partial complex-node 500 @node-fill @node-stroke)
-        :data          @data
-        :margin        {:top 20 :bottom 20 :left 20 :right 20}
-        :nodeWidth     10
-        :nodePadding   60
-        :linkCurvature @curve
-        :iterations    64
-        :link          {:stroke @link-stroke}}
-       (when @tooltip? [:> Tooltip])])))
+    (fn [data component-id container-ui ui]
+      [:> ResponsiveContainer
+       [:> Sankey
+        {:node          (partial complex-node 500 @node-fill @node-stroke)
+         :data          @data
+         :margin        {:top 20 :bottom 20 :left 20 :right 20}
+         :nodeWidth     10
+         :nodePadding   60
+         :linkCurvature @curve
+         :iterations    64
+         :link          {:stroke @link-stroke}}
+        (when @tooltip? [:> Tooltip])]])))
 
 
-(defn component
+(defn configurable-component
   "the chart to draw, taking cues from the settings of the configuration panel
 
   ---
@@ -160,31 +160,43 @@
   - chart-id : (string) unique identifier of this chart insatnce within this container
   - container-id : (string) name of the container this chart is inside of
   "
-  ([data component-id]
-   [component data component-id ""])
+  [& {:keys [data component-id container-id ui]}]
+  [c/base-chart
+   :data data
+   :config (config component-id data)
+   :component-id component-id
+   :container-id (or container-id "")
+   :data-panel utils/dag-data-panel
+   :config-panel config-panel
+   :component-panel component-panel
+   :ui ui])
 
 
-  ([data component-id container-id]
+(defn component
+  "the chart to draw. this variant does NOT provide a configuration panel
 
-   (let [id (r/atom nil)]
+  ---
 
-     (fn []
-       (when (nil? @id)
-         (reset! id component-id)
-         (ui-utils/init-widget @id (config @id data))
-         (ui-utils/dispatch-local @id [:container] container-id))
+  - data : (atom) any data shown by the component's ui
+  - component-id : (string) unique identifier of this chart instance within this container
+  - container-id : (string) name of the container this chart is inside of
+  "
+  [& {:keys [data component-id container-id ui]}]
+  [c/base-chart
+   :data data
+   :config (config component-id data)
+   :component-id component-id
+   :container-id (or container-id "")
+   :component-panel component-panel
+   :ui ui])
 
-       ;(log/info "component" @id)
 
-       [c/configurable-chart
-        :data data
-        :id @id
-        :config (config component-id data)
-        :component-id component-id
-        :container-id container-id
-        :data-panel utils/dag-data-panel
-        :config-panel config-panel
-        :component component-panel]))))
+(def meta-data {:component              component
+                :configurable-component configurable-component
+                :sources                {:data :source-type/meta-dag}
+                :pubs                   []
+                :subs                   []})
+
 
 
 (comment

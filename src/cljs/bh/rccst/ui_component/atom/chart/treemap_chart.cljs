@@ -1,22 +1,22 @@
 (ns bh.rccst.ui-component.atom.chart.treemap-chart
-  (:require [taoensso.timbre :as log]
+  (:require [bh.rccst.ui-component.atom.chart.utils :as utils]
+            [bh.rccst.ui-component.atom.chart.utils.example-data :as data]
+            [bh.rccst.ui-component.atom.chart.wrapper :as c]
+            [bh.rccst.ui-component.utils :as ui-utils]
             [re-com.core :as rc]
             [reagent.core :as r]
-
-            ["recharts" :refer [Treemap]]
-            [bh.rccst.ui-component.utils :as ui-utils]
-            [bh.rccst.ui-component.atom.chart.utils :as utils]
-            [bh.rccst.ui-component.atom.chart.wrapper :as c]))
+            ["recharts" :refer [ResponsiveContainer Treemap]]))
 
 
 (def sample-data
   "the Treemap Chart works best with \"hierarchical data\" so we return the hierarchy-data from utils"
-  (r/atom utils/hierarchy-data))
+  (r/atom data/hierarchy-data))
 
 
 (def default-ratio (/ 4 3))
 (def default-stroke "#ffffff")
 (def default-fill "#8884d8")
+
 
 (defn config
   "constructs the configuration panel for the chart's configurable properties. This is specific to
@@ -38,14 +38,14 @@
   [component-id data]
   (merge
     ui-utils/default-pub-sub
-    {:tab-panel {:value     (keyword component-id "config")
-                 :data-path [:widgets (keyword component-id) :tab-panel]}
+    {:tab-panel         {:value     (keyword component-id "config")
+                         :data-path [:widgets (keyword component-id) :tab-panel]}
      :isAnimationActive true
-     :ratio  {:include true
-              :n 4
-              :d 3}
-     :stroke  {:color "#ffffff"}
-     :fill {:color "#8884d8"}}))
+     :ratio             {:include true
+                         :n       4
+                         :d       3}
+     :stroke            {:color "#ffffff"}
+     :fill              {:color "#8884d8"}}))
 
 
 (defn- ratio-config
@@ -92,13 +92,13 @@
 
 
 (def source-code `[:> Treemap
-                   {:width 400 :height 400
-                    :data @data
-                    :dataKey "size"
+                   {:width             400 :height 400
+                    :data              @data
+                    :dataKey           "size"
                     :isAnimationActive true
-                    :ratio (/ 4 3)
-                    :stroke "#ffffff"
-                    :fill "#8884d8"}])
+                    :ratio             (/ 4 3)
+                    :stroke            "#ffffff"
+                    :fill              "#8884d8"}])
 
 
 (defn- component-panel
@@ -109,60 +109,69 @@
   - data : (atom) any data shown by the component's ui
   - widget-id : (string) unique identifier for this widget instance
   "
-  [data component-id]
+  [data component-id container-id ui]
   (let [;ratio (ui-utils/subscribe-local widget-id [:ratio :include])
         isAnimationActive? (ui-utils/subscribe-local component-id [:isAnimationActive])
-        stroke (ui-utils/subscribe-local component-id [:stroke :color])
-        fill (ui-utils/subscribe-local component-id [:fill :color])]
+        stroke             (ui-utils/subscribe-local component-id [:stroke :color])
+        fill               (ui-utils/subscribe-local component-id [:fill :color])]
 
-    (fn []
-      [:> Treemap
-       {:width 400 :height 400
-        :data @data
-        :dataKey "size"
-        :isAnimationActive @isAnimationActive?
-        :ratio default-ratio
-        :stroke @stroke
-        :fill @fill}])))
+    (fn [data component-id container-id ui]
+      [:> ResponsiveContainer
+       [:> Treemap
+        {:data              @data
+         :dataKey           "size"
+         :isAnimationActive @isAnimationActive?
+         :ratio             default-ratio
+         :stroke            @stroke
+         :fill              @fill}]])))
 
 
-(defn component
+(defn configurable-component
   "the chart to draw, taking cues from the settings of the configuration panel
-
-  the component creates its own ID (a random-uuid) to hold the local state. This way multiple charts
-  can be placed inside the same outer container/composite
 
   ---
 
-  - data : (atom) any data shown by the component's ui
-  - chart-id : (string) unique identifier for this chart instance within this container
-  - container-id : (string) name of the container this chart is inside of
+  - :data : (atom) any data shown by the component's ui
+  - :component-id : (string) unique identifier for this chart instance within this container
+  - :container-id : (string) name of the container this chart is inside of
   "
-  ([data component-id]
-   [component data component-id ""])
+  [& {:keys [data component-id container-id ui]}]
+  [c/base-chart
+   :data data
+   :config (config component-id data)
+   :component-id component-id
+   :container-id (or container-id "")
+   :data-panel utils/hierarchy-data-panel
+   :config-panel config-panel
+   :component-panel component-panel
+   :ui ui])
 
 
-  ([data component-id container-id]
+(defn component
+  "the chart to draw. this variant does NOT provide a configuration panel
 
-   (let [id (r/atom nil)]
+  ---
 
-     (fn []
-       (when (nil? @id)
-         (reset! id component-id)
-         (ui-utils/init-widget @id (config @id data))
-         (ui-utils/dispatch-local @id [:container] container-id))
+  - :data : (atom) any data shown by the component's ui
+  - :component-id : (string) unique identifier for this chart instance within this container
+  - :container-id : (string) name of the container this chart is inside of
+  "
+  [& {:keys [data component-id container-id ui]}]
+  [c/base-chart
+   :data data
+   :config (config component-id data)
+   :component-id component-id
+   :container-id (or container-id "")
+   :component-panel component-panel
+   :ui ui])
 
-       ;(log/info "component" @id)
 
-       [c/configurable-chart
-        :data data
-        :id @id
-        :config (config component-id data)
-        :component-id component-id
-        :container-id container-id
-        :data-panel utils/hierarchy-data-panel
-        :config-panel config-panel
-        :component component-panel]))))
+(def meta-data {:component              component
+                :configurable-component configurable-component
+                :sources                {:data :source-type/meta-hierarchy}
+                :pubs                   []
+                :subs                   []})
+
 
 
 (comment

@@ -1,27 +1,32 @@
 (ns bh.rccst.ui-component.atom.chart.pie-chart
   (:require [bh.rccst.ui-component.atom.chart.utils :as utils]
+            [bh.rccst.ui-component.utils.color :as color]
+            [bh.rccst.ui-component.atom.chart.utils.example-data :as data]
             [bh.rccst.ui-component.atom.chart.wrapper :as c]
             [bh.rccst.ui-component.utils :as ui-utils]
-
-            ["recharts" :refer [PieChart Pie]]
             [re-com.core :as rc]
             [reagent.core :as r]
-            [taoensso.timbre :as log]))
+            [taoensso.timbre :as log]
+
+            ["recharts" :refer [ResponsiveContainer PieChart Pie]]))
+
+
+(log/info "bh.rccst.ui-component.atom.chart.pie-chart")
 
 
 (def sample-data
   "the Pie Chart works best with \"paired data\" so we return the paired-data from utils"
 
   ; switching to tabular data to work out the UI logic
-  (r/atom utils/meta-tabular-data))
+  (r/atom data/meta-tabular-data))
 
 
 (defn local-config [data]
-  (let [d (get @data :data)
+  (let [d      (get @data :data)
         fields (get-in @data [:metadata :fields])]
 
     (merge
-      {:fill (ui-utils/get-color 0)}
+      {:fill (color/get-color 0)}
 
       ; process options for :name
       (->> fields
@@ -104,60 +109,73 @@
   - data : (atom) any data used by the component's ui
   - widget-id : (string) unique identifier for this specific widget instance
   "
-  [data component-id container-id]
-  (let [container (ui-utils/subscribe-local component-id [:container])
+  [data component-id container-id ui]
+  (let [container          (ui-utils/subscribe-local component-id [:container])
         isAnimationActive? (ui-utils/subscribe-local component-id [:isAnimationActive])
-        subscriptions (ui-utils/build-subs component-id (local-config data))]
+        subscriptions      (ui-utils/build-subs component-id (local-config data))]
 
-    (fn []
-      [:> PieChart {:width 400 :height 400 :label true}
+    (fn [data component-id container-id ui]
+      [:> ResponsiveContainer
+         [:> PieChart {:label (utils/override true ui :label)}
 
-       (utils/non-gridded-chart-components component-id)
+          (utils/non-gridded-chart-components component-id ui)
 
-       [:> Pie {:dataKey           (ui-utils/resolve-sub subscriptions [:value :chosen])
-                :nameKey           (ui-utils/resolve-sub subscriptions [:name :chosen])
-                :data              (get @data :data)
-                :fill              (ui-utils/resolve-sub subscriptions [:fill])
-                :label             true
-                :isAnimationActive @isAnimationActive?}]])))
+          [:> Pie {:dataKey           (ui-utils/resolve-sub subscriptions [:value :chosen])
+                   :nameKey           (ui-utils/resolve-sub subscriptions [:name :chosen])
+                   :data              (get @data :data)
+                   :fill              (ui-utils/resolve-sub subscriptions [:fill])
+                   :label             (utils/override true ui :label)
+                   :isAnimationActive @isAnimationActive?}]]])))
 
 
-(defn component
+(defn configurable-component
   "the chart to draw, taking cues from the settings of the configuration panel
-
-  the component creates its own ID (a random-uuid) to hold the local state. This way multiple charts
-  can be placed inside the same outer container/composite
 
   ---
 
   - data : (atom) any data shown by the component's ui
+  - :component-id : (string) name of this chart\n
   - container-id : (string) name of the container this chart is inside of
   "
-  ([data component-id]
-   [component data component-id ""])
+  [& {:keys [data component-id container-id ui]}]
+  [c/base-chart
+   :data data
+   :config (config component-id data)
+   :component-id component-id
+   :container-id (or container-id "")
+   :data-panel utils/meta-tabular-data-panel
+   :config-panel config-panel
+   :component-panel component-panel
+   :ui ui])
 
 
-  ([data component-id container-id]
+(defn component
+  "the chart to draw. this variant does NOT provide a configuration panel
 
-   (let [id (r/atom nil)]
+  ---
 
-     (fn []
-       (when (nil? @id)
-         (reset! id component-id)
-         (ui-utils/init-widget @id (config @id data))
-         (ui-utils/dispatch-local @id [:container] container-id))
+  - :data : (atom) any data shown by the component's ui
+  - :component-id : (string) name of this chart
+  - :container-id : (string) name of the container this chart is inside of
+  "
+  [& {:keys [data component-id container-id ui]}]
+  [c/base-chart
+   :data data
+   :config (config component-id data)
+   :component-id component-id
+   :container-id (or container-id "")
+   :component-panel component-panel
+   :ui ui])
 
-       ;(log/info "component" @id)
 
-       [c/configurable-chart
-        :data data
-        :id @id
-        :config (config component-id data)
-        :component-id component-id
-        :container-id container-id
-        :data-panel utils/meta-tabular-data-panel
-        :config-panel config-panel
-        :component component-panel]))))
+(def meta-data {:component              component
+                :configurable-component configurable-component
+                :sources                {:data :source-type/meta-tabular}
+                :pubs                   []
+                :subs                   []})
+
+
+
 
 
 

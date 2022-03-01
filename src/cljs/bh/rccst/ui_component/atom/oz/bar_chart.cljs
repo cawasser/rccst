@@ -98,13 +98,8 @@
    [oz/vega-lite @data]])
 
 
-
 (defn component
-  ([data chart-id]
-   [component data chart-id ""])
-
-
-  ([data chart-id container-id]
+  ([& {:keys [data component-id container-id]}]
 
    ;(log/info "bar-chart" @data)
 
@@ -119,9 +114,9 @@
 
      (fn []
        (when (nil? @id)
-         (reset! id chart-id)
+         (reset! id component-id)
          (ui-utils/init-widget @id (config @id data))
-         (ui-utils/dispatch-local @id [:container] container-id))
+         (ui-utils/dispatch-local @id [:container] (or container-id "")))
 
        ;(log/info "component" @id)
 

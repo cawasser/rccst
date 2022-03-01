@@ -1,19 +1,21 @@
 (ns bh.rccst.ui-component.atom.chart.bar-chart
   (:require [bh.rccst.ui-component.atom.chart.utils :as utils]
-            ["recharts" :refer [BarChart Bar Brush]]
+            [bh.rccst.ui-component.utils.color :as color]
+            [bh.rccst.ui-component.atom.chart.utils.example-data :as data]
             [bh.rccst.ui-component.atom.chart.wrapper :as c]
             [bh.rccst.ui-component.utils :as ui-utils]
-
             [re-com.core :as rc]
             [reagent.core :as r]
-            [taoensso.timbre :as log]))
+            [taoensso.timbre :as log]
+            ["recharts" :refer [ResponsiveContainer BarChart Bar Brush]]))
 
+(log/info "bh.rccst.ui-component.atom.chart.bar-chart")
 
 (def sample-data
   "the Bar Chart works best with \"tabular data\" so we return the tabular-data from utils,
   and we mix-in a fourth column just to show how it can be done"
-  (let [source utils/meta-tabular-data
-        data (get source :data)
+  (let [source data/meta-tabular-data
+        data   (get source :data)
         fields (get-in source [:metadata :fields])]
     (-> source
       (assoc
@@ -46,7 +48,7 @@
       keys
       (map-indexed (fn [idx a]
                      {a {:include true
-                         :fill    (ui-utils/get-color idx)
+                         :fill    (color/get-color idx)
                          :stackId ""}}))
       (into {}))))
 
@@ -153,21 +155,22 @@
   - data : (atom) any data used by the component's ui
   - widget-id : (string) unique identifier for this specific widget
   "
-  [data component-id container-id]
-  (let [container (ui-utils/subscribe-local component-id [:container])
+  [data component-id container-id ui]
+  (let [container          (ui-utils/subscribe-local component-id [:container])
         isAnimationActive? (ui-utils/subscribe-local component-id [:isAnimationActive])
-        override-subs @(ui-utils/subscribe-local component-id [:sub])
-        local-subs (ui-utils/build-subs component-id (local-config data))
-        subscriptions (ui-utils/override-subs container-id local-subs override-subs)]
+        override-subs      @(ui-utils/subscribe-local component-id [:sub])
+        local-subs         (ui-utils/build-subs component-id (local-config data))
+        subscriptions      (ui-utils/override-subs container-id local-subs override-subs)]
 
     (fn []
-      [:> BarChart {:width 400 :height 400 :data (get @data :data)}
+      [:> ResponsiveContainer
+       [:> BarChart {:data (get @data :data)}
 
-       (utils/standard-chart-components component-id)
+        (utils/standard-chart-components component-id ui)
 
-       (when (ui-utils/resolve-sub subscriptions [:brush]) [:> Brush])
+        (when (ui-utils/resolve-sub subscriptions [:brush]) [:> Brush])
 
-       (make-bar-display component-id data subscriptions isAnimationActive?)])))
+        (make-bar-display component-id data subscriptions isAnimationActive?)]])))
 
 
 (defn configurable-component
@@ -181,20 +184,16 @@
   - data : (atom) any data shown by the component's ui
   - container-id : (string) name of the container this chart is inside of
   "
-  ([data component-id]
-   [configurable-component data component-id ""])
-
-
-  ([data component-id container-id]
+  ([& {:keys [data component-id container-id ui]}]
    [c/base-chart
     :data data
     :config (config component-id data)
     :component-id component-id
-    :container-id container-id
+    :container-id (or container-id "")
     :data-panel utils/meta-tabular-data-panel
     :config-panel config-panel
-
-    :component-panel component-panel]))
+    :component-panel component-panel
+    :ui ui]))
 
 
 (defn component
@@ -208,17 +207,14 @@
   - data : (atom) any data shown by the component's ui
   - container-id : (string) name of the container this chart is inside of
   "
-  ([data component-id]
-   [component data component-id ""])
-
-
-  ([data component-id container-id]
+  ([& {:keys [data component-id container-id ui]}]
    [c/base-chart
     :data data
     :config (config component-id data)
     :component-id component-id
-    :container-id container-id
-    :component-panel component-panel]))
+    :container-id (or container-id "")
+    :component-panel component-panel
+    :ui ui]))
 
 
 (comment
@@ -246,3 +242,10 @@
     (into [:<>]))
 
   ())
+
+
+(def meta-data {:component              component
+                :configurable-component configurable-component
+                :sources                {:data :source-type/meta-tabular}
+                :pubs                   []
+                :subs                   []})

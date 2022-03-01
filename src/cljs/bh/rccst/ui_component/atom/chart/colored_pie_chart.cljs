@@ -1,21 +1,26 @@
 (ns bh.rccst.ui-component.atom.chart.colored-pie-chart
-  (:require [taoensso.timbre :as log]
+  (:require [bh.rccst.ui-component.atom.chart.utils :as utils]
+            [bh.rccst.ui-component.utils.color :as color]
+            [bh.rccst.ui-component.atom.chart.utils.example-data :as data]
+            [bh.rccst.ui-component.atom.chart.wrapper :as c]
+            [bh.rccst.ui-component.utils :as ui-utils]
             [re-com.core :as rc]
             [reagent.core :as r]
+            [taoensso.timbre :as log]
 
-            ["recharts" :refer [PieChart Pie Cell]]
-            [bh.rccst.ui-component.utils :as ui-utils]
-            [bh.rccst.ui-component.atom.chart.utils :as utils]
-            [bh.rccst.ui-component.atom.chart.wrapper :as c]))
+            ["recharts" :refer [ResponsiveContainer PieChart Pie Cell]]))
+
+
+(log/info "bh.rccst.ui-component.atom.chart.colored-pie-chart")
 
 
 (def sample-data
   "the Pie Chart works best with \"paired data\" so we return the paired-data from utils"
-  (r/atom utils/meta-tabular-data))
+  (r/atom data/meta-tabular-data))
 
 
 (defn local-config [data]
-  (let [d (get @data :data)
+  (let [d      (get @data :data)
         fields (get-in @data [:metadata :fields])]
 
     (merge
@@ -29,7 +34,7 @@
       ; process :name to map up the :colors
       (->> d
         (map :name)
-        (#(zipmap % ui-utils/default-stroke-fill-colors))
+        (#(zipmap % color/default-stroke-fill-colors))
         (assoc {} :colors))
 
       ; process options for :value
@@ -45,9 +50,9 @@
   (def d (get @data :data))
 
   (->> d
-    (map :name ,)
-    (#(zipmap % ui-utils/default-stroke-fill-colors) ,)
-    (assoc {} :colors ,))
+    (map :name,)
+    (#(zipmap % ui-utils/default-stroke-fill-colors),)
+    (assoc {} :colors,))
 
   (as-> d x
     (map :name x)
@@ -91,7 +96,7 @@
   [:<>
    (doall
      (map (fn [[id _]]
-            ^{:key id}[utils/color-config-text chart-id id [:colors id] :right-above])
+            ^{:key id} [utils/color-config-text chart-id id [:colors id] :right-above])
        @(ui-utils/subscribe-local chart-id [:colors])))])
 
 
@@ -145,32 +150,66 @@
   - data : (atom) any data used by the component's ui
   - widget-id : (string) unique identifier for this specific widget instance
   "
-  [data chart-id]
-  (let [isAnimationActive? (ui-utils/subscribe-local chart-id [:isAnimationActive])
-        subscriptions (ui-utils/build-subs chart-id (local-config data))]
+  [data component-id container-id ui]
+  (let [isAnimationActive? (ui-utils/subscribe-local component-id [:isAnimationActive])
+        subscriptions      (ui-utils/build-subs component-id (local-config data))]
 
-    (fn [data chart-id]
-      [:> PieChart {:width 400 :height 400 :label true}
+    (fn [data component-id container-id ui]
 
-       (utils/non-gridded-chart-components chart-id)
+      (log/info "colored-pie-chart" component-id "///" ui)
 
-       [:> Pie {:dataKey (ui-utils/resolve-sub subscriptions [:value :chosen])
-                :nameKey (ui-utils/resolve-sub subscriptions [:name :chosen])
-                :data (get @data :data)
-                :label true
-                :isAnimationActive @isAnimationActive?}
-        (doall
-          (map-indexed
-            (fn [idx {name :name}]
-              ^{:key (str idx name)}
-              [:> Cell {:key (str "cell-" idx)
-                        :fill (or (ui-utils/resolve-sub subscriptions [:colors name])
-                                (ui-utils/get-color 0))}])
-            (get @data :data)))]])))
+      [:> ResponsiveContainer
+       [:> PieChart {:label true} (utils/override true ui :label)
+
+        (utils/non-gridded-chart-components component-id ui)
+
+        [:> Pie {:dataKey           (ui-utils/resolve-sub subscriptions [:value :chosen])
+                 :nameKey           (ui-utils/resolve-sub subscriptions [:name :chosen])
+                 :data              (get @data :data)
+                 :label             (utils/override true ui :label)
+                 :isAnimationActive @isAnimationActive?}
+         (doall
+           (map-indexed
+             (fn [idx {name :name}]
+               ^{:key (str idx name)}
+               [:> Cell {:key  (str "cell-" idx)
+                         :fill (or (ui-utils/resolve-sub subscriptions [:colors name])
+                                 (color/get-color 0))}])
+             (get @data :data)))]]])))
+
+
+(comment
+  (def ui '({:legend false :tooltip false :label false}))
+
+  ())
+
+
+(defn configurable-component
+  "the chart to draw, taking cues from the settings of the configuration panel
+
+  the component creates its own ID (a random-uuid) to hold the local state. This way multiple charts
+  can be placed inside the same outer container/composite
+
+  ---
+
+  - :data : (atom) any data shown by the component's ui
+  - :component-id : (string) name of the component itself
+  - :container-id : (string) name of the container this chart is inside of
+  "
+  [& {:keys [data component-id container-id ui]}]
+  [c/base-chart
+   :data data
+   :config (config component-id data)
+   :component-id component-id
+   :container-id (or container-id "")
+   :data-panel utils/meta-tabular-data-panel
+   :config-panel config-panel
+   :component-panel component-panel
+   :ui ui])
 
 
 (defn component
-  "the chart to draw, taking cues from the settings of the configuration panel
+  "the chart to draw. this variant does NOT provide a configuration panel
 
   the component creates its own ID (a random-uuid) to hold the local state. This way multiple charts
   can be placed inside the same outer container/composite
@@ -180,31 +219,22 @@
   - data : (atom) any data shown by the component's ui
   - container-id : (string) name of the container this chart is inside of
   "
-  ([data component-id]
-   [component data component-id ""])
+  [& {:keys [data component-id container-id ui]}]
+  [c/base-chart
+   :data data
+   :config (config component-id data)
+   :component-id component-id
+   :container-id (or container-id "")
+   :component-panel component-panel
+   :ui ui])
 
 
-  ([data component-id container-id]
+(def meta-data {:component              component
+                :configurable-component configurable-component
+                :sources                {:data :source-type/meta-tabular}
+                :pubs                   []
+                :subs                   []})
 
-   (let [id (r/atom nil)]
-
-     (fn []
-       (when (nil? @id)
-         (reset! id component-id)
-         (ui-utils/init-widget @id (config @id data))
-         (ui-utils/dispatch-local @id [:container] container-id))
-
-       ;(log/info "component" @id)
-
-       [c/configurable-chart
-        :data data
-        :id @id
-        :config (config component-id data)
-        :component-id component-id
-        :container-id container-id
-        :data-panel utils/meta-tabular-data-panel
-        :config-panel config-panel
-        :component component-panel]))))
 
 
 (comment

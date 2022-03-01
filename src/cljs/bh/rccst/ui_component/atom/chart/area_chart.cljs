@@ -1,19 +1,23 @@
 (ns bh.rccst.ui-component.atom.chart.area-chart
   (:require [bh.rccst.ui-component.atom.chart.utils :as utils]
+            [bh.rccst.ui-component.utils.color :as color]
+            [bh.rccst.ui-component.atom.chart.utils.example-data :as data]
             [bh.rccst.ui-component.atom.chart.wrapper :as c]
             [bh.rccst.ui-component.utils :as ui-utils]
-            ["recharts" :refer [AreaChart Area Brush]]
-
+            ["recharts" :refer [ResponsiveContainer AreaChart Area Brush]]
             [re-com.core :as rc]
             [reagent.core :as r]
             [taoensso.timbre :as log]))
 
 
+(log/info "bh.rccst.ui-component.atom.chart.area-chart")
+
+
 (def sample-data
   "the Area Chart works best with \"tabular data\" so we return the tabular-data from utils,
   and we mix-in a fourth column just to show how it can be done"
-  (let [source utils/meta-tabular-data
-        data (get source :data)
+  (let [source data/meta-tabular-data
+        data   (get source :data)
         fields (get-in source [:metadata :fields])]
     (-> source
       (assoc
@@ -46,8 +50,8 @@
       keys
       (map-indexed (fn [idx a]
                      {a {:include true
-                         :fill    (ui-utils/get-color idx)
-                         :stroke    (ui-utils/get-color idx)
+                         :fill    (color/get-color idx)
+                         :stroke  (color/get-color idx)
                          :stackId ""}}))
       (into {}))))
 
@@ -170,20 +174,23 @@
   - data : (atom) any data used by the component's ui
   - widget-id : (string) unique identifier for this specific widget
   "
-  [data chart-id]
-  (let [container (ui-utils/subscribe-local chart-id [:container])
-        isAnimationActive? (ui-utils/subscribe-local chart-id [:isAnimationActive])
-        subscriptions (ui-utils/build-subs chart-id (local-config data))]
+  [data component-id container-id ui]
+  (let [container          (ui-utils/subscribe-local component-id [:container])
+        isAnimationActive? (ui-utils/subscribe-local component-id [:isAnimationActive])
+        subscriptions      (ui-utils/build-subs component-id (local-config data))]
 
-    (fn []
-      ;[c/chart
-      [:> AreaChart {:width 400 :height 400 :data (get @data :data)}
+    (fn [data component-id container-id ui]
 
-       (utils/standard-chart-components chart-id)
+      (log/info "area-chart" component-id "///" ui)
 
-       (when (ui-utils/resolve-sub subscriptions [:brush]) [:> Brush])
+      [:> ResponsiveContainer
+       [:> AreaChart {:data (get @data :data)}
 
-       (make-area-display chart-id data subscriptions isAnimationActive?)])))
+        (utils/standard-chart-components component-id ui)
+
+        (when (ui-utils/resolve-sub subscriptions [:brush]) [:> Brush])
+
+        (make-area-display component-id data subscriptions isAnimationActive?)]])))
 
 
 (defn configurable-component
@@ -198,18 +205,19 @@
   - component-id : (string) unique id of this chart within its container
   - container-id : (string, optional) name of the container this chart is inside of
   "
-  ([data component-id]
-   [configurable-component data component-id ""])
+  [& {:keys [data component-id container-id ui]}]
 
-  ([data component-id container-id]
-   [c/base-chart
-    :data data
-    :config (config component-id data)
-    :component-id component-id
-    :container-id container-id
-    :data-panel utils/meta-tabular-data-panel
-    :config-panel config-panel
-    :component-panel component-panel]))
+  ;(log/info "area-chart configurable-component" @data component-id container-id ui)
+
+  [c/base-chart
+   :data data
+   :config (config component-id data)
+   :component-id component-id
+   :container-id (or container-id "")
+   :data-panel utils/meta-tabular-data-panel
+   :config-panel config-panel
+   :component-panel component-panel
+   :ui ui])
 
 
 (defn component
@@ -224,17 +232,34 @@
   - component-id : (string) unique id of this chart within its container
   - container-id : (string, optional) name of the container this chart is inside of
   "
-  ([data component-id]
-   [component data component-id ""])
+  [& {:keys [data component-id container-id ui]}]
+
+  (log/info "area-chart component" @data component-id container-id ui)
+
+  [c/base-chart
+   :data data
+   :config (config component-id data)
+   :component-id component-id
+   :container-id container-id
+   :component-panel component-panel
+   :ui ui])
 
 
-  ([data component-id container-id]
-   [c/base-chart
-    :data data
-    :config (config component-id data)
-    :component-id component-id
-    :container-id container-id
-    :component-panel component-panel]))
+(def meta-data {:component              component
+                :configurable-component configurable-component
+                :sources                {:data :source-type/meta-tabular}
+                :pubs                   [{:selection :string}]
+                :subs                   [{:highlight :string}]})
+
+
+(comment
+  (def ui {:x-axis false :y-axis false
+           :legend false :tooltip false})
+  (def component-id "diagram/GOES-East.chart")
+
+  (utils/standard-chart-components component-id ui)
+
+  ())
 
 
 (comment
@@ -262,3 +287,4 @@
     (into [:<>]))
 
   ())
+
