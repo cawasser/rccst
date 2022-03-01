@@ -1,5 +1,6 @@
 (ns bh.rccst.ui-component.atom.chart.area-chart
   (:require [bh.rccst.ui-component.atom.chart.utils :as utils]
+            [bh.rccst.ui-component.utils.color :as color]
             [bh.rccst.ui-component.atom.chart.utils.example-data :as data]
             [bh.rccst.ui-component.atom.chart.wrapper :as c]
             [bh.rccst.ui-component.utils :as ui-utils]
@@ -7,6 +8,9 @@
             [re-com.core :as rc]
             [reagent.core :as r]
             [taoensso.timbre :as log]))
+
+
+(log/info "bh.rccst.ui-component.atom.chart.area-chart")
 
 
 (def sample-data
@@ -46,8 +50,8 @@
       keys
       (map-indexed (fn [idx a]
                      {a {:include true
-                         :fill    (ui-utils/get-color idx)
-                         :stroke  (ui-utils/get-color idx)
+                         :fill    (color/get-color idx)
+                         :stroke  (color/get-color idx)
                          :stackId ""}}))
       (into {}))))
 

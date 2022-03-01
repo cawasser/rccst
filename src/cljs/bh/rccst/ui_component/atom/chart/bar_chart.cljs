@@ -1,13 +1,15 @@
 (ns bh.rccst.ui-component.atom.chart.bar-chart
   (:require [bh.rccst.ui-component.atom.chart.utils :as utils]
-            ["recharts" :refer [ResponsiveContainer BarChart Bar Brush]]
+            [bh.rccst.ui-component.utils.color :as color]
             [bh.rccst.ui-component.atom.chart.utils.example-data :as data]
             [bh.rccst.ui-component.atom.chart.wrapper :as c]
             [bh.rccst.ui-component.utils :as ui-utils]
-
             [re-com.core :as rc]
-            [reagent.core :as r]))
+            [reagent.core :as r]
+            [taoensso.timbre :as log]
+            ["recharts" :refer [ResponsiveContainer BarChart Bar Brush]]))
 
+(log/info "bh.rccst.ui-component.atom.chart.bar-chart")
 
 (def sample-data
   "the Bar Chart works best with \"tabular data\" so we return the tabular-data from utils,
@@ -46,7 +48,7 @@
       keys
       (map-indexed (fn [idx a]
                      {a {:include true
-                         :fill    (ui-utils/get-color idx)
+                         :fill    (color/get-color idx)
                          :stackId ""}}))
       (into {}))))
 

@@ -1,12 +1,17 @@
 (ns bh.rccst.ui-component.atom.chart.pie-chart
   (:require [bh.rccst.ui-component.atom.chart.utils :as utils]
+            [bh.rccst.ui-component.utils.color :as color]
             [bh.rccst.ui-component.atom.chart.utils.example-data :as data]
             [bh.rccst.ui-component.atom.chart.wrapper :as c]
             [bh.rccst.ui-component.utils :as ui-utils]
-
-            ["recharts" :refer [ResponsiveContainer PieChart Pie]]
             [re-com.core :as rc]
-            [reagent.core :as r]))
+            [reagent.core :as r]
+            [taoensso.timbre :as log]
+
+            ["recharts" :refer [ResponsiveContainer PieChart Pie]]))
+
+
+(log/info "bh.rccst.ui-component.atom.chart.pie-chart")
 
 
 (def sample-data
@@ -21,7 +26,7 @@
         fields (get-in @data [:metadata :fields])]
 
     (merge
-      {:fill (ui-utils/get-color 0)}
+      {:fill (color/get-color 0)}
 
       ; process options for :name
       (->> fields

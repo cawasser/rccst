@@ -4,11 +4,14 @@
             [bh.rccst.ui-component.atom.chart.utils :as utils]
             [bh.rccst.ui-component.molecule.composite :as c]
             [bh.rccst.ui-component.utils :as ui-utils]
+            [bh.rccst.ui-component.utils.color :as color]
             [re-com.core :as rc]
             [reagent.core :as r]
             [taoensso.timbre :as log]
-
             [woolybear.ad.containers :as containers]))
+
+
+(log/info "bh.rccst.ui-component.molecule.composite.multi-chart")
 
 
 (def sample-data line-chart/sample-data)
@@ -34,18 +37,18 @@
                 :config-panel {:type config-panel}}
 
    ; remote data sources (mapped to a local name) along with internal pub/sub "topics"
-   :topics    {:tabular-data [:remote :source-type/meta-tabular :source/sequence-of-measurements]
-               :server-time  [:remote :time :source/server-time]
-               :dag-data     [:remote :source-type/meta-dag :source/dag-data]
-               :selected     [:local :string]
-               :active-aoi   [:local :string]
-               :current-time [:local :time]}
+   :topics     {:tabular-data [:remote :source-type/meta-tabular :source/sequence-of-measurements]
+                :server-time  [:remote :time :source/server-time]
+                :dag-data     [:remote :source-type/meta-dag :source/dag-data]
+                :selected     [:local :string]
+                :active-aoi   [:local :string]
+                :current-time [:local :time]}
 
    ; links - how the different components get their data and if they publish or
    ; subscribe to the composite
-   :links      {:line-chart   {:subs {:data :tabular-data
+   :links      {:line-chart   {:subs {:data      :tabular-data
                                       :selection :selected
-                                      :time :current-time}}
+                                      :time      :current-time}}
                 :bar-chart    {:subs {:data :tabular-data
                                       :time :current-time}}
                 :config-panel {:subs {:data :tabular-data}}
@@ -80,7 +83,7 @@
 
 (defn- config-panel [data component-id]
   [containers/v-scroll-pane
-   {:width "200px"
+   {:width  "200px"
     :height "400px"}
    [rc/v-box :src (rc/at)
     ;:width "200px"
@@ -110,8 +113,8 @@
                    keys
                    (map-indexed (fn [idx a]
                                   {a {:include true
-                                      :stroke  (ui-utils/get-color idx)
-                                      :fill    (ui-utils/get-color idx)
+                                      :stroke  (color/get-color idx)
+                                      :fill    (color/get-color idx)
                                       :stackId ""}}))
                    (into {})))})
 

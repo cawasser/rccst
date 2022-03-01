@@ -2,16 +2,18 @@
   (:require [bh.rccst.events :as events]
             [bh.rccst.ui-component.table :as table]
             [bh.rccst.ui-component.utils :as u]
+            [bh.rccst.ui-component.utils.color :as color]
             [re-com.core :as rc]
-
-            ["recharts" :refer [XAxis YAxis CartesianGrid Tooltip Legend]]
-            ["react-colorful" :refer [HexColorPicker]]
-
             [re-frame.core :as re-frame]
             [reagent.core :as r]
             [taoensso.timbre :as log]
+            [woolybear.packs.tab-panel :as tab-panel]
 
-            [woolybear.packs.tab-panel :as tab-panel]))
+            ["recharts" :refer [XAxis YAxis CartesianGrid Tooltip Legend]]
+            ["react-colorful" :refer [HexColorPicker]]))
+
+
+(log/info "bh.rccst.ui-component.atom.chart.utils")
 
 
 (defn init-config-panel
@@ -413,8 +415,8 @@
        :anchor [rc/button :src (rc/at)
                 :label label
                 :style {:background-color @background-color
-                        :color            (u/best-text-color
-                                            (u/hex->rgba @background-color))}
+                        :color            (color/best-text-color
+                                            (color/hex->rgba @background-color))}
                 :on-click #(swap! showing? not)]
        :popover [rc/popover-content-wrapper :src (rc/at)
                  :close-button? true

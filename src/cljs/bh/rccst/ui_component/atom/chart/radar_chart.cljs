@@ -1,12 +1,17 @@
 (ns bh.rccst.ui-component.atom.chart.radar-chart
   (:require [bh.rccst.ui-component.atom.chart.utils :as utils]
-            ["recharts" :refer [ResponsiveContainer RadarChart PolarGrid
-                                PolarAngleAxis PolarRadiusAxis Radar]]
+            [bh.rccst.ui-component.utils.color :as color]
             [bh.rccst.ui-component.atom.chart.wrapper :as c]
             [bh.rccst.ui-component.utils :as ui-utils]
             [re-com.core :as rc]
             [reagent.core :as r]
-            [taoensso.timbre :as log]))
+            [taoensso.timbre :as log]
+
+            ["recharts" :refer [ResponsiveContainer RadarChart PolarGrid
+                                PolarAngleAxis PolarRadiusAxis Radar]]))
+
+
+(log/info "bh.rccst.ui-component.atom.chart.radar-chart")
 
 
 (def sample-data (r/atom {:metadata {:type   :tabular
@@ -74,8 +79,8 @@
       (map-indexed (fn [idx a]
                      {a {:include     true
                          :name        a
-                         :fill        (ui-utils/get-color idx)
-                         :stroke      (ui-utils/get-color idx)
+                         :fill        (color/get-color idx)
+                         :stroke      (color/get-color idx)
                          :fillOpacity 0.6}}))
       (into {}))))
 

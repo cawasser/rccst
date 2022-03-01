@@ -1,11 +1,16 @@
 (ns bh.rccst.ui-component.atom.chart.line-chart
   (:require [bh.rccst.ui-component.atom.chart.utils :as utils]
+            [bh.rccst.ui-component.utils.color :as color]
             [bh.rccst.ui-component.atom.chart.utils.example-data :as data]
             [bh.rccst.ui-component.atom.chart.wrapper :as c]
             [bh.rccst.ui-component.utils :as ui-utils]
             ["recharts" :refer [ResponsiveContainer LineChart Line Brush]]
             [re-com.core :as rc]
-            [reagent.core :as r]))
+            [reagent.core :as r]
+            [taoensso.timbre :as log]))
+
+
+(log/info "bh.rccst.ui-component.atom.chart.line-chart")
 
 
 (def sample-data
@@ -35,8 +40,8 @@
       (map-indexed (fn [idx a]
                      ;(log/info "line color" idx a (ui-utils/get-color idx))
                      {a {:include true
-                         :stroke  (ui-utils/get-color idx)
-                         :fill    (ui-utils/get-color idx)}}))
+                         :stroke  (color/get-color idx)
+                         :fill    (color/get-color idx)}}))
       (into {}))))
 
 

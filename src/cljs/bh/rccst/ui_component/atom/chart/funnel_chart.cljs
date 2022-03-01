@@ -1,12 +1,18 @@
 (ns bh.rccst.ui-component.atom.chart.funnel-chart
-  (:require ["recharts" :refer [ResponsiveContainer FunnelChart Funnel Cell LabelList
-                                XAxis YAxis CartesianGrid Tooltip Brush]]
-            [bh.rccst.ui-component.atom.chart.utils :as utils]
+  (:require [bh.rccst.ui-component.atom.chart.utils :as utils]
+            [bh.rccst.ui-component.utils.color :as color]
             [bh.rccst.ui-component.atom.chart.utils.example-data :as data]
             [bh.rccst.ui-component.atom.chart.wrapper :as c]
             [bh.rccst.ui-component.utils :as ui-utils]
             [re-com.core :as rc]
-            [reagent.core :as r]))
+            [reagent.core :as r]
+            [taoensso.timbre :as log]
+
+            ["recharts" :refer [ResponsiveContainer FunnelChart Funnel Cell LabelList
+                                XAxis YAxis CartesianGrid Tooltip Brush]]))
+
+
+(log/info "bh.rccst.ui-component.atom.chart.funnel-chart")
 
 
 (def sample-data
@@ -29,7 +35,7 @@
       ; process :name to map up the :colors
       (->> d
         (map :name)
-        (#(zipmap % ui-utils/default-stroke-fill-colors))
+        (#(zipmap % color/default-stroke-fill-colors))
         (assoc {} :colors))
 
       ; process options for :value
@@ -152,7 +158,7 @@
                ^{:key (str idx name)}
                [:> Cell {:key  (str "cell-" idx)
                          :fill (or (ui-utils/resolve-sub subscriptions [:colors name])
-                                 (ui-utils/get-color 0))}])
+                                 (color/get-color 0))}])
              (get @data :data)))
          [:> LabelList {:position :right :fill "#000000" :stroke "none" :dataKey (ui-utils/resolve-sub subscriptions [:value :chosen])}]]]])))
 

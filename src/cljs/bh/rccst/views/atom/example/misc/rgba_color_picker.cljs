@@ -1,13 +1,16 @@
 (ns bh.rccst.views.atom.example.misc.rgba-color-picker
-  (:require [bh.rccst.ui-component.utils :as ui-utils]
+  (:require [bh.rccst.ui-component.utils.color :as color]
             [bh.rccst.views.atom.example.utils :as utils]
             [re-com.core :as rc]
             [reagent.core :as r]
             [taoensso.timbre :as log]
-
-            ["react-colorful" :refer [RgbaColorPicker]]
             [woolybear.ad.catalog.utils :as acu]
-            [woolybear.ad.layout :as layout]))
+            [woolybear.ad.layout :as layout]
+
+            ["react-colorful" :refer [RgbaColorPicker]]))
+
+
+(log/info "bh.rccst.views.atom.example.misc.rgba-color-picker")
 
 
 (def config (r/atom {:r 200 :g 150 :b 35 :a 0.5}))
@@ -28,15 +31,15 @@
                :gap "5px"
                :children [[rc/button :src (rc/at)
                            :label "Button"
-                           :style {:background-color (ui-utils/rgba->hex @config)
-                                   :color            (ui-utils/best-text-color @config)}]
+                           :style {:background-color (color/rgba->hex @config)
+                                   :color            (color/best-text-color @config)}]
                           [:div
                            {:style {:width            "100px"
                                     :text-align       :center
                                     :margin           :auto
                                     :padding          "5px"
-                                    :background-color (ui-utils/hash->rgba @config)
-                                    :color            (ui-utils/best-text-color-alpha @config)}}
+                                    :background-color (color/hash->rgba @config)
+                                    :color            (color/best-text-color-alpha @config)}}
                            "div w/alpha"]]]]])
 
 
