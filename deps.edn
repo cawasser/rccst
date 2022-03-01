@@ -39,6 +39,7 @@
              re-com/re-com                                 {:mvn/version "2.13.2"}
              org.clojars.ertucetin/re-frame-flow           {:mvn/version "0.1.4"}
              com.lucasbradstreet/cljs-uuid-utils           {:mvn/version "1.0.2"}
+             aysylu/loom                                   {:mvn/version "1.0.2"}
 
              metasoarous/oz                                {:mvn/version "2.0.0-alpha2"}}
 

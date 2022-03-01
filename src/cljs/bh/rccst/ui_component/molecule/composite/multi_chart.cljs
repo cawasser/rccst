@@ -23,9 +23,9 @@
 (def composite-def
   "this data structure defines the composite in terms of the:
 
-  - :components - the subcomponents, like tables, charts, and such used for the actual UI
-  - :topics     - remote data sources (mapped to a local name) along with internal pub/sub \"topics\"
-  - :links      - linkages between the components and the data sources
+  - :components - the subcomponents, like tables, charts, and such used for the actual UI as well as
+  remote data sources (mapped to a local name) and internal pub/sub \"topics\"
+  - :links      - linkages between the components
   - :layout     - a \"DSL\" which defined how the components are to be organized on the display,
                   treated as a grid of rows and columns
 
@@ -34,15 +34,13 @@
   {; the ui components (looked up in a registry), mapped to local names
    :components {:line-chart   {:type :chart/line-chart :configurable false}
                 :bar-chart    {:type :chart/bar-chart :configurable false}
-                :config-panel {:type config-panel}}
-
-   ; remote data sources (mapped to a local name) along with internal pub/sub "topics"
-   :topics     {:tabular-data [:remote :source-type/meta-tabular :source/sequence-of-measurements]
-                :server-time  [:remote :time :source/server-time]
-                :dag-data     [:remote :source-type/meta-dag :source/dag-data]
-                :selected     [:local :string]
-                :active-aoi   [:local :string]
-                :current-time [:local :time]}
+                :config-panel {:type config-panel}
+                :tabular-data {:type :source/remote :name :source/sequence-of-measurements}
+                :server-time  {:type :source/remote :name :source/server-time}
+                :dag-data     {:type :source/remote :name :source/dag-data}
+                :selected     {:type :source/local :name :selected}
+                :active-aoi   {:type :source/local :name :active-aoi}
+                :current-time {:type :source/local :name :current-time}}
 
    ; links - how the different components get their data and if they publish or
    ; subscribe to the composite
