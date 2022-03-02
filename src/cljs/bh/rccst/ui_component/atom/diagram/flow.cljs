@@ -2,12 +2,10 @@
   (:require [bh.rccst.ui-component.atom.card.flippable-card :as card]
             [bh.rccst.ui-component.atom.chart.area-chart :as area-chart]
             [bh.rccst.ui-component.atom.chart.bar-chart :as bar-chart]
-            [bh.rccst.ui-component.atom.chart.line-chart :as line-chart]
-            [bh.rccst.ui-component.atom.oz.bar-chart :as oz-bar-chart]
             [bh.rccst.ui-component.atom.chart.colored-pie-chart :as pie-chart]
+            [bh.rccst.ui-component.atom.chart.line-chart :as line-chart]
             [bh.rccst.ui-component.utils :as ui-utils]
             [reagent.core :as r]
-            [taoensso.timbre :as log]
             ["react-flow-renderer" :refer (ReactFlowProvider MiniMap Controls Handle) :default ReactFlow]))
 
 
@@ -20,7 +18,8 @@
             :el-type   :node
             :type      "globe"
             :data      {:label "viirs-5"
-                        :chart  pie-chart/component}
+                        :chart pie-chart/component
+                        :ui    {:legend false :tooltip false :label false}}
             :draggable false
             :position  (diagram-cell 0 1)}
 
@@ -28,7 +27,8 @@
             :el-type   :node
             :type      "globe"
             :data      {:label "abi-meso-11"
-                        :chart  pie-chart/component}
+                        :chart pie-chart/component
+                        :ui    {:legend false :tooltip false :label false}}
             :draggable false
             :position  (diagram-cell 0 0)}
 
@@ -37,7 +37,9 @@
             :type      "platform"
             :data      {:label "GOES East"
                         :image "/images/icons/Weather-Satellite-PNG-Clipart.png"
-                        :chart area-chart/component}
+                        :chart area-chart/component
+                        :ui    {:x-axis false :y-axis false
+                                :legend false :tooltip false}}
             :draggable false
             :position  (diagram-cell 1 0)}
 
@@ -46,7 +48,9 @@
             :type      "downlink-terminal"
             :data      {:label "Wallops"
                         :image "/images/icons/downlink-terminal.png"
-                        :chart bar-chart/component}
+                        :chart bar-chart/component
+                        :ui    {:grid false :x-axis false :y-axis false
+                                :legend false :tooltip false}}
             :draggable false
             :position  (diagram-cell 2 0)}
 
@@ -55,7 +59,9 @@
             :type      "processing-center"
             :data      {:label "NSOF Suitland"
                         :image "/images/icons/processing-center.png"
-                        :chart line-chart/component}
+                        :chart line-chart/component
+                        :ui    {:grid false :x-axis false :y-axis false
+                                :legend false :tooltip false}}
             :draggable false
             :position  (diagram-cell 3 0)}
 
@@ -64,7 +70,9 @@
             :type      "platform"
             :data      {:label "NOAA XX"
                         :image "/images/icons/Weather-Satellite-PNG-Clipart.png"
-                        :chart area-chart/component}
+                        :chart area-chart/component
+                        :ui    {:x-axis false :y-axis false
+                                :legend false :tooltip false}}
             :draggable false
             :position  (diagram-cell 1 1)}
 
@@ -73,7 +81,9 @@
             :type      "downlink-terminal"
             :data      {:label "Svalbaard/McMurdo"
                         :image "/images/icons/downlink-terminal.png"
-                        :chart bar-chart/component}
+                        :chart bar-chart/component
+                        :ui    {:grid false :x-axis false :y-axis false
+                                :legend false :tooltip false}}
             :draggable false
             :position  (diagram-cell 2 1)}
 
@@ -144,8 +154,15 @@
                         :align-items     :center})
 ;; endregion
 
+(defn- keywordize
+  "convert all keys and values into keywords"
+  [m]
+  (let [k (keys m)
+        v (vals m)]
+    (zipmap (map keyword k) (map keyword v))))
 
-(defn- globe-node [props & {:keys [data label image chart]}]
+
+(defn- platform-node [props & {:keys [data label image chart ui]}]
   [card/card
    :style card-style
    :front [:div#entity-card {:style (merge node-style-square props)}
@@ -159,73 +176,7 @@
            :data data
            :component-id (ui-utils/path->keyword "diagram" label "chart")
            :container-id (ui-utils/path->keyword "diagram" label)
-           :ui {:legend false :tooltip false :label false}]]])
-
-
-(defn- platform-node [props & {:keys [data label image chart]}]
-  [card/card
-   :style card-style
-   :front [:div#entity-card {:style (merge node-style-square props)}
-           [:img {:style (merge image-style
-                           {:background-color default-background}
-                           props)
-                  :src   image}]
-           [:div.subtitle.is-3 {:style label-style} label]]
-   :back [:div {:style (merge node-style-square props)}
-          [chart
-           :data data
-           :component-id (ui-utils/path->keyword "diagram" label "chart")
-           :container-id (ui-utils/path->keyword "diagram" label)
-           :ui {:x-axis false :y-axis false
-                :legend false :tooltip false}]]])
-
-
-(comment
-  (def data area-chart/sample-data)
-
-  (assoc @data
-    :data
-    (map (fn [r]
-           (dissoc r :pv :tv :d))
-      (:data @data)))
-  ())
-
-
-
-(defn- downlink-node [props & {:keys [data label image chart]}]
-  [card/card
-   :style card-style
-   :front [:div#entity-card {:style (merge node-style-square props)}
-           [:img {:style (merge image-style
-                           {:background-color default-background}
-                           props)
-                  :src   image}]
-           [:div.subtitle.is-3 {:style label-style} label]]
-   :back [:div {:style (merge node-style-square props)}
-          [chart
-           :data data
-           :component-id (ui-utils/path->keyword "diagram" label "chart")
-           :container-id (ui-utils/path->keyword "diagram" label)
-           :ui {:grid   false :x-axis false :y-axis false
-                :legend false :tooltip false}]]])
-
-
-(defn- processing-node [props & {:keys [data label image chart]}]
-  [card/card
-   :style card-style
-   :front [:div#entity-card {:style (merge node-style-square props)}
-           [:img {:style (merge image-style
-                           {:background-color default-background}
-                           props)
-                  :src   image}]
-           [:div.subtitle.is-3 {:style label-style} label]]
-   :back [:div {:style (merge node-style-square props)}
-          [chart
-           :data data
-           :component-id (ui-utils/path->keyword "diagram" label "chart")
-           :container-id (ui-utils/path->keyword "diagram" label)
-           :ui {:grid   false :x-axis false :y-axis false
-                :legend false :tooltip false}]]])
+           :ui (keywordize ui)]]])
 
 
 (defn- node [type sources d]
@@ -233,6 +184,7 @@
         label  (get-in data ["data" "label"])
         image  (get-in data ["data" "image"])
         chart  (get-in data ["data" "chart"])
+        ui     (get-in data ["data" "ui"])
         id     (get data "id")
         source (get sources label)]
 
@@ -244,7 +196,8 @@
         :data source
         :label label
         :image image
-        :chart chart]
+        :chart chart
+        :ui ui]
        [:> Handle {:id    (str id "-out") :type "source" :position "right"
                    :style handle-style}]
        [:> Handle {:id    (str id "-in") :type "target" :position "left"
@@ -256,10 +209,10 @@
    [:> ReactFlowProvider
     [:> ReactFlow {:className        component-id
                    :elements         @data
-                   :nodeTypes        {"globe"             (partial node globe-node data-sources)
+                   :nodeTypes        {"globe"             (partial node platform-node data-sources)
                                       "platform"          (partial node platform-node data-sources)
-                                      "downlink-terminal" (partial node downlink-node data-sources)
-                                      "processing-center" (partial node processing-node data-sources)}
+                                      "downlink-terminal" (partial node platform-node data-sources)
+                                      "processing-center" (partial node platform-node data-sources)}
                    :edgeTypes        {}
                    :zoomOnScroll     false
                    :preventScrolling false
