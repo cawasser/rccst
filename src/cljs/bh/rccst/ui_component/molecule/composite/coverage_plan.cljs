@@ -5,13 +5,13 @@
 
 
 
-(declare subscribe)
-(declare publish)
+(defn subscribe [a b c])
+(defn publish [a b c])
 
-(declare selectable-table)
-(declare globe)
-(declare slider)
-(declare label)
+(def selectable-table)
+(def globe)
+(def slider)
+(def label)
 
 
 ; assume the ui components have the following meta-data:
@@ -44,8 +44,11 @@
 ;    note: make-coverage and make-range are function (in this namespace)
 ;
 
-(declare make-coverage)
-(declare make-range)
+(defn make-coverage [& _])
+(defn make-range [& _])
+
+(def h-box [])
+(def v-box [])
 
 (def composite-def
   {:title      "Coverage Plan"
@@ -81,24 +84,24 @@
                                             :ports {:data  :port/sink
                                                     :range :port/source}}}
 
-   :link       {; ui components
-                :ui/targets      {:data      :topic/target-data
-                                  :selection :topic/selected-targets}
-                :ui/satellites   {:data      :topic/satellite-data
-                                  :selection :topic/selected-satellites}
-                :ui/globe        {:coverages :topic/coverages
-                                  :time      :topic/current-time}
-                :ui/time-slider  {:time  :topic/current-time
-                                  :range :topic/time-range}
-                :ui/current-time {:value :topic/current-time}
+   :links       {; ui components
+                 :ui/targets      {:data      :topic/target-data
+                                   :selection :topic/selected-targets}
+                 :ui/satellites   {:data      :topic/satellite-data
+                                   :selection :topic/selected-satellites}
+                 :ui/globe        {:coverages :topic/coverages
+                                   :time      :topic/current-time}
+                 :ui/time-slider  {:time  :topic/current-time
+                                   :range :topic/time-range}
+                 :ui/current-time {:value :topic/current-time}
 
-                ; transformation functions
-                :fn/coverage     {:targets    :topic/selected-targets
-                                  :satellites :topic/selected-satellites
-                                  :coverages  :topic/coverage-data
-                                  :selected   :topic/selected-coverages}
-                :fn/range        {:data  :topic/coverages
-                                  :range :topic/time-range}}
+                 ; transformation functions
+                 :fn/coverage     {:targets    :topic/selected-targets
+                                   :satellites :topic/selected-satellites
+                                   :coverages  :topic/coverage-data
+                                   :selected   :topic/selected-coverages}
+                 :fn/range        {:data  :topic/coverages
+                                   :range :topic/time-range}}
 
    :layout     [v-box
                 [h-box
@@ -172,7 +175,16 @@
 
 ; how do we use Loom for our composite?
 (comment
+  (def nodes (->> composite-def :components keys (into [])))
+  (def edges (->> composite-def
+               :links
+               (mapcat (fn [[k v]]
+                         (map (fn [[name type]]
+                                [k type])
+                           v)))
+               (into [])))
 
+  (def g (apply lg/graph nodes edges))
 
 
   ())

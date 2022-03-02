@@ -42,7 +42,7 @@ A current thrust for RCCST is the development of a catalog of reusable UI compon
 mechanism for composing them into complex user interfaces to solve real-world problems for users.
 
 
-![](figures/catalog-screenshot.png)
+![](/docs/figures/catalog-screenshot.png)
 Figure 1: A sample of our UI Catalog
 
 ## Current Activities 
