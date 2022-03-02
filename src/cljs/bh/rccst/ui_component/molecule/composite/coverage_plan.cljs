@@ -1,7 +1,15 @@
 (ns bh.rccst.ui-component.molecule.composite.coverage-plan
   "provide a composed UI for a \"Coverage Plan\" which shows targets and satellite coverage areas
   on a 3D globe"
-  (:require [loom.graph :as lg]))
+  (:require [loom.graph :as lg]
+            [reagent.core :as r]
+            [bh.rccst.ui-component.utils :as ui-utils]
+            [bh.rccst.ui-component.utils.color :as color]
+            [re-com.core :as rc]
+            [reagent.core :as r]
+            [taoensso.timbre :as log]
+            [woolybear.ad.containers :as containers]
+            ["react-flow-renderer" :refer (ReactFlowProvider Controls Handle) :default ReactFlow]))
 
 
 ; declare some dummy functions so everything compiles
@@ -24,13 +32,93 @@
   [[:fn/subscribe-remote name]
    [:fn/publish-remote name]])
 
-
 (defn h-box [& body]
   (into [] body))
 (defn v-box [& body]
   (into [] body))
 
+
+; we can define the "Coverage Plan" as:
+;
+;    note: fn-coverage and fn-range are functions (in this namespace)
+;
+
+(defn fn-coverage [& {:keys []}]
+  [])
+(defn fn-range [& {:keys []}]
+  [])
+
+
 ;; endregion
+
+
+(def sample-data (r/atom {:title        "Coverage Plan"
+                          :component-id :coverage-plan
+                          :components   {; ui components
+                                         :ui/targets                {:type :ui/component :name :table/selectable-table}
+                                         :ui/satellites             {:type :ui/component :name :table/selectable-table}
+                                         :ui/globe                  {:type :ui/component :name :globe/three-d-globe}
+                                         :ui/time-slider            {:type :ui/component :name :slider/slider}
+                                         :ui/current-time           {:type :ui/component :name :label/label}
+
+                                         ; remote data sources
+                                         :topic/target-data         {:type :source/remote :name :source/targets}
+                                         :topic/satellite-data      {:type :source/remote :name :source/satellites}
+                                         :topic/coverage-data       {:type :source/remote :name :source/coverages}
+
+                                         ; composite-local data sources
+                                         :topic/selected-targets    {:type :source/local :name :selected-targets}
+                                         :topic/selected-satellites {:type :source/local :name :selected-satellites}
+                                         :topic/current-time        {:type :source/local :name :current-time}
+                                         :topic/selected-coverages  {:type :source/local :name :selected-coverages}
+                                         :topic/time-range          {:type :source/local :name :time-range}
+
+                                         ; transformation functions
+                                         :fn/coverage               {:type  :source/fn
+                                                                     :name  fn-coverage
+                                                                     :ports {:targets    :port/sink
+                                                                             :satellites :port/sink
+                                                                             :coverages  :port/sink
+                                                                             :selected   :port/source}}
+                                         :fn/range                  {:type  :source/fn
+                                                                     :name  fn-range
+                                                                     :ports {:data  :port/sink
+                                                                             :range :port/source}}}
+
+                          :links        {; ui components publish to what?
+                                         :ui/targets                {:topic/target-data      :data
+                                                                     :topic/selected-targets :selection}
+                                         :ui/satellites             {:topic/satellite-data      :data
+                                                                     :topic/selected-satellites :selection}
+                                         :ui/time-slider            {:topic/current-time :value}
+
+                                         ; transformation functions publish to what?
+                                         :fn/coverage               {:topic/selected-coverages :selected}
+                                         :fn/range                  {:topic/time-range :range}
+
+                                         ; topics are inputs into what?
+                                         :topic/target-data         {:ui/targets :data}
+                                         :topic/satellite-data      {:ui/satellites :data}
+                                         :topic/selected-targets    {:fn/coverage :targets}
+                                         :topic/selected-satellites {:fn/coverage :satellites}
+                                         :topic/coverage-data       {:fn/coverage :coverages
+                                                                     :fn/range    :data}
+                                         :topic/selected-coverages  {:ui/globe :coverages}
+                                         :topic/current-time        {:ui/current-time :value
+                                                                     :ui/time-slider  :value
+                                                                     :ui/globe        :current-time}
+                                         :topic/time-range          {:ui/time-slider :range}}
+
+                          :layout       [v-box
+                                         [h-box
+                                          [v-box [:ui/targets] [:ui/satellites] [:ui/time-slider]]
+                                          [v-box [:ui/globe] [:ui/current-time]]]]}))
+
+(def source-code '[coverage-plan])
+
+
+(defn- config [_ _]
+  {})
 
 
 ; assume the ui components have the following meta-data:
@@ -59,116 +147,43 @@
                 :ui/label            {:component :component/label
                                       :ports     {:value :port/sink}}})
 
-
-
-; we can define the "Coverage Plan" as:
-;
-;    note: fn-coverage and fn-range are functions (in this namespace)
-;
-
-(defn fn-coverage [& {:keys []}]
-  [])
-(defn fn-range [& {:keys []}]
-  [])
-
-
-
-(def composite-def
-  {:title        "Coverage Plan"
-   :component-id :coverage-plan
-   :components   {; ui components
-                  :ui/targets                {:type :ui/component :name :table/selectable-table}
-                  :ui/satellites             {:type :ui/component :name :table/selectable-table}
-                  :ui/globe                  {:type :ui/component :name :globe/three-d-globe}
-                  :ui/time-slider            {:type :ui/component :name :slider/slider}
-                  :ui/current-time           {:type :ui/component :name :label/label}
-
-                  ; remote data sources
-                  :topic/target-data         {:type :source/remote :name :source/targets}
-                  :topic/satellite-data      {:type :source/remote :name :source/satellites}
-                  :topic/coverage-data       {:type :source/remote :name :source/coverages}
-
-                  ; composite-local data sources
-                  :topic/selected-targets    {:type :source/local :name :selected-targets}
-                  :topic/selected-satellites {:type :source/local :name :selected-satellites}
-                  :topic/current-time        {:type :source/local :name :current-time}
-                  :topic/selected-coverages  {:type :source/local :name :selected-coverages}
-                  :topic/time-range          {:type :source/local :name :time-range}
-
-                  ; transformation functions
-                  :fn/coverage               {:type  :source/fn
-                                              :name  fn-coverage
-                                              :ports {:targets    :port/sink
-                                                      :satellites :port/sink
-                                                      :coverages  :port/sink
-                                                      :selected   :port/source}}
-                  :fn/range                  {:type  :source/fn
-                                              :name  fn-range
-                                              :ports {:data  :port/sink
-                                                      :range :port/source}}}
-
-   :links        {; ui components
-                  :ui/targets      {:data      :topic/target-data
-                                    :selection :topic/selected-targets}
-                  :ui/satellites   {:data      :topic/satellite-data
-                                    :selection :topic/selected-satellites}
-                  :ui/globe        {:coverages :topic/selected-coverages
-                                    :time      :topic/current-time}
-                  :ui/time-slider  {:time  :topic/current-time
-                                    :range :topic/time-range}
-                  :ui/current-time {:value :topic/current-time}
-
-                  ; transformation functions
-                  :fn/coverage     {:targets    :topic/selected-targets
-                                    :satellites :topic/selected-satellites
-                                    :coverages  :topic/coverage-data
-                                    :selected   :topic/selected-coverages}
-                  :fn/range        {:data  :topic/coverages
-                                    :range :topic/time-range}}
-
-   :layout       [v-box
-                  [h-box
-                   [v-box [:ui/targets] [:ui/satellites] [:ui/time-slider]]
-                   [v-box [:ui/globe] [:ui/current-time]]]]})
-
-
 ; we want to turn the composite-def into things like...
 ;
 (comment
-  {:fn/coverage   (fn-coverage
-                    :targets (subscribe-local :source/local :topic/selected-targets)
-                    :satellites (subscribe-local :source/local :topic/selected-satellites)
-                    :coverages (subscribe-remote :source/remote :topic/coverages)
-                    :selected (publish-local :source/local :topic/selected-coverages))
+  {:fn/coverage     (fn-coverage
+                      :targets (subscribe-local :source/local :topic/selected-targets)
+                      :satellites (subscribe-local :source/local :topic/selected-satellites)
+                      :coverages (subscribe-remote :source/remote :topic/coverages)
+                      :selected (publish-local :source/local :topic/selected-coverages))
 
 
-   :fn/range      (fn-range
-                    :data (subscribe-remote :source/remote :topic/coverages)
-                    :selected (publish-local :source/local :topic/time-range))
+   :fn/range        (fn-range
+                      :data (subscribe-remote :source/remote :topic/coverages)
+                      :selected (publish-local :source/local :topic/time-range))
 
-   :ui/targets    [:component/selectable-table
-                   :component-id :coverage-plan/targets
-                   :container-id :coverage-plan
-                   :data (pub-sub-remote :source/remote :topic/target-data)
-                   :selected (publish-local :source/local :topic/selected-targets)]
+   :ui/targets      [:component/selectable-table
+                     :component-id :coverage-plan/targets
+                     :container-id :coverage-plan
+                     :data (pub-sub-remote :source/remote :topic/target-data)
+                     :selected (publish-local :source/local :topic/selected-targets)]
 
-   :ui/satellites [:component/selectable-table
-                   :component-id :coverage-plan/satellites
-                   :container-id :coverage-plan
-                   :data (pub-sub-remote :source/remote :topic/satellite-data)
-                   :selected (publish-local :source/local :topic/selected-targets)]
+   :ui/satellites   [:component/selectable-table
+                     :component-id :coverage-plan/satellites
+                     :container-id :coverage-plan
+                     :data (pub-sub-remote :source/remote :topic/satellite-data)
+                     :selected (publish-local :source/local :topic/selected-targets)]
 
-   :ui/globe [:component/globe
-              :component-id :coverage-plan/globe
-              :container-id :coverage-plan
-              :coverages (subscribe-local :source/local :topic/selected-coverages)
-              :current-time (subscribe-local :source/local :topic/current-time)]
+   :ui/globe        [:component/globe
+                     :component-id :coverage-plan/globe
+                     :container-id :coverage-plan
+                     :coverages (subscribe-local :source/local :topic/selected-coverages)
+                     :current-time (subscribe-local :source/local :topic/current-time)]
 
-   :ui/time-slider [:component/slider
-                    :component-id :coverage-plan/slider
-                    :container-id :coverage-plan
-                    :value (pub-sub-local :source/local :topic/current-time)
-                    :range (subscribe-local :source/local :topic/time-range)]
+   :ui/time-slider  [:component/slider
+                     :component-id :coverage-plan/slider
+                     :container-id :coverage-plan
+                     :value (pub-sub-local :source/local :topic/current-time)
+                     :range (subscribe-local :source/local :topic/time-range)]
 
    :ui/current-time [:component/label
                      :component-id :coverage-plan/label
@@ -204,6 +219,90 @@
 ;; endregion
 
 
+(defn- create-flow-node [node-id]
+  (println "node" node-id)
+  {:id       (str node-id)
+   :el-type  :node
+   :data     {:label (str node-id)}
+   :position {:x 250 :y 5}})
+
+
+(defn- create-flow-edge [idx [node-id target-id :as edge]]
+  (println "edge" edge)
+  {:id       (str idx)
+   :el-type  :edge
+   :source   (str node-id)
+   :target   (str target-id)
+   :style    {:stroke-width 5 :stroke :gray}
+   :animated false})
+
+
+(defn- compute-edges [config]
+  (->> config
+    :links
+    (mapcat (fn [[entity links]]
+              (map (fn [[target port]]
+                     [entity target])
+                links)))
+    (into [])))
+
+
+(defn- make-flow [graph]
+  (apply conj
+    (map create-flow-node (lg/nodes graph))
+    (map-indexed (fn [idx node]
+                   (create-flow-edge idx node))
+      (lg/edges graph))))
+
+
+(defn- dag-panel [& {:keys [graph component-id container-id ui]}]
+  (let [config-flow  (make-flow graph)]
+    [:div {:style {:width "1000px" :height "500px"}}
+     [:> ReactFlowProvider
+      [:> ReactFlow {:className        component-id
+                     :elements         config-flow
+                     :nodeTypes        {}
+                     :edgeTypes        {}
+                     :zoomOnScroll     false
+                     :preventScrolling false
+                     :onConnect        #()}
+       [:> Controls]]]]))
+
+
+(defn- component-panel [& {:keys [graph component-id container-id ui]}]
+  [:div "The composed UI will display here"
+   (map (fn [node]
+          ^{:key node} [:p (str node)])
+     (lg/nodes graph))])
+
+
+(defn component [& {:keys [data component-id container-id ui]}]
+  (let [id (r/atom nil)
+        config-graph (apply lg/digraph (compute-edges @data))]
+
+    (fn []
+      (when (nil? @id)
+        (reset! id component-id)
+        (ui-utils/init-widget @id (config @id data))
+        (ui-utils/dispatch-local @id [:container] container-id))
+
+      ;(log/info "coverage-plan" @id (config @id data))
+
+      [rc/h-box :src (rc/at)
+       :gap "1px"
+       :children [[dag-panel
+                   :graph config-graph
+                   :component-id @id
+                   :container-id container-id
+                   :ui ui]
+                  [component-panel
+                   :graph config-graph
+                   :component-id @id
+                   :container-id container-id
+                   :ui ui]]])))
+
+
+
 
 ; basics of Loom (https://github.com/aysylu/loom)
 (comment
@@ -229,115 +328,40 @@
 ;
 (comment
   ; a Loom digraph only needs EDGES (:links)
-  ;; region
   (def edges (->> composite-def
                :links
-               (mapcat (fn [[component links]]
-                         (map (fn [[port target]]
-                                [component target])
+               (mapcat (fn [[entity links]]
+                         (map (fn [[target port]]
+                                [entity target])
                            links)))
                (into [])))
 
 
   ; with THIS set of edges, sources and sinks all look like successors
   (def g (apply lg/digraph edges))
-  ;(lio/view g)
+
+  ())
+
+; playing with the graph
+(comment
+  (def graph (apply lg/digraph (compute-edges composite-def)))
+
+  (apply conj
+    (map #(create-flow-node %) (lg/nodes graph))
+    (map-indexed (fn [idx node]
+                   (create-flow-edge idx node))
+      (lg/edges graph)))
+
+  (def nodes (lg/nodes graph))
+
+  (create-flow-node (first nodes))
+
+  (apply conj '(:a :b) '(:c :d))
 
 
-  ;; endregion
-
-
-  ; the result isn't quite what we want
-  ;
-  ; we need a way to turn the sources into predecessors when needed, not just successors
-  ;; region
-  ;
-  ; two options:
-  ;    1. change the format of :links to include the sources as keys (more like willa)
-  ;
-  ; essentially, this means we are only interested in what a :component "PUBLISHES TO"
-  ;
-  ;                also,  we'll swap the "target" part to be "target, then port-id"
-  ;
-  ; so, something like this:
-  ;
-  (def links-2 {:links {; ui components publish to what?
-                        :ui/targets                {:topic/target-data      :data
-                                                    :topic/selected-targets :selection}
-                        :ui/satellites             {:topic/satellite-data      :data
-                                                    :topic/selected-satellites :selection}
-                        :ui/time-slider            {:topic/current-time :value}
-
-                        ; transformation functions publish to what?
-                        :fn/coverage               {:topic/selected-coverages :selected}
-                        :fn/range                  {:topic/time-range :range}
-
-                        ; topics are inputs into what?
-                        :topic/target-data         {:ui/targets :data}
-                        :topic/satellite-data      {:ui/satellites :data}
-                        :topic/selected-targets    {:fn/coverage :targets}
-                        :topic/selected-satellites {:fn/coverage :satellites}
-                        :topic/coverage-data       {:fn/coverage :coverages
-                                                    :fn/range    :data}
-                        :topic/selected-coverages  {:ui/globe :coverages}
-                        :topic/current-time        {:ui/current-time :value
-                                                    :ui/time-slider  :value
-                                                    :ui/globe        :current-time}
-                        :topic/time-range          {:ui/time-slider :range}}})
-
-  (def g2 (apply lg/digraph (->> links-2
-                              :links
-                              (mapcat (fn [[component links]]
-                                        (map (fn [[target port]]
-                                               [component target])
-                                          links)))
-                              (into []))))
-  ;(lio/view g2)
-
-
-
-
-  ; OR
-  ;    2. additional transformations to get the data into that kind of format
-  ;
-  ; so, THIS:
-  ;
-  (def links3 {:ui/targets {:data      :topic/target-data
-                            :selection :topic/selected-targets}})
-
-  ; turns into THIS:
-  ;
-  (def expanded-links3 {:ui/targets             {:topic/target-data :data}
-                        :topic/target-data      {:ui/targets :data}
-                        :topic/selected-targets {:ui/targets :selection}})
-
-  ; we'll need to look up the port-types in the meta-data
-  ;    (or we can do ANOTHER pre-step and mix that into the components, so we only
-  ;     have one place to look for the port-type)
-  ;
-
-
-  (defn expand-links [links])
-
-
-  ;; endregion
-
-
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  ;
-  ; SUMMARY:
-  ;
-  ; Option 1 is easier if we use a builder tool, since it already has the Digraph (that's what the user
-  ;         actually builds), but harder to do by hand
-  ;
-  ; while
-  ;
-  ; Option 2 is easier to build by hand, but require some complex logic to "reverse engineer"
-  ;         the actual Digraph out of the partial graph we write by hand.
-  ;
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  (def config-graph (apply lg/digraph (compute-edges composite-def)))
+  (def config-flow  (make-flow config-graph))
 
 
   ())
+
