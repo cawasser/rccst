@@ -38,6 +38,13 @@ Read all about the API [here](/docs/api/index.html).
 There are lots of things we wanted to learn more about, and we've [done many of them](/docs/already-done.md)
 
 
+A current thrust for RCCST is the development of a catalog of reusable UI components, and a data-driven
+mechanism for composing them into complex user interfaces to solve real-world problems for users.
+
+
+![](/docs/figures/catalog-screenshot2.png)
+Figure 1: A sample of our UI Catalog
+
 ## Current Activities 
 
 1. [ ] [Re-think the UI](/docs/rethinking-ui.md)

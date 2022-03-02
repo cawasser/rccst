@@ -1,9 +1,9 @@
 (ns bh.rccst.ui-component.atom.chart.area-chart
   (:require [bh.rccst.ui-component.atom.chart.utils :as utils]
-            [bh.rccst.ui-component.utils.color :as color]
             [bh.rccst.ui-component.atom.chart.utils.example-data :as data]
             [bh.rccst.ui-component.atom.chart.wrapper :as c]
             [bh.rccst.ui-component.utils :as ui-utils]
+            [bh.rccst.ui-component.utils.color :as color]
             ["recharts" :refer [ResponsiveContainer AreaChart Area Brush]]
             [re-com.core :as rc]
             [reagent.core :as r]
@@ -247,9 +247,7 @@
 
 (def meta-data {:component              component
                 :configurable-component configurable-component
-                :sources                {:data :source-type/meta-tabular}
-                :pubs                   [{:selection :string}]
-                :subs                   [{:highlight :string}]})
+                :ports                  {:data {:port-type :port/sink :info-type :source-type/meta-tabular}}})
 
 
 (comment
