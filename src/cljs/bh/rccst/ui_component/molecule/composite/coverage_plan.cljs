@@ -1,14 +1,13 @@
 (ns bh.rccst.ui-component.molecule.composite.coverage-plan
   "provide a composed UI for a \"Coverage Plan\" which shows targets and satellite coverage areas
   on a 3D globe"
-  (:require [loom.graph :as lg]
-            [reagent.core :as r]
-            [bh.rccst.ui-component.utils :as ui-utils]
-            [bh.rccst.ui-component.utils.color :as color]
+  (:require [bh.rccst.ui-component.utils :as ui-utils]
+            [loom.graph :as lg]
             [re-com.core :as rc]
             [reagent.core :as r]
-            [taoensso.timbre :as log]
-            [woolybear.ad.containers :as containers]
+            [reagent.core :as r]
+            ["dagre" :as dagre]
+            ["graphlib" :as graphlib]
             ["react-flow-renderer" :refer (ReactFlowProvider Controls Handle) :default ReactFlow]))
 
 
@@ -113,6 +112,7 @@
                                          [h-box
                                           [v-box [:ui/targets] [:ui/satellites] [:ui/time-slider]]
                                           [v-box [:ui/globe] [:ui/current-time]]]]}))
+
 
 (def source-code '[coverage-plan])
 
@@ -219,16 +219,89 @@
 ;; endregion
 
 
+(defn- node-type [node]
+  (:el-type node))
+
+
+(defn- dagre-graph [graph]
+  (let [dagreGraph (new (.-Graph graphlib))
+        nodeWidth  172
+        nodeHeight 36]
+
+
+    (.setDefaultEdgeLabel dagreGraph (clj->js {}))
+    (.setGraph dagreGraph (clj->js {:rankdir "tb"}))
+
+    (doall
+      (map (fn [element]
+             ;(println "layout" element)
+             (condp = (:el-type element)
+               :node (do
+                       ;(println "adding node" element)
+                       (.setNode dagreGraph (:id element) (clj->js {:width nodeWidth :height nodeHeight})))
+               :edge (do
+                       ;(println "adding edge" element)
+                       (.setEdge dagreGraph (:source element) (:target element)))))
+        graph))
+
+    (println "before" dagreGraph (.nodeCount dagreGraph) (.edgeCount dagreGraph))
+
+    (doall
+      (map (fn [n]
+             (println "node" (js->clj n)))
+        (.nodes dagreGraph)))
+    (doall
+      (map (fn [n]
+             (println "edge" (js->clj n)))
+        (.edges dagreGraph)))
+
+    dagreGraph))
+
+
+(defn- layout [graph]
+  (let [dagreGraph (dagre-graph graph)
+        nodeWidth  172
+        nodeHeight 36]
+
+    (.layout dagre dagreGraph)
+
+    (doall
+      (map (fn [element]
+             (println "element" (:id element) (.node dagreGraph (clj->js (:id element))))
+             (condp = (:el-type element)
+               :node (let [dagreNode (.node dagreGraph (clj->js (:id element)))]
+                       (assoc element :position {:x (- (.-x dagreNode) (/ nodeWidth 2))
+                                                 :y (- (.-y dagreNode) (/ nodeWidth 2))}))
+               :edge (assoc element :targetPosition "top"
+                                    :sourcePosition "bottom")))
+        graph))))
+
+
+(comment
+  (def graph (apply lg/digraph (compute-edges @sample-data)))
+  (def dagreGraph (dagre-graph graph))
+
+  (make-flow graph)
+
+  (clj->js {:width 10 :height 10})
+  (clj->js {:width :thing :height 10})
+
+  (.node ("my-id"))
+
+
+  ())
+
+
 (defn- create-flow-node [node-id]
-  (println "node" node-id)
+  ;(println "node" node-id)
   {:id       (str node-id)
    :el-type  :node
    :data     {:label (str node-id)}
-   :position {:x 250 :y 5}})
+   :position {}})
 
 
 (defn- create-flow-edge [idx [node-id target-id :as edge]]
-  (println "edge" edge)
+  ;(println "edge" edge)
   {:id       (str idx)
    :el-type  :edge
    :source   (str node-id)
@@ -248,16 +321,19 @@
 
 
 (defn- make-flow [graph]
-  (apply conj
-    (map create-flow-node (lg/nodes graph))
-    (map-indexed (fn [idx node]
-                   (create-flow-edge idx node))
-      (lg/edges graph))))
+  (let [flow (apply conj
+               (map create-flow-node (lg/nodes graph))
+               (map-indexed (fn [idx node]
+                              (create-flow-edge idx node))
+                 (lg/edges graph)))]
+    (layout flow)))
+
+
 
 
 (defn- dag-panel [& {:keys [graph component-id container-id ui]}]
-  (let [config-flow  (make-flow graph)]
-    [:div {:style {:width "1000px" :height "500px"}}
+  (let [config-flow (make-flow graph)]
+    [:div {:style {:width "60%" :height "100%"}}
      [:> ReactFlowProvider
       [:> ReactFlow {:className        component-id
                      :elements         config-flow
@@ -277,7 +353,7 @@
 
 
 (defn component [& {:keys [data component-id container-id ui]}]
-  (let [id (r/atom nil)
+  (let [id           (r/atom nil)
         config-graph (apply lg/digraph (compute-edges @data))]
 
     (fn []
@@ -289,7 +365,9 @@
       ;(log/info "coverage-plan" @id (config @id data))
 
       [rc/h-box :src (rc/at)
-       :gap "1px"
+       :gap "20px"
+       :width "1000px"
+       :height "800px"
        :children [[dag-panel
                    :graph config-graph
                    :component-id @id
@@ -360,7 +438,7 @@
 
 
   (def config-graph (apply lg/digraph (compute-edges composite-def)))
-  (def config-flow  (make-flow config-graph))
+  (def config-flow (make-flow config-graph))
 
 
   ())
