@@ -37,7 +37,6 @@
                                       :init-fn bh.rccst.core/init}}
                  :devtools     {:preloads [re-frame-flow.preload
                                            day8.re-frame-10x.preload]}
-                 :js-options  {:entry-keys ["module" "browser" "main"]}
                  :dev          {:compiler-options
                                 {:output-feature-set :es-next
                                  :infer-externs true
