@@ -19,7 +19,6 @@
     (reset! editing-cell-content nil)))
 
 
-
 (defn edit-comp []
   [:div#editable {:style {:display     "inline-block"
                           :align-items "center"
@@ -53,7 +52,7 @@
 (defn span-with-border
   [{:keys [rowidx colidx colname name background height width font-size]}]
   (let [is-editing? (r/atom (= [(:row @editing-cell) (:col @editing-cell)][rowidx colidx]))]
-    (if @is-editing? [edit-comp]
+    (if (and @is-editing? (not (= colidx -1))) [edit-comp]
       [:span {:style {:position           "static"
                       :width              (px width)
                       :height             (px height)
