@@ -1,6 +1,12 @@
 (ns bh.rccst.ui-component.atom.card.flippable-card)
 
 
+(def source-code '[:div.flip-card {:style (or style default-style)}
+                   [:div.flip-card-inner
+                    [:div.flip-card-front front]
+                    [:div.flip-card-back back]]])
+
+
 (def default-background "#9CA8B3")
 (def default-color "#FF")
 (def default-style {:width           "100%" :height "100%"
