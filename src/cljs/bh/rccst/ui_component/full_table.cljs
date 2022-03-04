@@ -4,33 +4,106 @@
             [re-com.util    :refer [px]]
             [reagent.core :as r]))
 
+(def dataset (r/atom nil))
+(def editing-cell (r/atom nil))
+(def editing-cell-content (r/atom nil))
 
-(defn table-column-headers [data rows width height]
-  (let [d (apply set (map keys data))
-        col-count (count d)
-        col-width (max 80 (/ (or width 400) col-count))
-        row-height (max 50 (/ (or height 400) (+ 2 (or rows 5))))]
-    (->> d
-      (map (fn [k]
-             {:id    k :header-label (name k) :row-label-fn k
-              :width col-width :height row-height}))
-      (into []))))
+(defn cell-click [rowidx colidx k v]
+  (reset! editing-cell {:row rowidx :col colidx k v})
+  (reset! editing-cell-content (str v)))
 
-;(defn box-with-border
-;      [{:keys [name background height width]}]
-;      [rc/v-box :src (rc/at)
-;       :height height
-;       :width   width
-;       :style  {:color "white" :background-color background :padding "3px" :border "solid white 1px"}
-;       :align  :center
-;       :justify :center
-;       :children [[rc/label :src (rc/at) :label name :style {:font-size 11 :font-weight "bold"}]]])
+(defn check-click []
+  (do
+    (swap! dataset assoc-in [(:row @editing-cell) (key (last @editing-cell))] @editing-cell-content)
+    (reset! editing-cell nil)
+    (reset! editing-cell-content nil)))
 
-(defn row-edit [data row]
-      )
+
+
+(defn edit-comp []
+  [:div#editable {:style {:display     "inline-block"
+                          :align-items "center"
+                          :padding (px 1)
+                          :width (px 195)
+                          :height (px 30)}}
+   [:div#input {:style {:display     "inline-block"
+                        :padding (px 1)}}
+     [rc/input-text :src (rc/at)
+      :model editing-cell-content
+      :width (px 130)
+      :height (px 20)
+      :on-change #(reset! editing-cell-content %)]]
+   [:div#check {:style {:display     "inline-block"
+                        :padding (px 2)}}
+    [rc/md-icon-button :src (rc/at)
+                      :style {:display "inline-block"}
+                       :md-icon-name "zmdi-check"
+                       :size :smaller
+                       :on-click #(check-click)]]
+   [:div#cancel {:style {:display     "inline-block"
+                         :padding (px 2)}}
+     [rc/md-icon-button :src (rc/at)
+                        :style {:display "inline-block"}
+                        :md-icon-name "zmdi-delete"
+                        :size :smaller
+                        :on-click #(do (reset! editing-cell-content nil)
+                                       (reset! editing-cell nil))]]])
+
+
+(defn span-with-border
+  [{:keys [rowidx colidx colname name background height width font-size]}]
+  (let [is-editing? (r/atom (= [(:row @editing-cell) (:col @editing-cell)][rowidx colidx]))]
+    (if @is-editing? [edit-comp]
+      [:span {:style {:position           "static"
+                      :width              (px width)
+                      :height             (px height)
+                      :border-radius      "2px"
+                      :border             "solid white 2px"
+                      :vertical-align     "middle"
+                      :background-color   background
+                      :display            "inline-block"
+                      :text-align         "center"
+                      :white-space        "nowrap"
+                      :overflow           "hidden"
+                      :text-overflow      "ellipsis"
+                      :color              "white"
+                      :font-size          font-size
+                      :cursor             "pointer"}
+              :on-click #(cell-click rowidx colidx colname name)} (str name)])))
+
+(defn build-header [vals]
+    [:div {:class "headers"
+           :style {:display     "inline-block"
+                   :text-align "center"}}
+     (doall
+       (map-indexed
+         (fn [idx v]
+           ^{:key [idx]}[span-with-border {:name (str v)
+                                           :rowidx -1
+                                           :colidx -1
+                                           :font-size 20
+                                           :background "#60d898"
+                                           :height 40 :width 195}]) vals))])
+
+(defn build-row [row_index row]
+      (let [values (vals row)
+            ks    (into [] (keys row))]
+        [:div {:class (str "row" row_index)
+               :style {:display     "inline-block"
+                       :text-align "center"}}
+         (doall
+           (map-indexed
+             (fn [idx v]
+               ^{:key [row_index idx (get ks idx)]}[span-with-border {:rowidx row_index
+                                                                      :colidx idx
+                                                                      :colname (get ks idx)
+                                                                      :name v
+                                                                      :font-size 12
+                                                                      :background "#d860a0" :height 30 :width 195}]) values))]))
+
+
 
 (comment
-
   (def data (r/atom
               [{:id "Page A" :kp 2000 :uv 4000 :pv 2400 :amt 2400}
                {:id "Page B" :kp 2000 :uv 3000 :pv 5598 :amt 2210}
@@ -40,55 +113,27 @@
                {:id "Page F" :kp 2000 :uv 2390 :pv 3800 :amt 2500}
                {:id "Page G" :kp 2000 :uv 3490 :pv 4300 :amt 2100}]))
 
-  (vals (get @data 2))
+  (keys (get @data 2))
   (mapv #(merge {:id (:name %)} %) @data)
   (mapv #(clojure.set/rename-keys % {:name :id}) @data)
 
   (map (fn [k v] [box-with-border {:name (str v)
-                    :background "#d860a0"
-                    :height 30
-                    :width 50}]) (get @data 0))
+                                   :background "#d860a0"
+                                   :height 30
+                                   :width 50}]) (get @data 0))
   (build-row 1 (get @data 0))
-  ())
 
 
-
-;(defn table [& {:keys [data max-rows width height cell-style-fn
-;                       on-click-row-fn row-line-color]}]
-;
-;  [rc/v-table :src (rc/at)
-;   :model (mapv #(merge {:id (:name %)} %) @data)
-;   :row-renderer (fn [_row_index, _row] [box-with-border {:name (:name _row) :background "#d860a0" :height 10 :width 20}])
-;   :row-content-width 100
-;   :row-height 10
-;
-;
-;   :column-header-renderer (table-column-headers @data 5 (or width 100) (or height))])
-
-
-
-
-(defn box-with-border
-      [{:keys [name background height width]}]
-      ^{:key (rand-int 30)}[rc/v-box :src (rc/at)
-                   :height (px  height)
-                   :width   (if width (px width) "1 0 auto")
-                   :style  {:color "white" :background-color background :padding "3px" :border "solid white 1px"}
-                   :align  :center
-                   :justify :center
-                   :children [[rc/label :src (rc/at) :label name :style {:font-size 11 :font-weight "bold"}]]])
-
-(defn build-row [row_index row]
-      (let [values (vals row)]
-        [:div {:class (str "row" row_index)}
-         (into [] (map #(vector box-with-border {:name (str %) :background "#d860a0" :height 30 :width 500}) values))]))
-
-
-(comment
   (def row {:id "Page A", :kp 2000, :uv 4000, :pv 2400, :amt 2400})
   (def values (vals row))
   (-> (into [] (map #(vector box-with-border {:name (str %) :background "#d860a0" :height 30 :width 500}) values))
       (with-meta {:key (rand-int 30)}))
+  ^{:key (rand-int 30)}
+
+  @is-editing?
+  @dataset
+  (assoc-in @dataset [(:row @editing-cell) (key (last @editing-cell))] @editing-cell-content)
+  (swap! dataset update-in [(:row @editing-cell) (key (last @editing-cell))] @editing-cell-content)
 
 
   ())
@@ -96,6 +141,7 @@
 
 (defn table
       [& {:keys [data width height]}]
+    (do (reset! dataset @data))
       (let [light-blue        "#d860a0"
             blue              "#60A0D8"
             gold              "#d89860"
@@ -115,12 +161,12 @@
             dummy-rows                (r/atom (mapv #(hash-map :id %1) (range num-rows)))]
            (fn []
                [rc/v-table :src (rc/at)
-                :model                   data
+                :model                   dataset
 
                 ;; Data Rows (section 5)
                 ;:row-renderer            (fn [_row_index, _row] [box-with-border {:name (str (:id _row)) :background light-blue :height row-height :width width-of-main-row-content}])
                 :row-renderer            (partial build-row )
-                :row-content-width       width-of-main-row-content
+                :row-content-width       980
                 :row-height              row-height
                 :max-row-viewport-height total-row-height       ;; force a vertical scrollbar
 
@@ -129,9 +175,9 @@
                 ;:row-footer-renderer     (fn [_row-index, _row] [box-with-border {:name ":row-footer-renderer"  :background green :height unit-31 :width unit-121}])
 
                 ;; column header/footer (sections 4,6)
-                :column-header-renderer  (fn [] [box-with-border {:name ":column-header-renderer" :background gold :height unit-50 :width width-of-main-row-content}])
-                :column-header-height    unit-50
-                ;:column-footer-renderer  (fn [] [box-with-border {:name ":column-footer-renderer" :background "#d8d460" :height unit-50 :width width-of-main-row-content}])
+                :column-header-renderer  (fn [] [build-header (into (keys (get @data 0)))])
+                :column-header-height    40
+                ;:column-footer-renderer  (fn [] [edit-comp])
                 ;:column-footer-height    unit-50
 
                 ;; 4 corners (sections 1,3,7,9)

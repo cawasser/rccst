@@ -39,10 +39,10 @@
 
 
 (defn example []
-  (acu/demo "FULL Table"
-    "We're using the `simple-v-table` from [Re-com](https://github.com/Day8/re-com)"
+  (acu/demo "Editable Table"
+    "We're using the `v-table` from [Re-com](https://github.com/Day8/re-com)"
 
-    [layout/centered {:extra-classes :width-50}
+    [layout/centered ;{:extra-classes :width-50}
      [table/table
       :data data
       :max-rows 5
