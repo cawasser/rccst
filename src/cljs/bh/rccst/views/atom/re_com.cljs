@@ -1,5 +1,5 @@
 (ns bh.rccst.views.atom.re-com
-  (:require [bh.rccst.views.atom.example.re-com.table :as table]
+  (:require [bh.rccst.views.atom.example.re-com.full-table :as table]
             [bh.rccst.views.atom.example.re-com.checkbox-re-com :as checkbox]
             [bh.rccst.views.atom.example.re-com.progress-bar :as progress-bar]
             [bh.rccst.views.atom.example.re-com.throbber :as throbber]
