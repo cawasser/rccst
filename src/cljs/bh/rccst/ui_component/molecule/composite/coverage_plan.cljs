@@ -7,9 +7,13 @@
             [re-com.core :as rc]
             [re-frame.core :as re-frame]
             [reagent.core :as r]
+            [taoensso.timbre :as log]
             ["dagre" :as dagre]
             ["graphlib" :as graphlib]
             ["react-flow-renderer" :refer (ReactFlowProvider Controls Handle) :default ReactFlow]))
+
+
+(log/info "bh.rccst.ui-component.molecule.composite.coverage-plan")
 
 
 (defn fn-coverage
@@ -226,6 +230,7 @@
 ;; endregion
 
 
+
 (defn- node-type [node]
   (:el-type node))
 
@@ -282,12 +287,25 @@
         graph))))
 
 
-(defn- create-flow-node [node-id]
-  ;(println "node" node-id)
-  {:id       (str node-id)
-   :el-type  :node
-   :data     {:label (str node-id)}
-   :position {}})
+(def node-style {:ui/component {:background :green :color :white}
+                 :source/remote {:background :orange :color :black}
+                 :source/local {:background :blue :color :white}
+                 :source/fn {:background :pink :color :black}})
+
+
+(defn- create-flow-node [configuration node-id]
+  (let [node-type (get-in configuration [:components node-id :type])]
+    (log/info "node" node-id node-type "///" configuration)
+    {:id       (str node-id)
+     :el-type  :node
+     :type     (str node-type)
+     :data     {:label (str node-id)}
+     :position {}
+     :style (merge
+              (or (get node-style node-type) {:background :white :color :black})
+              {:text-align :center
+               :width 180
+               :border "1px solid #222138"})}))
 
 
 (defn- create-flow-edge [idx [node-id target-id :as edge]]
@@ -296,7 +314,8 @@
    :el-type  :edge
    :source   (str node-id)
    :target   (str target-id)
-   :style    {:stroke-width 5 :stroke :gray}
+   :style    {:stroke-width 1 :stroke :black}
+   :arrowHeadType "arrowclosed"
    :animated false})
 
 
@@ -310,17 +329,17 @@
     (into [])))
 
 
-(defn- make-flow [graph]
+(defn- make-flow [configuration graph]
   (let [flow (apply conj
-               (map create-flow-node (lg/nodes graph))
+               (map #(create-flow-node configuration %) (lg/nodes graph))
                (map-indexed (fn [idx node]
                               (create-flow-edge idx node))
                  (lg/edges graph)))]
     (layout flow)))
 
 
-(defn- dag-panel [& {:keys [graph component-id container-id ui]}]
-  (let [config-flow (make-flow graph)]
+(defn- dag-panel [& {:keys [graph configuration component-id container-id ui]}]
+  (let [config-flow (make-flow configuration graph)]
     [:div {:style {:width "60%" :height "100%"}}
      [:> ReactFlowProvider
       [:> ReactFlow {:className        component-id
@@ -361,6 +380,7 @@
        :children [[dag-panel
                    :graph config-graph
                    :component-id @id
+                   :configuration @data
                    :container-id container-id
                    :ui ui]
                   [component-panel
