@@ -246,7 +246,11 @@
       (.edges dagreGraph))))
 
 
-(defn- dagre-graph [graph]
+(defn- dagre-graph
+  "copy the nodes and edges from Look to dagre, so we can use dagre layout function to put them
+  onto the display without drawing over each other
+  "
+  [graph]
   (let [dagreGraph (new (.-Graph graphlib))
         nodeWidth  172
         nodeHeight 36]
@@ -256,20 +260,20 @@
 
     (doall
       (map (fn [element]
-             ;(println "layout" element)
              (condp = (:el-type element)
-               :node (do
-                       ;(println "adding node" element)
-                       (.setNode dagreGraph (:id element) (clj->js {:width nodeWidth :height nodeHeight})))
-               :edge (do
-                       ;(println "adding edge" element)
-                       (.setEdge dagreGraph (:source element) (:target element)))))
+               :node (.setNode dagreGraph (:id element)
+                       (clj->js {:width nodeWidth :height nodeHeight}))
+               :edge (.setEdge dagreGraph (:source element)
+                       (:target element))))
         graph))
 
     dagreGraph))
 
 
-(defn- layout [graph]
+(defn- layout
+  "use dagre (see https://reactflow.dev/examples/layouting/) to perform an auto-layout of the nodes,
+  which are then connected by the edges."
+  [graph]
   (let [dagreGraph (dagre-graph graph)
         nodeWidth  172
         nodeHeight 36]
@@ -283,17 +287,25 @@
                :node (let [dagreNode (.node dagreGraph (clj->js (:id element)))]
                        (assoc element :position {:x (- (.-x dagreNode) (/ nodeWidth 2))
                                                  :y (- (.-y dagreNode) (/ nodeHeight 2))}))
-               :edge (assoc element :targetPosition "top" :sourcePosition "bottom")))
+               :edge element))
         graph))))
 
 
-(def node-style {:ui/component {:background :green :color :white}
+(def node-style {:ui/component  {:background :green :color :white}
                  :source/remote {:background :orange :color :black}
-                 :source/local {:background :blue :color :white}
-                 :source/fn {:background :pink :color :black}})
+                 :source/local  {:background :blue :color :white}
+                 :source/fn     {:background :pink :color :black}})
 
 
-(defn- create-flow-node [configuration node-id]
+; TODO: make a custom node which can have multiple Handles, so we can separate
+; the various inputs and outputs
+
+
+(defn- create-flow-node
+  "convert the nodes, currently organized by Loom (https://github.com/aysylu/loom), into
+  the format needed by react-flow (https://reactflow.dev)
+  "
+  [configuration node-id]
   (let [node-type (get-in configuration [:components node-id :type])]
     (log/info "node" node-id node-type "///" configuration)
     {:id       (str node-id)
@@ -301,26 +313,37 @@
      :type     (str node-type)
      :data     {:label (str node-id)}
      :position {}
-     :style (merge
-              (or (get node-style node-type) {:background :white :color :black})
-              {:text-align :center
-               :width 180
-               :border "1px solid #222138"})}))
+     :style    (merge
+                 (or (get node-style node-type) {:background :white :color :black})
+                 {:text-align :center
+                  :width      180
+                  :border     "1px solid #222138"})}))
 
 
-(defn- create-flow-edge [idx [node-id target-id :as edge]]
-  ;(println "edge" edge)
-  {:id       (str idx)
-   :el-type  :edge
-   :source   (str node-id)
-   :target   (str target-id)
-   :style    {:stroke-width 1 :stroke :black}
-   :arrowHeadType "arrowclosed"
-   :animated false})
+(defn- create-flow-edge
+  "convert the edges, currently organized by Loom (https://github.com/aysylu/loom), into
+  the format needed by react-flow (https://reactflow.dev)
+  "
+  [configuration idx [node-id target-id :as edge]]
+  (let [handle-id (or (get-in configuration [:links node-id target-id])
+                    (get-in configuration [:links target-id node-id]))]
+    {:id            (str idx)
+     :el-type       :edge
+     :source        (str node-id)
+     :target        (str target-id)
+     :handle-id     (str handle-id)
+     :label         (str handle-id)
+     :style         {:stroke-width 1 :stroke :black}
+     :arrowHeadType "arrowclosed"
+     :animated      false}))
 
 
-(defn- compute-edges [config]
-  (->> config
+(defn- compute-edges
+  "pull out just the relevant information from the configuration, so it can be passed into Loom and
+  the interconnected digraph can be built
+  "
+  [configuration]
+  (->> configuration
     :links
     (mapcat (fn [[entity links]]
               (map (fn [[target port]]
@@ -329,16 +352,23 @@
     (into [])))
 
 
-(defn- make-flow [configuration graph]
+(defn- make-flow
+  "take the Loom graph and turn it into what react-flow needs to draw it onto the display
+  "
+  [configuration graph]
   (let [flow (apply conj
                (map #(create-flow-node configuration %) (lg/nodes graph))
                (map-indexed (fn [idx node]
-                              (create-flow-edge idx node))
+                              (create-flow-edge configuration idx node))
                  (lg/edges graph)))]
     (layout flow)))
 
 
-(defn- dag-panel [& {:keys [graph configuration component-id container-id ui]}]
+(defn- dag-panel
+  "show the DAG, built form the configuration passed into the component, in a panel
+  (beside the actual UI)
+  "
+  [& {:keys [graph configuration component-id container-id ui]}]
   (let [config-flow (make-flow configuration graph)]
     [:div {:style {:width "70%" :height "100%"}}
      [:> ReactFlowProvider
@@ -352,7 +382,10 @@
        [:> Controls]]]]))
 
 
-(defn- component-panel [& {:keys [graph configuration component-id container-id ui]}]
+(defn- component-panel
+  "show the UI, built form the configuration data passed to the component
+  "
+  [& {:keys [graph configuration component-id container-id ui]}]
   (let [layout     (:layout configuration)
         components (:components configuration)]
     [:div "The composed UI will display here"
@@ -361,7 +394,11 @@
        (lg/nodes graph))]))
 
 
-(defn component [& {:keys [data component-id container-id ui]}]
+(defn component
+  "build a UI from a data structure (data), which provides the :components, :links between them,
+  and the :layout of the physical UI-components on the display
+  "
+  [& {:keys [data component-id container-id ui]}]
   (let [id           (r/atom nil)
         config-graph (apply lg/digraph (compute-edges @data))]
 
@@ -680,4 +717,15 @@
   ())
 
 
+; get the different handle names, so we can put multiple handles on a single node
+; and then also connect the different edges to the correct one
+(comment
+  (def configuration @sample-data)
+  (def node-id :ui/globe)
+  (def target-id :topic/selected-coverages)
+
+  (or (get-in configuration [:links node-id target-id])
+    (get-in configuration [:links target-id node-id]))
+
+  ())
 
