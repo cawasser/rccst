@@ -340,7 +340,7 @@
 
 (defn- dag-panel [& {:keys [graph configuration component-id container-id ui]}]
   (let [config-flow (make-flow configuration graph)]
-    [:div {:style {:width "60%" :height "100%"}}
+    [:div {:style {:width "70%" :height "100%"}}
      [:> ReactFlowProvider
       [:> ReactFlow {:className        component-id
                      :elements         config-flow
