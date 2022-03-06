@@ -34,7 +34,7 @@
         r (re-frame/subscribe range)]
     (fn [& {:keys [value range component-id container-id]}]
       [:div.card {:style {:width "100px" :height "100px"}}
-       [:h2 "3D Globe Table"]
+       [:h2 "Slider"]
        [lf/labeled-field "Value" @v]
        [lf/labeled-field "Range" @r]])))
 
@@ -43,7 +43,7 @@
   (let [v (re-frame/subscribe value)]
     (fn [& {:keys [value component-id container-id]}]
       [:div.card {:style {:width "100px" :height "100px"}}
-       [:h2 "3D Globe Table"]
+       [:h2 "Label"]
        [lf/labeled-field "Value" @v]])))
 
 

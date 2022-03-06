@@ -525,20 +525,6 @@
     (def edges (lg/edges graph))
     (def registry meta-data-registry))
 
-  (def meta {:name "dummy" :ports {:a 1 :b 2}})
-  (assoc meta :ports {})                                    ; wrong
-  (merge-with merge
-    meta
-    {:ports {}})
-
-  (def components {:ui/targets {:type :ui/component
-                                :name :table/selectable-table}})
-
-  (-> registry :globe/three-d-globe :ports)
-
-
-
-
   ; 1. build the functions... (how? where?)
   ;
   ; actually, since the functions "subscribe" to some inputs and then produce something
@@ -582,36 +568,10 @@
   ;
   ;
 
-  (def grouped-denorm-comp
-    (->> components
-      (map (fn [[id meta]]
-             [id (merge-with merge meta
-                   {:ports (or (-> registry (:name meta) :ports) {})})]))
-      (into {})
-      seq
-      (group-by (fn [[id meta]]
-                  (:type meta)))))
-
-  (defn build-ports [meta]
-    (->> meta
-      :ports
-      (map (fn [[name type]]
-             ; this needs to find the correct target for the component/port combination: what is
-             ; actually "hooked" to the port?
-             [name type]))
-      (into [])
-      flatten))
-
-  (def functions (->> grouped-denorm-comp
-                   :source/fn
-                   (map (fn [[name meta]]
-                          (apply conj [(:name meta)]
-                            (build-ports meta))))))
-
 
   ; explore getting data about a node
   ;
-  ; predecessors (what comes before, ie, what are it's inputs)
+  ; predecessors (what comes before, i.e., what are it's inputs)
   ;
   (def predecessors (map (fn [node]
                            [node (lg/predecessors* graph node)])
@@ -621,15 +581,6 @@
   (def successors (map (fn [node]
                          [node (lg/successors* graph node)])
                     nodes))
-
-  ; let's expand the denormalized data about each node
-  (def in-and-out (->> nodes
-                    (map (fn [node]
-                           {node
-                            {:pred (lg/predecessors* graph node)
-                             :succ (lg/successors* graph node)}}))
-                    (into {})))
-
 
   ; we could mix-in the "local name" for each link by mapping over the
   ; successors and predecessors
@@ -645,10 +596,6 @@
     (def registry meta-data-registry))
 
 
-  (def target :topic/current-time)
-  (def source :ui/globe)
-  (def pred (lg/predecessors* graph source))
-
   (defn get-predecessor-name [links source target]
     (println "pred" source target)
     (->> links
@@ -658,68 +605,59 @@
       vals
       first
       (#(get % source))))
-
-
-  (let [revr (filter (fn [[s targets]]
-                       (and (get targets source)
-                         (= s target)))
-               links)]
-    (->> revr
-      vals
-      first
-      (#(get % source))))
-
-  (->> links
-    (filter (fn [[s targets]]
-              (and (get targets source)
-                (= s target))))
-    vals
-    first
-    (#(get % source)))
-
-
   (get-predecessor-name links :ui/globe :topic/current-time)
   (get-predecessor-name links :fn/range :topic/coverage-data)
-  (get-successor-name links :topic/time-range :ui/time-slider)
+
 
   (defn get-successor-name [links source target]
     (->> links
       source
       target))
-
   (get-successor-name links :fn/range :topic/time-range)
 
-  (def in-and-out (->> nodes
-                    (map (fn [node]
-                           {node
-                            {:pred (into {}
-                                     (map (fn [target]
-                                            {target (get-predecessor-name links node target)})
-                                       (lg/predecessors* graph node)))
-                             :succ (into {}
-                                     (map (fn [target]
-                                            {target (get-successor-name links node target)})
-                                       (lg/successors* graph node)))}}))
-                    (into {})))
+  (defn denorm-components [graph nodes]
+    (->> nodes
+      (map (fn [node]
+             {node (into {}
+                     [(into {}
+                        (map (fn [target]
+                               {target (get-predecessor-name links node target)})
+                          (lg/predecessors* graph node)))
+                      (into {}
+                        (map (fn [target]
+                               {target (get-successor-name links node target)})
+                          (lg/successors* graph node)))])}))
+      (into {})))
+  (denorm-components graph nodes)
 
   ; GOT IT!
   ;
-  ; we can now work from any node to its inputs (:pred) and outputs (:succ)
-  ; which means we can build the call and vectors for the ui elements
+  ; we can now work from any node to its inputs and outputs,
+  ; which means we can build the signal vectors for the ui elements
 
 
-
-
-
-
-
-  ; 2. build the rest of the blackboard subscriptions (except the "functions" we defined in step 1)
+  ; QUESTION: should we mixin the notion of :local and :remote right here, so we can
+  ; build the correct subscription/event signals?
   ;
-  ;          so the ones that are just simple subs against the container's blackboard
+  ; OR we can leave that logic to the function that actually builds the signal vectors (see
+  ;    Step 2)
+  ;        THIS requires looking at the component's meta-data
+  ;
+  ; OR we could leave it to the component itself to build the correct vector(s)
+  ;
 
-  ; 3. build the components, passing them their input "signals"
+
+
+
+
+  ; 2. build the subscription and event signal vectors
+
+  ; 3. build the components, passing them their "signals" (vectors)
 
   ; 4. render the components, using composite-layout/layout
 
 
   ())
+
+
+
