@@ -415,24 +415,32 @@
                  :source/fn     {:background :pink :color :black}})
 
 
-(defn- input-output-handles [label inputs outputs]
+(defn- input-output-handles
+  "
+
+  NOTE: the inputs (values in the hash-map) are STRINGS!
+  "
+
+  [label inputs outputs]
   [:<>
    ; add the input handles
    (doall
      (->> inputs
-       (map (fn [[target port]]
-              (log/info "input handle" label target port)
-              [:> Handle {:id    port :type "target" :position "top"
-                          :style handle-style}]))
+       (map-indexed (fn [idx [target ports]]
+                      (let [[source-port target-port] ports]
+                        (log/info "input-handle" label "/" target-port "///" target "/" source-port)
+                        [:> Handle {:id target-port :type "target" :position "top"
+                                    :style (merge handle-style {:left (+ 20 (* 10 idx))})}])))
        (into [:<>])))
 
    ; add the output handles
    (doall
      (->> outputs
-       (map (fn [[target port]]
-              (log/info "output handle" label target port)
-              [:> Handle {:id    port :type "source" :position "bottom"
-                          :style handle-style}]))
+       (map-indexed (fn [idx [target ports]]
+                      (let [[source-port target-port] ports]
+                        (log/info "output-handle" label "/" source-port "///" target "/" target-port)
+                        [:> Handle {:id source-port :type "source" :position "bottom"
+                                    :style (merge handle-style {:left (+ 20 (* 10 idx))})}])))
        (into [:<>])))])
 
 
@@ -522,18 +530,22 @@
   "
   [configuration node-id]
   (let [node-type (get-in configuration [:components node-id :type])]
-    ;(log/info "node" node-id node-type)
+    (log/info "node" node-id node-type)
     {:id       (str node-id)
      :el-type  :node
      :type     (str node-type)
      :data     {:label   (str node-id)
                 :inputs  (->>
                            (get-in configuration [:denorm node-id :inputs])
-                           (map (fn [[k v]] {(str k) (str v)}))
+                           (map (fn [[k v]]
+                                  (let [[sp tp] v]
+                                   {(str k) [(str sp) (str tp)]})))
                            (into {}))
                 :outputs (->>
                            (get-in configuration [:denorm node-id :outputs])
-                           (map (fn [[k v]] {(str k) (str v)}))
+                           (map (fn [[k v]]
+                                  (let [[sp tp] v]
+                                   {(str k) [(str sp) (str tp)]})))
                            (into {}))}
      :position {}}))
 
@@ -543,11 +555,9 @@
   the format needed by react-flow (https://reactflow.dev)
   "
   [configuration idx [node-id target-id :as edge]]
-  (let [target-handle (or (get-in configuration [:links node-id target-id])
-                        (get-in configuration [:links target-id node-id]))
-        source-handle (get-in configuration [:denorm node-id :outputs target-id])]
+  (let [[source-handle target-handle] (get-in configuration [:denorm node-id :outputs target-id])]
 
-    (log/info "flow-edge" idx node-id "/" source-handle "///" target-id "/" target-handle)
+    (log/info "flow-edge" idx "/" node-id "/" source-handle "///" target-id "/" target-handle)
 
     {:id            (str idx)
      :el-type       :edge
@@ -795,6 +805,16 @@
 
   {:selected-coverages (subscribe-local container-id :topic/selected-coverages)}
 
+
+  (do
+    (def graph (apply lg/digraph (compute-edges @sample-data)))
+    (def configuration
+      (assoc @sample-data
+        :graph graph
+        :denorm (denorm-components graph (:links configuration) (lg/nodes graph))
+        :nodes (lg/nodes graph)
+        :edges (lg/edges graph))))
+  (def config-flow (make-flow configuration))
 
   ())
 
