@@ -63,18 +63,28 @@
         (some-computation d)))))
 
 
+; assume the ui components have the following meta-data:
+;
+;      you SUBSCRIBE from a :port/sink    (re-frame/subscribe ...)
+;
+;      you PUBLISH to a :port/source      (re-frame/dispatch ...)
+;
+;      you do BOTH with :port/source-sink (both)
+
+
 (def meta-data-registry
-  {:table/selectable-table {:component e/selectable-table
+  {
+   :table/selectable-table {:component e/selectable-table
                             :ports     {:data      :port/source-sink
                                         :selection :port/source}}
 
    :globe/three-d-globe    {:component e/three-d-globe
-                            :ports     {:layers       :port/source
-                                        :current-time :port/source}}
+                            :ports     {:layers       :port/sink
+                                        :current-time :port/sink}}
 
    :slider/slider          {:component e/slider
                             :ports     {:value :port/source-sink
-                                        :range :port/sink}}
+                                        :range :port/source}}
 
    :label/label            {:component e/label
                             :ports     {:value :port/sink}}})
@@ -113,29 +123,33 @@
                                                                      :ports {:data  :port/sink
                                                                              :range :port/source}}}
 
-                          :links        {; ui components publish to what?
-                                         :ui/targets                {:topic/target-data      :data
-                                                                     :topic/selected-targets :selection}
-                                         :ui/satellites             {:topic/satellite-data      :data
-                                                                     :topic/selected-satellites :selection}
-                                         :ui/time-slider            {:topic/current-time :value}
+                          :links        {; ui components publish to what? via which port?
+                                         ;
+                                         ; <source>                 {<source-port>  {<target> <target-port>
+                                         ;                                           <target> <target-port>}}
+                                         ;
+                                         :ui/targets                {:data      {:topic/target-data :data}
+                                                                     :selection {:topic/selected-targets :data}}
+                                         :ui/satellites             {:data      {:topic/satellite-data :data}
+                                                                     :selection {:topic/selected-satellites :data}}
+                                         :ui/time-slider            {:value {:topic/current-time :data}}
 
                                          ; transformation functions publish to what?
-                                         :fn/coverage               {:topic/selected-coverages :selected}
-                                         :fn/range                  {:topic/time-range :range}
+                                         :fn/coverage               {:selected {:topic/selected-coverages :data}}
+                                         :fn/range                  {:range {:topic/time-range :data}}
 
                                          ; topics are inputs into what?
-                                         :topic/target-data         {:ui/targets :data}
-                                         :topic/satellite-data      {:ui/satellites :data}
-                                         :topic/selected-targets    {:fn/coverage :targets}
-                                         :topic/selected-satellites {:fn/coverage :satellites}
-                                         :topic/coverage-data       {:fn/coverage :coverages
-                                                                     :fn/range    :data}
-                                         :topic/selected-coverages  {:ui/globe :coverages}
-                                         :topic/current-time        {:ui/current-time :value
-                                                                     :ui/time-slider  :value
-                                                                     :ui/globe        :current-time}
-                                         :topic/time-range          {:ui/time-slider :range}}
+                                         :topic/target-data         {:data {:ui/targets :data}}
+                                         :topic/satellite-data      {:data {:ui/satellites :data}}
+                                         :topic/selected-targets    {:data {:fn/coverage :targets}}
+                                         :topic/selected-satellites {:data {:fn/coverage :satellites}}
+                                         :topic/coverage-data       {:data {:fn/coverage :coverages
+                                                                            :fn/range    :data}}
+                                         :topic/selected-coverages  {:data {:ui/globe :coverages}}
+                                         :topic/current-time        {:data {:ui/current-time :value
+                                                                            :ui/time-slider  :value
+                                                                            :ui/globe        :current-time}}
+                                         :topic/time-range          {:data {:ui/time-slider :range}}}
 
                           :layout       [rc/v-box
                                          [rc/h-box
@@ -150,14 +164,6 @@
   {})
 
 
-; assume the ui components have the following meta-data:
-;
-;      you SUBSCRIBE from a :port/sink    (re-frame/subscribe ...)
-;
-;      you PUBLISH to a :port/source      (re-frame/dispatch ...)
-;
-;      you do BOTH with :port/source-sink (both)
-;
 
 ; we want to turn the composite-def into things like...
 ;
@@ -230,6 +236,180 @@
 ;; endregion
 
 
+;;;;;;;;;;
+;;;;;;;;;;
+;
+;  Expand on the configuration, computing denormalized data, the Loom digraph, etc.
+;
+;;;;;;;;;;
+;;;;;;;;;;
+;; region
+
+
+(defn- expand-components [data]
+  (let [components (:components data)]
+    (->> data
+      :components
+      (map (fn [[id meta-data]]
+             {id (assoc meta-data
+                   :ports
+                   (condp = (:type meta-data)
+                     :ui/component (->> components id :name meta-data-registry :ports)
+                     :source/remote {:port/pub-sub :data}
+                     :source/local {:port/pub-sub :data}
+                     :source/fn (:ports meta-data)))}))
+      (assoc data :components))))
+
+
+(defn- get-predecessor-name [links source target]
+  ;(log/info "pred" source target)
+  (->> links
+    (filter (fn [[s targets]]
+              (and (get targets source)
+                (= s target))))
+    vals
+    first
+    (#(get % source))))
+
+
+(defn- get-successor-name [links source target]
+  (->> links
+    source
+    target))
+
+
+(defn denorm-components
+  "denormalize the links between components by mixing in additional information bout the
+  ports at both ends of the inter-connection:
+
+  {<source> {:inputs  {<target> [<target's-port> <source's-port>]}
+            {:outputs {<target> [<target's-port> <source's-port>]}}
+
+
+  "
+  [graph links nodes]
+  (->> nodes
+    (map (fn [node]
+           (let [node-meta (->> links node)]
+             {node {:inputs
+                    (into {}
+                      (map (fn [target]
+                             ; TODO: what the heck should replace :dummy?!?!?!?!
+                             {target [(get-predecessor-name links node target) :dummy]})
+                        (lg/predecessors* graph node)))
+
+                    :outputs
+                    (into {}
+                      (map (fn [target]
+                             ; TODO: what the heck should replace :dummy?!?!?!?!
+                             {target [(get-successor-name links node target) :dummy]})
+                        (lg/successors* graph node)))}})))
+    (into {})))
+
+
+
+(comment
+  (do
+    (def data @sample-data)
+    (def graph (apply lg/digraph (compute-edges @sample-data)))
+    (def nodes (lg/nodes graph))
+    (def links (:links data))
+    (def components (:components data))
+    (def configuration (assoc @sample-data
+                         :components (expand-components data)
+                         :graph graph
+                         :nodes (lg/nodes graph)
+                         :edges (lg/edges graph)))
+
+    (def node-meta (->> links :ui/satellites)))
+
+
+  (->> data
+    :components
+    (map (fn [[id meta-data] component]
+           {id (assoc meta-data
+                 :ports
+                 (condp = (:type meta-data)
+                   :ui/component (->> components id :name meta-data-registry :ports)
+                   :source/remote {:port/pub-sub :data}
+                   :source/local {:port/pub-sub :data}
+                   :source/fn (:ports meta-data)))}))
+    (assoc data :components))
+
+  (expand-components data)
+
+  (map #(assoc % :ports "x") (:components data))
+
+
+  (def target-meta (map (fn [[target _]] (target meta-data-registry)) node-meta))
+
+  (denorm-components graph links nodes)
+
+
+  ())
+
+;; endregion
+
+
+;;;;;;;;;;
+;;;;;;;;;;
+;
+;  UI Implementation
+;
+;;;;;;;;;;
+;;;;;;;;;;
+;; region
+
+(def handle-style {:width "8px" :height "8px" :borderRadius "50%"})
+(def default-node-style {:padding      "3px" :max-width "180px"
+                         :borderRadius "5px" :margin :auto
+                         :background   :white :color :black})
+(def node-style {:ui/component  {:background :green :color :white}
+                 :source/remote {:background :orange :color :black}
+                 :source/local  {:background :blue :color :white}
+                 :source/fn     {:background :pink :color :black}})
+
+
+(defn- input-output-handles [label inputs outputs]
+  [:<>
+   ; add the input handles
+   (doall
+     (->> inputs
+       (map (fn [[target port]]
+              (log/info "input handle" label target port)
+              [:> Handle {:id    port :type "target" :position "top"
+                          :style handle-style}]))
+       (into [:<>])))
+
+   ; add the output handles
+   (doall
+     (->> outputs
+       (map (fn [[target port]]
+              (log/info "output handle" label target port)
+              [:> Handle {:id    port :type "source" :position "bottom"
+                          :style handle-style}]))
+       (into [:<>])))])
+
+
+(defn- custom-node
+  "build a custom node for the flow diagram, this time for :ui/component, so
+  green, since this is a 'view', and one Handle for each input (along the top)
+  and output (along the bottom)
+  "
+  [type d]
+  (let [data    (js->clj d)
+        label   (get-in data ["data" "label"])
+        inputs  (get-in data ["data" "inputs"])
+        outputs (get-in data ["data" "outputs"])
+        style   (merge default-node-style (type node-style))]
+
+    (log/info "custom-node" label data "///" inputs "///" outputs)
+
+    (r/as-element
+      [:div {:style style}
+       [:h5 {:style (merge {:textAlign :center} style)} label]
+       (input-output-handles label inputs outputs)])))
+
 
 (defn- node-type [node]
   (:el-type node))
@@ -291,33 +471,39 @@
         graph))))
 
 
-(def node-style {:ui/component  {:background :green :color :white}
-                 :source/remote {:background :orange :color :black}
-                 :source/local  {:background :blue :color :white}
-                 :source/fn     {:background :pink :color :black}})
-
-
-; TODO: make a custom node which can have multiple Handles, so we can separate
-; the various inputs and outputs
-
-
 (defn- create-flow-node
   "convert the nodes, currently organized by Loom (https://github.com/aysylu/loom), into
   the format needed by react-flow (https://reactflow.dev)
   "
   [configuration node-id]
   (let [node-type (get-in configuration [:components node-id :type])]
-    (log/info "node" node-id node-type "///" configuration)
+    ;(log/info "node" node-id node-type)
     {:id       (str node-id)
      :el-type  :node
      :type     (str node-type)
-     :data     {:label (str node-id)}
-     :position {}
-     :style    (merge
-                 (or (get node-style node-type) {:background :white :color :black})
-                 {:text-align :center
-                  :width      180
-                  :border     "1px solid #222138"})}))
+     :data     {:label   (str node-id)
+                :inputs  (->>
+                           (get-in configuration [:denorm node-id :inputs])
+                           (map (fn [[k v]] {(str k) (str v)}))
+                           (into {}))
+                :outputs (->>
+                           (get-in configuration [:denorm node-id :outputs])
+                           (map (fn [[k v]] {(str k) (str v)}))
+                           (into {}))}
+     :position {}}))
+
+(comment
+  (do
+    (def graph (apply lg/digraph (compute-edges @sample-data)))
+    (def configuration
+      (assoc @sample-data
+        :graph graph
+        :denorm (denorm-components graph (:links configuration) (lg/nodes graph))
+        :nodes (lg/nodes graph)
+        :edges (lg/edges graph))))
+
+
+  ())
 
 
 (defn- create-flow-edge
@@ -325,14 +511,19 @@
   the format needed by react-flow (https://reactflow.dev)
   "
   [configuration idx [node-id target-id :as edge]]
-  (let [handle-id (or (get-in configuration [:links node-id target-id])
-                    (get-in configuration [:links target-id node-id]))]
+  (let [target-handle (or (get-in configuration [:links node-id target-id])
+                        (get-in configuration [:links target-id node-id]))
+        source-handle (get-in configuration [:denorm node-id :outputs target-id])]
+
+    (log/info "flow-edge" idx node-id "/" source-handle "///" target-id "/" target-handle)
+
     {:id            (str idx)
      :el-type       :edge
      :source        (str node-id)
+     :sourceHandle  (str source-handle)
      :target        (str target-id)
-     :handle-id     (str handle-id)
-     :label         (str handle-id)
+     :targetHandle  (str target-handle)
+     :label         (str target-handle)
      :style         {:stroke-width 1 :stroke :black}
      :arrowHeadType "arrowclosed"
      :animated      false}))
@@ -346,8 +537,10 @@
   (->> configuration
     :links
     (mapcat (fn [[entity links]]
-              (map (fn [[target port]]
-                     [entity target])
+              (mapcat (fn [[source-port targets]]
+                        (map (fn [[target target-port]]
+                               [entity target])
+                          targets))
                 links)))
     (into [])))
 
@@ -355,12 +548,12 @@
 (defn- make-flow
   "take the Loom graph and turn it into what react-flow needs to draw it onto the display
   "
-  [configuration graph]
+  [configuration]
   (let [flow (apply conj
-               (map #(create-flow-node configuration %) (lg/nodes graph))
+               (map #(create-flow-node configuration %) (:nodes configuration))
                (map-indexed (fn [idx node]
                               (create-flow-edge configuration idx node))
-                 (lg/edges graph)))]
+                 (:edges configuration)))]
     (layout flow)))
 
 
@@ -368,13 +561,17 @@
   "show the DAG, built form the configuration passed into the component, in a panel
   (beside the actual UI)
   "
-  [& {:keys [graph configuration component-id container-id ui]}]
-  (let [config-flow (make-flow configuration graph)]
+  [& {:keys [configuration component-id container-id ui]}]
+  (let [config-flow (make-flow configuration)
+        node-types  {":ui/component"  (partial custom-node :ui/component)
+                     ":source/remote" (partial custom-node :source/remote)
+                     ":source/local"  (partial custom-node :source/local)
+                     ":source/fn"     (partial custom-node :source/fn)}]
     [:div {:style {:width "70%" :height "100%"}}
      [:> ReactFlowProvider
       [:> ReactFlow {:className        component-id
                      :elements         config-flow
-                     :nodeTypes        {}
+                     :nodeTypes        node-types
                      :edgeTypes        {}
                      :zoomOnScroll     false
                      :preventScrolling false
@@ -385,13 +582,17 @@
 (defn- component-panel
   "show the UI, built form the configuration data passed to the component
   "
-  [& {:keys [graph configuration component-id container-id ui]}]
+  [& {:keys [configuration component-id container-id ui]}]
   (let [layout     (:layout configuration)
         components (:components configuration)]
     [:div "The composed UI will display here"
-     (map (fn [node]
+     (map (fn [[node meta-data]]
             ^{:key node} [:p (str node)])
-       (lg/nodes graph))]))
+       (filter (fn [[node {:keys [type]}]]
+                 (= :ui/component type))
+            components))]))
+
+;;endregion
 
 
 (defn component
@@ -399,8 +600,9 @@
   and the :layout of the physical UI-components on the display
   "
   [& {:keys [data component-id container-id ui]}]
-  (let [id           (r/atom nil)
-        config-graph (apply lg/digraph (compute-edges @data))]
+  (let [id            (r/atom nil)
+        configuration @data
+        graph         (apply lg/digraph (compute-edges configuration))]
 
     (fn []
       (when (nil? @id)
@@ -409,25 +611,46 @@
         (ui-utils/dispatch-local @id [:container] container-id))
 
       ;(log/info "coverage-plan" @id (config @id data))
+      (let [full-config (assoc configuration
+                          :graph graph
+                          :denorm (denorm-components graph (:links configuration) (lg/nodes graph))
+                          :nodes (lg/nodes graph)
+                          :edges (lg/edges graph))]
 
-      [rc/h-box :src (rc/at)
-       :gap "20px"
-       :width "1000px"
-       :height "800px"
-       :children [[dag-panel
-                   :graph config-graph
-                   :component-id @id
-                   :configuration @data
-                   :container-id container-id
-                   :ui ui]
-                  [component-panel
-                   :graph config-graph
-                   :configuration data
-                   :component-id @id
-                   :container-id container-id
-                   :ui ui]]])))
+        [rc/h-box :src (rc/at)
+         :gap "20px"
+         :width "1000px"
+         :height "800px"
+         :children [[dag-panel
+                     :configuration full-config
+                     :component-id @id
+                     :container-id container-id
+                     :ui ui]
+                    [component-panel
+                     :configuration full-config
+                     :component-id @id
+                     :container-id container-id
+                     :ui ui]]]))))
 
 
+
+
+
+(comment
+  (def configuration @sample-data)
+  (def graph (apply lg/digraph (compute-edges @sample-data)))
+  (def denorm (denorm-components graph (:links @sample-data)
+                (lg/nodes graph)))
+
+
+  (assoc configuration
+    :graph graph
+    :denorm (denorm-components graph (:links configuration) (lg/nodes graph))
+    :nodes (lg/nodes graph)
+    :edges (lg/edges graph))
+
+
+  ())
 
 
 ; basics of Loom (https://github.com/aysylu/loom)
@@ -467,6 +690,7 @@
   (def g (apply lg/digraph edges))
 
   ())
+
 
 ; playing with the graph
 (comment
@@ -569,7 +793,7 @@
   ())
 
 
-; denormalize the ports into the components
+; piece together the data needed to build all the UI components and supporting functions
 (comment
   (do
     (def configuration @sample-data)
@@ -626,66 +850,31 @@
   ;
 
 
-  ; explore getting data about a node
-  ;
-  ; predecessors (what comes before, i.e., what are it's inputs)
-  ;
-  (def predecessors (map (fn [node]
-                           [node (lg/predecessors* graph node)])
-                      nodes))
-
-  ; successors (what is an input to)
-  (def successors (map (fn [node]
-                         [node (lg/successors* graph node)])
-                    nodes))
-
   ; we could mix-in the "local name" for each link by mapping over the
   ; successors and predecessors
-  (do
-    (def configuration @sample-data)
-    (def container-id "dummy")
-    (def links (:links configuration))
-    (def layout (:layout configuration))
-    (def components (:components configuration))
-    (def graph (apply lg/digraph (compute-edges configuration)))
-    (def nodes (lg/nodes graph))
-    (def edges (lg/edges graph))
-    (def registry meta-data-registry))
 
+  ; predecessors
+  (def source :ui/globe)
+  (def target :topic/current-time)
 
-  (defn get-predecessor-name [links source target]
-    (println "pred" source target)
-    (->> links
-      (filter (fn [[s targets]]
-                (and (get targets source)
-                  (= s target))))
-      vals
-      first
-      (#(get % source))))
+  (lg/predecessors* graph :ui/globe)
+  (->> links
+    (filter (fn [[s targets]]
+              {:s s :t targets})))
+              ;(and (get targets source)
+              ;  (= s target)))))
+    ;vals
+    ;first
+    ;(#(get % source)))
+
   (get-predecessor-name links :ui/globe :topic/current-time)
   (get-predecessor-name links :fn/range :topic/coverage-data)
 
-
-  (defn get-successor-name [links source target]
-    (->> links
-      source
-      target))
   (get-successor-name links :fn/range :topic/time-range)
 
-  (defn denorm-components [graph nodes]
-    (->> nodes
-      (map (fn [node]
-             {node (into {}
-                     [(into {}
-                        (map (fn [target]
-                               {target (get-predecessor-name links node target)})
-                          (lg/predecessors* graph node)))
-                      (into {}
-                        (map (fn [target]
-                               {target (get-successor-name links node target)})
-                          (lg/successors* graph node)))])}))
-      (into {})))
-  (denorm-components graph nodes)
+
+
+  (denorm-components graph links nodes)
 
   ; GOT IT!
   ;
@@ -728,4 +917,37 @@
     (get-in configuration [:links target-id node-id]))
 
   ())
+
+
+
+; new logic for building the flow-nodes, so we can have custom node rendering
+(comment
+  (do
+    (def node-id :fn/range)
+    (def graph (apply lg/digraph (compute-edges @sample-data)))
+    (def configuration
+      (assoc @sample-data
+        :graph graph
+        :denorm (denorm-components graph (:links configuration) (lg/nodes graph))
+        :nodes (lg/nodes graph)
+        :edges (lg/edges graph))))
+
+  (:denorm configuration)
+
+  (get-in configuration [:denorm :fn/coverage :inputs])
+
+  (def components (:components configuration))
+
+
+  (map (fn [[node meta-data]]
+         ^{:key node} [:p (str node)])
+    (filter (fn [[node {:keys [type]}]]
+              (= :ui/component type))
+      components))
+
+  (keys components)
+
+
+  ())
+
 
