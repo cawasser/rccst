@@ -5,7 +5,7 @@
 
 (defn globe []
       (log/info "resium Globe")
-      [:div
+      [:div#resium-globe
        [:> Viewer
         [:> Entity {:description "test"
                     :name "tokyo"
