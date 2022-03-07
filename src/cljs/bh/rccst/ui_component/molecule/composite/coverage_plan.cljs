@@ -10,7 +10,7 @@
             [taoensso.timbre :as log]
             ["dagre" :as dagre]
             ["graphlib" :as graphlib]
-            ["react-flow-renderer" :refer (ReactFlowProvider Controls Handle) :default ReactFlow]))
+            ["react-flow-renderer" :refer (ReactFlowProvider Controls Handle Background) :default ReactFlow]))
 
 
 (log/info "bh.rccst.ui-component.molecule.composite.coverage-plan")
@@ -393,46 +393,6 @@
     (into {})))
 
 
-(comment
-  (do
-    (def data @sample-data)
-    (def graph (apply lg/digraph (compute-edges @sample-data)))
-    (def nodes (lg/nodes graph))
-    (def links (:links data))
-    (def components (:components data))
-    (def configuration (assoc @sample-data
-                         :components (expand-components data)
-                         :graph graph
-                         :nodes (lg/nodes graph)
-                         :edges (lg/edges graph)))
-
-    (def node-meta (->> links :ui/satellites)))
-
-
-  (->> data
-    :components
-    (map (fn [[id meta-data] component]
-           {id (assoc meta-data
-                 :ports
-                 (condp = (:type meta-data)
-                   :ui/component (->> components id :name meta-data-registry :ports)
-                   :source/remote {:port/pub-sub :data}
-                   :source/local {:port/pub-sub :data}
-                   :source/fn (:ports meta-data)))}))
-    (assoc data :components))
-
-  (expand-components data)
-
-  (map #(assoc % :ports "x") (:components data))
-
-
-  (def target-meta (map (fn [[target _]] (target meta-data-registry)) node-meta))
-
-  (denorm-components graph links nodes)
-
-
-  ())
-
 ;; endregion
 
 
@@ -648,6 +608,7 @@
                      :zoomOnScroll     false
                      :preventScrolling false
                      :onConnect        #()}
+       [:> Background]
        [:> Controls]]]]))
 
 
@@ -658,13 +619,17 @@
   (let [layout     (:layout configuration)
         components (:components configuration)]
 
-    [:div {:style {:textAlign :center}}
-     [:h2 "The composed UI will display here"]
-     (map (fn [[node meta-data]]
-            ^{:key node} [:h4 (str node)])
-       (filter (fn [[node {:keys [type]}]]
-                 (= :ui/component type))
-         components))]))
+    [rc/v-box
+     :style {:textAlign :center}
+     :gap "15px"
+     :children [[:h2 "The composed UI will display here"]
+                [rc/line :size "2px" :color "blue"]
+                (into [:<>]
+                  (map (fn [[node meta-data]]
+                         ^{:key node} [:h3 (str node)])
+                    (filter (fn [[node {:keys [type]}]]
+                              (= :ui/component type))
+                      components)))]]))
 
 ;;endregion
 
@@ -1054,3 +1019,43 @@
 
   ())
 
+
+(comment
+  (do
+    (def data @sample-data)
+    (def graph (apply lg/digraph (compute-edges @sample-data)))
+    (def nodes (lg/nodes graph))
+    (def links (:links data))
+    (def components (:components data))
+    (def configuration (assoc @sample-data
+                         :components (expand-components data)
+                         :graph graph
+                         :nodes (lg/nodes graph)
+                         :edges (lg/edges graph)))
+
+    (def node-meta (->> links :ui/satellites)))
+
+
+  (->> data
+    :components
+    (map (fn [[id meta-data] component]
+           {id (assoc meta-data
+                 :ports
+                 (condp = (:type meta-data)
+                   :ui/component (->> components id :name meta-data-registry :ports)
+                   :source/remote {:port/pub-sub :data}
+                   :source/local {:port/pub-sub :data}
+                   :source/fn (:ports meta-data)))}))
+    (assoc data :components))
+
+  (expand-components data)
+
+  (map #(assoc % :ports "x") (:components data))
+
+
+  (def target-meta (map (fn [[target _]] (target meta-data-registry)) node-meta))
+
+  (denorm-components graph links nodes)
+
+
+  ())
