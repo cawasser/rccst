@@ -63,19 +63,26 @@
         (some-computation d)))))
 
 
-; assume the ui components have the following meta-data:
-;
-;      you SUBSCRIBE from a :port/sink    (re-frame/subscribe ...)
-;
-;      you PUBLISH to a :port/source      (re-frame/dispatch ...)
-;
-;      you do BOTH with :port/source-sink (both)
+;; components have "ports" which define their inputs and outputs:
+;;
+;;      you SUBSCRIBE to a :port/sink, ie, data goes IN     (re-frame/subscribe ...)
+;;
+;;      you PUBLISH to a :port/source, ie, data goes OUT    (re-frame/dispatch ...)
+;;
+;;      you do BOTH with :port/source-sink (both)           should we even have this?
+;;
+;; the question about :port/source-sink arises because building the layout (the call for the UI itself) we don't actually
+;; need to make a distinction (in fact the code is a bit cleaner if we don't) and have the callee sort it out (since it
+;; needs to implement the correct usage anyway). The flow-diagram, on the other hand, is easier if we DO make the
+;; distinction, so we can quickly build all the Nodes and Handles used for the diagram...
+;;
+;;
 
 
 (def meta-data-registry
   {
    :table/selectable-table {:component e/selectable-table
-                            :ports     {:data      :port/source-sink
+                            :ports     {:data      :port/source-sink ; out this be {:data-in :port/sink} & {:data-out :port/source}?
                                         :selection :port/source}}
 
    :globe/three-d-globe    {:component e/three-d-globe
@@ -112,18 +119,13 @@
                                          :topic/time-range          {:type :source/local :name :time-range}
 
                                          ; transformation functions
-                                         :fn/coverage               {:type  :source/fn
-                                                                     :name  fn-coverage
-                                                                     :ports {:targets    :port/sink
-                                                                             :satellites :port/sink
-                                                                             :coverages  :port/sink
-                                                                             :layers     :port/source}}
-                                         :fn/range                  {:type  :source/fn
-                                                                     :name  fn-range
-                                                                     :ports {:data  :port/sink
-                                                                             :range :port/source}}}
+                                         :fn/coverage               {:type  :source/fn :name fn-coverage
+                                                                     :ports {:targets   :port/sink :satellites :port/sink
+                                                                             :coverages :port/sink :layers :port/source}}
+                                         :fn/range                  {:type  :source/fn :name fn-range
+                                                                     :ports {:data :port/sink :range :port/source}}}
 
-                          :links        {; ui components publish to what? via which port?
+                          :links        {; components publish to what? via which port?
                                          ;
                                          ; <source>                 {<source-port>  {<target> <target-port>
                                          ;                                           <target> <target-port>}}
@@ -261,29 +263,38 @@
       (assoc data :components))))
 
 
-(defn- get-predecessor-name [links source target]
-  ;(log/info "pred" source target)
+(defn- get-predecessor-name [links graph source target]
+  ;(log/info "pred" source target "//" graph)
   (->> links
-    (filter (fn [[s targets]]
-              (and (get targets source)
+    (filter (fn [[s _]]
+              (and (contains? (lg/predecessors* graph source) s)
                 (= s target))))
     vals
     first
-    (#(get % source))))
+    keys
+    first))
 
 
-(defn- get-successor-name [links source target]
+(defn- get-successor-name [links graph source target]
   (->> links
     source
-    target))
+    (filter (fn [[s _]]
+              (contains? (lg/successors* graph source) target)))
+    vals
+    first
+    vals
+    first))
+;(->> links
+;  source
+;  target))
 
 
-(defn denorm-components
+(defn denorm-components-obe
   "denormalize the links between components by mixing in additional information bout the
   ports at both ends of the inter-connection:
 
-  {<source> {:inputs  {<target> [<target's-port> <source's-port>]}
-            {:outputs {<target> [<target's-port> <source's-port>]}}
+  {<source> {:inputs  {<target> [<source's-port> <target's-port>]}
+            {:outputs {<target> [<source's-port> <target's-port>]}}
 
 
   "
@@ -295,17 +306,91 @@
                     (into {}
                       (map (fn [target]
                              ; TODO: what the heck should replace :dummy?!?!?!?!
-                             {target [(get-predecessor-name links node target) :dummy]})
+                             {target [:dummy (get-predecessor-name links graph node target)]})
                         (lg/predecessors* graph node)))
 
                     :outputs
                     (into {}
                       (map (fn [target]
                              ; TODO: what the heck should replace :dummy?!?!?!?!
-                             {target [(get-successor-name links node target) :dummy]})
+                             {target [:dummy (get-successor-name links graph node target)]})
                         (lg/successors* graph node)))}})))
     (into {})))
 
+
+(defn- get-inputs
+  "get all the inputs to the given node (these are 'predecessors')
+
+  we grab the node's predecessors, and format the data correctly:
+
+  {<source> [<node's-port> <source's-port>]
+   <source> [<node's-port> <source's-port>]}
+
+
+  WORK-IN-PROGRESS
+  "
+  [links graph node]
+  (->> node
+    (lg/predecessors* graph)
+    (map (fn [p]
+           ; 1. grab the target meta-data for each source
+           (apply merge
+             (map (fn [[source-port targets]]
+                    (let [target-port (get targets node)]
+                      {p [source-port target-port]}))
+               (get links p)))))
+    (into {})))
+
+
+(defn- get-outputs [links node]
+  "get all the outputs of the given node
+
+  these are given directly by the links, but need reformatting from:
+
+  {<source's-port {<target> <target's-port>
+                   <target> <target's-port>}}
+
+  to:
+
+  {<target> [<node's-port> <target's-port>]
+   <target> [<node's-port> <target's-port>]}
+
+
+  WORK-IN-PROGRESS
+  "
+  (->> links
+    node
+    (map (fn [[node-port target-meta]]
+           (apply merge
+             (map (fn [[target target-port]]
+                    {target [node-port target-port]})
+               target-meta))))
+    (apply merge)))
+
+
+(defn denorm-components
+  "denormalize the links between components by mixing in additional information bout the
+  ports at both ends of the inter-connection:
+
+  {<node> {:inputs  {<source> [<node's-port> <source's-port>]
+                     <source> [<node's-port> <source's-port>]}
+           :outputs {<target> [<node's-port> <target's-port>]
+                     <target> [<node's-port> <target's-port>]}
+           :params  {<source> [<node's-port> <source's-port>]
+                     <source> [<node's-port> <source's-port>]
+                     <target> [<node's-port> <target's-port>]
+                     <target> [<node's-port> <target's-port>]}}
+
+  WORK-IN-PROGRESS
+  "
+  [graph links nodes]
+  (->> nodes
+    (map (fn [node]
+           {node
+            {:inputs  (get-inputs links graph node)
+             :outputs (get-outputs links node)
+             :params  {}}}))
+    (into {})))
 
 
 (comment
@@ -492,19 +577,6 @@
                            (into {}))}
      :position {}}))
 
-(comment
-  (do
-    (def graph (apply lg/digraph (compute-edges @sample-data)))
-    (def configuration
-      (assoc @sample-data
-        :graph graph
-        :denorm (denorm-components graph (:links configuration) (lg/nodes graph))
-        :nodes (lg/nodes graph)
-        :edges (lg/edges graph))))
-
-
-  ())
-
 
 (defn- create-flow-edge
   "convert the edges, currently organized by Loom (https://github.com/aysylu/loom), into
@@ -585,12 +657,14 @@
   [& {:keys [configuration component-id container-id ui]}]
   (let [layout     (:layout configuration)
         components (:components configuration)]
-    [:div "The composed UI will display here"
+
+    [:div {:style {:textAlign :center}}
+     [:h2 "The composed UI will display here"]
      (map (fn [[node meta-data]]
-            ^{:key node} [:p (str node)])
+            ^{:key node} [:h4 (str node)])
        (filter (fn [[node {:keys [type]}]]
                  (= :ui/component type))
-            components))]))
+         components))]))
 
 ;;endregion
 
@@ -653,7 +727,7 @@
   ())
 
 
-; basics of Loom (https://github.com/aysylu/loom)
+;; basics of Loom (https://github.com/aysylu/loom)
 (comment
   (do
     (def g (lg/graph [1 2] [2 3] {3 [4] 5 [6 7]} 7 8 9))
@@ -673,8 +747,8 @@
   ())
 
 
-; how do we use Loom for our composite?
-;
+;; how do we use Loom for our composite?
+
 (comment
   ; a Loom digraph only needs EDGES (:links)
   (def edges (->> composite-def
@@ -692,7 +766,7 @@
   ())
 
 
-; playing with the graph
+;; playing with the graph
 (comment
   (def graph (apply lg/digraph (compute-edges composite-def)))
 
@@ -716,7 +790,7 @@
   ())
 
 
-; dagre
+;; dagre
 (comment
   (def graph (apply lg/digraph (compute-edges @sample-data)))
   (def dagreGraph (dagre-graph graph))
@@ -732,40 +806,7 @@
   ())
 
 
-
-(def just-components
-  {; ui components
-   :ui/targets                {:type :ui/component :name :table/selectable-table}
-   :ui/satellites             {:type :ui/component :name :table/selectable-table}
-   :ui/globe                  {:type :ui/component :name :globe/three-d-globe}
-   :ui/time-slider            {:type :ui/component :name :slider/slider}
-   :ui/current-time           {:type :ui/component :name :label/label}
-
-   ; remote data sources
-   :topic/target-data         {:type :source/remote :name :source/targets}
-   :topic/satellite-data      {:type :source/remote :name :source/satellites}
-   :topic/coverage-data       {:type :source/remote :name :source/coverages}
-
-   ; composite-local data sources
-   :topic/selected-targets    {:type :source/local :name :selected-targets}
-   :topic/selected-satellites {:type :source/local :name :selected-satellites}
-   :topic/current-time        {:type :source/local :name :current-time}
-   :topic/selected-coverages  {:type :source/local :name :selected-coverages}
-   :topic/time-range          {:type :source/local :name :time-range}
-
-   ; transformation functions
-   :fn/coverage               {:type  :source/fn
-                               :name  fn-coverage
-                               :ports {:targets    :port/sink
-                                       :satellites :port/sink
-                                       :coverages  :port/sink
-                                       :selected   :port/source}}
-   :fn/range                  {:type  :source/fn
-                               :name  fn-range
-                               :ports {:data  :port/sink
-                                       :range :port/source}}})
-
-; layout!
+;; layout!
 (comment
   (def configuration @sample-data)
   (def links (:links configuration))
@@ -793,7 +834,7 @@
   ())
 
 
-; piece together the data needed to build all the UI components and supporting functions
+;; piece together the data needed to build all the UI components and supporting functions
 (comment
   (do
     (def configuration @sample-data)
@@ -806,83 +847,145 @@
     (def edges (lg/edges graph))
     (def registry meta-data-registry))
 
-  ; 1. build the functions... (how? where?)
-  ;
-  ; actually, since the functions "subscribe" to some inputs and then produce something
-  ; that "others" subscribe to, they need to be "cascaded subscriptions" themselves,
-  ; so we will actually build the subscriptions alongside step 2, using the data we assemble here
-  ; (input signals, and the "subscription name(s)")
-  ;
-  ; NOTE: these functions need to produce ONE subscription for each :port/source
-  ;
-  ; for example,
-  ;
-  ;         {:fn/compute {:name some-computation
-  ;                       :ports {:input :port/sink
-  ;                               :computed-output :port/source}}}
-  ;
-  ; builds the equivalent of:
-  ;
-  ;         (re/frame/reg-sub-db
-  ;           :container/blackboard.computed-output
-  ;           :<- [:container/blackboard.input]
-  ;           (fn [input [_ _]]
-  ;              (some-computation* input))
-  ;
-  ;
-  ; something like,
-  ;
-  ;         {:fn/compute {:name some-computation
-  ;                       :ports {:input-1 :port/sink
-  ;                               :input-2 :port/sink
-  ;                               :computed-output :port/source}}}
-  ;
-  ; would build the equivalent of:
-  ;
-  ;         (re/frame/reg-sub-db
-  ;           :container/blackboard.computed-output
-  ;           :<- [:container/blackboard.input-1]
-  ;           :<- [:container/blackboard.input-2]
-  ;           (fn [input-1 input-2 [_ _]]
-  ;              (some-computation* input-1 input-2))
-  ;
-  ;
-  ;
+  ;; 1. build the functions... (how? where?)
+  ;; region
+  ;;
+  ;; actually, since the functions "subscribe" to some inputs and then produce something
+  ;; that "others" subscribe to, they need to be "cascaded subscriptions" themselves,
+  ;; so we will actually build the subscriptions alongside step 2, using the data we assemble here
+  ;; (input signals, and the "subscription name(s)")
+  ;;
+  ;; NOTE: these functions need to produce ONE subscription for each :port/source
+  ;;
+  ;; for example,
+  ;;
+  ;;         {:fn/compute {:name some-computation
+  ;;                       :ports {:input :port/sink
+  ;;                               :computed-output :port/source}}}
+  ;;
+  ;; builds the equivalent of:
+  ;;
+  ;;         (re/frame/reg-sub-db
+  ;;           :container/blackboard.computed-output
+  ;;           :<- [:container/blackboard.input]
+  ;;           (fn [input [_ _]]
+  ;;              (some-computation* input))
+  ;;
+  ;;;
+  ;; something like,
+  ;;
+  ;;         {:fn/compute {:name some-computation
+  ;;                       :ports {:input-1 :port/sink
+  ;;                               :input-2 :port/sink
+  ;;                               :computed-output :port/source}}}
+  ;;
+  ;; would build the equivalent of:
+  ;;
+  ;;         (re/frame/reg-sub-db
+  ;;           :container/blackboard.computed-output
+  ;;           :<- [:container/blackboard.input-1]
+  ;;           :<- [:container/blackboard.input-2]
+  ;;           (fn [input-1 input-2 [_ _]]
+  ;;              (some-computation* input-1 input-2))
+  ;;
+  ;; endregion
 
 
-  ; we could mix-in the "local name" for each link by mapping over the
-  ; successors and predecessors
+  ;; we could mix-in the "local name" for each link by mapping over the
+  ;; successors and predecessors
 
-  ; predecessors
-  (def source :ui/globe)
-  (def target :topic/current-time)
+  ;; actually, now it looks like :links already has all the names we need, we just need to
+  ;; make the distinction between :inputs and :outputs for the flow-diagram (the UI Layout doesn't
+  ;; need this data) But, I think we can use this function to split the flow-diagram data from the
+  ;; UI-layout data (and putting BOTH into the expanded data configuration structure)
 
-  (lg/predecessors* graph :ui/globe)
+
+  ;; let's just use the terms :inputs and :outputs and drop the preds/succs
+
+  ;; outputs
+  ;; region
+  (def source :fn/coverage)
+
   (->> links
-    (filter (fn [[s targets]]
-              {:s s :t targets})))
-              ;(and (get targets source)
-              ;  (= s target)))))
-    ;vals
-    ;first
-    ;(#(get % source)))
-
-  (get-predecessor-name links :ui/globe :topic/current-time)
-  (get-predecessor-name links :fn/range :topic/coverage-data)
-
-  (get-successor-name links :fn/range :topic/time-range)
+    source
+    (map (fn [[source-port target-meta]]
+           (apply merge
+             (map (fn [[target target-port]]
+                    {target [source-port target-port]})
+               target-meta))))
+    (apply merge))
 
 
+  {:fn/range {:outputs (get-outputs links :fn/range)}}
+  (get-outputs links :fn/coverage)
 
-  (denorm-components graph links nodes)
+  ; map over all the cmoponets (:ui/globe & :ui/current-time should have not outputs!)
+  (->> nodes
+    (map (fn [node]
+           {node (get-outputs links node)})))
+
+
+  ;; endregion
+
+
+  ;; inputs
+  ;; region
+  (def node :ui/globe)
+
+
+  ; find components with :ui/globe as a target (ie. predecessors of :ui/globe
+  (def preds (lg/predecessors* graph source))
+
+  ; then map over then and pull out their source-port and the target meta-data for
+  ; :ui/globe
+
+  (->> node
+    (lg/predecessors* graph)
+    (map (fn [p]
+           (apply merge
+             (map (fn [[source-port targets]]
+                    (let [target-port (get targets node)]
+                      {p [source-port target-port]}))
+               (get links p)))))
+    (into {}))
+
+  (:topic/coverage-data links)
+
+  (get-inputs links graph :ui/globe)
+  (get-inputs links graph :fn/range)
+
+
+  (->> nodes
+    (map (fn [node]
+           {node (get-inputs links graph node)})))
+
+  ;; endregion
+
+
+  ;; now put is all together
+  ;; region
+
+  (->> nodes
+    (map (fn [node]
+           {node
+            {:inputs  (get-inputs links graph node)
+             :outputs (get-outputs links node)}}))
+    (into {}))
+
+  (denorm-components-2 graph links nodes)
+
+  ;; endregion
 
   ; GOT IT!
   ;
   ; we can now work from any node to its inputs and outputs,
   ; which means we can build the signal vectors for the ui elements
+  ;
+  ; AND a react-flow diagram of the event-mode for the UI!
+  ;
 
 
-  ; QUESTION: should we mixin the notion of :local and :remote right here, so we can
+  ; QUESTION: should we mix-in the notion of :local and :remote right here, so we can
   ; build the correct subscription/event signals?
   ;
   ; OR we can leave that logic to the function that actually builds the signal vectors (see
@@ -890,6 +993,8 @@
   ;        THIS requires looking at the component's meta-data
   ;
   ; OR we could leave it to the component itself to build the correct vector(s)
+  ;
+  ; what about the flow-diagram?
   ;
 
 
@@ -917,7 +1022,6 @@
     (get-in configuration [:links target-id node-id]))
 
   ())
-
 
 
 ; new logic for building the flow-nodes, so we can have custom node rendering
@@ -949,5 +1053,4 @@
 
 
   ())
-
 
