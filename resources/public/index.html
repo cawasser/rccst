@@ -30,7 +30,8 @@
         var csrfToken = "{{csrf-token}}";
     </script>
     <script>
-          window.CESIUM_BASE_URL = 'https://localhost:8280/';
+      window.CESIUM_BASE_URL = '/assets/Cesium/';
+      Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJkYWNiMDFiNy1iYzFiLTQ2NDMtYmJlNC0zMjRiNTIzMjM5ODQiLCJpZCI6ODQ1MDAsImlhdCI6MTY0NjMyODY1Mn0.Nax1YEWqQzM_eOqHPhblhU9TO9U42VJn4wCcolAkuhM';
     </script>
     <script>
          window.prstr  = function (obj) { return cljs.core.pr_str(obj) };
