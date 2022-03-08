@@ -294,24 +294,25 @@
 
 
 (defmethod component->ui :ui/component [{:keys [node registry configuration container-id]}]
-  (log/info "component->ui :ui/component" node)
+  ;(log/info "component->ui :ui/component" node)
   (let [ui-type (->> configuration :components node :name)
         ui-component (->> registry ui-type :component)]
-    (into [ui-component]
-      (flatten
-        (seq
-          (merge
-            (make-params configuration node :inputs container-id)
-            (make-params configuration node :outputs container-id)))))))
+    {node
+     (into [ui-component]
+       (flatten
+         (seq
+           (merge
+             (make-params configuration node :inputs container-id)
+             (make-params configuration node :outputs container-id)))))}))
 
 
 (defmethod component->ui :source/local [{:keys [node container-id]}]
-  (log/info "component->ui :source/local" node)
+  ;(log/info "component->ui :source/local" node)
   [:local-subscription (ui-utils/path->keyword container-id node)])
 
 
 (defmethod component->ui :source/remote [{:keys [node]}]
-  (log/info "component->ui :source/remote" node)
+  ;(log/info "component->ui :source/remote" node)
   [:remote-subscription node])
 
 
@@ -319,7 +320,7 @@
   (let [actual-fn (->> configuration :components node :name)
         denorm (->> configuration :denorm node)]
 
-    (log/info "component->ui :source/fn" node "//" actual-fn "//" denorm)
+    ;(log/info "component->ui :source/fn" node "//" actual-fn "//" denorm)
 
     (apply actual-fn
       (flatten
@@ -327,6 +328,19 @@
           (merge
             (make-params configuration node :inputs container-id)
             (make-params configuration node :outputs container-id)))))))
+
+
+(defn- process-components [configuration type registry container-id]
+  (->> configuration
+    :components
+    (filter (fn [[_ meta-data]]
+              (= type (:type meta-data))))
+    (map (fn [[node meta-data]]
+           (component->ui {:node node
+                           :type (:type meta-data)
+                           :configuration configuration
+                           :registry registry
+                           :container-id container-id})))))
 
 ;; endregion
 
@@ -1086,6 +1100,7 @@
 
 
   ; 2. build the subscription and event signal vectors (just call them)
+  ;; region
   (defn dummy [& {:keys [data range]}]
     {:data data :range range})
 
@@ -1111,6 +1126,8 @@
 
 
   (->> components
+    (filter (fn [[node meta-data]]
+              (= :ui/component (:type meta-data))))
     (map (fn [[node meta-data]]
            (component->ui {:node node
                            :type (:type meta-data)
@@ -1118,15 +1135,30 @@
                            :registry meta-data-registry
                            :container-id :dummy}))))
 
+  ;; endregion
+
 
   ; the correct order of operations is:
   ;
   ;  1. remote subscriptions (including the remote call)
-  ;  2. blackboard data
-  ;  3. local subscription against th blackboard
-  ;  4. local functions (with subscriptions against the blackboard  or remotes)
-  ;  5. build UI components (with subscriptions against the blackboard  or remotes)
-  ;  6. run layout over the UI components
+  (process-components configuration :source/remote meta-data-registry :coverage-plan)
+
+  ;  2. add blackboard data to the app-db and build local subscriptions against the blackboard
+  (process-components configuration :source/local meta-data-registry :coverage-plan)
+
+  ;  3. local functions (with subscriptions against the blackboard or remotes)
+  (process-components configuration :source/fn meta-data-registry :coverage-plan)
+
+  ;  4. build UI components (with subscriptions against the blackboard or remotes)
+  ;
+  ;    actually, this can happen at any time, since evaluation is deferred to Reagent upon re-render
+  ;
+  (def component-lookup (into {}
+                          (process-components
+                            configuration :ui/component
+                            meta-data-registry :coverage-plan)))
+
+  ;  5. run layout over the UI components using component-lookup
   ;
 
 
