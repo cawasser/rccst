@@ -270,20 +270,20 @@
     direction)
 
   (->> configuration
-      :denorm
-      node
-      direction
-      (map (fn [[target ports]]
-             (let [[source-port target-port] ports]
-               (println target (-> configuration :components target :type))
-               (if (= direction :outputs)
-                 {source-port (if (= :source/local (-> configuration :components target :type))
-                                (ui-utils/path->keyword container-id :backboard target)
-                                target)}
-                 {target-port (if (= :source/local (-> configuration :components target :type))
-                                (ui-utils/path->keyword container-id :backboard target)
-                                target)}))))
-      (into {}))
+    :denorm
+    node
+    direction
+    (map (fn [[target ports]]
+           (let [[source-port target-port] ports]
+             (println target (-> configuration :components target :type))
+             (if (= direction :outputs)
+               {source-port (if (= :source/local (-> configuration :components target :type))
+                              (ui-utils/path->keyword container-id :backboard target)
+                              target)}
+               {target-port (if (= :source/local (-> configuration :components target :type))
+                              (ui-utils/path->keyword container-id :backboard target)
+                              target)}))))
+    (into {}))
 
 
   ())
@@ -295,7 +295,7 @@
 
 (defmethod component->ui :ui/component [{:keys [node registry configuration container-id]}]
   ;(log/info "component->ui :ui/component" node)
-  (let [ui-type (->> configuration :components node :name)
+  (let [ui-type      (->> configuration :components node :name)
         ui-component (->> registry ui-type :component)]
     {node
      (into [ui-component]
@@ -336,7 +336,7 @@
 
 (defmethod component->ui :source/fn [{:keys [node configuration container-id]}]
   (let [actual-fn (->> configuration :components node :name)
-        denorm (->> configuration :denorm node)]
+        denorm    (->> configuration :denorm node)]
 
     ;(log/info "component->ui :source/fn" node "//" actual-fn "//" denorm)
 
@@ -354,11 +354,11 @@
     (filter (fn [[_ meta-data]]
               (= type (:type meta-data))))
     (map (fn [[node meta-data]]
-           (component->ui {:node node
-                           :type (:type meta-data)
+           (component->ui {:node          node
+                           :type          (:type meta-data)
                            :configuration configuration
-                           :registry registry
-                           :container-id container-id})))))
+                           :registry      registry
+                           :container-id  container-id})))))
 
 ;; endregion
 
@@ -734,7 +734,7 @@
                      ":source/remote" (partial custom-node :source/remote)
                      ":source/local"  (partial custom-node :source/local)
                      ":source/fn"     (partial custom-node :source/fn)}]
-    [:div {:style {:width "70%" :height "100%"}}
+    [:div {:style {:width "100%" :height "100%"}}
      [:> ReactFlowProvider
       [:> ReactFlow {:className        component-id
                      :elements         config-flow
@@ -757,6 +757,7 @@
     [rc/v-box
      :style {:textAlign :center}
      :gap "15px"
+     :width "100%" :height "100%"
      :children [[:h2 "The composed UI will display here"]
                 [rc/line :size "2px" :color "blue"]
                 (into [:<>]
@@ -776,7 +777,8 @@
   [& {:keys [data component-id container-id ui]}]
   (let [id            (r/atom nil)
         configuration @data
-        graph         (apply lg/digraph (compute-edges configuration))]
+        graph         (apply lg/digraph (compute-edges configuration))
+        comp-or-dag?  (r/atom :component)]
 
     (fn []
       (when (nil? @id)
@@ -791,20 +793,37 @@
                           :nodes (lg/nodes graph)
                           :edges (lg/edges graph))]
 
+
         [rc/h-box :src (rc/at)
-         :gap "20px"
          :width "1000px"
          :height "800px"
-         :children [[dag-panel
-                     :configuration full-config
-                     :component-id @id
-                     :container-id container-id
-                     :ui ui]
-                    [component-panel
-                     :configuration full-config
-                     :component-id @id
-                     :container-id container-id
-                     :ui ui]]]))))
+         :justify :end
+         :children [(condp = @comp-or-dag?
+                      :dag [dag-panel
+                            :configuration full-config
+                            :component-id @id
+                            :container-id container-id
+                            :ui ui]
+                      :component [component-panel
+                                  :configuration full-config
+                                  :component-id @id
+                                  :container-id container-id
+                                  :ui ui]
+                      :default [rc/alert-box :src (rc/at)
+                                :alert-type :warning
+                                :body "There is a problem with this component."])
+                    [rc/md-icon-button
+                     :md-icon-name (if (= :component @comp-or-dag?)
+                                     "zmdi-settings"
+                                     "zmdi-view-compact")
+                     :tooltip (if (= :component @comp-or-dag?)
+                                "view the DAG for this component"
+                                "view the component as it is rendered")
+                     :on-click #(do
+                                  (reset! comp-or-dag? (if (= :component @comp-or-dag?)
+                                                         :dag
+                                                         :component))
+                                  (log/info "comp-or-dag?" @comp-or-dag?))]]]))))
 
 
 
@@ -1147,11 +1166,11 @@
     (filter (fn [[node meta-data]]
               (= :ui/component (:type meta-data))))
     (map (fn [[node meta-data]]
-           (component->ui {:node node
-                           :type (:type meta-data)
+           (component->ui {:node          node
+                           :type          (:type meta-data)
                            :configuration configuration
-                           :registry meta-data-registry
-                           :container-id :dummy}))))
+                           :registry      meta-data-registry
+                           :container-id  :dummy}))))
 
   ;; endregion
 
