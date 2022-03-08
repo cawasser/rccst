@@ -8,6 +8,7 @@
 
 
 (defn selectable-table [& {:keys [data selection component-id container-id]}]
+
   (let [source  (re-frame/subscribe data)
         clicked (r/atom 0)]
     (fn [& {:keys [data selection component-id container-id]}]

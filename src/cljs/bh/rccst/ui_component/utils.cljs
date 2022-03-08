@@ -251,7 +251,7 @@
         (get widgets id)))))
 
 
-(defn- create-widget-local-sub
+(defn create-widget-local-sub
   "create and registers a re-frame [subscription handler](https://day8.github.io/re-frame/subscriptions/)
   for the value at the path inside the [`:widgets` `widget-id as a keyword`] key in the `app-db`.
 
@@ -311,7 +311,7 @@
         (assoc-in db [:widgets id] new-val)))))
 
 
-(defn- create-widget-local-event
+(defn create-widget-local-event
   "create and registers a re-frame [event handler](https://day8.github.io/re-frame/dominoes-30k/#domino-2-event-handling)
   for the value at the path inside the [`:widgets` `widget-id as a keyword`] key in the `app-db`.
 

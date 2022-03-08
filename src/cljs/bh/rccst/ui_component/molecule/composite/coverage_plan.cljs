@@ -33,16 +33,16 @@
   [& {:keys [targets satellites coverages layers]}]
 
   (let [some-computation (fn [t s c] [:layers])]
-    ["fn-coverage" {:targets targets :satellites satellites
-                    :coverages coverages :layers layers}]))
+    ;["fn-coverage" {:targets targets :satellites satellites
+    ;                :coverages coverages :layers layers}]))
 
-    ;(re-frame/reg-sub
-    ;  layers
-    ;  :<- [targets]
-    ;  :<- [satellites]
-    ;  :<- [coverages]
-    ;  (fn [t s c [_ _]]
-    ;    (some-computation t s c)))))
+    (re-frame/reg-sub
+      layers
+      :<- [targets]
+      :<- [satellites]
+      :<- [coverages]
+      (fn [t s c [_ _]]
+        (some-computation t s c)))))
 
 
 (defn fn-range
@@ -57,13 +57,13 @@
   [& {:keys [data range]}]
 
   (let [some-computation (fn [x] [:range])]
-    ["fn-range" {:data data :range range}]))
+    ;["fn-range" {:data data :range range}]))
 
-;(re-frame/reg-sub
-;  range
-;  :<- [data]
-;  (fn [d [_ _]]
-;    (some-computation d)))))
+    (re-frame/reg-sub
+      range
+      :<- [data]
+      (fn [d [_ _]]
+        (some-computation d)))))
 
 
 ;; components have "ports" which define their inputs and outputs:
@@ -176,23 +176,23 @@
   {:fn/coverage     (fn-coverage
                       :targets [:coverage-plan/blackboard.topic.selected-targets]
                       :satellites [:coverage-plan/blackboard.topic.selected-satellites]
-                      :coverages [:topic/coverages]
+                      :coverages [:bh.rccst.subs/source :topic/coverages]
                       :layers [:coverage-plan/blackboard.topic.layers])
 
    :fn/range        (fn-range
-                      :data [:topic/coverages]
+                      :data [:bh.rccst.subs/source :topic/coverages]
                       :selected [:coverage-plan/blackboard.topic.time-range])
 
    :ui/targets      [e/selectable-table
                      :component-id :coverage-plan/targets
                      :container-id :coverage-plan
-                     :data [:topic/target-data]
+                     :data [:bh.rccst.subs/source :topic/target-data]
                      :selected [:coverage-plan/blackboard.topic.selected-targets]]
 
    :ui/satellites   [e/selectable-table
                      :component-id :coverage-plan/satellites
                      :container-id :coverage-plan
-                     :data [:topic/satellite-data]
+                     :data [:bh.rccst.subs/source :topic/satellite-data]
                      :selected [:coverage-plan/blackboard.topic.selected-targets]]
 
    :ui/globe        [e/globe
@@ -306,14 +306,32 @@
              (make-params configuration node :outputs container-id)))))}))
 
 
-(defmethod component->ui :source/local [{:keys [node container-id]}]
-  ;(log/info "component->ui :source/local" node)
-  [:local-subscription (ui-utils/path->keyword container-id node)])
+(defmethod component->ui :source/local [{:keys [node component-id container-id]}]
+  (log/info "component->ui :source/local" node)
+
+  ; 1. add the key to the blackboard (what about a default value?)
+  (re-frame/dispatch-sync [:events/init-widget-locals node {}])
+
+  ; 2. create the subscription against the new :blackboard key
+  (ui-utils/create-widget-local-sub component-id [:blackboard node])
+
+  ; 3. create the event against the new :blackboard key
+  (ui-utils/create-widget-local-event component-id [:blackboard node])
+
+  ; 3. return the signal vector for the new subscription
+  [(ui-utils/path->keyword container-id node)])
 
 
 (defmethod component->ui :source/remote [{:keys [node]}]
-  ;(log/info "component->ui :source/remote" node)
-  [:remote-subscription node])
+  (log/info "component->ui :source/remote" node)
+
+  ; 1. subscribe to the server (if needed)
+  (re-frame/dispatch [:bh.rccst.events/subscribe-to #{node}])
+
+  ; 2. add the key to the app-db (I think this happens in step 2)
+
+  ; 3. return the signal vector to the new data-source key
+  [:bh.rccst.subs/source node])
 
 
 (defmethod component->ui :source/fn [{:keys [node configuration container-id]}]
@@ -1140,25 +1158,40 @@
 
   ; the correct order of operations is:
   ;
-  ;  1. remote subscriptions (including the remote call)
+  ; 1. remote subscriptions (including the remote call)
+  ;
+  ; [SIDE EFFECT]
   (process-components configuration :source/remote meta-data-registry :coverage-plan)
 
-  ;  2. add blackboard data to the app-db and build local subscriptions against the blackboard
+  ; 1a. build the subscription for the "container" which provide the basis for the
+  ;     subscriptions for the "locals"
+  ;
+  ; [SIDE EFFECT]
+  (ui-utils/create-widget-sub container-id)
+
+
+  ; 2. add blackboard data to the app-db and build local subscriptions/events against the blackboard
+  ;
+  ; [SIDE EFFECT]
   (process-components configuration :source/local meta-data-registry :coverage-plan)
 
-  ;  3. local functions (with subscriptions against the blackboard or remotes)
+  ; 3. local functions (to build subscriptions against the blackboard or remotes)
+  ;
+  ; [SIDE EFFECT]
   (process-components configuration :source/fn meta-data-registry :coverage-plan)
 
-  ;  4. build UI components (with subscriptions against the blackboard or remotes)
+  ; 4. build UI components (with subscriptions against the blackboard or remotes)
   ;
-  ;    actually, this can happen at any time, since evaluation is deferred to Reagent upon re-render
+  ;      actually, this can happen at any time, since evaluation is deferred to Reagent upon re-render
+  ;
+  ; this just builds the vectors and maps them to the component-id in the configuration in pre for Step 5
   ;
   (def component-lookup (into {}
                           (process-components
                             configuration :ui/component
                             meta-data-registry :coverage-plan)))
 
-  ;  5. run layout over the UI components using component-lookup
+  ; 5. run layout over the UI components using component-lookup
   ;
 
 
