@@ -22,6 +22,7 @@
 
 ; TODO!!!!
 ; get data from the topics
+; replaced by (defmethod component->ui :source/remote) in ...coverage-plan
 (defn- resolved-sources [composite-def]
   (->> composite-def
     :sources
@@ -36,12 +37,13 @@
 (defn- process-sources [resolved-sources sources]
   (->> sources
     (mapcat (fn [[name source]]
-              (println name source)
+              ;(log/info name source)
               [name (get resolved-sources source)]))
     flatten
     (into [])))
 
 
+; replaced by (defmethod component->ui :ui/component) in ...coverage-plan
 (defn- process-component [composite-def resolved-components resolved-sources id component]
   (let [sources (get-in composite-def [:links component])]
     (flatten
@@ -104,9 +106,17 @@
 ;
 ; i.e., we want to create something like this:
 ;
-;    [[[line-chart/component data (str component-id "/line-chart") component-id]
-;      [config-panel data component-id]
-;      [bar-chart/component data (str component-id "/bar-chart") component-id]})))
+;    [[[line-chart/component
+;       :data data
+;       :component-id (path->keyword id "line-chart")
+;       :container-id id]
+;      [config-panel
+;       :data data
+;       :component-id (path->keyword id "config")]
+;      [bar-chart/component
+;       :data data
+;       :component-id (path->keyword id "bar-chart")
+;       :container-id id]]]
 ;
 (comment
   (def composite-def bh.rccst.ui-component.molecule.composite.multi-chart/composite-def)
@@ -119,9 +129,17 @@
   ;
   ; i.e., we want to create something like this:
   ;
-  ;    [[[line-chart/component data (str component-id "/line-chart") component-id]
-  ;      [config-panel data component-id]
-  ;      [bar-chart/component data (str component-id "/bar-chart") component-id]})))
+  ;    [[[line-chart/component
+  ;       :data data
+  ;       :component-id (path->keyword id "line-chart")
+  ;       :container-id id]
+  ;      [config-panel
+  ;       :data data
+  ;       :component-id (path->keyword id "config")]
+  ;      [bar-chart/component
+  ;       :data data
+  ;       :component-id (path->keyword id "bar-chart")
+  ;       :container-id id]]]
   ;
   ; let's start with :line-chart
   ;

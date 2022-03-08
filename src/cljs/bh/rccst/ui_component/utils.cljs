@@ -243,6 +243,7 @@
   [widget-id]
   (let [id (keyword widget-id)
         w (keyword :widgets widget-id)]
+    (log/info "create-widget-sub" w "//" id)
     (re-frame/reg-sub
       w
       :<- [:widgets]
@@ -251,7 +252,7 @@
         (get widgets id)))))
 
 
-(defn- create-widget-local-sub
+(defn create-widget-local-sub
   "create and registers a re-frame [subscription handler](https://day8.github.io/re-frame/subscriptions/)
   for the value at the path inside the [`:widgets` `widget-id as a keyword`] key in the `app-db`.
 
@@ -283,7 +284,7 @@
   [widget-id [a & more :as value-path]]
   (let [p (compute-path widget-id a more)
         dep (compute-deps widget-id a more)]
-    ;(log/info "create-widget-local-sub" widget-id p dep more (if more (last more) a))
+    (log/info "create-widget-local-sub" widget-id p dep more (if more (last more) a))
     (re-frame/reg-sub
       p
       :<- [dep]
@@ -311,7 +312,7 @@
         (assoc-in db [:widgets id] new-val)))))
 
 
-(defn- create-widget-local-event
+(defn create-widget-local-event
   "create and registers a re-frame [event handler](https://day8.github.io/re-frame/dominoes-30k/#domino-2-event-handling)
   for the value at the path inside the [`:widgets` `widget-id as a keyword`] key in the `app-db`.
 
