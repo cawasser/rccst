@@ -32,15 +32,17 @@
   "
   [& {:keys [targets satellites coverages layers]}]
 
-  (let [some-computation (fn [t s c] [:fn-coverage])]
+  (let [some-computation (fn [t s c] [:layers])]
+    ["fn-coverage" {:targets targets :satellites satellites
+                    :coverages coverages :layers layers}]))
 
-    (re-frame/reg-sub
-      layers
-      :<- [targets]
-      :<- [satellites]
-      :<- [coverages]
-      (fn [t s c [_ _]]
-        (some-computation t s c)))))
+    ;(re-frame/reg-sub
+    ;  layers
+    ;  :<- [targets]
+    ;  :<- [satellites]
+    ;  :<- [coverages]
+    ;  (fn [t s c [_ _]]
+    ;    (some-computation t s c)))))
 
 
 (defn fn-range
@@ -52,15 +54,16 @@
 
   builds and registers the subscription :<container>/blackboard.<selected>
   "
-  [& {:keys [data selected]}]
+  [& {:keys [data range]}]
 
-  (let [some-computation (fn [x] [:fn-range])]
+  (let [some-computation (fn [x] [:range])]
+    ["fn-range" {:data data :range range}]))
 
-    (re-frame/reg-sub
-      selected
-      :<- [data]
-      (fn [d [_ _]]
-        (some-computation d)))))
+;(re-frame/reg-sub
+;  range
+;  :<- [data]
+;  (fn [d [_ _]]
+;    (some-computation d)))))
 
 
 ;; components have "ports" which define their inputs and outputs:
@@ -91,7 +94,7 @@
 
    :slider/slider          {:component e/slider
                             :ports     {:value :port/source-sink
-                                        :range :port/source}}
+                                        :range :port/sink}}
 
    :label/label            {:component e/label
                             :ports     {:value :port/sink}}})
@@ -115,7 +118,7 @@
                                          :topic/selected-targets    {:type :source/local :name :selected-targets}
                                          :topic/selected-satellites {:type :source/local :name :selected-satellites}
                                          :topic/current-time        {:type :source/local :name :current-time}
-                                         :topic/selected-coverages  {:type :source/local :name :selected-coverages}
+                                         :topic/layers              {:type :source/local :name :layers}
                                          :topic/time-range          {:type :source/local :name :time-range}
 
                                          ; transformation functions
@@ -137,7 +140,7 @@
                                          :ui/time-slider            {:value {:topic/current-time :data}}
 
                                          ; transformation functions publish to what?
-                                         :fn/coverage               {:selected {:topic/selected-coverages :data}}
+                                         :fn/coverage               {:layers {:topic/layers :data}}
                                          :fn/range                  {:range {:topic/time-range :data}}
 
                                          ; topics are inputs into what?
@@ -147,7 +150,7 @@
                                          :topic/selected-satellites {:data {:fn/coverage :satellites}}
                                          :topic/coverage-data       {:data {:fn/coverage :coverages
                                                                             :fn/range    :data}}
-                                         :topic/selected-coverages  {:data {:ui/globe :coverages}}
+                                         :topic/layers              {:data {:ui/globe :coverages}}
                                          :topic/current-time        {:data {:ui/current-time :value
                                                                             :ui/time-slider  :value
                                                                             :ui/globe        :current-time}}
@@ -174,7 +177,7 @@
                       :targets [:coverage-plan/blackboard.topic.selected-targets]
                       :satellites [:coverage-plan/blackboard.topic.selected-satellites]
                       :coverages [:topic/coverages]
-                      :selected [:coverage-plan/blackboard.topic.selected-coverages])
+                      :layers [:coverage-plan/blackboard.topic.layers])
 
    :fn/range        (fn-range
                       :data [:topic/coverages]
@@ -195,7 +198,7 @@
    :ui/globe        [e/globe
                      :component-id :coverage-plan/globe
                      :container-id :coverage-plan
-                     :coverages [:coverage-plan/blackboard.topic.selected-coverages]
+                     :layers [:coverage-plan/blackboard.topic.layers]
                      :current-time [:coverage-plan/blackboard.topic.current-time]]
 
    :ui/time-slider  [e/slider
@@ -221,20 +224,110 @@
 ;;;;;;;;;;
 ;; region
 
+
+(defn- make-params [configuration node direction container-id]
+  (->> configuration
+    :denorm
+    node
+    direction
+    (map (fn [[target ports]]
+           (let [[source-port target-port] ports]
+             (println target (-> configuration :components target :type))
+             (if (= direction :outputs)
+               {source-port (if (= :source/local (-> configuration :components target :type))
+                              (ui-utils/path->keyword container-id :backboard target)
+                              target)}
+               {target-port (if (= :source/local (-> configuration :components target :type))
+                              (ui-utils/path->keyword container-id :backboard target)
+                              target)}))))
+    (into {})))
+
+
+(comment
+  (do
+    (def config @sample-data)
+    (def container-id "dummy")
+    (def links (:links config))
+    (def layout (:layout config))
+    (def components (:components config))
+    (def graph (apply lg/digraph (compute-edges config)))
+    (def nodes (lg/nodes graph))
+    (def edges (lg/edges graph))
+    (def registry meta-data-registry)
+    (def configuration (assoc @sample-data
+                         :graph graph
+                         :denorm (denorm-components graph (:links config) (lg/nodes graph))
+                         :nodes (lg/nodes graph)
+                         :edges (lg/edges graph)))
+    (def node :fn/coverage)
+    (def direction :inputs))
+
+  (make-params configuration :fn/coverage :inputs :dummy)
+
+  (->> configuration
+    :denorm
+    node
+    direction)
+
+  (->> configuration
+      :denorm
+      node
+      direction
+      (map (fn [[target ports]]
+             (let [[source-port target-port] ports]
+               (println target (-> configuration :components target :type))
+               (if (= direction :outputs)
+                 {source-port (if (= :source/local (-> configuration :components target :type))
+                                (ui-utils/path->keyword container-id :backboard target)
+                                target)}
+                 {target-port (if (= :source/local (-> configuration :components target :type))
+                                (ui-utils/path->keyword container-id :backboard target)
+                                target)}))))
+      (into {}))
+
+
+  ())
+
+
 (defmulti component->ui (fn [{:keys [type]}]
                           type))
 
-(defmethod component->ui :ui/component [{:keys [name]}]
-  [name])
 
-(defmethod component->ui :source/local [{:keys [component-id name]}]
-  (ui-utils/path->keyword component-id name))
+(defmethod component->ui :ui/component [{:keys [node registry configuration container-id]}]
+  (log/info "component->ui :ui/component" node)
+  (let [ui-type (->> configuration :components node :name)
+        ui-component (->> registry ui-type :component)]
+    (into [ui-component]
+      (flatten
+        (seq
+          (merge
+            (make-params configuration node :inputs container-id)
+            (make-params configuration node :outputs container-id)))))))
 
-(defmethod component->ui :source/remote [{:keys [component-id name]}]
-  name)
 
-(defmethod component->ui :source/fn [{:keys [name ports]}]
-  [name ports])
+(defmethod component->ui :source/local [{:keys [node container-id]}]
+  (log/info "component->ui :source/local" node)
+  [:local-subscription (ui-utils/path->keyword container-id node)])
+
+
+(defmethod component->ui :source/remote [{:keys [node]}]
+  (log/info "component->ui :source/remote" node)
+  [:remote-subscription node])
+
+
+(defmethod component->ui :source/fn [{:keys [node configuration container-id]}]
+  (let [actual-fn (->> configuration :components node :name)
+        denorm (->> configuration :denorm node)]
+
+    (log/info "component->ui :source/fn" node "//" actual-fn "//" denorm)
+
+    (apply actual-fn
+      (flatten
+        (seq
+          (merge
+            (make-params configuration node :inputs container-id)
+            (make-params configuration node :outputs container-id)))))))
+
 ;; endregion
 
 
@@ -429,7 +522,7 @@
        (map-indexed (fn [idx [target ports]]
                       (let [[source-port target-port] ports]
                         (log/info "input-handle" label "/" target-port "///" target "/" source-port)
-                        [:> Handle {:id target-port :type "target" :position "top"
+                        [:> Handle {:id    target-port :type "target" :position "top"
                                     :style (merge handle-style {:left (+ 20 (* 10 idx))})}])))
        (into [:<>])))
 
@@ -439,7 +532,7 @@
        (map-indexed (fn [idx [target ports]]
                       (let [[source-port target-port] ports]
                         (log/info "output-handle" label "/" source-port "///" target "/" target-port)
-                        [:> Handle {:id source-port :type "source" :position "bottom"
+                        [:> Handle {:id    source-port :type "source" :position "bottom"
                                     :style (merge handle-style {:left (+ 20 (* 10 idx))})}])))
        (into [:<>])))])
 
@@ -539,13 +632,13 @@
                            (get-in configuration [:denorm node-id :inputs])
                            (map (fn [[k v]]
                                   (let [[sp tp] v]
-                                   {(str k) [(str sp) (str tp)]})))
+                                    {(str k) [(str sp) (str tp)]})))
                            (into {}))
                 :outputs (->>
                            (get-in configuration [:denorm node-id :outputs])
                            (map (fn [[k v]]
                                   (let [[sp tp] v]
-                                   {(str k) [(str sp) (str tp)]})))
+                                    {(str k) [(str sp) (str tp)]})))
                            (into {}))}
      :position {}}))
 
@@ -822,15 +915,21 @@
 ;; piece together the data needed to build all the UI components and supporting functions
 (comment
   (do
-    (def configuration @sample-data)
+    (def config @sample-data)
     (def container-id "dummy")
-    (def links (:links configuration))
-    (def layout (:layout configuration))
-    (def components (:components configuration))
-    (def graph (apply lg/digraph (compute-edges configuration)))
+    (def links (:links config))
+    (def layout (:layout config))
+    (def components (:components config))
+    (def graph (apply lg/digraph (compute-edges config)))
     (def nodes (lg/nodes graph))
     (def edges (lg/edges graph))
-    (def registry meta-data-registry))
+    (def registry meta-data-registry)
+
+    (def configuration (assoc @sample-data
+                         :graph graph
+                         :denorm (denorm-components graph (:links config) (lg/nodes graph))
+                         :nodes (lg/nodes graph)
+                         :edges (lg/edges graph))))
 
   ;; 1. build the functions... (how? where?)
   ;; region
@@ -986,11 +1085,50 @@
 
 
 
-  ; 2. build the subscription and event signal vectors
+  ; 2. build the subscription and event signal vectors (just call them)
+  (defn dummy [& {:keys [data range]}]
+    {:data data :range range})
 
-  ; 3. build the components, passing them their "signals" (vectors)
+  (def target :topic/coverage-data)
+  (def thing {:data [:topic/coverage-data], :range [:topic/time-range]})
 
-  ; 4. render the components, using composite-layout/layout
+  (flatten (seq thing))
+
+  (apply conj [:dummy] (flatten (seq thing)))
+
+
+
+  (make-params configuration :fn/range :inputs :dummy)
+  (make-params configuration :fn/range :outputs :dummy)
+
+
+  (make-params configuration :fn/coverage :inputs :dummy)
+
+  (apply fn-range
+    (flatten (seq (merge
+                    (make-params configuration :fn/range :inputs :dummy)
+                    (make-params configuration :fn/range :outputs :dummy)))))
+
+
+  (->> components
+    (map (fn [[node meta-data]]
+           (component->ui {:node node
+                           :type (:type meta-data)
+                           :configuration configuration
+                           :registry meta-data-registry
+                           :container-id :dummy}))))
+
+
+  ; the correct order of operations is:
+  ;
+  ;  1. remote subscriptions (including the remote call)
+  ;  2. blackboard data
+  ;  3. local subscription against th blackboard
+  ;  4. local functions (with subscriptions against the blackboard  or remotes)
+  ;  5. build UI components (with subscriptions against the blackboard  or remotes)
+  ;  6. run layout over the UI components
+  ;
+
 
 
   ())
