@@ -46,7 +46,7 @@
      [table/table
       :data data
       :max-rows 5
-      :width 600
+      :width 500
       :on-click-row #(log/info "on-click-row")
       :cell-style cell-styling-fn]]
 

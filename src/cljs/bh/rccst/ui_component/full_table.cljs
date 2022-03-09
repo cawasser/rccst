@@ -9,37 +9,40 @@
 (def editing-cell-content (r/atom nil))
 
 (defn cell-click [rowidx colidx k v]
-  (reset! editing-cell {:row rowidx :col colidx k v})
-  (reset! editing-cell-content (str v)))
-
-(defn check-click []
-  (do
-    (swap! dataset assoc-in [(:row @editing-cell) (key (last @editing-cell))] @editing-cell-content)
-    (reset! editing-cell nil)
-    (reset! editing-cell-content nil)))
+  ;(log/info "cell clicked: " rowidx colidx k v)
+  (if (and (= -1 colidx)(= -1 rowidx))
+    (reset! dataset (into [] (sort-by v @dataset)))
+    (do
+      (reset! editing-cell {:row rowidx :col colidx k v})
+      (reset! editing-cell-content (str v)))))
 
 
 (defn edit-comp []
   [:div#editable {:style {:display     "inline-block"
-                          :align-items "center"
-                          :padding (px 1)
+                          :vertical-align "middle"
                           :width (px 195)
                           :height (px 30)}}
    [:div#input {:style {:display     "inline-block"
-                        :padding (px 1)}}
+                        :vertical-align "middle"}}
      [rc/input-text :src (rc/at)
       :model editing-cell-content
-      :width (px 130)
-      :height (px 20)
+      :width (px 135)
+      :height (px 25)
+      :style {:align-items "bottom"}
       :on-change #(reset! editing-cell-content %)]]
    [:div#check {:style {:display     "inline-block"
+                        :vertical-align "middle"
                         :padding (px 2)}}
     [rc/md-icon-button :src (rc/at)
                       :style {:display "inline-block"}
                        :md-icon-name "zmdi-check"
                        :size :smaller
-                       :on-click #(check-click)]]
+                       :on-click #(do
+                                    (swap! dataset assoc-in [(:row @editing-cell) (key (last @editing-cell))] @editing-cell-content)
+                                    (reset! editing-cell nil)
+                                    (reset! editing-cell-content nil))]]
    [:div#cancel {:style {:display     "inline-block"
+                         :vertical-align "middle"
                          :padding (px 2)}}
      [rc/md-icon-button :src (rc/at)
                         :style {:display "inline-block"}
@@ -57,7 +60,7 @@
                       :width              (px width)
                       :height             (px height)
                       :border-radius      "2px"
-                      :border             "solid white 2px"
+                      :border             "solid grey 2px"
                       :vertical-align     "middle"
                       :background-color   background
                       :display            "inline-block"
@@ -65,26 +68,26 @@
                       :white-space        "nowrap"
                       :overflow           "hidden"
                       :text-overflow      "ellipsis"
-                      :color              "white"
+                      :color              "black"
                       :font-size          font-size
                       :cursor             "pointer"}
               :on-click #(cell-click rowidx colidx colname name)} (str name)])))
 
-(defn build-header [vals]
+(defn build-header [height vals]
     [:div {:class "headers"
            :style {:display     "inline-block"
                    :text-align "center"}}
      (doall
        (map-indexed
          (fn [idx v]
-           ^{:key [idx]}[span-with-border {:name (str v)
+           ^{:key [idx]}[span-with-border {:name v
                                            :rowidx -1
                                            :colidx -1
                                            :font-size 20
-                                           :background "#60d898"
-                                           :height 40 :width 195}]) vals))])
+                                           :background "#60A0D8"
+                                           :height height :width 195}]) vals))])
 
-(defn build-row [row_index row]
+(defn build-row [row_height row_index row]
       (let [values (vals row)
             ks    (into [] (keys row))]
         [:div {:class (str "row" row_index)
@@ -97,11 +100,11 @@
                                                                       :colidx idx
                                                                       :colname (get ks idx)
                                                                       :name v
-                                                                      :font-size 12
-                                                                      :background "#d860a0" :height 30 :width 195}]) values))]))
+                                                                      :font-size 14
+                                                                      :background "#ffffff" :height row_height :width 195}]) values))]))
 
 
-
+; Testing out row building
 (comment
   (def data (r/atom
               [{:id "Page A" :kp 2000 :uv 4000 :pv 2400 :amt 2400}
@@ -111,6 +114,9 @@
                {:id "Page E" :kp 2000 :uv 1890 :pv 4800 :amt 2181}
                {:id "Page F" :kp 2000 :uv 2390 :pv 3800 :amt 2500}
                {:id "Page G" :kp 2000 :uv 3490 :pv 4300 :amt 2100}]))
+  (sort-by :pv @dataset)
+  (map #(map (fn [k v] (str v)) %) @data)
+  (into [] (map #(apply merge (map (fn [[k v]] {k (str v)}) %)) @dataset))
 
   (keys (get @data 2))
   (mapv #(merge {:id (:name %)} %) @data)
@@ -140,7 +146,9 @@
 
 (defn table
       [& {:keys [data width height]}]
-    (do (reset! dataset @data))
+    ; the apply/merge/map below is to stringify all the values so sorting still works once a value is edited
+    ; this will need more modification/thought once we move beyond strings/ints in the table cells
+    (do (reset! dataset (into [] (map #(apply merge (map (fn [[k v]] {k (str v)}) %)) @data))))
       (let [light-blue        "#d860a0"
             blue              "#60A0D8"
             gold              "#d89860"
@@ -149,7 +157,6 @@
 
             fib-ratio         0.618             ;; fibonacci ratios to make the visuals look pretty
             unit-50           50                ;; base for fibonacci calulations
-            unit-121          (js/Math.round (/ unit-50 fib-ratio fib-ratio))
             unit-31           (js/Math.round (* unit-50 fib-ratio))
 
             num-rows          5
@@ -164,7 +171,7 @@
 
                 ;; Data Rows (section 5)
                 ;:row-renderer            (fn [_row_index, _row] [box-with-border {:name (str (:id _row)) :background light-blue :height row-height :width width-of-main-row-content}])
-                :row-renderer            (partial build-row )
+                :row-renderer            (partial build-row row-height )
                 :row-content-width       980
                 :row-height              row-height
                 :max-row-viewport-height total-row-height       ;; force a vertical scrollbar
@@ -174,7 +181,7 @@
                 ;:row-footer-renderer     (fn [_row-index, _row] [box-with-border {:name ":row-footer-renderer"  :background green :height unit-31 :width unit-121}])
 
                 ;; column header/footer (sections 4,6)
-                :column-header-renderer  (fn [] [build-header (into (keys (get @data 0)))])
+                :column-header-renderer  (fn [] [build-header (+ row-height 10) (into (keys (get @data 0)))])
                 :column-header-height    40
                 ;:column-footer-renderer  (fn [] [edit-comp])
                 ;:column-footer-height    unit-50
