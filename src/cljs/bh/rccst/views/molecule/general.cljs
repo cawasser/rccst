@@ -15,5 +15,5 @@
    ;[header-bar/example]
    ;[login/example]
    ;[two-d-three-d-globe/example]
-   ;[multi-chart/example]
+   [multi-chart/example]
    [coverage-plan/example]])
