@@ -156,10 +156,10 @@
                                                                             :ui/globe        :current-time}}
                                          :topic/time-range          {:data {:ui/time-slider :range}}}
 
-                          :layout       [rc/v-box
-                                         [rc/h-box
-                                          [rc/v-box [:ui/targets] [:ui/satellites] [:ui/time-slider]]
-                                          [rc/v-box [:ui/globe] [:ui/current-time]]]]}))
+                          :layout       [:v-box
+                                         [:h-box
+                                          [:v-box [:ui/targets :ui/satellites :ui/time-slider]
+                                           :v-box [:ui/globe :ui/current-time]]]]}))
 
 
 (def source-code '[coverage-plan])
@@ -553,7 +553,7 @@
      (->> inputs
        (map-indexed (fn [idx [target ports]]
                       (let [[source-port target-port] ports]
-                        (log/info "input-handle" label "/" target-port "///" target "/" source-port)
+                        ;(log/info "input-handle" label "/" target-port "///" target "/" source-port)
                         [:> Handle {:id    target-port :type "target" :position "top"
                                     :style (merge handle-style {:left (+ 20 (* 10 idx))})}])))
        (into [:<>])))
@@ -563,7 +563,7 @@
      (->> outputs
        (map-indexed (fn [idx [target ports]]
                       (let [[source-port target-port] ports]
-                        (log/info "output-handle" label "/" source-port "///" target "/" target-port)
+                        ;(log/info "output-handle" label "/" source-port "///" target "/" target-port)
                         [:> Handle {:id    source-port :type "source" :position "bottom"
                                     :style (merge handle-style {:left (+ 20 (* 10 idx))})}])))
        (into [:<>])))])
@@ -581,7 +581,7 @@
         outputs (get-in data ["data" "outputs"])
         style   (merge default-node-style (type node-style))]
 
-    (log/info "custom-node" label data "///" inputs "///" outputs)
+    ;(log/info "custom-node" label data "///" inputs "///" outputs)
 
     (r/as-element
       [:div {:style style}
@@ -628,7 +628,7 @@
     dagreGraph))
 
 
-(defn- layout
+(defn- build-layout
   "use dagre (see https://reactflow.dev/examples/layouting/) to perform an auto-layout of the nodes,
   which are then connected by the edges."
   [graph]
@@ -655,7 +655,7 @@
   "
   [configuration node-id]
   (let [node-type (get-in configuration [:components node-id :type])]
-    (log/info "node" node-id node-type)
+    ;(log/info "node" node-id node-type)
     {:id       (str node-id)
      :el-type  :node
      :type     (str node-type)
@@ -682,7 +682,7 @@
   [configuration idx [node-id target-id :as edge]]
   (let [[source-handle target-handle] (get-in configuration [:denorm node-id :outputs target-id])]
 
-    (log/info "flow-edge" idx "/" node-id "/" source-handle "///" target-id "/" target-handle)
+    ;(log/info "flow-edge" idx "/" node-id "/" source-handle "///" target-id "/" target-handle)
 
     {:id            (str idx)
      :el-type       :edge
@@ -721,7 +721,7 @@
                (map-indexed (fn [idx node]
                               (create-flow-edge configuration idx node))
                  (:edges configuration)))]
-    (layout flow)))
+    (build-layout flow)))
 
 
 (defn- dag-panel
@@ -751,21 +751,23 @@
   "show the UI, built form the configuration data passed to the component
   "
   [& {:keys [configuration component-id container-id ui]}]
-  (let [layout     (:layout configuration)
-        components (:components configuration)]
+  (let [layout      (:layout configuration)
+        components  (:components configuration)
+        composed-ui ()]
 
-    [rc/v-box
-     :style {:textAlign :center}
-     :gap "15px"
-     :width "100%" :height "100%"
-     :children [[:h2 "The composed UI will display here"]
-                [rc/line :size "2px" :color "blue"]
-                (into [:<>]
-                  (map (fn [[node meta-data]]
-                         ^{:key node} [:h3 (str node)])
-                    (filter (fn [[node {:keys [type]}]]
-                              (= :ui/component type))
-                      components)))]]))
+    (fn [& {:keys [configuration component-id container-id ui]}]
+      [rc/v-box
+       :style {:textAlign :center}
+       :gap "15px"
+       :width "100%" :height "100%"
+       :children [[:h2 "The composed UI will display here"]
+                  [rc/line :size "2px" :color "blue"]
+                  (into [:<>]
+                    (map (fn [[node meta-data]]
+                           ^{:key node} [:h3 (str node)])
+                      (filter (fn [[node {:keys [type]}]]
+                                (= :ui/component type))
+                        components)))]])))
 
 ;;endregion
 
@@ -822,8 +824,7 @@
                      :on-click #(do
                                   (reset! comp-or-dag? (if (= :component @comp-or-dag?)
                                                          :dag
-                                                         :component))
-                                  (log/info "comp-or-dag?" @comp-or-dag?))]]]))))
+                                                         :component)))]]]))))
 
 
 
@@ -963,6 +964,13 @@
   ())
 
 
+;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;
+;
+; THIS IS THE ONE!!!
+;
+;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; piece together the data needed to build all the UI components and supporting functions
 (comment
   (do
@@ -1133,9 +1141,6 @@
   ;
 
 
-
-
-
   ; 2. build the subscription and event signal vectors (just call them)
   ;; region
   (defn dummy [& {:keys [data range]}]
@@ -1298,6 +1303,96 @@
   (def target-meta (map (fn [[target _]] (target meta-data-registry)) node-meta))
 
   (denorm-components graph links nodes)
+
+
+  ())
+
+
+; work out the "new" logic for building the :layout
+(comment
+  (do
+    (def config @sample-data)
+    (def container-id "dummy")
+    (def links (:links config))
+    (def layout (:layout config))
+    (def components (:components config))
+    (def graph (apply lg/digraph (compute-edges config)))
+    (def nodes (lg/nodes graph))
+    (def edges (lg/edges graph))
+    (def registry meta-data-registry)
+
+    (def configuration (assoc @sample-data
+                         :graph graph
+                         :denorm (denorm-components graph (:links config) (lg/nodes graph))
+                         :nodes (lg/nodes graph)
+                         :edges (lg/edges graph)
+                         :ui (into {}
+                               (process-components
+                                 configuration :ui/component
+                                 meta-data-registry :coverage-plan)))))
+
+  ; in a more 'tree format, the layout looks like this:
+  ;
+  ; |-v-box ---------------------------------------------|
+  ; | |--------------------------------------------------|
+  ; | | h-box                                            |
+  ; | | |-v-box ---------------| |-v-box ----------------|
+  ; | | |    [:ui/targets]     | |   [:ui/globe]         |
+  ; | | |    [:ui/satellites]  | |   [:ui/current-time]  |
+  ; | | |    [:ui/time-slider] | |                       |
+  ; |-|-|----------------------|-|-----------------------|
+
+  (:ui configuration)
+  (:layout configuration)
+
+
+  (def layout [:v-box
+               [:h-box
+                [:v-box [[:ui/targets] [:ui/satellites] [:ui/time-slider]]]
+                [:v-box [[:ui/globe] [:ui/current-time]]]]])
+
+  (def should-be [:v-box
+                  :children [[:h-box
+                              :children [[:v-box
+                                          :children [[:ui/targets]
+                                                     [:ui/satellites]
+                                                     [:ui/time-slider]]]
+                                         [:v-box
+                                          :children [[:ui/globe]
+                                                     [:ui/current-time]]]]]]])
+
+  (defn process-ui [tree]
+    (let [[node children] tree
+          siblings (and (vector? node))
+                     ;(or (= :v-box (first node)) (= :h-box (first node))))
+          branch?  (and (vector? children)
+                     (or (= :v-box node) (= :h-box node)))]
+      (cond
+        branch? (do
+                  (println "branch" node "///" children)
+                  [node :children [(process-ui children)]])
+        siblings (do
+                   (println "siblings" tree)
+                   ; this mapv adds an extra '[]' which we don't need,
+                   ; but how to get rid of it?
+                   (mapv process-ui tree))
+        :else (do
+                (println "leaf" tree)
+                tree))))
+
+  (def tree [:v-box [:h-box [:c :d]]])
+  (process-ui tree)
+
+  (def tree2 [:v-box
+              [:h-box
+               [[:v-box [:c :d]]
+                [:v-box [:e :f]]]]])
+  (process-ui tree2)
+
+  (def produces [:v-box
+                 :children [[:h-box
+                             :children [[:c] [:d]]]]])
+
 
 
   ())
