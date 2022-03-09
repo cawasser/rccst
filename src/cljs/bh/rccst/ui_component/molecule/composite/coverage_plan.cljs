@@ -157,9 +157,9 @@
                                          :topic/time-range          {:data {:ui/time-slider :range}}}
 
                           :layout       [:v-box
-                                         [:h-box
-                                          [:v-box [:ui/targets :ui/satellites :ui/time-slider]
-                                           :v-box [:ui/globe :ui/current-time]]]]}))
+                                         [[:h-box
+                                           [[:v-box [:ui/targets :ui/satellites :ui/time-slider]]
+                                            [:v-box [:ui/globe :ui/current-time]]]]]]}))
 
 
 (def source-code '[coverage-plan])
@@ -1347,21 +1347,18 @@
 
 
   (def layout [:v-box
-               [:h-box
-                [:v-box [[:ui/targets] [:ui/satellites] [:ui/time-slider]]]
-                [:v-box [[:ui/globe] [:ui/current-time]]]]])
+               [[:h-box
+                 [[:v-box [:ui/targets :ui/satellites :ui/time-slider]]
+                  [:v-box [:ui/globe :ui/current-time]]]]]])
 
   (def should-be [:v-box
                   :children [[:h-box
                               :children [[:v-box
-                                          :children [[:ui/targets]
-                                                     [:ui/satellites]
-                                                     [:ui/time-slider]]]
+                                          :children [:ui/targets :ui/satellites :ui/time-slider]]
                                          [:v-box
-                                          :children [[:ui/globe]
-                                                     [:ui/current-time]]]]]]])
+                                          :children [:ui/globe :ui/current-time]]]]]])
 
-  (defn process-ui [tree]
+  (defn process-ui [a tree]
     (let [[node children] tree
           siblings (and (vector? node))
                      ;(or (= :v-box (first node)) (= :h-box (first node))))
@@ -1370,29 +1367,48 @@
       (cond
         branch? (do
                   (println "branch" node "///" children)
-                  [node :children [(process-ui children)]])
+                  (apply conj a [node :children (process-ui [] children)]))
         siblings (do
                    (println "siblings" tree)
                    ; this mapv adds an extra '[]' which we don't need,
                    ; but how to get rid of it?
-                   (mapv process-ui tree))
+                   (apply conj a (mapv #(process-ui [] %) tree)))
         :else (do
                 (println "leaf" tree)
                 tree))))
 
-  (def tree [:v-box [:h-box [:c :d]]])
-  (process-ui tree)
 
-  (def tree2 [:v-box
-              [:h-box
-               [[:v-box [:c :d]]
-                [:v-box [:e :f]]]]])
-  (process-ui tree2)
-
+  (def tree [:v-box [[:h-box [:c :d]]]])
+  (process-ui [] tree)
   (def produces [:v-box
                  :children [[:h-box
-                             :children [[:c] [:d]]]]])
+                             :children [:c :d]]]])
 
+
+  (def tree2 [:v-box
+              [[:h-box
+                [[:v-box [:c :d :e]]
+                 [:v-box [:f :g]]]]]])
+  (process-ui [] tree2)
+
+  (def produces2 [:v-box
+                  :children
+                  [[:h-box
+                    :children [[:v-box
+                                :children [:c :d :e]]
+                               [:v-box
+                                :children [:f :g]]]]]])
+
+
+  (= (process-ui [] layout)
+    should-be)
+
+  (def produces-layout [:v-box
+                        :children [[:h-box
+                                    :children [[:v-box
+                                                :children [:ui/targets :ui/satellites :ui/time-slider]]
+                                               [:v-box
+                                                :children [:ui/globe :ui/current-time]]]]]])
 
 
   ())
