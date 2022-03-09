@@ -62,18 +62,17 @@
              :flex-flow         "column wrap"})
 
 
-(defn path->keyword [id & path]
+(defn path->keyword [& path]
   (->> path
     flatten
-    (apply conj [])
-    (map name)
+    (map str)
+    (map #(clojure.string/replace % #":" ""))
+    (map #(clojure.string/replace % #"/" "."))
     (map #(clojure.string/replace % #" " "-"))
     (clojure.string/join ".")
-    (keyword id)))
-
+    keyword))
 
 ;; endregion
-
 
 
 

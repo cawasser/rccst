@@ -1524,7 +1524,7 @@
   (do
     (def config @sample-data)
     (def container-id "coverage-plan-demo")
-    (def component-id :coverage-plan-demo/component)
+    (def component-id :coverage-plan-demo.component)
     (def links (:links config))
     (def layout (:layout config))
     (def components (:components config))
@@ -1575,10 +1575,10 @@
   (keyword "dummy")
   ; :dummy
 
-  (keyword "namespace" "dummy")
+  (keyword "container" "component")
   ; :namespace/dummy
 
-  (keyword "namespace/component" "dummy")
+  (keyword "container/component" "dummy")
   ; :namespace/component/dummy   <-- BAD!
   ;      (actually invalid. The runtime is fine, but the reader can't handle it!)
 
@@ -1586,6 +1586,9 @@
 
   (keyword "namespace/component" :dummy)
   ; :namespace/component/dummy   <-- BAD!
+
+
+  (keyword :namespace/component :topic/dummy)
 
   (name :dummy)
   ; "dummy"
@@ -1607,5 +1610,8 @@
   (ui-utils/path->keyword "namespace/component" :topic/dummy)
   ; :namespace/component/dummy   <-- STILL BAD
 
+  (keyword (clojure.string/join "." ["container" "component" "topic.dummy"]))
+
+  (str :topic/dummy)
 
   ())
