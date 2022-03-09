@@ -37,7 +37,7 @@
 (defn- process-sources [resolved-sources sources]
   (->> sources
     (mapcat (fn [[name source]]
-              (println name source)
+              ;(log/info name source)
               [name (get resolved-sources source)]))
     flatten
     (into [])))

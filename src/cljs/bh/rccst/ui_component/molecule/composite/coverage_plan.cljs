@@ -150,7 +150,7 @@
                                          :topic/selected-satellites {:data {:fn/coverage :satellites}}
                                          :topic/coverage-data       {:data {:fn/coverage :coverages
                                                                             :fn/range    :data}}
-                                         :topic/layers              {:data {:ui/globe :coverages}}
+                                         :topic/layers              {:data {:ui/globe :layers}}
                                          :topic/current-time        {:data {:ui/current-time :value
                                                                             :ui/time-slider  :value
                                                                             :ui/globe        :current-time}}
@@ -232,61 +232,15 @@
     direction
     (map (fn [[target ports]]
            (let [[source-port target-port] ports]
-             (println target (-> configuration :components target :type))
+             ;(log/info target (-> configuration :components target :type))
              (if (= direction :outputs)
                {source-port (if (= :source/local (-> configuration :components target :type))
-                              (ui-utils/path->keyword container-id :backboard target)
-                              target)}
+                              [(ui-utils/path->keyword container-id :backboard target)]
+                              [:bh.rccst.subs/source target])}
                {target-port (if (= :source/local (-> configuration :components target :type))
-                              (ui-utils/path->keyword container-id :backboard target)
-                              target)}))))
+                              [(ui-utils/path->keyword container-id :backboard target)]
+                              [:bh.rccst.subs/source target])}))))
     (into {})))
-
-
-(comment
-  (do
-    (def config @sample-data)
-    (def container-id "dummy")
-    (def links (:links config))
-    (def layout (:layout config))
-    (def components (:components config))
-    (def graph (apply lg/digraph (compute-edges config)))
-    (def nodes (lg/nodes graph))
-    (def edges (lg/edges graph))
-    (def registry meta-data-registry)
-    (def configuration (assoc @sample-data
-                         :graph graph
-                         :denorm (denorm-components graph (:links config) (lg/nodes graph))
-                         :nodes (lg/nodes graph)
-                         :edges (lg/edges graph)))
-    (def node :fn/coverage)
-    (def direction :inputs))
-
-  (make-params configuration :fn/coverage :inputs :dummy)
-
-  (->> configuration
-    :denorm
-    node
-    direction)
-
-  (->> configuration
-    :denorm
-    node
-    direction
-    (map (fn [[target ports]]
-           (let [[source-port target-port] ports]
-             (println target (-> configuration :components target :type))
-             (if (= direction :outputs)
-               {source-port (if (= :source/local (-> configuration :components target :type))
-                              (ui-utils/path->keyword container-id :backboard target)
-                              target)}
-               {target-port (if (= :source/local (-> configuration :components target :type))
-                              (ui-utils/path->keyword container-id :backboard target)
-                              target)}))))
-    (into {}))
-
-
-  ())
 
 
 (defmulti component->ui (fn [{:keys [type]}]
@@ -294,32 +248,33 @@
 
 
 (defmethod component->ui :ui/component [{:keys [node registry configuration container-id]}]
-  ;(log/info "component->ui :ui/component" node)
+  (log/info "component->ui :ui/component" node)
   (let [ui-type      (->> configuration :components node :name)
         ui-component (->> registry ui-type :component)]
     {node
-     (into [ui-component]
-       (flatten
-         (seq
-           (merge
-             (make-params configuration node :inputs container-id)
-             (make-params configuration node :outputs container-id)))))}))
+     (reduce into [ui-component]
+       (seq
+         (merge
+           (make-params configuration node :inputs container-id)
+           (make-params configuration node :outputs container-id))))}))
 
 
 (defmethod component->ui :source/local [{:keys [node component-id container-id]}]
   (log/info "component->ui :source/local" node)
 
   ; 1. add the key to the blackboard (what about a default value?)
-  (re-frame/dispatch-sync [:events/init-widget-locals node {}])
+  (re-frame/dispatch-sync [:events/init-widget-locals
+                           (ui-utils/path->keyword container-id [:blackboard node])
+                           {}])
 
   ; 2. create the subscription against the new :blackboard key
-  (ui-utils/create-widget-local-sub component-id [:blackboard node])
+  (ui-utils/create-widget-local-sub container-id [:blackboard node])
 
   ; 3. create the event against the new :blackboard key
-  (ui-utils/create-widget-local-event component-id [:blackboard node])
+  (ui-utils/create-widget-local-event container-id [:blackboard node])
 
   ; 3. return the signal vector for the new subscription
-  [(ui-utils/path->keyword container-id node)])
+  [(ui-utils/path->keyword container-id [:blackboard node])])
 
 
 (defmethod component->ui :source/remote [{:keys [node]}]
@@ -349,16 +304,42 @@
 
 
 (defn- process-components [configuration type registry container-id]
+
+  (log/info "process-components" type)
+
   (->> configuration
     :components
     (filter (fn [[_ meta-data]]
               (= type (:type meta-data))))
     (map (fn [[node meta-data]]
+           (log/info "process-components (nodes)" node "//" meta-data "//" (:type meta-data))
            (component->ui {:node          node
                            :type          (:type meta-data)
                            :configuration configuration
                            :registry      registry
                            :container-id  container-id})))))
+
+
+(defn- parse-token [lookup token]
+  (condp = token
+    :v-box [rc/v-box :src (rc/at) :gap "10px"]
+    :h-box [rc/v-box :src (rc/at) :gap "10px"]
+    (or (get lookup token)
+      [rc/alert-box :src (rc/at)
+       :alert-type :warning
+       :body "There is a problem with this component."])))
+
+
+(defn- process-ui [lookup acc tree]
+  (let [[node children] tree
+        siblings? (and (vector? node))
+        branch?   (and (vector? children)
+                    (or (= :v-box node) (= :h-box node)))]
+    (cond
+      branch? (apply conj acc (into (parse-token lookup node) [:children (process-ui lookup [] children)]))
+      siblings? (apply conj acc (mapv #(process-ui lookup [] %) tree))
+      :else (apply conj acc (mapv #(parse-token lookup %) tree)))))
+
 
 ;; endregion
 
@@ -409,38 +390,6 @@
     first
     vals
     first))
-;(->> links
-;  source
-;  target))
-
-
-(defn denorm-components-obe
-  "denormalize the links between components by mixing in additional information bout the
-  ports at both ends of the inter-connection:
-
-  {<source> {:inputs  {<target> [<source's-port> <target's-port>]}
-            {:outputs {<target> [<source's-port> <target's-port>]}}
-
-
-  "
-  [graph links nodes]
-  (->> nodes
-    (map (fn [node]
-           (let [node-meta (->> links node)]
-             {node {:inputs
-                    (into {}
-                      (map (fn [target]
-                             ; TODO: what the heck should replace :dummy?!?!?!?!
-                             {target [:dummy (get-predecessor-name links graph node target)]})
-                        (lg/predecessors* graph node)))
-
-                    :outputs
-                    (into {}
-                      (map (fn [target]
-                             ; TODO: what the heck should replace :dummy?!?!?!?!
-                             {target [:dummy (get-successor-name links graph node target)]})
-                        (lg/successors* graph node)))}})))
-    (into {})))
 
 
 (defn- get-inputs
@@ -528,6 +477,12 @@
 ;
 ;;;;;;;;;;
 ;;;;;;;;;;
+;; region
+
+
+;
+;  UI Support Functions
+;
 ;; region
 
 (def handle-style {:width "8px" :height "8px" :borderRadius "50%"})
@@ -640,7 +595,7 @@
 
     (doall
       (map (fn [element]
-             ;(println "element" (:id element) (.node dagreGraph (clj->js (:id element))))
+             ;(log/info "element" (:id element) (.node dagreGraph (clj->js (:id element))))
              (condp = (:el-type element)
                :node (let [dagreNode (.node dagreGraph (clj->js (:id element)))]
                        (assoc element :position {:x (- (.-x dagreNode) (/ nodeWidth 2))
@@ -723,6 +678,7 @@
                  (:edges configuration)))]
     (build-layout flow)))
 
+;; endregion
 
 (defn- dag-panel
   "show the DAG, built form the configuration passed into the component, in a panel
@@ -747,27 +703,62 @@
        [:> Controls]]]]))
 
 
+(defn stand-in [components]
+  [rc/v-box
+   :style {:textAlign :center}
+   :gap "15px"
+   :width "100%" :height "100%"
+   :children [[:h2 "The composed UI will display here"]
+              [rc/line :size "2px" :color "blue"]
+              (into [:<>]
+                (map (fn [[node meta-data]]
+                       ^{:key node} [:h3 (str node)])
+                  (filter (fn [[node {:keys [type]}]]
+                            (= :ui/component type))
+                    components)))]])
+
 (defn- component-panel
   "show the UI, built form the configuration data passed to the component
   "
-  [& {:keys [configuration component-id container-id ui]}]
-  (let [layout      (:layout configuration)
-        components  (:components configuration)
-        composed-ui ()]
+  [& {:keys [configuration component-id container-id]}]
+  (let [layout           (:layout configuration)
+        components       (:components configuration)
+        component-lookup (into {}
+                           (process-components
+                             configuration :ui/component
+                             meta-data-registry container-id))
 
-    (fn [& {:keys [configuration component-id container-id ui]}]
-      [rc/v-box
-       :style {:textAlign :center}
-       :gap "15px"
-       :width "100%" :height "100%"
-       :children [[:h2 "The composed UI will display here"]
-                  [rc/line :size "2px" :color "blue"]
-                  (into [:<>]
-                    (map (fn [[node meta-data]]
-                           ^{:key node} [:h3 (str node)])
-                      (filter (fn [[node {:keys [type]}]]
-                                (= :ui/component type))
-                        components)))]])))
+        ; 1. build UI components (with subscription/event signals against the blackboard or remotes)
+        composed-ui      (process-ui component-lookup [] layout)]
+
+    ; 2. remote subscriptions (including the remote call)
+    ;
+    ; [SIDE EFFECT]
+    (process-components configuration :source/remote meta-data-registry container-id)
+
+    ; 1a. build the subscription for the "container" which provide the basis for the
+    ;     subscriptions for the "locals"
+    ;
+    ; [SIDE EFFECT]
+    (ui-utils/create-widget-sub container-id)
+    (ui-utils/create-widget-local-sub container-id [:blackboard])
+
+    ; 3. add blackboard data to the app-db and build local subscriptions/events against the blackboard
+    ;
+    ; [SIDE EFFECT]
+    (process-components configuration :source/local meta-data-registry container-id)
+
+    ; 4. local functions (to build subscriptions against the blackboard or remotes)
+    ;
+    ; [SIDE EFFECT]
+    (process-components configuration :source/fn meta-data-registry container-id)
+
+
+    (fn [& {:keys [configuration component-id container-id]}]
+
+      ; 5. return the composed component layout!
+      ;composed-ui)))
+      [stand-in components])))
 
 ;;endregion
 
@@ -776,7 +767,7 @@
   "build a UI from a data structure (data), which provides the :components, :links between them,
   and the :layout of the physical UI-components on the display
   "
-  [& {:keys [data component-id container-id ui]}]
+  [& {:keys [data component-id container-id]}]
   (let [id            (r/atom nil)
         configuration @data
         graph         (apply lg/digraph (compute-edges configuration))
@@ -804,13 +795,11 @@
                       :dag [dag-panel
                             :configuration full-config
                             :component-id @id
-                            :container-id container-id
-                            :ui ui]
+                            :container-id container-id]
                       :component [component-panel
                                   :configuration full-config
                                   :component-id @id
-                                  :container-id container-id
-                                  :ui ui]
+                                  :container-id container-id]
                       :default [rc/alert-box :src (rc/at)
                                 :alert-type :warning
                                 :body "There is a problem with this component."])
@@ -1326,10 +1315,14 @@
                          :denorm (denorm-components graph (:links config) (lg/nodes graph))
                          :nodes (lg/nodes graph)
                          :edges (lg/edges graph)
-                         :ui (into {}
-                               (process-components
-                                 configuration :ui/component
-                                 meta-data-registry :coverage-plan)))))
+                         :ui-lookup (into {}
+                                      (process-components
+                                        configuration :ui/component
+                                        meta-data-registry :coverage-plan))))
+    (def component-lookup (into {}
+                            (process-components
+                              configuration :ui/component
+                              meta-data-registry :coverage-plan))))
 
   ; in a more 'tree format, the layout looks like this:
   ;
@@ -1342,44 +1335,49 @@
   ; | | |    [:ui/time-slider] | |                       |
   ; |-|-|----------------------|-|-----------------------|
 
-  (:ui configuration)
+  (:ui-lookup configuration)
   (:layout configuration)
 
 
-  (def layout [:v-box
-               [[:h-box
-                 [[:v-box [:ui/targets :ui/satellites :ui/time-slider]]
-                  [:v-box [:ui/globe :ui/current-time]]]]]])
+  ;(def layout [:v-box
+  ;             [[:h-box
+  ;               [[:v-box [:ui/targets :ui/satellites :ui/time-slider]]
+  ;                [:v-box [:ui/globe :ui/current-time]]]]]])
 
   (def should-be [:v-box
-                  :children [[:h-box
-                              :children [[:v-box
-                                          :children [:ui/targets :ui/satellites :ui/time-slider]]
-                                         [:v-box
-                                          :children [:ui/globe :ui/current-time]]]]]])
+                  :children
+                  [[:h-box
+                    :children
+                    [[:v-box :children [:ui/targets :ui/satellites :ui/time-slider]]
+                     [:v-box :children [:ui/globe :ui/current-time]]]]]])
 
-  (defn process-ui [a tree]
-    (let [[node children] tree
-          siblings (and (vector? node))
-                     ;(or (= :v-box (first node)) (= :h-box (first node))))
-          branch?  (and (vector? children)
-                     (or (= :v-box node) (= :h-box node)))]
-      (cond
-        branch? (do
-                  (println "branch" node "///" children)
-                  (apply conj a [node :children (process-ui [] children)]))
-        siblings (do
-                   (println "siblings" tree)
-                   ; this mapv adds an extra '[]' which we don't need,
-                   ; but how to get rid of it?
-                   (apply conj a (mapv #(process-ui [] %) tree)))
-        :else (do
-                (println "leaf" tree)
-                tree))))
+  ;(defn process-ui [lookup a tree]
+  ;  (let [[node children] tree
+  ;        siblings? (and (vector? node))
+  ;        ;(or (= :v-box (first node)) (= :h-box (first node))))
+  ;        branch?   (and (vector? children)
+  ;                    (or (= :v-box node) (= :h-box node)))]
+  ;    (cond
+  ;      branch? (do
+  ;                (println "branch" node "///" children)
+  ;                (apply conj a [node :children (process-ui lookup [] children)]))
+  ;      siblings? (do
+  ;                  (println "siblings" tree)
+  ;                  ; this mapv adds an extra '[]' which we don't need,
+  ;                  ; but how to get rid of it?
+  ;                  (apply conj a (mapv #(process-ui lookup [] %) tree)))
+  ;      :else (do
+  ;              (println "leaf" tree)
+  ;              tree))))
+
+  (= (process-ui component-lookup [] layout)
+    should-be)
+
+
 
 
   (def tree [:v-box [[:h-box [:c :d]]]])
-  (process-ui [] tree)
+  (process-ui component-lookup [] tree)
   (def produces [:v-box
                  :children [[:h-box
                              :children [:c :d]]]])
@@ -1389,7 +1387,7 @@
               [[:h-box
                 [[:v-box [:c :d :e]]
                  [:v-box [:f :g]]]]]])
-  (process-ui [] tree2)
+  (process-ui component-lookup [] tree2)
 
   (def produces2 [:v-box
                   :children
@@ -1400,8 +1398,6 @@
                                 :children [:f :g]]]]]])
 
 
-  (= (process-ui [] layout)
-    should-be)
 
   (def produces-layout [:v-box
                         :children [[:h-box
@@ -1409,6 +1405,207 @@
                                                 :children [:ui/targets :ui/satellites :ui/time-slider]]
                                                [:v-box
                                                 :children [:ui/globe :ui/current-time]]]]]])
+
+
+  ())
+
+
+; token substitution
+(comment
+  (do
+    (def config @sample-data)
+    (def container-id "dummy")
+    (def links (:links config))
+    (def layout (:layout config))
+    (def components (:components config))
+    (def graph (apply lg/digraph (compute-edges config)))
+    (def nodes (lg/nodes graph))
+    (def edges (lg/edges graph))
+    (def registry meta-data-registry)
+
+    (def configuration (assoc @sample-data
+                         :graph graph
+                         :denorm (denorm-components graph (:links config) (lg/nodes graph))
+                         :nodes (lg/nodes graph)
+                         :edges (lg/edges graph)
+                         :ui-lookup (into {}
+                                      (process-components
+                                        configuration :ui/component
+                                        meta-data-registry :coverage-plan))))
+    (def component-lookup (into {}
+                            (process-components
+                              configuration :ui/component
+                              meta-data-registry :coverage-plan)))
+    (def node :h-box))
+
+  (:ui-lookup configuration)
+
+  (parse-token component-lookup node)
+
+  (into (parse-token lookup node) [:children [:a :b :c]])
+
+
+  ())
+
+
+; make-param
+(comment
+  (do
+    (def config @sample-data)
+    (def container-id "dummy")
+    (def links (:links config))
+    (def layout (:layout config))
+    (def components (:components config))
+    (def graph (apply lg/digraph (compute-edges config)))
+    (def nodes (lg/nodes graph))
+    (def edges (lg/edges graph))
+    (def registry meta-data-registry)
+    (def configuration (assoc @sample-data
+                         :graph graph
+                         :denorm (denorm-components graph (:links config) (lg/nodes graph))
+                         :nodes (lg/nodes graph)
+                         :edges (lg/edges graph)))
+    (def node :fn/coverage)
+    (def direction :inputs))
+
+  (make-params configuration :fn/coverage :inputs :dummy)
+
+  (->> configuration
+    :denorm
+    node
+    direction)
+
+  ; make-param
+  (->> configuration
+    :denorm
+    node
+    direction
+    (map (fn [[target ports]]
+           (let [[source-port target-port] ports]
+             ;(println target (-> configuration :components target :type))
+             (if (= direction :outputs)
+               {source-port (if (= :source/local (-> configuration :components target :type))
+                              [(ui-utils/path->keyword container-id :backboard target)]
+                              [:bh.rccst.subs/source target])}
+               {target-port (if (= :source/local (-> configuration :components target :type))
+                              [(ui-utils/path->keyword container-id :backboard target)]
+                              [:bh.rccst.subs/source target])}))))
+    (into {}))
+
+
+  ; process-component :ui/component
+  (do
+    (def node :ui/targets)
+    (def ui-type (->> configuration :components node :name))
+    (def ui-component (->> registry ui-type :component))
+    (def container-id "dummy"))
+
+  (let [ui-type      (->> configuration :components node :name)
+        ui-component (->> registry ui-type :component)]
+    {node
+     (reduce into [ui-component]
+       (seq
+         (merge
+           (make-params configuration node :inputs container-id)
+           (make-params configuration node :outputs container-id))))})
+
+  (def params '([:data [:one :two]] [:thing [:one :three]]))
+
+  (reduce into [] params)
+
+  (reduce into [:node] '([:data [:one :two]] [:thing [:one :three]]))
+
+  ())
+
+
+
+; process-components
+(comment
+  (do
+    (def config @sample-data)
+    (def container-id "coverage-plan-demo")
+    (def component-id :coverage-plan-demo/component)
+    (def links (:links config))
+    (def layout (:layout config))
+    (def components (:components config))
+    (def graph (apply lg/digraph (compute-edges config)))
+    (def nodes (lg/nodes graph))
+    (def edges (lg/edges graph))
+    (def registry meta-data-registry)
+    (def configuration (assoc @sample-data
+                         :graph graph
+                         :denorm (denorm-components graph (:links config) (lg/nodes graph))
+                         :nodes (lg/nodes graph)
+                         :edges (lg/edges graph)))
+    (def type :source/local))
+
+
+  (ui-utils/create-widget-sub component-id)
+  (ui-utils/create-widget-local-sub container-id [:blackboard])
+
+  (ui-utils/create-widget-local-sub container-id [:blackboard :topic/layers])
+
+  (->> configuration
+    :components
+    (filter (fn [[_ meta-data]]
+              (= type (:type meta-data))))
+    (map (fn [[node meta-data]]
+           (log/info "process-components (nodes)" node "//"
+             meta-data "//" (:type meta-data))
+           (component->ui {:node          node
+                           :type          (:type meta-data)
+                           :configuration configuration
+                           :registry      registry
+                           :component-id  component-id
+                           :container-id  container-id}))))
+
+  (re-frame/subscribe [:coverage-plan-demo/component])
+  (re-frame/subscribe [:coverage-plan-demo/blackboard])
+  (re-frame/subscribe [:coverage-plan-demo/blackboard.layers])
+  (re-frame/dispatch [:coverage-plan-demo/blackboard.layers {:dummy "one"}])
+
+
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  ;
+  ; the problem is KEYWORDS, specifically the (keyword ...) function and the
+  ; (name ...) function as applied to keywords:
+  ;
+
+  (keyword "dummy")
+  ; :dummy
+
+  (keyword "namespace" "dummy")
+  ; :namespace/dummy
+
+  (keyword "namespace/component" "dummy")
+  ; :namespace/component/dummy   <-- BAD!
+  ;      (actually invalid. The runtime is fine, but the reader can't handle it!)
+
+  ;:namespace/component/dummy
+
+  (keyword "namespace/component" :dummy)
+  ; :namespace/component/dummy   <-- BAD!
+
+  (name :dummy)
+  ; "dummy"
+
+  (name :namespace/dummy)
+  ; "dummy"  <-- also BAD!
+
+  ; so
+  (keyword (name :namespace/component) (name :topic/dummy))
+  ; :component/dummy   <-- really, really BAD
+
+
+
+  ; built the (path->keyword ...) function, but...
+  ;
+  (ui-utils/path->keyword :namespace/component :topic/dummy)
+  ; :component/dummy   <-- STILL BAD
+
+  (ui-utils/path->keyword "namespace/component" :topic/dummy)
+  ; :namespace/component/dummy   <-- STILL BAD
 
 
   ())

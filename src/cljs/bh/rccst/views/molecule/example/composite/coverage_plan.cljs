@@ -16,5 +16,6 @@
      :description "First exercise in our new COMPOSABLE UI"
      :data coverage-plan/sample-data
      :component coverage-plan/component
-     :component-id (ui-utils/path->keyword container-id "multi-chart")
+     :component-id (ui-utils/path->keyword container-id "component")
+     :container-id container-id
      :source-code coverage-plan/source-code]))

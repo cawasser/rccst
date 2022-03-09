@@ -4,10 +4,13 @@
 
   (:require [bh.rccst.ui-component.labeled-field :as lf]
             [re-frame.core :as re-frame]
-            [reagent.core :as r]))
+            [reagent.core :as r]
+            [taoensso.timbre :as log]))
 
 
 (defn selectable-table [& {:keys [data selection]}]
+
+  (log/info "selectable-table data" data "// selection" selection)
 
   (let [source  (re-frame/subscribe data)
         clicked (r/atom 0)]
@@ -20,12 +23,10 @@
                                      (re-frame/dispatch (conj selection :sub-path @clicked)))}]])))
 
 
-(def selection [:update])
-
-(conj selection :new-val)
-(re-frame/dispatch [:update :new-val])
-
 (defn three-d-globe [& {:keys [layers current-time component-id container-id]}]
+
+  (log/info "three-d-globe layers" layers "// current-time" current-time)
+
   (let [l (re-frame/subscribe layers)
         t (re-frame/subscribe current-time)]
     (fn [& {:keys [layers current-time component-id container-id]}]
@@ -36,6 +37,9 @@
 
 
 (defn slider [& {:keys [value range]}]
+
+  (log/info "slider value" value "// range" range)
+
   (let [v (re-frame/subscribe value)
         r (re-frame/subscribe range)]
     (fn [& {:keys [value range]}]
@@ -46,6 +50,9 @@
 
 
 (defn label [& {:keys [value]}]
+
+  (log/info "label value" value)
+
   (let [v (re-frame/subscribe value)]
 
     (fn [& {:keys [value]}]
@@ -55,8 +62,6 @@
        [lf/labeled-field "Value" @v]])))
 
 
-(def meta-data {:component label
-                :ports     {:value :port/sink}})
 
 (comment
   (def data [:sources/string])

@@ -243,6 +243,7 @@
   [widget-id]
   (let [id (keyword widget-id)
         w (keyword :widgets widget-id)]
+    (log/info "create-widget-sub" w "//" id)
     (re-frame/reg-sub
       w
       :<- [:widgets]
@@ -283,7 +284,7 @@
   [widget-id [a & more :as value-path]]
   (let [p (compute-path widget-id a more)
         dep (compute-deps widget-id a more)]
-    ;(log/info "create-widget-local-sub" widget-id p dep more (if more (last more) a))
+    (log/info "create-widget-local-sub" widget-id p dep more (if more (last more) a))
     (re-frame/reg-sub
       p
       :<- [dep]
