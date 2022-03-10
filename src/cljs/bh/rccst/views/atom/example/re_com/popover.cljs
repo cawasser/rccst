@@ -71,8 +71,7 @@
                    :body "popover body"]])]))
 
 
-
-(defn- line-chart-popover [data component-id]
+(defn- line-chart-popover [data component-id container-id]
   (let [showing? (r/atom false)]
     [rc/popover-anchor-wrapper :src (rc/at)
      :showing? showing?
@@ -82,10 +81,14 @@
               :on-click #(swap! showing? not)]
      :popover [rc/popover-content-wrapper :src (rc/at)
                :title "A Line Chart"
-               :body [line-chart/component data component-id]]]))
+               :body [:div {:style {:width "400px" :height "400px"}}
+                      [line-chart/component
+                       :data data
+                       :component-id component-id
+                       :container-id container-id]]]]))
 
 
-(defn- area-chart-popover [data component-id]
+(defn- area-chart-popover [data component-id container-id]
   (let [showing? (r/atom false)]
     [rc/popover-anchor-wrapper :src (rc/at)
      :showing? showing?
@@ -95,10 +98,14 @@
               :on-click #(swap! showing? not)]
      :popover [rc/popover-content-wrapper :src (rc/at)
                :title "An Area Chart"
-               :body [area-chart/component data component-id]]]))
+               :body [:div {:style {:width "400px" :height "400px"}}
+                      [area-chart/component
+                       :data data
+                       :component-id component-id
+                       :container-id container-id]]]]))
 
 
-(defn- sankey-chart-popover [data component-id]
+(defn- sankey-chart-popover [data component-id container-id]
   (let [showing? (r/atom false)]
     [rc/popover-anchor-wrapper :src (rc/at)
      :showing? showing?
@@ -108,7 +115,11 @@
               :on-click #(swap! showing? not)]
      :popover [rc/popover-content-wrapper :src (rc/at)
                :title "A Sankey Chart"
-               :body [sankey-chart/component data component-id]]]))
+               :body [:div {:style {:width "400px" :height "400px"}}
+                      [sankey-chart/component
+                       :data data
+                       :component-id component-id
+                       :container-id container-id]]]]))
 
 
 (defn chart-example []
@@ -121,13 +132,15 @@
       [layout/centered {:extra-classes :width-50}
        [rc/h-box :src (rc/at)
         :gap "10px"
-        :children [[line-chart-popover tabular-data "popover/line-chart"]
-                   [area-chart-popover tabular-data "popover/area-chart"]
-                   [sankey-chart-popover dag-data "popover/sankey-chart"]]]]
+        :children [[line-chart-popover tabular-data "popover.line-chart" "popover"]
+                   [area-chart-popover tabular-data "popover.area-chart" "popover"]
+                   [sankey-chart-popover dag-data "popover.sankey-chart" "popover"]]]]
 
       '[layout/centered {:extra-classes :width-50}
         [rc/h-box :src (rc/at)
          :gap "10px"
-         :children [[line-chart-popover data "popover/line-chart"]
-                    [area-chart-popover data "popover/area-chart"]
-                    [sankey-chart-popover dag-data "popover/sankey-chart"]]]])))
+         :children [[line-chart-popover data "popover.line-chart" "popover"]
+                    [area-chart-popover data "popover.area-chart" "popover"]
+                    [sankey-chart-popover dag-data "popover.sankey-chart" "popover"]]]])))
+
+
