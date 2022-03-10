@@ -426,6 +426,8 @@
 
 
 (defn color-config-text [widget-id label path & [position]]
+  ;(log/info "color-config-text" widget-id "//" label "//" path)
+
   (let [model (u/subscribe-local widget-id path)]
     (fn [widget-id label path & [position]]
       [rc/h-box :src (rc/at)
