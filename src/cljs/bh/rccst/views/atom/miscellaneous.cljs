@@ -11,8 +11,8 @@
   []
 
   [:div
-   [globe/example]
    [hex-picker/example]
    [rgba-picker/example]
    [two-d-globe/example]
-   [three-d-globe/example]])
+   [three-d-globe/example]
+   [globe/example]])
