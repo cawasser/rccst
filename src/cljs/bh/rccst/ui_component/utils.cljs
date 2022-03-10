@@ -62,18 +62,40 @@
              :flex-flow         "column wrap"})
 
 
-(defn path->keyword [id & path]
+(defn path->string [& path]
   (->> path
     flatten
-    (apply conj [])
-    (map name)
+    (remove nil?)
+    (map str)
+    (map #(clojure.string/replace % #":" ""))
+    (map #(clojure.string/replace % #"/" "."))
     (map #(clojure.string/replace % #" " "-"))
-    (clojure.string/join ".")
-    (keyword id)))
+    (clojure.string/join ".")))
 
+
+(defn path->keyword [& path]
+  (->> path
+    path->string
+    keyword))
+
+
+(comment
+  (path->string "one" "two" "three/dummy")
+  (path->keyword "one" "two" "three/dummy")
+
+  (path->keyword :area-chart-demo.area-chart :grid nil)
+  (path->string :area-chart-demo.area-chart :grid nil)
+
+
+  (path->keyword :topic/layers)
+  (path->keyword [:topic/layers])
+
+  (apply conj [:widgets]
+    (map path->keyword [:blackboard :topic/layers]))
+
+  ())
 
 ;; endregion
-
 
 
 
@@ -118,7 +140,7 @@
   "
   [widget-id values]
   (let [target (keyword widget-id)
-        path [:events/init-widget-locals target values]]
+        path   [:events/init-widget-locals target values]]
     ;(log/info "init-local-values" path)
     (re-frame/dispatch-sync path)))
 
@@ -201,37 +223,28 @@
           (rest tree))))))
 
 
-(defn- compute-path [widget-id a more]
-  (keyword widget-id (str (name a)
-                       (when more
-                         (str "." (clojure.string/join "." (->> more
-                                                             (map name)
-                                                             (map #(clojure.string/replace % #" " "")))))))))
-
-
 (defn- compute-container-path [widget-id a more]
-  (keyword widget-id (str "blackboard."
-                       (name a)
-                       (when more
-                         (str "." (clojure.string/join "."
-                                    (->> more
-                                      (map name)
-                                      (map #(clojure.string/replace % #" " "")))))))))
+  (path->keyword widget-id "blackboard" a more))
 
 
 (defn- compute-deps [widget-id a more]
   (if more
-    (keyword widget-id
-      (str (name a)
-        (when (seq (drop-last more))
-          (str "." (clojure.string/join "." (->> more
-                                              drop-last
-                                              (map name)
-                                              (map #(clojure.string/replace % #" " ""))))))))
-    (keyword :widgets widget-id)))
+    (path->keyword widget-id a (drop-last more))
+    (path->keyword widget-id)))
 
 
-(defn- create-widget-sub
+(comment
+  (def widget-id "area-chart-demo.area-chart")
+  (def a :tv)
+  (def more ())
+
+  (compute-deps widget-id a more)
+  (compute-container-path widget-id a more)
+
+  ())
+
+
+(defn create-widget-sub
   "create and registers a re-frame [subscription handler](https://day8.github.io/re-frame/subscriptions/)
   for the `widget-id` (as a keyword) inside the `:widgets` top-level key in the `app-db`.
 
@@ -241,11 +254,12 @@
 
   "
   [widget-id]
-  (let [id (keyword widget-id)
-        w (keyword :widgets widget-id)]
-    (log/info "create-widget-sub" w "//" id)
+  (let [id (path->keyword widget-id)]
+
+    ;(log/info "create-widget-sub" id)
+
     (re-frame/reg-sub
-      w
+      id
       :<- [:widgets]
       (fn [widgets _]
         ;(log/info "sub" w id)
@@ -282,15 +296,20 @@
 > in place of standard re-frame subscription calls. It provides the same result, and does all the encoding for you.
   "
   [widget-id [a & more :as value-path]]
-  (let [p (compute-path widget-id a more)
-        dep (compute-deps widget-id a more)]
-    (log/info "create-widget-local-sub" widget-id p dep more (if more (last more) a))
+  (let [p    (path->keyword widget-id a more)
+        dep  (compute-deps widget-id a more)
+        item (path->keyword (if more (last more) a))]
+
+    ;(log/info "create-widget-local-sub" p
+    ;  ":<-" dep
+    ;  "item" item)
+
     (re-frame/reg-sub
       p
       :<- [dep]
       (fn [widget _]
         ;(log/info "sub" p dep widget (last more))
-        (get widget (if more (last more) a))))))
+        (get widget item)))))
 
 
 (defn- create-widget-event
@@ -303,10 +322,12 @@
 
   "
   [widget-id]
-  (let [id (keyword widget-id)
-        w (keyword :widgets widget-id)]
+  (let [id (path->keyword widget-id)]
+
+    ;(log/info "create-widget-event" id)
+
     (re-frame/reg-event-db
-      w
+      id
       (fn [db [_ new-val]]
         ;(log/info "event" w id)
         (assoc-in db [:widgets id] new-val)))))
@@ -342,14 +363,17 @@
 > in place of standard re-frame subscription calls. It provides the same result, and does all the encoding for you.
   "
   [widget-id [a & more :as value-path]]
-  (let [p (compute-path widget-id a more)]
-    ;(log/info "create-widget-local-event" widget-id p (conj [:widgets (keyword widget-id)] value-path))
+  (let [p (path->keyword widget-id a more)]
+
+    ;(log/info "create-widget-local-event" p
+    ;  "apply conj" (apply conj [:widgets (path->keyword widget-id)] (map path->keyword value-path)))
+
     (re-frame/reg-event-db
       p
       (fn [db [_ new-val]]
         ;(log/info "event" p new-val)
         (assoc-in db
-          (apply conj [:widgets (keyword widget-id)] value-path)
+          (apply conj [:widgets (path->keyword widget-id)] (map path->keyword value-path))
           new-val)))))
 
 
@@ -435,7 +459,7 @@
    | `:nested-value`      | `(subscribe-local \"some-guid\" [:value-2 :nested-value])` |
   "
   [widget-id [a & more :as value-path]]
-  (let [p (compute-path widget-id a more)]
+  (let [p (path->keyword widget-id a more)]
     ;(log/info "subscribe-local" widget-id value-path p)
     (re-frame/subscribe [p])))
 
@@ -475,12 +499,8 @@
 
   ;(log/info "dispatch-local" widget-id value-path new-val)
 
-  (let [p (keyword widget-id (str (name a)
-                               (when more
-                                 (str "." (clojure.string/join "." (->> more
-                                                                     (map name)
-                                                                     (map #(clojure.string/replace % #" " ""))))))))]
-    ;(log/info "dispatch-local" widget-id value-path new-val p)
+  (let [p (path->keyword widget-id a more)]
+    ;(log/info "dispatch-local" widget-id "//" value-path "//" p "//" new-val)
     (re-frame/dispatch [p new-val])))
 
 
@@ -532,9 +552,9 @@
 
 
 (defn init-container [container-id]
-  (let [id (keyword container-id)
-        c (keyword :widgets container-id)
-        blackboard (keyword container-id "blackboard")]
+  (let [id         (path->keyword container-id)
+        c          (path->keyword :widgets container-id)
+        blackboard (path->keyword container-id "blackboard")]
 
     ;(log/info "init-container" container-id id c blackboard)
 
@@ -597,7 +617,7 @@
 
   ;(log/info "publish-to-container-local" container-id component-path new-val)
 
-  (let [p (keyword container-id "blackboard")]
+  (let [p (path->keyword container-id "blackboard")]
     ;(log/info "publish-to-container" container-id component-path new-val p)
     (re-frame/dispatch [p component-path new-val])))
 
@@ -654,7 +674,7 @@
 
 (defn subscribe-data-source [data-source-id]
   (log/info "subscribe-data-source" data-source-id)
-  (re-frame/subscribe [:data-sources (keyword data-source-id)]))
+  (re-frame/subscribe [:data-sources (path->keyword data-source-id)]))
 
 
 
@@ -735,15 +755,15 @@
   (def path [:tab-panel :value])
 
   (defn subscribe-local [widget-id [a & more]]
-    (let [p (keyword widget-id (str (name a)
-                                 (when more
-                                   (str "." (clojure.string/join "." (map name more))))))]
+    (let [p (path->keyword widget-id (str (name a)
+                                       (when more
+                                         (str "." (clojure.string/join "." (map name more))))))]
       p))
   ;(re-frame/subscribe p)))
 
   (let [d (subscribe-local :line-chart [:grid :strokeDasharray :d])]
     d)
-  (keyword :line-chart)
+  (path->keyword :line-chart)
 
   (subscribe-local widget-id [:some-value])
   (subscribe-local :line-chart [:tab-panel :value])
@@ -778,8 +798,8 @@
 
   ;; region ; set initial values into the app-db:
   (defn load-local-values [widget-id values]
-    (let [target (keyword widget-id)
-          path [:events/init-widget-locals target values]]
+    (let [target (path->keyword widget-id)
+          path   [:events/init-widget-locals target values]]
       (re-frame/dispatch-sync path)))
 
   (load-local-values "<guid-1>" widget-locals)
@@ -830,9 +850,9 @@
 
   ;; region ; subscribing to locals (chart around re-frame/subscribe)
   (defn subscribe-local [widget-id [a & more :as path]]
-    (let [p (keyword widget-id (str (name a)
-                                 (when more
-                                   (str "." (clojure.string/join "." (map name more))))))]
+    (let [p (path->keyword widget-id (str (name a)
+                                       (when more
+                                         (str "." (clojure.string/join "." (map name more))))))]
       ;(log/info "subscribe-local" widget-id path p)
       (re-frame/subscribe [p])))
 
@@ -846,16 +866,16 @@
   ;      "create-widget-sub"        i.e., [<widget-id>] (`:widget` is assumed)
   ;      "create-widget-local-sub"  i.e., [<widget-id> [<path>]]
 
-  (keyword :widgets "dummy.part-1.part-2")
-  (keyword :widgets ":dummy")
+  (path->keyword :widgets "dummy.part-1.part-2")
+  (path->keyword :widgets ":dummy")
   (name :dummy)
 
   ;; endregion
 
   ;; region ; create all the subscriptions (by hand)
   (defn create-widget-sub [widget-id]
-    (let [id (keyword widget-id)
-          w (keyword :widgets widget-id)]
+    (let [id (path->keyword widget-id)
+          w  (path->keyword :widgets widget-id)]
       (re-frame/reg-sub
         w
         :<- [:widgets]
@@ -865,15 +885,15 @@
 
 
   (defn create-widget-local-sub [widget-id [a & more]]
-    (let [p (keyword widget-id (str (name a)
-                                 (when more
-                                   (str "." (clojure.string/join "." (map name more))))))
+    (let [p   (path->keyword widget-id (str (name a)
+                                         (when more
+                                           (str "." (clojure.string/join "." (map name more))))))
           dep (if more
-                (keyword widget-id
+                (path->keyword widget-id
                   (str (name a)
                     (when (seq (drop-last [:value]))
                       (str "." (clojure.string/join "." (map name (drop 1 more)))))))
-                (keyword :widgets widget-id))]
+                (path->keyword :widgets widget-id))]
       ;(log/info "create-widget-local-sub" p dep more (if more (last more) a))
       (re-frame/reg-sub
         p
@@ -960,8 +980,8 @@
   (defn process-locals [a r t]
     (println "process-locals" a r t)
     (loop [accum a
-           root r
-           tree t]
+           root  r
+           tree  t]
       (println "process" tree root accum)
       (if (empty? tree)
         (do
