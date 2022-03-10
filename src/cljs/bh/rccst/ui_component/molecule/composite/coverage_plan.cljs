@@ -32,9 +32,7 @@
   "
   [& {:keys [targets satellites coverages layers]}]
 
-  (let [some-computation (fn [t s c] [:layers])]
-    ;["fn-coverage" {:targets targets :satellites satellites
-    ;                :coverages coverages :layers layers}]))
+  (let [some-computation (fn [t s c] [])]
 
     (re-frame/reg-sub
       layers
@@ -56,8 +54,9 @@
   "
   [& {:keys [data range]}]
 
-  (let [some-computation (fn [x] [:range])]
-    ;["fn-range" {:data data :range range}]))
+  (let [some-computation (fn [x]
+                           (println "fn-range subscription")
+                           [0 100])]
 
     (re-frame/reg-sub
       range
@@ -115,11 +114,11 @@
                                          :topic/coverage-data       {:type :source/remote :name :source/coverages}
 
                                          ; composite-local data sources
-                                         :topic/selected-targets    {:type :source/local :name :selected-targets}
-                                         :topic/selected-satellites {:type :source/local :name :selected-satellites}
-                                         :topic/current-time        {:type :source/local :name :current-time}
-                                         :topic/layers              {:type :source/local :name :layers}
-                                         :topic/time-range          {:type :source/local :name :time-range}
+                                         :topic/selected-targets    {:type :source/local :name :selected-targets :default []}
+                                         :topic/selected-satellites {:type :source/local :name :selected-satellites :default []}
+                                         :topic/current-time        {:type :source/local :name :current-time :default (js/Date.)}
+                                         :topic/layers              {:type :source/local :name :layers :default []}
+                                         :topic/time-range          {:type :source/local :name :time-range :default [0 100]}
 
                                          ; transformation functions
                                          :fn/coverage               {:type  :source/fn :name fn-coverage
@@ -235,10 +234,10 @@
              ;(log/info target (-> configuration :components target :type))
              (if (= direction :outputs)
                {source-port (if (= :source/local (-> configuration :components target :type))
-                              [(ui-utils/path->keyword container-id :backboard target)]
+                              [(ui-utils/path->keyword container-id :blackboard target)]
                               [:bh.rccst.subs/source target])}
                {target-port (if (= :source/local (-> configuration :components target :type))
-                              [(ui-utils/path->keyword container-id :backboard target)]
+                              [(ui-utils/path->keyword container-id :blackboard target)]
                               [:bh.rccst.subs/source target])}))))
     (into {})))
 
@@ -248,7 +247,8 @@
 
 
 (defmethod component->ui :ui/component [{:keys [node registry configuration container-id]}]
-  (log/info "component->ui :ui/component" node)
+  ;(log/info "component->ui :ui/component" node)
+
   (let [ui-type      (->> configuration :components node :name)
         ui-component (->> registry ui-type :component)]
     {node
@@ -259,26 +259,24 @@
            (make-params configuration node :outputs container-id))))}))
 
 
-(defmethod component->ui :source/local [{:keys [node component-id container-id]}]
-  (log/info "component->ui :source/local" node)
+(defmethod component->ui :source/local [{:keys [node meta-data container-id]}]
+  ;(log/info "component->ui :source/local" node meta-data)
 
-  ; 1. add the key to the blackboard (what about a default value?)
-  (re-frame/dispatch-sync [:events/init-widget-locals
-                           (ui-utils/path->keyword container-id [:blackboard node])
-                           {}])
-
-  ; 2. create the subscription against the new :blackboard key
+  ; 1. create the subscription against the new :blackboard key
   (ui-utils/create-widget-local-sub container-id [:blackboard node])
 
-  ; 3. create the event against the new :blackboard key
+  ; 2. create the event against the new :blackboard key
   (ui-utils/create-widget-local-event container-id [:blackboard node])
 
-  ; 3. return the signal vector for the new subscription
+  ; 3. add the key to the blackboard, uses the :default property of the meta-data
+  (ui-utils/dispatch-local container-id [:blackboard node] (:default meta-data))
+
+  ; 4. return the signal vector for the new subscription
   [(ui-utils/path->keyword container-id [:blackboard node])])
 
 
 (defmethod component->ui :source/remote [{:keys [node]}]
-  (log/info "component->ui :source/remote" node)
+  ;(log/info "component->ui :source/remote" node)
 
   ; 1. subscribe to the server (if needed)
   (re-frame/dispatch [:bh.rccst.events/subscribe-to #{node}])
@@ -303,27 +301,34 @@
             (make-params configuration node :outputs container-id)))))))
 
 
-(defn- process-components [configuration type registry container-id]
+(defn- process-components [configuration node-type registry container-id]
 
-  (log/info "process-components" type)
+  ;(log/info "process-components" container-id node-type
+  ;  "//" (->> configuration
+  ;         :components
+  ;         (filter (fn [[_ meta-data]]
+  ;                   (= node-type (:type meta-data))))))
 
-  (->> configuration
-    :components
-    (filter (fn [[_ meta-data]]
-              (= type (:type meta-data))))
-    (map (fn [[node meta-data]]
-           (log/info "process-components (nodes)" node "//" meta-data "//" (:type meta-data))
-           (component->ui {:node          node
-                           :type          (:type meta-data)
-                           :configuration configuration
-                           :registry      registry
-                           :container-id  container-id})))))
+  (doall
+    (->> configuration
+      :components
+      (filter (fn [[_ meta-data]]
+                (= node-type (:type meta-data))))
+      (map (fn [[node meta-data]]
+             ;(log/info "process-components (nodes)" node "//" meta-data "//" (:type meta-data))
+             (component->ui {:node          node
+                             :type          (:type meta-data)
+                             :meta-data     meta-data
+                             :configuration configuration
+                             :registry      registry
+                             :component-id  (ui-utils/path->keyword container-id node)
+                             :container-id  container-id}))))))
 
 
 (defn- parse-token [lookup token]
   (condp = token
     :v-box [rc/v-box :src (rc/at) :gap "10px"]
-    :h-box [rc/v-box :src (rc/at) :gap "10px"]
+    :h-box [rc/h-box :src (rc/at) :gap "10px"]
     (or (get lookup token)
       [rc/alert-box :src (rc/at)
        :alert-type :warning
@@ -680,6 +685,7 @@
 
 ;; endregion
 
+
 (defn- dag-panel
   "show the DAG, built form the configuration passed into the component, in a panel
   (beside the actual UI)
@@ -717,8 +723,33 @@
                             (= :ui/component type))
                     components)))]])
 
+
+(defn- prep-environment [configuration component-id]
+  ; 1. remote subscriptions (including the remote call)
+  ;
+  ; [SIDE EFFECT]
+  (process-components configuration :source/remote meta-data-registry component-id)
+
+  ; 2. build the subscription for the "container" which provide the basis for the
+  ;     subscriptions for the "locals"
+  ;
+  ; [SIDE EFFECT]
+  (ui-utils/create-widget-sub component-id)
+  (ui-utils/create-widget-local-sub component-id [:blackboard])
+
+  ; 3. add blackboard data to the app-db and build local subscriptions/events against the blackboard
+  ;
+  ; [SIDE EFFECT]
+  (process-components configuration :source/local meta-data-registry component-id)
+
+  ; 4. local functions (to build subscriptions against the blackboard or remotes)
+  ;
+  ; [SIDE EFFECT]
+  (process-components configuration :source/fn meta-data-registry component-id))
+
+
 (defn- component-panel
-  "show the UI, built form the configuration data passed to the component
+  "show the UI, built from the configuration data passed to the component
   "
   [& {:keys [configuration component-id container-id]}]
   (let [layout           (:layout configuration)
@@ -726,39 +757,21 @@
         component-lookup (into {}
                            (process-components
                              configuration :ui/component
-                             meta-data-registry container-id))
+                             meta-data-registry component-id))
 
         ; 1. build UI components (with subscription/event signals against the blackboard or remotes)
         composed-ui      (process-ui component-lookup [] layout)]
 
-    ; 2. remote subscriptions (including the remote call)
-    ;
-    ; [SIDE EFFECT]
-    (process-components configuration :source/remote meta-data-registry container-id)
-
-    ; 1a. build the subscription for the "container" which provide the basis for the
-    ;     subscriptions for the "locals"
-    ;
-    ; [SIDE EFFECT]
-    (ui-utils/create-widget-sub container-id)
-    (ui-utils/create-widget-local-sub container-id [:blackboard])
-
-    ; 3. add blackboard data to the app-db and build local subscriptions/events against the blackboard
-    ;
-    ; [SIDE EFFECT]
-    (process-components configuration :source/local meta-data-registry container-id)
-
-    ; 4. local functions (to build subscriptions against the blackboard or remotes)
-    ;
-    ; [SIDE EFFECT]
-    (process-components configuration :source/fn meta-data-registry container-id)
+    (log/info "component-panel" component-id)
 
 
     (fn [& {:keys [configuration component-id container-id]}]
 
       ; 5. return the composed component layout!
-      ;composed-ui)))
-      [stand-in components])))
+      [:div {:style {:width "1000px" :height "100%"}}
+       composed-ui])))
+
+;[stand-in components])))
 
 ;;endregion
 
@@ -776,8 +789,10 @@
     (fn []
       (when (nil? @id)
         (reset! id component-id)
-        (ui-utils/init-widget @id (config @id data))
-        (ui-utils/dispatch-local @id [:container] container-id))
+        (ui-utils/init-widget @id {:blackboard {} :container ""})
+        (ui-utils/dispatch-local @id [:container] container-id)
+
+        (prep-environment configuration @id))
 
       ;(log/info "coverage-plan" @id (config @id data))
       (let [full-config (assoc configuration
@@ -818,6 +833,9 @@
 
 
 
+
+; RICH COMMENTS
+;; region
 
 (comment
   (def configuration @sample-data)
@@ -1485,10 +1503,10 @@
              ;(println target (-> configuration :components target :type))
              (if (= direction :outputs)
                {source-port (if (= :source/local (-> configuration :components target :type))
-                              [(ui-utils/path->keyword container-id :backboard target)]
+                              [(ui-utils/path->keyword container-id :blackboard target)]
                               [:bh.rccst.subs/source target])}
                {target-port (if (= :source/local (-> configuration :components target :type))
-                              [(ui-utils/path->keyword container-id :backboard target)]
+                              [(ui-utils/path->keyword container-id :blackboard target)]
                               [:bh.rccst.subs/source target])}))))
     (into {}))
 
@@ -1518,46 +1536,96 @@
   ())
 
 
-
 ; process-components
 (comment
   (do
-    (def config @sample-data)
+    (def data @sample-data)
     (def container-id "coverage-plan-demo")
     (def component-id :coverage-plan-demo.component)
-    (def links (:links config))
-    (def layout (:layout config))
-    (def components (:components config))
-    (def graph (apply lg/digraph (compute-edges config)))
+    (def links (:links data))
+    (def layout (:layout data))
+    (def components (:components data))
+    (def graph (apply lg/digraph (compute-edges data)))
     (def nodes (lg/nodes graph))
     (def edges (lg/edges graph))
     (def registry meta-data-registry)
     (def configuration (assoc @sample-data
                          :graph graph
-                         :denorm (denorm-components graph (:links config) (lg/nodes graph))
+                         :denorm (denorm-components graph (:links data) (lg/nodes graph))
                          :nodes (lg/nodes graph)
                          :edges (lg/edges graph)))
-    (def type :source/local))
+    (def source-type :source/local)
+    (def node-type :source/local))
 
 
-  (ui-utils/create-widget-sub component-id)
-  (ui-utils/create-widget-local-sub container-id [:blackboard])
 
-  (ui-utils/create-widget-local-sub container-id [:blackboard :topic/layers])
+  (->> configuration
+    :components
+    (filter (fn [[_ meta-data]]
+              (= node-type (:type meta-data))))
+    (map (fn [[node meta-data]]
+           ;(log/info "process-components (nodes)" node "//" meta-data "//" (:type meta-data))
+           (component->ui {:node          node
+                           :type          (:type meta-data)
+                           :configuration configuration
+                           :registry      registry
+                           :component-id  (ui-utils/path->keyword container-id node)
+                           :container-id  container-id}))))
+
+
+
+
+
+  (process-components configuration :source/local meta-data-registry component-id)
+
+
+  (ui-utils/init-widget component-id {:blackboard {}})
+
+  (ui-utils/create-widget-local-sub component-id [:container])
+  (ui-utils/create-widget-local-event component-id [:container])
+
+  (ui-utils/subscribe-local component-id [:container])
+  (ui-utils/dispatch-local component-id [:container] container-id)
+
+  (ui-utils/subscribe-local component-id [:blackboard])
+  (re-frame/subscribe [:coverage-plan-demo.component.blackboard])
+
+  (ui-utils/dispatch-local component-id [:blackboard] {:dummy "dummy"})
+
+  (ui-utils/create-widget-local-sub component-id [:blackboard :topic/layers])
+  (ui-utils/create-widget-local-event component-id [:blackboard :topic/layers])
+  (ui-utils/dispatch-local component-id [:blackboard :topic/layers] {:dummy "ui-utils"})
+
+  (re-frame/dispatch [:coverage-plan-demo.component.blackboard.topic.layers {:dummy "re-frame"}])
+
+
+  (ui-utils/subscribe-local component-id [:blackboard :topic/current-time])
+
+  (ui-utils/create-widget-local-sub component-id [:blackboard :topic/current-time])
+  (ui-utils/create-widget-local-event component-id [:blackboard :topic/current-time])
+  (ui-utils/dispatch-local component-id [:blackboard :topic/current-time] {})
+
+
+
+
+
+  (re-frame/subscribe [:coverage-plan-demo.component.blackboard.topic.layers])
 
   (->> configuration
     :components
     (filter (fn [[_ meta-data]]
               (= type (:type meta-data))))
     (map (fn [[node meta-data]]
-           (log/info "process-components (nodes)" node "//"
-             meta-data "//" (:type meta-data))
+           ;(log/info "process-components (nodes)" node "//"
+           ;  meta-data "//" (:type meta-data))
            (component->ui {:node          node
                            :type          (:type meta-data)
                            :configuration configuration
                            :registry      registry
                            :component-id  component-id
                            :container-id  container-id}))))
+
+
 
   (re-frame/subscribe [:coverage-plan-demo/component])
   (re-frame/subscribe [:coverage-plan-demo/blackboard])
@@ -1615,3 +1683,49 @@
   (str :topic/dummy)
 
   ())
+
+
+; subscription scratchpad
+(comment
+  (ui-utils/subscribe-local :coverage-plan-demo.component
+    [:blackboard :topic/current-time])
+
+  (ui-utils/dispatch-local :coverage-plan-demo.component
+    [:blackboard :topic/current-time] (js/Date.))
+
+
+  ())
+
+
+; building the UI components "for real"
+(comment
+  (do
+    (def data @sample-data)
+    (def container-id "coverage-plan-demo")
+    (def component-id :coverage-plan-demo.component)
+    (def links (:links data))
+    (def layout (:layout data))
+    (def components (:components data))
+    (def graph (apply lg/digraph (compute-edges data)))
+    (def nodes (lg/nodes graph))
+    (def edges (lg/edges graph))
+    (def registry meta-data-registry)
+    (def configuration (assoc @sample-data
+                         :graph graph
+                         :denorm (denorm-components graph (:links data) (lg/nodes graph))
+                         :nodes (lg/nodes graph)
+                         :edges (lg/edges graph)))
+    (def source-type :source/local)
+    (def node-type :source/local))
+
+  (def component-lookup (into {}
+                          (process-components
+                            configuration :ui/component
+                            meta-data-registry component-id)))
+
+  (def component-ui (process-ui component-lookup [] layout))
+
+
+  ())
+
+;; endregion
