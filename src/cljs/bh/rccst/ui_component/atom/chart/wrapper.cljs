@@ -24,11 +24,13 @@
   (let [open? (r/atom false)
         config-key (keyword component-id "config")
         data-key (keyword component-id "data")
-        tab-panel (keyword component-id "tab-panel")
-        selected-tab (keyword component-id "tab-panel.value")
+        tab-panel (ui-utils/path->keyword component-id "tab-panel")
+        selected-tab (ui-utils/path->keyword component-id "tab-panel.value")
         chart-events [config-key data-key tab-panel selected-tab]]
 
-    (log/info "configurable-chart-2" component-id "///" container-id "///" ui)
+    ;(log/info "configurable-chart" component-id
+    ;  "///" container-id "///" ui
+    ;  "///" chart-events)
 
     (ui-utils/dispatch-local component-id [:container] container-id)
 
