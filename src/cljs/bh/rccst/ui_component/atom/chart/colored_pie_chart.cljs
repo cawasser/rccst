@@ -1,9 +1,9 @@
 (ns bh.rccst.ui-component.atom.chart.colored-pie-chart
   (:require [bh.rccst.ui-component.atom.chart.utils :as utils]
-            [bh.rccst.ui-component.utils.color :as color]
             [bh.rccst.ui-component.atom.chart.utils.example-data :as data]
             [bh.rccst.ui-component.atom.chart.wrapper :as c]
             [bh.rccst.ui-component.utils :as ui-utils]
+            [bh.rccst.ui-component.utils.color :as color]
             [re-com.core :as rc]
             [reagent.core :as r]
             [taoensso.timbre :as log]
@@ -33,8 +33,11 @@
 
       ; process :name to map up the :colors
       (->> d
-        (map :name)
-        (#(zipmap % color/default-stroke-fill-colors))
+        (map-indexed (fn [idx entry]
+                       {(ui-utils/path->keyword (:name entry))
+                        {:name  (:name entry)
+                         :color (nth (cycle color/default-stroke-fill-colors) idx)}}))
+        (into {})
         (assoc {} :colors))
 
       ; process options for :value
@@ -43,24 +46,6 @@
         keys
         ((fn [m]
            {:value {:keys m :chosen (first m)}}))))))
-
-
-(comment
-  (def data sample-data)
-  (def d (get @data :data))
-
-  (->> d
-    (map :name,)
-    (#(zipmap % ui-utils/default-stroke-fill-colors),)
-    (assoc {} :colors,))
-
-  (as-> d x
-    (map :name x)
-    (zipmap x ui-utils/default-stroke-fill-colors)
-    (assoc {} :colors x))
-
-
-  ())
 
 
 (defn config
@@ -95,8 +80,9 @@
   [chart-id]
   [:<>
    (doall
-     (map (fn [[id _]]
-            ^{:key id} [utils/color-config-text chart-id id [:colors id] :right-above])
+     (map (fn [[id color-data]]
+            (let [text  (:name color-data)]
+              ^{:key id} [utils/color-config-text chart-id text [:colors id :color] :right-above]))
        @(ui-utils/subscribe-local chart-id [:colors])))])
 
 
@@ -173,7 +159,7 @@
              (fn [idx {name :name}]
                ^{:key (str idx name)}
                [:> Cell {:key  (str "cell-" idx)
-                         :fill (or (ui-utils/resolve-sub subscriptions [:colors name])
+                         :fill (or (:color (ui-utils/resolve-sub subscriptions [:colors name]))
                                  (color/get-color 0))}])
              (get @data :data)))]]])))
 
@@ -243,7 +229,11 @@
     (def chart-id "colored-pie-chart-demo/colored-pie-chart")
     (def subscriptions (ui-utils/build-subs chart-id (local-config data))))
 
-  (ui-utils/resolve-sub subscriptions [:colors "Group A"])
+  (ui-utils/resolve-sub subscriptions [:colors])
+  (:color (ui-utils/resolve-sub subscriptions [:colors "Page A"]))
+
+  (ui-utils/resolve-sub subscriptions [:colors "Page-A"])
+  (ui-utils/resolve-sub subscriptions [:colors :Page-A])
 
   ())
 

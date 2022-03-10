@@ -34,8 +34,11 @@
 
       ; process :name to map up the :colors
       (->> d
-        (map :name)
-        (#(zipmap % color/default-stroke-fill-colors))
+        (map-indexed (fn [idx entry]
+                       {(ui-utils/path->keyword (:name entry))
+                        {:name  (:name entry)
+                         :color (nth (cycle color/default-stroke-fill-colors) idx)}}))
+        (into {})
         (assoc {} :colors))
 
       ; process options for :value
@@ -72,21 +75,15 @@
     (local-config data)))
 
 
-;{:tab-panel {:value     (keyword chart-id "config")
-;             :data-path [:widgets (keyword chart-id) :tab-panel]}
-; :colors    (zipmap (map :name utils/paired-data)
-;              ["#8884d8" "#83a6ed" "#8dd1e1"
-;               "#82ca9d" "#a4de6c" "#d7e62b"])}
-
-
 (defn- color-anchors
   "build the config ui-components needed for each of the funnel slices
   "
   [chart-id]
   [:<>
    (doall
-     (map (fn [[id _]]
-            ^{:key id} [utils/color-config-text chart-id id [:colors id] :right-above])
+     (map (fn [[id color-data]]
+            (let [text  (:name color-data)]
+              ^{:key id} [utils/color-config-text chart-id text [:colors id :color] :right-above]))
        @(ui-utils/subscribe-local chart-id [:colors])))])
 
 
@@ -157,7 +154,7 @@
              (fn [idx {name :name}]
                ^{:key (str idx name)}
                [:> Cell {:key  (str "cell-" idx)
-                         :fill (or (ui-utils/resolve-sub subscriptions [:colors name])
+                         :fill (or (:color (ui-utils/resolve-sub subscriptions [:colors name]))
                                  (color/get-color 0))}])
              (get @data :data)))
          [:> LabelList {:position :right :fill "#000000" :stroke "none" :dataKey (ui-utils/resolve-sub subscriptions [:value :chosen])}]]]])))

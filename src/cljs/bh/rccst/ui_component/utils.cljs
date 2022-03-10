@@ -520,7 +520,9 @@
 
 
 (defn resolve-sub [subs path]
-  (deref (get subs path)))
+  (deref (get subs (->> path
+                     (map path->keyword)
+                     (into [])))))
 
 
 
