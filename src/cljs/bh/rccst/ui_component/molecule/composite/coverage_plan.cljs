@@ -8,6 +8,8 @@
             [re-frame.core :as re-frame]
             [reagent.core :as r]
             [taoensso.timbre :as log]
+            [woolybear.ad.containers :as containers]
+            [woolybear.ad.layout :as layout]
             ["dagre" :as dagre]
             ["graphlib" :as graphlib]
             ["react-flow-renderer" :refer (ReactFlowProvider Controls Handle Background) :default ReactFlow]))
@@ -686,6 +688,38 @@
 ;; endregion
 
 
+(defn- definition-panel
+  "show the text definition of the composed UI
+  "
+  [& {:keys [configuration]}]
+
+
+  (let [components (:components configuration)
+        links      (:links configuration)
+        layout     (:layout configuration)]
+
+    (log/info "definition-panel" components)
+    (log/info "definition-panel" links)
+    (log/info "definition-panel" layout)
+
+    (fn [& {:keys [configuration]}]
+      [rc/v-box :src (rc/at)
+       :width "70%"
+       :height "100%"
+       :gap "10px"
+       :children [[:h3 "Components"]
+                  [containers/v-scroll-pane {:height "10em"}
+                   [layout/text-block (str components)]]
+
+                  [:h3 "Links"]
+                  [containers/v-scroll-pane {:height "10em"}
+                   [layout/text-block (str links)]]
+
+                  [:h3 "Layout"]
+                  [containers/v-scroll-pane {:height "10em"}
+                   [layout/text-block (str layout)]]]])))
+
+
 (defn- dag-panel
   "show the DAG, built form the configuration passed into the component, in a panel
   (beside the actual UI)
@@ -799,7 +833,10 @@
                           :graph graph
                           :denorm (denorm-components graph (:links configuration) (lg/nodes graph))
                           :nodes (lg/nodes graph)
-                          :edges (lg/edges graph))]
+                          :edges (lg/edges graph))
+            buttons     [{:id :component :label [:i {:class "zmdi zmdi-view-compact"}]}
+                         {:id :dag :label [:i {:class "zmdi zmdi-share"}]}
+                         {:id :definition :label [:i {:class "zmdi zmdi-format-subject"}]}]]
 
 
         [rc/h-box :src (rc/at)
@@ -815,20 +852,16 @@
                                   :configuration full-config
                                   :component-id @id
                                   :container-id container-id]
+                      :definition [definition-panel
+                                   :configuration configuration]
                       :default [rc/alert-box :src (rc/at)
                                 :alert-type :warning
                                 :body "There is a problem with this component."])
-                    [rc/md-icon-button
-                     :md-icon-name (if (= :component @comp-or-dag?)
-                                     "zmdi-settings"
-                                     "zmdi-view-compact")
-                     :tooltip (if (= :component @comp-or-dag?)
-                                "view the DAG for this component"
-                                "view the component as it is rendered")
-                     :on-click #(do
-                                  (reset! comp-or-dag? (if (= :component @comp-or-dag?)
-                                                         :dag
-                                                         :component)))]]]))))
+
+                    [rc/horizontal-bar-tabs
+                     :model comp-or-dag?
+                     :tabs buttons
+                     :on-change #(reset! comp-or-dag? %)]]]))))
 
 
 
