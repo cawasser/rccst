@@ -307,7 +307,7 @@
 
 (defn- process-components [configuration node-type registry container-id]
 
-  ;(log/info "process-components" container-id node-type
+  ;(log/info "process-components" container-id node-type)
   ;  "//" (->> configuration
   ;         :components
   ;         (filter (fn [[_ meta-data]]
@@ -319,7 +319,7 @@
       (filter (fn [[_ meta-data]]
                 (= node-type (:type meta-data))))
       (map (fn [[node meta-data]]
-             ;(log/info "process-components (nodes)" node "//" meta-data "//" (:type meta-data))
+;             (log/info "process-components (nodes)" node "//" meta-data "//" (:type meta-data))
              (component->ui {:node          node
                              :type          (:type meta-data)
                              :meta-data     meta-data
@@ -834,11 +834,9 @@
 
         (prep-environment full-config @id))
 
-      ;(log/info "coverage-plan" @id (config @id data))
       (let [buttons [{:id :component :label [:i {:class "zmdi zmdi-view-compact"}]}
                      {:id :dag :label [:i {:class "zmdi zmdi-share"}]}
                      {:id :definition :label [:i {:class "zmdi zmdi-format-subject"}]}]]
-
 
         [rc/h-box :src (rc/at)
          :width "1000px"
@@ -1749,6 +1747,12 @@
 
 
   (re-frame/subscribe [:coverage-plan-demo.component.blackboard.topic.current-time])
+  (re-frame/subscribe [:coverage-plan-demo.component.blackboard.topic.selected-targets])
+  (re-frame/subscribe [:coverage-plan-demo.component.blackboard.topic.selected-satellites])
+  (re-frame/subscribe [:bh.rccst.subs/source :topic/target-data])
+  (re-frame/subscribe [:bh.rccst.subs/source :topic/satellite-data])
+  (re-frame/subscribe [:bh.rccst.subs/source :topic/coverage-data])
+
   (re-frame/subscribe [:coverage-plan-demo.component.blackboard.topic.layers])
   (re-frame/subscribe [:coverage-plan-demo.component.blackboard.topic.time-range])
 
@@ -1783,6 +1787,15 @@
 
   (def component-ui (process-ui component-lookup [] layout))
 
+
+  (process-ui component-lookup [] [:ui/globe])
+
+  (process-ui component-lookup [] [:v-box [:ui/time-slider]])
+
+  (re-frame/subscribe [:coverage-plan-demo.component.blackboard.topic.time-range])
+  (re-frame/subscribe [:coverage-plan-demo.component.blackboard.topic.current-time])
+
+  (re-frame/dispatch [:coverage-plan-demo.component.blackboard.topic.current-time 22])
 
   ())
 
