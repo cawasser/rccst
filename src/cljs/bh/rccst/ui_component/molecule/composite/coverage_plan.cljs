@@ -44,8 +44,8 @@
     :<- targets
     :<- satellites
     :<- coverages
-    (fn [t s c _]
-      [{:layer-1 {} :layer-2 {}}])))
+    (fn [[t s c] _]
+      [{:targets t} {:satellites s}])))
 
 
 (defn fn-range
@@ -70,14 +70,14 @@
 
 ;; components have "ports" which define their inputs and outputs:
 ;;
-;;      you SUBSCRIBE to a :port/sink, ie, data goes IN     (re-frame/subscribe ...)
+;;      you SUBSCRIBE with a :port/sink, ie, data come IN   (re-frame/subscribe ...)
 ;;
 ;;      you PUBLISH to a :port/source, ie, data goes OUT    (re-frame/dispatch ...)
 ;;
-;;      you do BOTH with :port/source-sink (both)           should we even have this?
+;;      you do BOTH with :port/source-sink (both)           should we even have this, or should we spell out both directions?
 ;;
-;; the question about :port/source-sink arises because building the layout (the call for the UI itself) we don't actually
-;; need to make a distinction (in fact the code is a bit cleaner if we don't) and have the callee sort it out (since it
+;; the question about :port/source-sink arises because building the layout (the call for the UI itself) doesn't actually
+;; need to make a distinction (in fact the code is a bit cleaner if we don't) and we have the callee sort it out (since it
 ;; needs to implement the correct usage anyway). The flow-diagram, on the other hand, is easier if we DO make the
 ;; distinction, so we can quickly build all the Nodes and Handles used for the diagram...
 ;;
@@ -117,11 +117,11 @@
                                          :topic/coverage-data       {:type :source/remote :name :source/coverages}
 
                                          ; composite-local data sources
-                                         :topic/selected-targets    {:type :source/local :name :selected-targets :default []}
-                                         :topic/selected-satellites {:type :source/local :name :selected-satellites :default []}
+                                         :topic/selected-targets    {:type :source/local :name :selected-targets :default 0}
+                                         :topic/selected-satellites {:type :source/local :name :selected-satellites :default 0}
                                          :topic/current-time        {:type :source/local :name :current-time :default 50} ;(js/Date.)}
-                                         :topic/layers              {:type :source/local :name :layers} ;:default []}
-                                         :topic/time-range          {:type :source/local :name :time-range} ;:default [0 100]}
+                                         :topic/layers              {:type :source/local :name :layers}
+                                         :topic/time-range          {:type :source/local :name :time-range}
 
                                          ; transformation functions
                                          :fn/coverage               {:type  :source/fn :name fn-coverage
@@ -176,14 +176,14 @@
 ;
 (comment
   {:fn/coverage     (fn-coverage
-                      :targets [:coverage-plan/blackboard.topic.selected-targets]
-                      :satellites [:coverage-plan/blackboard.topic.selected-satellites]
-                      :coverages [:bh.rccst.subs/source :topic/coverages]
-                      :layers [:coverage-plan/blackboard.topic.layers])
+                      {:targets    [:coverage-plan/blackboard.topic.selected-targets]
+                       :satellites [:coverage-plan/blackboard.topic.selected-satellites]
+                       :coverages  [:bh.rccst.subs/source :topic/coverages]
+                       :layers     [:coverage-plan/blackboard.topic.layers]})
 
    :fn/range        (fn-range
-                      :data [:bh.rccst.subs/source :topic/coverages]
-                      :selected [:coverage-plan/blackboard.topic.time-range])
+                      {:data     [:bh.rccst.subs/source :topic/coverages]
+                       :selected [:coverage-plan/blackboard.topic.time-range]})
 
    :ui/targets      [e/selectable-table
                      :component-id :coverage-plan/targets

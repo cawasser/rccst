@@ -22,7 +22,7 @@
        [lf/labeled-field "data" @source]
        [:button.button {:on-click #(do
                                      (swap! clicked inc)
-                                     (re-frame/dispatch (conj selection :sub-path @clicked)))}
+                                     (re-frame/dispatch (conj selection @clicked)))}
         "Click!"]])))
 
 
@@ -62,16 +62,6 @@
          [lf/labeled-field "Value" @v]
          [lf/labeled-field "Range" @r]]))))
 
-
-
-(comment
-
-  @(re-frame/subscribe [:coverage-plan-demo.component.blackboard.topic.current-time])
-
-  (re-frame/dispatch-sync [:coverage-plan-demo.component.blackboard.topic.current-time 45])
-
-
-  ())
 
 (defn label [& {:keys [value]}]
 

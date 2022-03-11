@@ -16,6 +16,9 @@
 # All the World's a DAG
 
 
+[xkdc](https://xkcd.com/1416/)
+
+
 **DAG** _Directed Acyclic Graph_
 
 a [directed acyclic graph](https://en.wikipedia.org/wiki/Directed_acyclic_graph) is a graph of nodes and 
