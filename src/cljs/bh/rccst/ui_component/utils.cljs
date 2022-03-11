@@ -233,17 +233,6 @@
     (path->keyword widget-id)))
 
 
-(comment
-  (def widget-id "area-chart-demo.area-chart")
-  (def a :tv)
-  (def more ())
-
-  (compute-deps widget-id a more)
-  (compute-container-path widget-id a more)
-
-  ())
-
-
 (defn create-widget-sub
   "create and registers a re-frame [subscription handler](https://day8.github.io/re-frame/subscriptions/)
   for the `widget-id` (as a keyword) inside the `:widgets` top-level key in the `app-db`.
@@ -372,6 +361,10 @@
       p
       (fn [db [_ new-val]]
         ;(log/info "event" p new-val)
+
+        ; NOTE: this "default" processing could be overridden (using an optional keyword)
+        ; to perform more custom functions (like incremental updates to a collection)
+        ;
         (assoc-in db
           (apply conj [:widgets (path->keyword widget-id)] (map path->keyword value-path))
           new-val)))))
@@ -523,8 +516,6 @@
   (deref (get subs (->> path
                      (map path->keyword)
                      (into [])))))
-
-
 
 ;; endregion
 

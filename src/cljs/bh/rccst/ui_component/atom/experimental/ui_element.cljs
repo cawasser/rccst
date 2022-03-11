@@ -19,12 +19,13 @@
     (fn [& {:keys [data selection component-id container-id]}]
       ;(log/info "selectable-table RENDER")
       [:div.card {:style {:width "300px" :height "200px"}}
-       [:h2 "Selectable Table"]
-       [lf/labeled-field "data" @source]
-       [:button.button {:on-click #(do
-                                     (swap! clicked inc)
-                                     (re-frame/dispatch (conj selection @clicked)))}
-        "Click!"]])))
+       [:h2 {:style {:text-align :center}} "Selectable Table"]
+       [:div {:style {:width "200px" :margin :auto}}
+        [lf/labeled-field "data" @source]
+        [:button.button {:on-click #(do
+                                      (swap! clicked inc)
+                                      (re-frame/dispatch (conj selection @clicked)))}
+         "Click!"]]])))
 
 
 (defn three-d-globe [& {:keys [layers current-time component-id container-id]}]
@@ -36,9 +37,10 @@
     (fn [& {:keys [layers current-time component-id container-id]}]
       ;(log/info "three-d-globe RENDER")
       [:div.card {:style {:width "500px" :height "500px"}}
-       [:h2 "3D Globe Table"]
-       [lf/labeled-field "Layers" @l]
-       [lf/labeled-field "Current Time" @t]])))
+       [:h2 {:style {:text-align :center}} "3D Globe Table"]
+       [:div {:style {:width "200px" :margin :auto}}
+        [lf/labeled-field "Layers" @l]
+        [lf/labeled-field "Current Time" @t]]])))
 
 
 (defn slider [& {:keys [value range]}]
@@ -51,19 +53,21 @@
       ;(log/info "slider RENDER")
       (let [[min max] @r]
         [:div.card {:style {:width "300px" :height "100px"}}
-         [:h2 "Slider"]
+         [:h2 {:style {:text-align :center}} "Slider"]
          [rc/slider
           :src (rc/at)
           :model (str @v)
           :min min
           :max max
-          :width "200px"
+          :width "90%"
+          :style {:margin-left :auto :margin-right :auto}
           :on-change #(do
                         (log/info "slider" (str %))
                         (re-frame/dispatch-sync (conj value %)))
           :disabled? false]
-         [lf/labeled-field "Value" @v]
-         [lf/labeled-field "Range" @r]]))))
+         [:div {:style {:width "200px" :margin :auto}}
+          [lf/labeled-field "Value" @v]
+          [lf/labeled-field "Range" @r]]]))))
 
 
 (defn label [& {:keys [value]}]
@@ -74,8 +78,9 @@
     ;(log/info "label RENDER")
     (fn [& {:keys [value]}]
       [:div.card {:style {:width "300px" :height "100px"}}
-       [:h2 "Label"]
-       [lf/labeled-field "Value" @v]])))
+       [:h2 {:style {:text-align :center}} "Label"]
+       [:div {:style {:width "200px" :margin :auto}}
+        [lf/labeled-field "Value" @v]]])))
 
 
 
