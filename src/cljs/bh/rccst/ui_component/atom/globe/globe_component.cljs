@@ -18,17 +18,8 @@
 
 (defn- time-slider [id current-time-t]
   [:div.control {:style {:display     :flex
-                 :position :relative}}
-                 ;:align-items :center}}
-   ;:width       "50%"}}
+                         :position :relative}}
 
-     [:div.slidecontainer {:style {:width "100%" :height "40px" :z-index "1" :margin-right "20px"}}
-      [:input#myRange.slider
-       {:style     {:height "40px" :width "100%"}
-        :type      "range" :min "0" :max "9" :value @current-time-t
-        :on-change #(do
-                      ;(log/info "time-slider" (js/parseInt (-> % .-target .-value)))
-                      (re-frame/dispatch-sync [::events/update-time id (js/parseInt (-> % .-target .-value))]))}]]
 
      [:div.textdate {:style {:position :absolute :top "60px" :z-index "2"}}
        [:h2 {:style {:width "100%" :text-align :center}}

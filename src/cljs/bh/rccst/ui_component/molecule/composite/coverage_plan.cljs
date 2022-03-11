@@ -32,17 +32,20 @@
   builds and registers the subscription provided by 'layers'
 
   "
-  [& {:keys [targets satellites coverages layers]}]
+  [{:keys [targets satellites coverages layers]}]
 
-  (let [some-computation (fn [t s c] [])]
+  ;(log/info "fn-coverage" layers
+  ;  "//" targets
+  ;  "//" satellites
+  ;  "//" coverages)
 
-    (re-frame/reg-sub
-      layers
-      :<- [targets]
-      :<- [satellites]
-      :<- [coverages]
-      (fn [t s c [_ _]]
-        (some-computation t s c)))))
+  (re-frame/reg-sub
+    (first layers)
+    :<- targets
+    :<- satellites
+    :<- coverages
+    (fn [t s c _]
+      [{:layer-1 {} :layer-2 {}}])))
 
 
 (defn fn-range
@@ -54,17 +57,15 @@
 
   builds and registers the subscription :<container>/blackboard.<selected>
   "
-  [& {:keys [data range]}]
+  [{:keys [data range]}]
 
-  (let [some-computation (fn [x]
-                           (println "fn-range subscription")
-                           [0 100])]
+  ;(log/info "fn-range" range "//" data)
 
-    (re-frame/reg-sub
-      range
-      :<- [data]
-      (fn [d [_ _]]
-        (some-computation d)))))
+  (re-frame/reg-sub
+    (first range)
+    :<- data
+    (fn [d _]
+      [0 100]))) ;(some-computation d)))))
 
 
 ;; components have "ports" which define their inputs and outputs:
@@ -118,9 +119,9 @@
                                          ; composite-local data sources
                                          :topic/selected-targets    {:type :source/local :name :selected-targets :default []}
                                          :topic/selected-satellites {:type :source/local :name :selected-satellites :default []}
-                                         :topic/current-time        {:type :source/local :name :current-time :default (js/Date.)}
-                                         :topic/layers              {:type :source/local :name :layers :default []}
-                                         :topic/time-range          {:type :source/local :name :time-range :default [0 100]}
+                                         :topic/current-time        {:type :source/local :name :current-time :default 50} ;(js/Date.)}
+                                         :topic/layers              {:type :source/local :name :layers} ;:default []}
+                                         :topic/time-range          {:type :source/local :name :time-range} ;:default [0 100]}
 
                                          ; transformation functions
                                          :fn/coverage               {:type  :source/fn :name fn-coverage
@@ -233,7 +234,7 @@
     direction
     (map (fn [[target ports]]
            (let [[source-port target-port] ports]
-             ;(log/info target (-> configuration :components target :type))
+             ;(log/info "make-params" target (-> configuration :components target :type))
              (if (= direction :outputs)
                {source-port (if (= :source/local (-> configuration :components target :type))
                               [(ui-utils/path->keyword container-id :blackboard target)]
@@ -271,7 +272,11 @@
   (ui-utils/create-widget-local-event container-id [:blackboard node])
 
   ; 3. add the key to the blackboard, uses the :default property of the meta-data
-  (ui-utils/dispatch-local container-id [:blackboard node] (:default meta-data))
+  ;
+  ;  only IF one exists, otherwise we assume it will be serviced by a :source/fn somewhere
+  ;
+  (when (:default meta-data)
+    (ui-utils/dispatch-local container-id [:blackboard node] (:default meta-data)))
 
   ; 4. return the signal vector for the new subscription
   [(ui-utils/path->keyword container-id [:blackboard node])])
@@ -291,16 +296,13 @@
 
 (defmethod component->ui :source/fn [{:keys [node configuration container-id]}]
   (let [actual-fn (->> configuration :components node :name)
-        denorm    (->> configuration :denorm node)]
+        params    (merge
+                    (make-params configuration node :inputs container-id)
+                    (make-params configuration node :outputs container-id))]
 
-    ;(log/info "component->ui :source/fn" node "//" actual-fn "//" denorm)
+    ;(log/info "component->ui :source/fn" node "//" params)
 
-    (apply actual-fn
-      (flatten
-        (seq
-          (merge
-            (make-params configuration node :inputs container-id)
-            (make-params configuration node :outputs container-id)))))))
+    (actual-fn params)))
 
 
 (defn- process-components [configuration node-type registry container-id]
@@ -698,9 +700,9 @@
         links      (:links configuration)
         layout     (:layout configuration)]
 
-    (log/info "definition-panel" components)
-    (log/info "definition-panel" links)
-    (log/info "definition-panel" layout)
+    ;(log/info "definition-panel" components)
+    ;(log/info "definition-panel" links)
+    ;(log/info "definition-panel" layout)
 
     (fn [& {:keys [configuration]}]
       [rc/v-box :src (rc/at)
@@ -798,14 +800,13 @@
 
     (log/info "component-panel" component-id)
 
-
     (fn [& {:keys [configuration component-id container-id]}]
 
       ; 5. return the composed component layout!
       [:div {:style {:width "1000px" :height "100%"}}
        composed-ui])))
 
-;[stand-in components])))
+       ;[stand-in components]])))
 
 ;;endregion
 
@@ -818,7 +819,12 @@
   (let [id            (r/atom nil)
         configuration @data
         graph         (apply lg/digraph (compute-edges configuration))
-        comp-or-dag?  (r/atom :component)]
+        comp-or-dag?  (r/atom :component)
+        full-config   (assoc configuration
+                        :graph graph
+                        :denorm (denorm-components graph (:links configuration) (lg/nodes graph))
+                        :nodes (lg/nodes graph)
+                        :edges (lg/edges graph))]
 
     (fn []
       (when (nil? @id)
@@ -826,17 +832,12 @@
         (ui-utils/init-widget @id {:blackboard {} :container ""})
         (ui-utils/dispatch-local @id [:container] container-id)
 
-        (prep-environment configuration @id))
+        (prep-environment full-config @id))
 
       ;(log/info "coverage-plan" @id (config @id data))
-      (let [full-config (assoc configuration
-                          :graph graph
-                          :denorm (denorm-components graph (:links configuration) (lg/nodes graph))
-                          :nodes (lg/nodes graph)
-                          :edges (lg/edges graph))
-            buttons     [{:id :component :label [:i {:class "zmdi zmdi-view-compact"}]}
-                         {:id :dag :label [:i {:class "zmdi zmdi-share"}]}
-                         {:id :definition :label [:i {:class "zmdi zmdi-format-subject"}]}]]
+      (let [buttons [{:id :component :label [:i {:class "zmdi zmdi-view-compact"}]}
+                     {:id :dag :label [:i {:class "zmdi zmdi-share"}]}
+                     {:id :definition :label [:i {:class "zmdi zmdi-format-subject"}]}]]
 
 
         [rc/h-box :src (rc/at)
@@ -1727,6 +1728,30 @@
     [:blackboard :topic/current-time] (js/Date.))
 
 
+  (re-frame/reg-sub
+    :coverage-plan-demo.component.blackboard.topic.time-range
+    :<- [:coverage-plan-demo.component.blackboard.topic.current-time]
+    (fn [t _]
+      [0 t]))
+
+
+  (re-frame/reg-sub
+    :coverage-plan-demo.component.blackboard.topic.layers
+    :<- [:coverage-plan-demo.component.blackboard.topic.selected-targets]
+    :<- [:coverage-plan-demo.component.blackboard.topic.selected-satellites]
+    :<- [:bh.rccst.subs/source :topic/coverage-data]
+    (fn [t s c _]
+      [{:layer-1 {} :layer-2 {}}]))
+
+
+  (ui-utils/dispatch-local :coverage-plan-demo.component
+    [:blackboard :topic/current-time] 75)
+
+
+  (re-frame/subscribe [:coverage-plan-demo.component.blackboard.topic.current-time])
+  (re-frame/subscribe [:coverage-plan-demo.component.blackboard.topic.layers])
+  (re-frame/subscribe [:coverage-plan-demo.component.blackboard.topic.time-range])
+
   ())
 
 
@@ -1757,6 +1782,70 @@
                             meta-data-registry component-id)))
 
   (def component-ui (process-ui component-lookup [] layout))
+
+
+  ())
+
+
+; have to actually CALL the fn/subcription we built!
+(comment
+  (do
+    (def config @sample-data)
+    (def container-id :coverage-plan-demo.component)
+    (def links (:links config))
+    (def layout (:layout config))
+    (def components (:components config))
+    (def graph (apply lg/digraph (compute-edges config)))
+    (def nodes (lg/nodes graph))
+    (def edges (lg/edges graph))
+    (def registry meta-data-registry)
+
+    (def configuration (assoc @sample-data
+                         :graph graph
+                         :denorm (denorm-components graph (:links config) (lg/nodes graph))
+                         :nodes (lg/nodes graph)
+                         :edges (lg/edges graph)
+                         :ui-lookup (into {}
+                                      (process-components
+                                        configuration :ui/component
+                                        meta-data-registry :coverage-plan))))
+    (def component-lookup (into {}
+                            (process-components
+                              configuration :ui/component
+                              meta-data-registry :coverage-plan)))
+    (def node :fn/range)
+
+    (def actual-fn (->> configuration :components node :name))
+    (def denorm (->> configuration :denorm node)))
+
+  (make-params configuration node :inputs container-id)
+  (make-params configuration node :outputs container-id)
+
+
+  (def built (seq
+               (reduce into [actual-fn]
+                 (seq
+                   (merge
+                     (make-params configuration node :inputs container-id)
+                     (make-params configuration node :outputs container-id))))))
+
+  (built)
+
+  (actual-fn
+    (merge
+      (make-params configuration node :inputs container-id)
+      (make-params configuration node :outputs container-id)))
+
+  (let [actual-fn (->> configuration :components node :name)
+        denorm    (->> configuration :denorm node)
+
+        _         (log/info "component->ui :source/fn" node "//" actual-fn "//" denorm)
+
+        built-fn  (apply actual-fn
+                    (seq
+                      (merge
+                        (make-params configuration node :inputs container-id)
+                        (make-params configuration node :outputs container-id))))])
 
 
   ())

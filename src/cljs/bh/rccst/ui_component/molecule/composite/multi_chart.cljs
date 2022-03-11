@@ -61,7 +61,7 @@
 
 
 (defn- data-config [component-id label path position]
-  (log/info "data-config" component-id label path position)
+  ;(log/info "data-config" component-id label path position)
   [rc/v-box :src (rc/at)
    :gap "5px"
    :children [[utils/boolean-config component-id label (conj path :include)]

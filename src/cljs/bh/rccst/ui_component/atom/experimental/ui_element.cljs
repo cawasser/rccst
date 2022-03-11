@@ -5,7 +5,9 @@
   (:require [bh.rccst.ui-component.labeled-field :as lf]
             [re-frame.core :as re-frame]
             [reagent.core :as r]
-            [taoensso.timbre :as log]))
+            [re-com.core :as rc]
+            [taoensso.timbre :as log]
+            [bh.rccst.ui-component.utils :as ui-utils]))
 
 
 (defn selectable-table [& {:keys [data selection]}]
@@ -44,11 +46,32 @@
   (let [v (re-frame/subscribe value)
         r (re-frame/subscribe range)]
     (fn [& {:keys [value range]}]
-      [:div.card {:style {:width "300px" :height "100px"}}
-       [:h2 "Slider"]
-       [lf/labeled-field "Value" @v]
-       [lf/labeled-field "Range" @r]])))
+      (let [[min max] @r]
+        [:div.card {:style {:width "300px" :height "100px"}}
+         [:h2 "Slider"]
+         [rc/slider
+          :src (rc/at)
+          :model (r/atom @v)
+          :min min
+          :max max
+          :width "200px"
+          :on-change #(do
+                        (log/info "slider" (str %) "//")
+                        (re-frame/dispatch-sync (conj value %)))
+          :disabled? false]
+         [lf/labeled-field "Value" @v]
+         [lf/labeled-field "Range" @r]]))))
 
+
+
+(comment
+
+  @(re-frame/subscribe [:coverage-plan-demo.component.blackboard.topic.current-time])
+
+  (re-frame/dispatch-sync [:coverage-plan-demo.component.blackboard.topic.current-time 45])
+
+
+  ())
 
 (defn label [& {:keys [value]}]
 
