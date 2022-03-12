@@ -1,5 +1,6 @@
 (ns bh.rccst.ui-component.molecule.composite.util.signals
   (:require [bh.rccst.ui-component.utils :as ui-utils]
+            [bh.rccst.ui-component.utils.locals :as ul]
             [day8.re-frame.tracing :refer-macros [fn-traced]]
             [re-com.core :as rc]
             [re-frame.core :as re-frame]
@@ -48,17 +49,17 @@
   ;(log/info "component->ui :source/local" node meta-data)
 
   ; 1. create the subscription against the new :blackboard key
-  (ui-utils/create-widget-local-sub container-id [:blackboard node])
+  (ul/create-widget-local-sub container-id [:blackboard node])
 
   ; 2. create the event against the new :blackboard key
-  (ui-utils/create-widget-local-event container-id [:blackboard node])
+  (ul/create-widget-local-event container-id [:blackboard node])
 
   ; 3. add the key to the blackboard, uses the :default property of the meta-data
   ;
   ;  only IF one exists, otherwise we assume it will be serviced by a :source/fn somewhere
   ;
   (when (:default meta-data)
-    (ui-utils/dispatch-local container-id [:blackboard node] (:default meta-data)))
+    (ul/dispatch-local container-id [:blackboard node] (:default meta-data)))
 
   ; 4. return the signal vector for the new subscription
   [(ui-utils/path->keyword container-id [:blackboard node])])

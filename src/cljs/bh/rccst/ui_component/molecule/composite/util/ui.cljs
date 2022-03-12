@@ -1,6 +1,7 @@
 (ns bh.rccst.ui-component.molecule.composite.util.ui
   (:require [bh.rccst.ui-component.molecule.composite.util.signals :as sig]
             [bh.rccst.ui-component.utils :as ui-utils]
+            [bh.rccst.ui-component.utils.locals :as ul]
             [day8.re-frame.tracing :refer-macros [fn-traced]]
             [reagent.core :as r]
             ["dagre" :as dagre]
@@ -212,8 +213,8 @@
   ;     subscriptions for the "locals"
   ;
   ; [SIDE EFFECT]
-  (ui-utils/create-widget-sub component-id)
-  (ui-utils/create-widget-local-sub component-id [:blackboard])
+  (ul/create-widget-sub component-id)
+  (ul/create-widget-local-sub component-id [:blackboard])
 
   ; 3. add blackboard data to the app-db and build local subscriptions/events against the blackboard
   ;
