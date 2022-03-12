@@ -14,7 +14,7 @@
 
 
 (def people [{:name  "Rich Hickey"
-              :image "imgs/rich-hickey.jpeg"
+              :image "imgs/giants/rich-hickey.jpeg"
               :description
               "Discuss various works and presentations
 
@@ -24,40 +24,75 @@
               "}
 
              {:name        "Stu Halloway"
-              :image       "imgs/stu-halloway.jpeg"
-              :description "Discuss the various works and presentations"}
+              :image       "imgs/giants/stu-halloway.jpeg"
+              :description "Stu is a Principle at Cognitect and talks on many subjects.
+
+[Simplicity Ain't Easy](https://www.youtube.com/watch?v=cidchWg74Y4) (2012)
+
+[The Impedance Mismatch is Our Fault](https://www.infoq.com/presentations/Impedance-Mismatch/) (2012)
+
+[Clojure in 10 Big Ideas](https://www.youtube.com/watch?v=noiGVQoyYHw) (2013)"}
 
              {:name        "David Nolen"
-              :image       "imgs/david-nolen.png"
-              :description "Discuss the various works and presentations"}
+              :image       "imgs/giants/david-nolen.png"
+              :description "David has been the lead developer of [Clojurescript]() for many years.
+
+[ClojureScript: Lisp's Revenge](https://www.youtube.com/watch?v=MTawgp3SKy8) (2013)
+
+[ClojureScript in the Age of TypeScript](https://www.youtube.com/watch?v=3HxVMGaiZbc) (2021)"}
 
              {:name        "Dan Holmsand"
-              :image       ""
-              :description "Discuss the various works and presentations"}
+              :image       "imgs/giants/dan-holmsand.jpeg"
+              :description "Dan started [Reagent](https://reagent-project.github.io)"}
 
              {:name        "Bret Victor"
-              :image       ""
-              :description "Discuss the various works and presentations"}
+              :image       "imgs/giants/bret-victor.jpg"
+              :description "Bret has worked at Magic Ink and Apple, focusing on human-centric design.
+
+[Drawing Dynamic Visualizations](http://worrydream.com/#!/DrawingDynamicVisualizationsTalk) (2013)
+
+[Media for the Unthinkable](http://worrydream.com/#!/MediaForThinkingTheUnthinkable) (2013)"}
 
              {:name        "James Reeves"
-              :image       ""
-              :description "Discuss the various works and presentations"}
+              :image       "imgs/giants/james-reeves.jpg"
+              :description "James is the developer of [Compojure](https://github.com/weavejester/compojure) and [Hiccup](https://github.com/weavejester/hiccup) and many others.
+
+[Transparency through data](https://www.youtube.com/watch?v=zznwKCifC1A) (2017)"}
 
              {:name        "Dave Martin"
-              :image       ""
-              :description "Discuss the various works and presentations"}
+              :image       "imgs/giants/dave-martin.jpeg"
+              :description "Dave started the development of [Willa](https://github.com/DaveWM/willa), a data-driven way to develop Kafka Topologies.
+
+[Kafka Streams, the Clojure way](https://blog.davemartin.me/posts/kafka-streams-the-clojure-way/) (2019)"}
+
+             {:name        "Aysylu Greenberg"
+              :image       "imgs/giants/aysylu-greenberg.jpeg"
+              :description "Aysylu developed [Loom](https://github.com/aysylu/loom), a library for working with 'graph data' in Clojure.
+
+[Loom and Graphs in Clojure](https://www.youtube.com/watch?v=wEEutxTYQQU) (2014)
+
+[+ Loom years 2](https://www.youtube.com/watch?v=eadPwx-bVS8) (2016)"}
 
              {:name        "Stuart Sierra"
-              :image       ""
-              :description "Discuss the various works and presentations"}
+              :image       "imgs/giants/stuart-sierra.jpg"
+              :description "Stuart is the developer of [Component](https://github.com/stuartsierra/component), a Clojure library for working with stateful-infrastructure within an application.
+
+[Components Just Enough Structure](https://www.youtube.com/watch?v=13cmHf_kt-Q) (2014)]"}
 
              {:name        "Mark Nutter"
-              :image       ""
-              :description "Discuss the various works and presentations"}
+              :image       "imgs/giants/mark-nutter.jpeg"
+              :description "Mark developed [Woolybear](https://github.com/manutter51/woolybear) as an experiment in Atomic Design for Clojurescript UIs.
+
+[Re-usable GUI Components with Re-frame and Atomic Design](https://www.youtube.com/watch?v=JCY_cHzklRs) (2018)"}
 
              {:name        "Sean Corfield"
-              :image       ""
-              :description "Discuss the various works and presentations"}
+              :image       "imgs/giants/sean-corfield.jpeg"
+              :description "Sean is a professional Clojure developer. He maintains a number of OSS libraries for the Clojure community
+              including [next.jdbc](https://github.com/seancorfield/next-jdbc).
+
+[Real World Clojure Doing Boring Stuff With An Exciting Language](https://www.youtube.com/watch?v=75U3W8Y2zzw) (2020)
+
+[REPL Driven Development, Clojure's Superpower ](https://www.youtube.com/watch?v=gIoadGfm5T8) (2021)"}
 
              {:name        "Mark Bastian"
               :image       ""
@@ -73,7 +108,7 @@
 
              {:name        "Thomas Heller"
               :image       ""
-              :description "Discuss the various works and presentations"}
+              :description "Discuss [Shadow-Cljs]()]"}
 
              {:name        "Eric Normand"
               :image       ""
