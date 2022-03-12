@@ -95,20 +95,49 @@
 [REPL Driven Development, Clojure's Superpower ](https://www.youtube.com/watch?v=gIoadGfm5T8) (2021)"}
 
              {:name        "Mark Bastian"
-              :image       ""
-              :description "Discuss the various works and presentations"}
+              :image       "imgs/giants/mark-bastian.jpg"
+              :description "Mark is a software developer and has presented at several Clojure conferences.
+
+[Bottom Up vs Top Down Design in Clojure](https://www.youtube.com/watch?v=Tb823aqgX_0) (2015)
+
+[Defeating the Four Horsemen of the Coding Apocalypse](https://www.youtube.com/watch?v=jh4hMAvygjk) (2019)]"}
+
+             {:name        "Mark Engelberg"
+              :image       "imgs/giants/mark-engleberg.jpg"
+              :description "Alex works with his father Mark, and the two have developed a number of useful tools
+              for the Clojure community, including [rolling-stones]() and [loco](https://github.com/aengelberg/loco).
+
+[Solving Problems with Automata](https://www.youtube.com/watch?v=AEhULv4ruL4) (2015)]
+
+[Solving Problems Declaratively](https://www.youtube.com/watch?v=TA9DBG8x-ys) (2017)"}
 
              {:name        "Alex Engelberg"
-              :image       ""
-              :description "Discuss the various works and presentations"}
+              :image       "imgs/giants/alex-engelberg.jpg"
+              :description "Mark works with his son Alex, and the two have developed a number of useful tools
+              for the Clojure community, including [rolling-stones]() and [loco](https://github.com/aengelberg/loco).
+
+[Solving Problems with Automata](https://www.youtube.com/watch?v=AEhULv4ruL4) (2015)]"}
 
              {:name        "Martin Kleppmann"
-              :image       ""
-              :description "Discuss the various works and presentations"}
+              :image       "imgs/giants/martin-kleppmann.jpg"
+              :description "Martin is one of the original developers of [Kafka](https://kafka.apache.org), based upon his work with
+              [Apache Samza](https://samza.apache.org), while at Linkedin.
+
+[Turning the database inside out with Apache Samza](https://www.youtube.com/watch?v=fU9hR3kiOK0) (2014)
+
+[Transactions: myths, surprises and opportunities](https://www.youtube.com/watch?v=5ZjhNTM8XU8) (2015)"}
 
              {:name        "Thomas Heller"
+              :image       "imgs/giants/thomas-heller.jpeg"
+              :description "Thomas is the developer and maintainer of the [Shadow-Cljs](https://github.com/thheller/shadow-cljs) build tool.
+
+[shadow-cljs with Thomas Heller (podcast)](https://www.listennotes.com/podcasts/clojurestream/s3-e3-shadow-cljs-with-hE6kaKgzCSJ/) (2020)"}
+
+             {:name        "Mike Thompson"
               :image       ""
-              :description "Discuss [Shadow-Cljs]()]"}
+              :description "Mike is the \"face\" of [Re-frame](https://github.com/Day8/re-frame).
+
+[re-frame with Mike Thompson (podcast)](https://www.listennotes.com/podcasts/clojurestream/s4-e3-re-frame-with-mike-kw5eNt0HWAh/) (2020)"}
 
              {:name        "Eric Normand"
               :image       ""
