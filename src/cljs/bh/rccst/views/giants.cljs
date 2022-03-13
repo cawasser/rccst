@@ -104,7 +104,7 @@
 
              {:name        "Mark Engelberg"
               :image       "imgs/giants/mark-engleberg.jpg"
-              :description "Alex works with his father Mark, and the two have developed a number of useful tools
+              :description "Mark works with his son Alex, and the two have developed a number of useful tools
               for the Clojure community, including [rolling-stones]() and [loco](https://github.com/aengelberg/loco).
 
 [Solving Problems with Automata](https://www.youtube.com/watch?v=AEhULv4ruL4) (2015)]
@@ -113,7 +113,7 @@
 
              {:name        "Alex Engelberg"
               :image       "imgs/giants/alex-engelberg.jpg"
-              :description "Mark works with his son Alex, and the two have developed a number of useful tools
+              :description "Alex works with his father Mark, and the two have developed a number of useful tools
               for the Clojure community, including [rolling-stones]() and [loco](https://github.com/aengelberg/loco).
 
 [Solving Problems with Automata](https://www.youtube.com/watch?v=AEhULv4ruL4) (2015)]"}
@@ -135,21 +135,34 @@
 
              {:name        "Mike Thompson"
               :image       ""
-              :description "Mike is the \"face\" of [Re-frame](https://github.com/Day8/re-frame).
+              :description "Mike is the \"face\" of [Re-frame](https://github.com/Day8/re-frame) his employer, Day8
+              also build the [Re-com](https://github.com/Day8/re-com) UI library.
 
 [re-frame with Mike Thompson (podcast)](https://www.listennotes.com/podcasts/clojurestream/s4-e3-re-frame-with-mike-kw5eNt0HWAh/) (2020)"}
 
              {:name        "Eric Normand"
-              :image       ""
-              :description "Discuss the various works and presentations"}
+              :image       "imgs/giants/eric-normand.jpeg"
+              :description "Eric is a Clojure trainer, writer, and lecturer. He runs [ericnormand.me](https://ericnormand.me).
+
+[Building composable abstractions](https://www.youtube.com/watch?v=jJIUoaIvD20) (2016)
+
+[All I needed for FP I learned in High School Algebra](https://www.youtube.com/watch?v=epT1xgxSpFU) (2017)"}
 
              {:name        "Will Byrd"
-              :image       ""
-              :description "Discuss the various works and presentations"}
+              :image       "imgs/giants/wil-byrd.png"
+              :description "Wil is a programming language researcher, and co-author of the [Reasoned Schemer](https://mitpress.mit.edu/books/reasoned-schemer) and
+              [miniKanren](http://minikanren.org).
+
+[Barliman: trying the halting problem backwards, blindfolded](https://www.youtube.com/watch?v=er_lLvkklsk) (2016)
+
+[The Most Beautiful Program Ever Written](https://www.youtube.com/watch?v=OyfBQmvr2Hc) (2017)"}
 
              {:name        "Paul deGrandis"
-              :image       ""
-              :description "Discuss the various works and presentations"}])
+              :image       "imgs/giants/paul-degrandis.jpeg"
+              :description "Paul has worked for Cognitect and developed a data-driven approach to UI develop while
+              consulting for Consumer Reports.
+
+[Unlocking data-driven systems](https://www.youtube.com/watch?v=BNkYYYyfF48) (2014)"}])
 
 
 (defn- personality
