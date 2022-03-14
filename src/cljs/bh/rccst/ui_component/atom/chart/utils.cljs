@@ -255,12 +255,44 @@
                           [slider-config widget-id min max (conj path :space)]]]]])
 
 
+(defn enumerated-config
+  "provides a multi-button control for setting a property fro a set of mutually-exclusive options
+
+  ---
+
+  - widget-id : (string/keyword) unique ID for this component
+  - btns : (vector) define the button(s) that set the value(s).
+
+  | key       | description                                                          |
+  |:----------|:---------------------------------------------------------------------|
+  | `:id`     | the value to set when the use click the corresponding button control |
+  | `:label`  | the label to put on the button                                       |
+
+
+  - label : (string) tell the user what property is being manipulated
+  - path : (vector) path into `config` for the correct property
+
+  "
+  [widget-id btns label path]
+
+  (let [model (u/subscribe-local widget-id path)]
+    (fn []
+      [rc/h-box :src (rc/at)
+       :children [[rc/box :src (rc/at) :align :start :child [:code label]]
+                  [rc/horizontal-bar-tabs
+                   :src (rc/at)
+                   :model @model
+                   :tabs btns
+                   :style btns-style
+                   :on-change #(u/dispatch-local widget-id path %)]]])))
+
+
 (defn orientation-config
   "lets the user configure the orientation of an axis. Which axis is defined by the arguments.
 
   ---
 
-  - config : (atom) holds a hash-map of the actual configuration properties see [[config]].
+  - widget-id : (string/keyword) unique ID for this component
   - btns : (vector) define the button that set the value(s).
 
   | key       | description                                                          |
@@ -280,16 +312,7 @@
   "
   [widget-id btns label path]
 
-  (let [model (u/subscribe-local widget-id path)]
-    (fn [widget-id btns label path]
-      [rc/h-box :src (rc/at)
-       :children [[rc/box :src (rc/at) :align :start :child [:code label]]
-                  [rc/horizontal-bar-tabs
-                   :src (rc/at)
-                   :model @model
-                   :tabs btns
-                   :style btns-style
-                   :on-change #(u/dispatch-local widget-id path %)]]])))
+  (enumerated-config widget-id btns label path))
 
 
 (defn scale-config
@@ -307,21 +330,12 @@
   - path : (vector) path into `config` where the scale for the correct axis is stored
   "
   [widget-id label path]
-  (let [model (u/subscribe-local widget-id path)
-        btns  [{:id "auto" :label "auto"}
+  (let [btns  [{:id "auto" :label "auto"}
                {:id "linear" :label "linear"}
                {:id "pow" :label "pow"}
                {:id "sqrt" :label "sqrt"}
                {:id "log" :label "log"}]]
-    (fn [widget-id label path]
-      [rc/h-box :src (rc/at)
-       :children [[rc/box :src (rc/at) :align :start :child [:code label]]
-                  [rc/horizontal-bar-tabs
-                   :src (rc/at)
-                   :model @model
-                   :tabs btns
-                   :style btns-style
-                   :on-change #(u/dispatch-local widget-id path %)]]])))
+    (enumerated-config widget-id btns label path)))
 
 
 (defn layout-config
@@ -336,18 +350,9 @@
   - path : (vector) path into `config` where the scale for the layout is stored
   "
   [widget-id path]
-  (let [model (u/subscribe-local widget-id path)
-        btns  [{:id "horizontal" :label "horizontal"}
+  (let [btns  [{:id "horizontal" :label "horizontal"}
                {:id "vertical" :label "vertical"}]]
-    (fn [widget-id path]
-      [rc/h-box :src (rc/at)
-       :children [[rc/box :src (rc/at) :align :start :child [:code ":layout"]]
-                  [rc/horizontal-bar-tabs
-                   :src (rc/at)
-                   :model @model
-                   :tabs btns
-                   :style btns-style
-                   :on-change #(u/dispatch-local widget-id path %)]]])))
+    (enumerated-config widget-id btns ":layout" path)))
 
 
 (defn align-config
@@ -362,19 +367,10 @@
   - path : (vector) path into `config` where the scale for the layout is stored
   "
   [widget-id path]
-  (let [model (u/subscribe-local widget-id path)
-        btns  [{:id "left" :label "left"}
+  (let [btns  [{:id "left" :label "left"}
                {:id "center" :label "center"}
                {:id "right" :label "right"}]]
-    (fn [widget-id path]
-      [rc/h-box :src (rc/at)
-       :children [[rc/box :src (rc/at) :align :start :child [:code ":align"]]
-                  [rc/horizontal-bar-tabs
-                   :src (rc/at)
-                   :model @model
-                   :tabs btns
-                   :style btns-style
-                   :on-change #(u/dispatch-local widget-id path %)]]])))
+    (enumerated-config widget-id btns ":align" path)))
 
 
 (defn verticalAlign-config
@@ -389,19 +385,10 @@
   - path : (vector) path into `config` where the scale for the layout is stored
   "
   [widget-id path]
-  (let [model (u/subscribe-local widget-id path)
-        btns  [{:id "top" :label "top"}
+  (let [btns  [{:id "top" :label "top"}
                {:id "middle" :label "middle"}
                {:id "bottom" :label "bottom"}]]
-    (fn [widget-id path]
-      [rc/h-box :src (rc/at)
-       :children [[rc/box :src (rc/at) :align :start :child [:code ":verticalAlign"]]
-                  [rc/horizontal-bar-tabs
-                   :src (rc/at)
-                   :model @model
-                   :tabs btns
-                   :style btns-style
-                   :on-change #(u/dispatch-local widget-id path %)]]])))
+    (enumerated-config widget-id btns ":verticalAlign" path)))
 
 
 (defn color-config [widget-id label path & [position]]
