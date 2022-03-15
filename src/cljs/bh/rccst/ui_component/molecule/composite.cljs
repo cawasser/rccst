@@ -19,6 +19,7 @@
             [bh.rccst.ui-component.molecule.component-layout :as cl]
             [bh.rccst.ui-component.atom.experimental.ui-element :as e]
             [bh.rccst.ui-component.table :as real-table]
+            [bh.rccst.ui-component.atom.re-com.label :as rc-label]
             [bh.rccst.ui-component.utils :as ui-utils]
             [day8.re-frame.tracing :refer-macros [fn-traced]]
             [loom.graph :as lg]
@@ -42,12 +43,11 @@
 (def meta-data-registry
   (merge
     real-table/table-meta-data
+    rc-label/meta-data
     {
      :table/selectable-table {:component e/selectable-table
                               :ports     {:data      :port/source-sink ; out this be {:data-in :port/sink} & {:data-out :port/source}?
                                           :selection :port/source}}
-
-
 
      :globe/three-d-globe    {:component e/three-d-globe
                               :ports     {:layers       :port/sink
@@ -55,10 +55,7 @@
 
      :slider/slider          {:component e/slider
                               :ports     {:value :port/source-sink
-                                          :range :port/sink}}
-
-     :label/label            {:component e/label
-                              :ports     {:value :port/sink}}}))
+                                          :range :port/sink}}}))
 
 
 (def source-code '[composite

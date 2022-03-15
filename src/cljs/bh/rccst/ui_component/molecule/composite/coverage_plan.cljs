@@ -2,7 +2,8 @@
   "provide a composed UI for a \"Coverage Plan\" which shows targets and satellite coverage areas
   on a 3D globe"
   (:require [bh.rccst.ui-component.atom.experimental.ui-element :as e]
-            [bh.rccst.ui-component.table :as real-table]
+            ;[bh.rccst.ui-component.table :as real-table]
+            ;[bh.rccst.ui-component.atom.re-com.label :as label]
             [bh.rccst.ui-component.molecule.composite :as c]
             [bh.rccst.ui-component.utils :as ui-utils]
             [loom.graph :as lg]
@@ -91,7 +92,7 @@
                                            :ui/satellites             {:type :ui/component :name :real-table/table}
                                            :ui/globe                  {:type :ui/component :name :globe/three-d-globe}
                                            :ui/time-slider            {:type :ui/component :name :slider/slider}
-                                           :ui/current-time           {:type :ui/component :name :label/label}
+                                           :ui/current-time           {:type :ui/component :name :rc-label/label-lg}
 
                                            ; remote data sources
                                            :topic/target-data         {:type :source/remote :name :source/targets}
