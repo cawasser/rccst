@@ -178,7 +178,7 @@
 > Note: so developer don't need to understand or even remember this encoding scheme, use the [[subscribe-local]] helper function
 > in place of standard re-frame subscription calls. It provides the same result, and does all the encoding for you.
   "
-  [widget-id [a & more :as value-path]]
+  [widget-id [a & more :as value-path] default]
   (let [p    (h/path->keyword widget-id a more)
         dep  (compute-deps widget-id a more)
         item (h/path->keyword (if more (last more) a))]
@@ -192,7 +192,7 @@
       :<- [dep]
       (fn [widget _]
         ;(log/info "sub" p dep widget (last more))
-        (get widget item)))))
+        (or (get widget item) default)))))
 
 
 (defn create-widget-event
@@ -292,7 +292,7 @@
     ; create subscriptions
     (create-widget-sub widget-id)
     (doall
-      (map #(create-widget-local-sub widget-id %) paths))
+      (map #(create-widget-local-sub widget-id % 0) paths))
 
     ; create event handlers
     (create-widget-event widget-id)

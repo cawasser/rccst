@@ -214,7 +214,7 @@
   ;
   ; [SIDE EFFECT]
   (ul/create-widget-sub component-id)
-  (ul/create-widget-local-sub component-id [:blackboard])
+  (ul/create-widget-local-sub component-id [:blackboard] {})
 
   ; 3. add blackboard data to the app-db and build local subscriptions/events against the blackboard
   ;

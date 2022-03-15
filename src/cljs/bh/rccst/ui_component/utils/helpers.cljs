@@ -4,9 +4,9 @@
             [day8.re-frame.tracing :refer-macros [fn-traced]]
             [re-com.core :as rc]
             [re-frame.core :as re-frame]
-            [re-frame.core :as re-frame]
             [reagent.core :as r]
-            [woolybear.packs.tab-panel :as tab-panel]))
+            [woolybear.packs.tab-panel :as tab-panel]
+            [taoensso.timbre :as log]))
 
 
 (defn config-tab-panel [chart-id]
@@ -57,13 +57,32 @@
 
 
 (defn resolve-value [value]
+  (let [ret (cond
+              (coll? value) (re-frame/subscribe value)
+              (instance? reagent.ratom.RAtom value) value
+              (instance? Atom value) value
+              :else (r/atom value))]
+    ;(log/info "resolve-value" value "//" ret "//" (str @ret))
+    ret))
+
+
+
+(defn handle-change [value new-value]
+  ;(log/info "handle-change" value "//" new-value)
   (cond
-    (coll? value) (re-frame/subscribe value)
-    (instance? reagent.ratom.RAtom value) value
-    (instance? Atom value) value
-    :else (r/atom value)))
+    (coll? value) (re-frame/dispatch (conj value new-value))
+    (instance? reagent.ratom.RAtom value) (reset! value new-value)
+    (instance? Atom value) (reset! value new-value)
+    :else ()))
 
 
+(comment
+  (->>
+    (re-frame/subscribe [:coverage-plan-demo.component.blackboard.topic.current-time])
+    deref
+    str)
+
+  ())
 
 
 

@@ -1,29 +1,21 @@
 (ns bh.rccst.views.atom.example.re-com.slider
   (:require [re-com.core :as rc]
-            [reagent.ratom :as ratom]
+            [reagent.core :as r]
+            [bh.rccst.ui-component.atom.re-com.slider :as slider]
             [woolybear.ad.catalog.utils :as acu]))
 
 
 (defn example []
-  (let [slider-val (ratom/atom "0")
-        slider-min (ratom/atom "0")
-        slider-max (ratom/atom "100")
-        disabled? (ratom/atom false)]
+  (let [slider-val (r/atom "0")
+        slider-min (r/atom "0")
+        slider-max (r/atom "100")
+        disabled? (r/atom false)]
     (fn []
       (acu/demo "Slider"
         [rc/h-box
          :src (rc/at)
          :justify :between
-         :children [[rc/v-box :src (rc/at)
-                     :align-self :center
-                     :children [[rc/slider
-                                 :src (rc/at)
-                                 :model slider-val
-                                 :min slider-min
-                                 :max slider-max
-                                 :width "300px"
-                                 :on-change #(reset! slider-val (str %))
-                                 :disabled? disabled?]]]
+         :children [[slider/slider :value slider-val :range (r/atom [@slider-min @slider-max])]
                     [rc/gap :src (rc/at) :size "0px"]
                     [rc/v-box
                      :src (rc/at)
@@ -37,8 +29,7 @@
                                  :src (rc/at)
                                  :gap "10px"
                                  :align :center
-                                 :children [
-                                            [rc/box
+                                 :children [[rc/box
                                              :src (rc/at)
                                              :align :start
                                              :width "60px"

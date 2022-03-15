@@ -51,18 +51,18 @@
 (defmethod component->ui :source/local [{:keys [node meta-data container-id]}]
   ;(log/info "component->ui :source/local" node meta-data)
 
-  ; 1. create the subscription against the new :blackboard key
-  (ul/create-widget-local-sub container-id [:blackboard node])
-
-  ; 2. create the event against the new :blackboard key
-  (ul/create-widget-local-event container-id [:blackboard node])
-
-  ; 3. add the key to the blackboard, uses the :default property of the meta-data
+  ; 1. add the key to the blackboard, uses the :default property of the meta-data
   ;
   ;  only IF one exists, otherwise we assume it will be serviced by a :source/fn somewhere
   ;
   (when (:default meta-data)
     (ul/dispatch-local container-id [:blackboard node] (:default meta-data)))
+
+  ; 2. create the subscription against the new :blackboard key
+  (ul/create-widget-local-sub container-id [:blackboard node] (:default meta-data))
+
+  ; 3. create the event against the new :blackboard key
+  (ul/create-widget-local-event container-id [:blackboard node])
 
   ; 4. return the signal vector for the new subscription
   [(ui-utils/path->keyword container-id [:blackboard node])])

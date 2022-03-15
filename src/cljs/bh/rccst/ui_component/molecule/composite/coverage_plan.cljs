@@ -91,7 +91,7 @@
                                            :ui/targets                {:type :ui/component :name :real-table/table}
                                            :ui/satellites             {:type :ui/component :name :real-table/table}
                                            :ui/globe                  {:type :ui/component :name :globe/three-d-globe}
-                                           :ui/time-slider            {:type :ui/component :name :slider/slider}
+                                           :ui/time-slider            {:type :ui/component :name :rc-slider/slider}
                                            :ui/current-time           {:type :ui/component :name :rc-label/label-lg}
 
                                            ; remote data sources

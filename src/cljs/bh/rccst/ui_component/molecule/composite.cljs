@@ -20,6 +20,7 @@
             [bh.rccst.ui-component.atom.experimental.ui-element :as e]
             [bh.rccst.ui-component.table :as real-table]
             [bh.rccst.ui-component.atom.re-com.label :as rc-label]
+            [bh.rccst.ui-component.atom.re-com.slider :as rc-slider]
             [bh.rccst.ui-component.utils :as ui-utils]
             [day8.re-frame.tracing :refer-macros [fn-traced]]
             [loom.graph :as lg]
@@ -44,6 +45,7 @@
   (merge
     real-table/table-meta-data
     rc-label/meta-data
+    rc-slider/meta-data
     {
      :table/selectable-table {:component e/selectable-table
                               :ports     {:data      :port/source-sink ; out this be {:data-in :port/sink} & {:data-out :port/source}?
@@ -1005,7 +1007,7 @@
 
   (ui-utils/init-widget component-id {:blackboard {}})
 
-  (ui-utils/create-widget-local-sub component-id [:container])
+  (ui-utils/create-widget-local-sub component-id [:container] "")
   (ui-utils/create-widget-local-event component-id [:container])
 
   (ui-utils/subscribe-local component-id [:container])
@@ -1016,7 +1018,7 @@
 
   (ui-utils/dispatch-local component-id [:blackboard] {:dummy "dummy"})
 
-  (ui-utils/create-widget-local-sub component-id [:blackboard :topic/layers])
+  (ui-utils/create-widget-local-sub component-id [:blackboard :topic/layers] [])
   (ui-utils/create-widget-local-event component-id [:blackboard :topic/layers])
   (ui-utils/dispatch-local component-id [:blackboard :topic/layers] {:dummy "ui-utils"})
 
@@ -1025,7 +1027,7 @@
 
   (ui-utils/subscribe-local component-id [:blackboard :topic/current-time])
 
-  (ui-utils/create-widget-local-sub component-id [:blackboard :topic/current-time])
+  (ui-utils/create-widget-local-sub component-id [:blackboard :topic/current-time] "")
   (ui-utils/create-widget-local-event component-id [:blackboard :topic/current-time])
   (ui-utils/dispatch-local component-id [:blackboard :topic/current-time] {})
 
