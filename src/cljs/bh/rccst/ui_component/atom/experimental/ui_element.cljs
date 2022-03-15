@@ -39,7 +39,11 @@
       [:div.card {:style {:width "500px" :height "500px"}}
        [:h2 {:style {:text-align :center}} "3D Globe Table"]
        [:div {:style {:width "200px" :margin :auto}}
-        [lf/labeled-field "Layers" @l]
+        [rc/input-textarea
+         :src (rc/at)
+         :model (r/atom (str @l))
+         :rows 5
+         :on-change #()]
         [lf/labeled-field "Current Time" @t]]])))
 
 

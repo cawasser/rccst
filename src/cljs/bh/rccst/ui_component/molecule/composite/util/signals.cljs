@@ -4,6 +4,7 @@
             [day8.re-frame.tracing :refer-macros [fn-traced]]
             [re-com.core :as rc]
             [re-frame.core :as re-frame]
+            [taoensso.timbre :as log]
             ["dagre" :as dagre]
             ["graphlib" :as graphlib]
             ["react-flow-renderer" :refer (ReactFlowProvider Controls Handle Background) :default ReactFlow]))
@@ -16,15 +17,17 @@
     node
     direction
     (map (fn [[target ports]]
-           (let [[source-port target-port] ports]
-             ;(log/info "make-params" target (-> configuration :components target :type))
+           (let [[source-port target-port] ports
+                 target-type (-> configuration :components target :type)
+                 remote (-> configuration :components target :name)]
+             ;(log/info "make-params" target target-type remote)
              (if (= direction :outputs)
-               {source-port (if (= :source/local (-> configuration :components target :type))
+               {source-port (if (= :source/local target-type)
                               [(ui-utils/path->keyword container-id :blackboard target)]
-                              [:bh.rccst.subs/source target])}
-               {target-port (if (= :source/local (-> configuration :components target :type))
+                              [:bh.rccst.subs/source remote])}
+               {target-port (if (= :source/local target-type)
                               [(ui-utils/path->keyword container-id :blackboard target)]
-                              [:bh.rccst.subs/source target])}))))
+                              [:bh.rccst.subs/source remote])}))))
     (into {})))
 
 
@@ -65,16 +68,17 @@
   [(ui-utils/path->keyword container-id [:blackboard node])])
 
 
-(defmethod component->ui :source/remote [{:keys [node]}]
-  ;(log/info "component->ui :source/remote" node)
+(defmethod component->ui :source/remote [{:keys [node meta-data]}]
+  ; get the meta-data for the node and use the "actual name" as the thing to subscribe to
+  (let [remote (:name meta-data)]
 
-  ; 1. subscribe to the server (if needed)
-  (re-frame/dispatch [:bh.rccst.events/subscribe-to #{node}])
+    ;(log/info "component->ui :source/remote" node "//" remote)
 
-  ; 2. add the key to the app-db (I think this happens in step 2)
+    ; 1. subscribe to the server (if needed)
+    (re-frame/dispatch [:bh.rccst.events/subscribe-to #{remote}])
 
-  ; 3. return the signal vector to the new data-source key
-  [:bh.rccst.subs/source node])
+    ; 2. return the signal vector to the new data-source key
+    [:bh.rccst.subs/source remote]))
 
 
 (defmethod component->ui :source/fn [{:keys [node configuration container-id]}]

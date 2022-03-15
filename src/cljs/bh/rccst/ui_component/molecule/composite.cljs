@@ -18,6 +18,7 @@
             [bh.rccst.ui-component.molecule.composite.util.ui :as ui]
             [bh.rccst.ui-component.molecule.component-layout :as cl]
             [bh.rccst.ui-component.atom.experimental.ui-element :as e]
+            [bh.rccst.ui-component.table :as real-table]
             [bh.rccst.ui-component.utils :as ui-utils]
             [day8.re-frame.tracing :refer-macros [fn-traced]]
             [loom.graph :as lg]
@@ -39,21 +40,25 @@
 
 
 (def meta-data-registry
-  {
-   :table/selectable-table {:component e/selectable-table
-                            :ports     {:data      :port/source-sink ; out this be {:data-in :port/sink} & {:data-out :port/source}?
-                                        :selection :port/source}}
+  (merge
+    real-table/table-meta-data
+    {
+     :table/selectable-table {:component e/selectable-table
+                              :ports     {:data      :port/source-sink ; out this be {:data-in :port/sink} & {:data-out :port/source}?
+                                          :selection :port/source}}
 
-   :globe/three-d-globe    {:component e/three-d-globe
-                            :ports     {:layers       :port/sink
-                                        :current-time :port/sink}}
 
-   :slider/slider          {:component e/slider
-                            :ports     {:value :port/source-sink
-                                        :range :port/sink}}
 
-   :label/label            {:component e/label
-                            :ports     {:value :port/sink}}})
+     :globe/three-d-globe    {:component e/three-d-globe
+                              :ports     {:layers       :port/sink
+                                          :current-time :port/sink}}
+
+     :slider/slider          {:component e/slider
+                              :ports     {:value :port/source-sink
+                                          :range :port/sink}}
+
+     :label/label            {:component e/label
+                              :ports     {:value :port/sink}}}))
 
 
 (def source-code '[composite
@@ -164,7 +169,7 @@
         ; 1. build UI components (with subscription/event signals against the blackboard or remotes)
         composed-ui      (sig/process-ui component-lookup [] layout)]
 
-    (log/info "component-panel" component-id)
+    (log/info "component-panel" component-id "//" composed-ui)
 
     (fn [& {:keys [configuration component-id container-id]}]
 
@@ -251,9 +256,9 @@
 ;; region
 
 (comment
-  (def configuration @sample-data)
-  (def graph (apply lg/digraph (compute-edges @sample-data)))
-  (def denorm (denorm-components graph (:links @sample-data)
+  (def configuration @bh.rccst.ui-component.molecule.composite.coverage-plan/ui-definition)
+  (def graph (apply lg/digraph (compute-edges @bh.rccst.ui-component.molecule.composite.coverage-plan/ui-definition)))
+  (def denorm (denorm-components graph (:links @bh.rccst.ui-component.molecule.composite.coverage-plan/ui-definition)
                 (lg/nodes graph)))
 
 
@@ -332,7 +337,7 @@
 
 ;; dagre
 (comment
-  (def graph (apply lg/digraph (compute-edges @sample-data)))
+  (def graph (apply lg/digraph (compute-edges @bh.rccst.ui-component.molecule.composite.coverage-plan/ui-definition)))
   (def dagreGraph (dagre-graph graph))
 
   (make-flow graph)
@@ -348,7 +353,7 @@
 
 ;; layout!
 (comment
-  (def configuration @sample-data)
+  (def configuration @bh.rccst.ui-component.molecule.composite.coverage-plan/ui-definition)
   (def links (:links configuration))
   (def layout (:layout configuration))
   (def components (:components configuration))
@@ -372,9 +377,9 @@
 
 
   (do
-    (def graph (apply lg/digraph (compute-edges @sample-data)))
+    (def graph (apply lg/digraph (compute-edges @bh.rccst.ui-component.molecule.composite.coverage-plan/ui-definition)))
     (def configuration
-      (assoc @sample-data
+      (assoc @bh.rccst.ui-component.molecule.composite.coverage-plan/ui-definition
         :graph graph
         :denorm (denorm-components graph (:links configuration) (lg/nodes graph))
         :nodes (lg/nodes graph)
@@ -394,7 +399,7 @@
 ;; piece together the data needed to build all the UI components and supporting functions
 (comment
   (do
-    (def config @sample-data)
+    (def config @bh.rccst.ui-component.molecule.composite.coverage-plan/ui-definition)
     (def container-id "dummy")
     (def links (:links config))
     (def layout (:layout config))
@@ -404,7 +409,7 @@
     (def edges (lg/edges graph))
     (def registry meta-data-registry)
 
-    (def configuration (assoc @sample-data
+    (def configuration (assoc @bh.rccst.ui-component.molecule.composite.coverage-plan/ui-definition
                          :graph graph
                          :denorm (denorm-components graph (:links config) (lg/nodes graph))
                          :nodes (lg/nodes graph)
@@ -646,7 +651,7 @@
 ; get the different handle names, so we can put multiple handles on a single node
 ; and then also connect the different edges to the correct one
 (comment
-  (def configuration @sample-data)
+  (def configuration @bh.rccst.ui-component.molecule.composite.coverage-plan/ui-definition)
   (def node-id :ui/globe)
   (def target-id :topic/selected-coverages)
 
@@ -660,9 +665,9 @@
 (comment
   (do
     (def node-id :fn/range)
-    (def graph (apply lg/digraph (compute-edges @sample-data)))
+    (def graph (apply lg/digraph (compute-edges @bh.rccst.ui-component.molecule.composite.coverage-plan/ui-definition)))
     (def configuration
-      (assoc @sample-data
+      (assoc @bh.rccst.ui-component.molecule.composite.coverage-plan/ui-definition
         :graph graph
         :denorm (denorm-components graph (:links configuration) (lg/nodes graph))
         :nodes (lg/nodes graph)
@@ -689,12 +694,12 @@
 
 (comment
   (do
-    (def data @sample-data)
-    (def graph (apply lg/digraph (compute-edges @sample-data)))
+    (def data @bh.rccst.ui-component.molecule.composite.coverage-plan/ui-definition)
+    (def graph (apply lg/digraph (compute-edges @bh.rccst.ui-component.molecule.composite.coverage-plan/ui-definition)))
     (def nodes (lg/nodes graph))
     (def links (:links data))
     (def components (:components data))
-    (def configuration (assoc @sample-data
+    (def configuration (assoc @bh.rccst.ui-component.molecule.composite.coverage-plan/ui-definition
                          :components (expand-components data)
                          :graph graph
                          :nodes (lg/nodes graph)
@@ -731,7 +736,7 @@
 ; work out the "new" logic for building the :layout
 (comment
   (do
-    (def config @sample-data)
+    (def config @bh.rccst.ui-component.molecule.composite.coverage-plan/ui-definition)
     (def container-id "dummy")
     (def links (:links config))
     (def layout (:layout config))
@@ -741,7 +746,7 @@
     (def edges (lg/edges graph))
     (def registry meta-data-registry)
 
-    (def configuration (assoc @sample-data
+    (def configuration (assoc @bh.rccst.ui-component.molecule.composite.coverage-plan/ui-definition
                          :graph graph
                          :denorm (denorm-components graph (:links config) (lg/nodes graph))
                          :nodes (lg/nodes graph)
@@ -844,7 +849,7 @@
 ; token substitution
 (comment
   (do
-    (def config @sample-data)
+    (def config @bh.rccst.ui-component.molecule.composite.coverage-plan/ui-definition)
     (def container-id "dummy")
     (def links (:links config))
     (def layout (:layout config))
@@ -854,7 +859,7 @@
     (def edges (lg/edges graph))
     (def registry meta-data-registry)
 
-    (def configuration (assoc @sample-data
+    (def configuration (assoc @bh.rccst.ui-component.molecule.composite.coverage-plan/ui-definition
                          :graph graph
                          :denorm (denorm-components graph (:links config) (lg/nodes graph))
                          :nodes (lg/nodes graph)
@@ -882,18 +887,18 @@
 ; make-param
 (comment
   (do
-    (def config @sample-data)
+    (def config @bh.rccst.ui-component.molecule.composite.coverage-plan/ui-definition)
     (def container-id "dummy")
     (def links (:links config))
     (def layout (:layout config))
     (def components (:components config))
-    (def graph (apply lg/digraph (compute-edges config)))
+    (def graph (apply lg/digraph (ui/compute-edges config)))
     (def nodes (lg/nodes graph))
     (def edges (lg/edges graph))
     (def registry meta-data-registry)
-    (def configuration (assoc @sample-data
+    (def configuration (assoc @bh.rccst.ui-component.molecule.composite.coverage-plan/ui-definition
                          :graph graph
-                         :denorm (denorm-components graph (:links config) (lg/nodes graph))
+                         :denorm (dig/denorm-components graph (:links config) (lg/nodes graph))
                          :nodes (lg/nodes graph)
                          :edges (lg/edges graph)))
     (def node :fn/coverage)
@@ -906,21 +911,30 @@
     node
     direction)
 
+  (->> configuration
+    :denorm
+    node
+    direction
+    (map (fn [[target ports]]
+           (let [remote (-> configuration :components target :name)]
+             [target remote]))))
+
   ; make-param
   (->> configuration
     :denorm
     node
     direction
     (map (fn [[target ports]]
-           (let [[source-port target-port] ports]
+           (let [[source-port target-port] ports
+                 remote (-> configuration :components target :name)]
              ;(println target (-> configuration :components target :type))
              (if (= direction :outputs)
                {source-port (if (= :source/local (-> configuration :components target :type))
                               [(ui-utils/path->keyword container-id :blackboard target)]
-                              [:bh.rccst.subs/source target])}
+                              [:bh.rccst.subs/source remote])}
                {target-port (if (= :source/local (-> configuration :components target :type))
                               [(ui-utils/path->keyword container-id :blackboard target)]
-                              [:bh.rccst.subs/source target])}))))
+                              [:bh.rccst.subs/source remote])}))))
     (into {}))
 
 
@@ -952,7 +966,7 @@
 ; process-components
 (comment
   (do
-    (def data @sample-data)
+    (def data @bh.rccst.ui-component.molecule.composite.coverage-plan/ui-definition)
     (def container-id "coverage-plan-demo")
     (def component-id :coverage-plan-demo.component)
     (def links (:links data))
@@ -962,7 +976,7 @@
     (def nodes (lg/nodes graph))
     (def edges (lg/edges graph))
     (def registry meta-data-registry)
-    (def configuration (assoc @sample-data
+    (def configuration (assoc @bh.rccst.ui-component.molecule.composite.coverage-plan/ui-definition
                          :graph graph
                          :denorm (denorm-components graph (:links data) (lg/nodes graph))
                          :nodes (lg/nodes graph)
@@ -1130,9 +1144,9 @@
   (re-frame/subscribe [:coverage-plan-demo.component.blackboard.topic.current-time])
   (re-frame/subscribe [:coverage-plan-demo.component.blackboard.topic.selected-targets])
   (re-frame/subscribe [:coverage-plan-demo.component.blackboard.topic.selected-satellites])
-  (re-frame/subscribe [:bh.rccst.subs/source :topic/target-data])
-  (re-frame/subscribe [:bh.rccst.subs/source :topic/satellite-data])
-  (re-frame/subscribe [:bh.rccst.subs/source :topic/coverage-data])
+  (re-frame/subscribe [:bh.rccst.subs/source :source/targets])
+  (re-frame/subscribe [:bh.rccst.subs/source :source/satellites])
+  (re-frame/subscribe [:bh.rccst.subs/source :source/coverages])
 
   (re-frame/subscribe [:coverage-plan-demo.component.blackboard.topic.layers])
   (re-frame/subscribe [:coverage-plan-demo.component.blackboard.topic.time-range])
@@ -1143,7 +1157,7 @@
 ; building the UI components "for real"
 (comment
   (do
-    (def data @sample-data)
+    (def data @bh.rccst.ui-component.molecule.composite.coverage-plan/ui-definition)
     (def container-id "coverage-plan-demo")
     (def component-id :coverage-plan-demo.component)
     (def links (:links data))
@@ -1153,7 +1167,7 @@
     (def nodes (lg/nodes graph))
     (def edges (lg/edges graph))
     (def registry meta-data-registry)
-    (def configuration (assoc @sample-data
+    (def configuration (assoc @bh.rccst.ui-component.molecule.composite.coverage-plan/ui-definition
                          :graph graph
                          :denorm (denorm-components graph (:links data) (lg/nodes graph))
                          :nodes (lg/nodes graph)
@@ -1184,7 +1198,7 @@
 ; have to actually CALL the fn/subcription we built!
 (comment
   (do
-    (def config @sample-data)
+    (def config @bh.rccst.ui-component.molecule.composite.coverage-plan/ui-definition)
     (def container-id :coverage-plan-demo.component)
     (def links (:links config))
     (def layout (:layout config))
@@ -1194,7 +1208,7 @@
     (def edges (lg/edges graph))
     (def registry meta-data-registry)
 
-    (def configuration (assoc @sample-data
+    (def configuration (assoc @bh.rccst.ui-component.molecule.composite.coverage-plan/ui-definition
                          :graph graph
                          :denorm (denorm-components graph (:links config) (lg/nodes graph))
                          :nodes (lg/nodes graph)

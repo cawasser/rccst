@@ -2,6 +2,7 @@
   "provide a composed UI for a \"Coverage Plan\" which shows targets and satellite coverage areas
   on a 3D globe"
   (:require [bh.rccst.ui-component.atom.experimental.ui-element :as e]
+            [bh.rccst.ui-component.table :as real-table]
             [bh.rccst.ui-component.molecule.composite :as c]
             [bh.rccst.ui-component.utils :as ui-utils]
             [loom.graph :as lg]
@@ -46,7 +47,7 @@
     :<- satellites
     :<- coverages
     (fn [[t s c] _]
-      [{:targets t} {:satellites s}])))
+      {:count (if c (-> c count) 0)})))
 
 
 (defn fn-range
@@ -66,7 +67,7 @@
     (first range)
     :<- data
     (fn [d _]
-      [0 100])))
+      [0 (if d (count d) 1)])))
 
 
 ;; components have "ports" which define their inputs and outputs:
@@ -86,8 +87,8 @@
 (def ui-definition (r/atom {:title        "Coverage Plan"
                             :component-id :coverage-plan
                             :components   {; ui components
-                                           :ui/targets                {:type :ui/component :name :table/selectable-table}
-                                           :ui/satellites             {:type :ui/component :name :table/selectable-table}
+                                           :ui/targets                {:type :ui/component :name :real-table/table}
+                                           :ui/satellites             {:type :ui/component :name :real-table/table}
                                            :ui/globe                  {:type :ui/component :name :globe/three-d-globe}
                                            :ui/time-slider            {:type :ui/component :name :slider/slider}
                                            :ui/current-time           {:type :ui/component :name :label/label}
@@ -98,9 +99,9 @@
                                            :topic/coverage-data       {:type :source/remote :name :source/coverages}
 
                                            ; composite-local data sources
-                                           :topic/selected-targets    {:type :source/local :name :selected-targets :default 0}
-                                           :topic/selected-satellites {:type :source/local :name :selected-satellites :default 0}
-                                           :topic/current-time        {:type :source/local :name :current-time :default 50} ;(js/Date.)}
+                                           :topic/selected-targets    {:type :source/local :name :selected-targets :default []}
+                                           :topic/selected-satellites {:type :source/local :name :selected-satellites :default []}
+                                           :topic/current-time        {:type :source/local :name :current-time :default 0} ;(js/Date.)}
                                            :topic/layers              {:type :source/local :name :layers}
                                            :topic/time-range          {:type :source/local :name :time-range}
 
@@ -147,3 +148,9 @@
 
 
 
+(comment
+  (re-frame/dispatch [:bh.rccst.events/login "string" "string"])
+
+  (re-frame/subscribe [:bh.rccst.subs/source :string])
+
+  ())

@@ -59,7 +59,7 @@
 (re-frame/reg-sub
   ::source
   (fn [db [_ id]]
-    (get-in db [:sources id])))
+    (or (get-in db [:sources id]) [])))
 
 
 (re-frame/reg-sub
