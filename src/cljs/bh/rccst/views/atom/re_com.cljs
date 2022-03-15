@@ -4,6 +4,7 @@
             [bh.rccst.views.atom.example.re-com.date-picker :as date-picker]
             [bh.rccst.views.atom.example.re-com.full-table :as editable-table]
             [bh.rccst.views.atom.example.re-com.input-time :as input-time]
+            [bh.rccst.views.atom.example.re-com.label :as label]
             [bh.rccst.views.atom.example.re-com.line :as line]
             [bh.rccst.views.atom.example.re-com.popover :as popover]
             [bh.rccst.views.atom.example.re-com.progress-bar :as progress-bar]
@@ -12,7 +13,8 @@
             [bh.rccst.views.atom.example.re-com.splitter :as splitter]
             [bh.rccst.views.atom.example.re-com.table :as table]
             [bh.rccst.views.atom.example.re-com.text-input-re-com :as input-text]
-            [bh.rccst.views.atom.example.re-com.throbber :as throbber]))
+            [bh.rccst.views.atom.example.re-com.throbber :as throbber]
+            [bh.rccst.views.atom.example.re-com.label :as label]))
 
 
 (defn examples
@@ -20,6 +22,7 @@
   [:div
    [table/example]
    [editable-table/example]
+   [label/example]
    [checkbox/example]
    [radio-button/example]
    [input-text/example]
