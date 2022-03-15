@@ -6,23 +6,23 @@
 
 
 (defn- label []
-  [label/label :value (r/atom "This is a \"regular\" label")])
+  [label/label :value "This is a \"regular\" label"])
 
 
 (defn- label-sm []
-  [label/label-sm :value (r/atom "This is a \"small\" label")])
+  [label/label-sm :value "This is a \"small\" label"])
 
 
 (defn- label-md []
-  [label/label-md :value (r/atom "This is a \"medium\" label")])
+  [label/label-md :value "This is a \"medium\" label"])
 
 
 (defn- label-lg []
-  [label/label-lg :value (r/atom "This is a \"large\" label")])
+  [label/label-lg :value "This is a \"large\" label"])
 
 
 (defn- label-hg []
-  [label/label-hg :value (r/atom "This is a \"huge\" label")])
+  [label/label-hg :value "This is a \"huge\" label"])
 
 
 (defn example []

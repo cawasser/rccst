@@ -1,9 +1,11 @@
 (ns bh.rccst.ui-component.utils.helpers
-  (:require [cljs-uuid-utils.core :as uuid]
-            [bh.rccst.ui-component.navbar :as navbar]
-            [re-com.core :as rc]
+  (:require [bh.rccst.ui-component.navbar :as navbar]
+            [cljs-uuid-utils.core :as uuid]
             [day8.re-frame.tracing :refer-macros [fn-traced]]
+            [re-com.core :as rc]
             [re-frame.core :as re-frame]
+            [re-frame.core :as re-frame]
+            [reagent.core :as r]
             [woolybear.packs.tab-panel :as tab-panel]))
 
 
@@ -52,6 +54,17 @@
   (->> path
     path->string
     keyword))
+
+
+(defn resolve-value [value]
+  (cond
+    (coll? value) (re-frame/subscribe value)
+    (instance? reagent.ratom.RAtom value) value
+    (instance? Atom value) value
+    :else (r/atom value)))
+
+
+
 
 
 (comment
