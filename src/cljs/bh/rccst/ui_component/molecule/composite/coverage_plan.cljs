@@ -1,18 +1,9 @@
 (ns bh.rccst.ui-component.molecule.composite.coverage-plan
   "provide a composed UI for a \"Coverage Plan\" which shows targets and satellite coverage areas
   on a 3D globe"
-  (:require [bh.rccst.ui-component.atom.experimental.ui-element :as e]
-            ;[bh.rccst.ui-component.table :as real-table]
-            ;[bh.rccst.ui-component.atom.re-com.label :as label]
-            [bh.rccst.ui-component.molecule.composite :as c]
-            [bh.rccst.ui-component.utils :as ui-utils]
-            [loom.graph :as lg]
-            [re-com.core :as rc]
-            [re-frame.core :as re-frame]
+  (:require [re-frame.core :as re-frame]
             [reagent.core :as r]
             [taoensso.timbre :as log]
-            [woolybear.ad.containers :as containers]
-            [woolybear.ad.layout :as layout]
             ["dagre" :as dagre]
             ["graphlib" :as graphlib]
             ["react-flow-renderer" :refer (ReactFlowProvider Controls Handle Background) :default ReactFlow]))
@@ -35,7 +26,7 @@
   builds and registers the subscription provided by 'layers'
 
   "
-  [{:keys [targets satellites coverages layers]}]
+  [{:keys [targets satellites coverages current-time layers]}]
 
   ;(log/info "fn-coverage" layers
   ;  "//" targets
@@ -47,9 +38,22 @@
     :<- targets
     :<- satellites
     :<- coverages
-    (fn [[t s c] _]
-      {:count (if c (-> c count) 0)})))
+    :<- current-time
+    (fn [[t s c ct] _]
+      (if (empty? c)
+        {}
+        (nth c (if (string? ct) (js/parseInt ct) ct))))))
 
+
+(comment
+
+  (js/parseInt "10")
+
+  (def ct "10")
+  (def ct 5)
+  (if (string? ct) (js/parseInt ct) ct)
+
+  ())
 
 (defn fn-range
   "registers the subscription for the entity defined by 'selected'. processing from
@@ -68,7 +72,7 @@
     (first range)
     :<- data
     (fn [d _]
-      [0 (if d (count d) 1)])))
+      [0 (if d (dec (count d)) 1)])))
 
 
 ;; components have "ports" which define their inputs and outputs:
@@ -109,7 +113,8 @@
                                            ; transformation functions
                                            :fn/coverage               {:type  :source/fn :name fn-coverage
                                                                        :ports {:targets   :port/sink :satellites :port/sink
-                                                                               :coverages :port/sink :layers :port/source}}
+                                                                               :coverages :port/sink :current-time :port/sink
+                                                                               :layers    :port/source}}
                                            :fn/range                  {:type  :source/fn :name fn-range
                                                                        :ports {:data :port/sink :range :port/source}}}
 
@@ -138,7 +143,8 @@
                                            :topic/layers              {:data {:ui/globe :layers}}
                                            :topic/current-time        {:data {:ui/current-time :value
                                                                               :ui/time-slider  :value
-                                                                              :ui/globe        :current-time}}
+                                                                              :ui/globe        :current-time
+                                                                              :fn/coverage     :current-time}}
                                            :topic/time-range          {:data {:ui/time-slider :range}}}
 
                             :layout       [:v-box
