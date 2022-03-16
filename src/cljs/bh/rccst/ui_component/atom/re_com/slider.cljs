@@ -18,7 +18,7 @@
      :min min
      :max max
      :width (or width "300px")
-     :on-change #(h/handle-change value (str %))
+     :on-change #(h/handle-change value (js/parseInt %))
      :disabled? (or disabled? false)]))
 
 

@@ -1,8 +1,8 @@
 (ns bh.rccst.components.pub-sub
-  (:require [clojure.set :refer [union]]
+  (:require [bh.rccst.components.system :as system]
+            [clojure.set :refer [union]]
             [clojure.tools.logging :as log]
-            [com.stuartsierra.component :as component]
-            [bh.rccst.components.system :as system]))
+            [com.stuartsierra.component :as component]))
 
 
 (defn publish!
@@ -38,10 +38,10 @@
                   (union (get-in subman [:subscribers uid]) #{tag}))))
       @subscriptions data-tags))
 
-    ;
-    ; now, (if this is the first subscription to a tag...)
-    ;    we need to start the "data-source provider" and pass it the :publish! function
-    ;
+  ;
+  ; now, (if this is the first subscription to a tag...)
+  ;    we need to start the "data-source provider" and pass it the :publish! function
+  ;
   (let [source-fn (lookup (first data-tags))]
     (log/info "subscribe source-fn" lookup "//" data-tags "//" source-fn)
     (when source-fn
@@ -256,22 +256,22 @@
 
   (publish-fn [:publish/data-update
                {:id    :source/targets
-                :value [{:id "one":data "TARGET DATA"}
-                        {:id "two":data "TWO TWO TWO"}
-                        {:id "three":data "TARGET DATA"}
-                        {:id "four":data "TARGET DATA"}]}])
+                :value [{:id "one" :data "TARGET DATA"}
+                        {:id "two" :data "TWO TWO TWO"}
+                        {:id "three" :data "TARGET DATA"}
+                        {:id "four" :data "TARGET DATA"}]}])
   (publish-fn [:publish/data-update
                {:id    :source/satellites
-                :value [{:id "one":data "SATELLITE DATA"}
-                        {:id "two":data "SATELLITE DATA"}
-                        {:id "three":data "SATELLITE DATA"}
-                        {:id "four":data "SATELLITE DATA"}]}])
+                :value [{:id "one" :data "SATELLITE DATA"}
+                        {:id "two" :data "SATELLITE DATA"}
+                        {:id "three" :data "SATELLITE DATA"}
+                        {:id "four" :data "SATELLITE DATA"}]}])
   (publish-fn [:publish/data-update
                {:id    :source/coverages
-                :value [{:id "COVERAGE DATA":shapes []}
-                        {:id "COVERAGE DATA":shapes []}
-                        {:id "COVERAGE DATA":shapes []}
-                        {:id "COVERAGE DATA":shapes []}]}])
+                :value [{:id "COVERAGE DATA" :shapes []}
+                        {:id "COVERAGE DATA" :shapes []}
+                        {:id "COVERAGE DATA" :shapes []}
+                        {:id "COVERAGE DATA" :shapes []}]}])
 
 
   (def id :source/targets)

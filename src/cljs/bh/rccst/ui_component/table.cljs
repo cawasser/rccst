@@ -61,4 +61,12 @@
 (comment
   (def data [:bh.rccst.subs/source :source/targets])
 
+
+  (def some-code {:dummy {:one :port/sink :alpha :port/sink}
+                  :dummy2 {:two :port/source}})
+
+  (str some-code)
+
+  (clojure.string/join "\n" (clojure.string/split (str some-code) #","))
+
   ())

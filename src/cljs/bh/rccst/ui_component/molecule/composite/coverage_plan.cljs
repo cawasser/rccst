@@ -42,18 +42,8 @@
     (fn [[t s c ct] _]
       (if (empty? c)
         {}
-        (nth c (if (string? ct) (js/parseInt ct) ct))))))
+        (nth c ct)))))
 
-
-(comment
-
-  (js/parseInt "10")
-
-  (def ct "10")
-  (def ct 5)
-  (if (string? ct) (js/parseInt ct) ct)
-
-  ())
 
 (defn fn-range
   "registers the subscription for the entity defined by 'selected'. processing from

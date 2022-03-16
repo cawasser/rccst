@@ -28,14 +28,10 @@
    :data data})
 
 
-(def pb (atom nil))
-
 (defn start-listener [pub-sub]
   ; 1. start the real listener, if necessary
 
   (log/info "start-listener" pub-sub)
-
-  (reset! pb pub-sub)
 
   ; 2. send over the most recent data as a boot-strap
   (pub-sub [:publish/data-update {:id source-id
@@ -46,9 +42,4 @@
 (def meta-data {source-id start-listener})
 
 
-(comment
-  (def pub-sub @pb)
 
-  (start-listener @pb)
-
-  ())
