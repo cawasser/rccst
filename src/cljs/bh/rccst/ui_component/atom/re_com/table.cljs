@@ -1,4 +1,4 @@
-(ns bh.rccst.ui-component.table
+(ns bh.rccst.ui-component.atom.re-com.table
   (:require [bh.rccst.ui-component.utils.helpers :as h]
             [re-com.core :as rc]
             [reagent.core :as r]
@@ -25,7 +25,7 @@
 
   (let [remote (h/resolve-value data)]
     (fn []
-      (log/info "table" data "//" @remote)
+      (log/info "table" data "//" @remote "//" cell-style-fn)
 
       [rc/simple-v-table :src (rc/at)
        :model remote
@@ -52,10 +52,10 @@
        :cell-style (or cell-style-fn #())])))
 
 
-(def meta-data {:real-table/table      {:component table
-                                        :ports     {:data :port/sink}}
-                :real-table/meta-table {:component meta-table
-                                        :ports     {:data :port/sink}}})
+(def meta-data {:rc-table/table      {:component table
+                                      :ports     {:data :port/sink}}
+                :rc-table/meta-table {:component meta-table
+                                      :ports     {:data :port/sink}}})
 
 
 (comment

@@ -12,6 +12,7 @@
             [bh.rccst.views.atom.example.re-com.slider :as slider]
             [bh.rccst.views.atom.example.re-com.splitter :as splitter]
             [bh.rccst.views.atom.example.re-com.table :as table]
+            [bh.rccst.views.atom.example.re-com.meta-table :as meta-table]
             [bh.rccst.views.atom.example.re-com.text-input-re-com :as input-text]
             [bh.rccst.views.atom.example.re-com.throbber :as throbber]
             [bh.rccst.views.atom.example.re-com.label :as label]))
@@ -21,6 +22,7 @@
   []
   [:div
    [table/example]
+   [meta-table/example]
    [editable-table/example]
    [label/example]
    [checkbox/example]

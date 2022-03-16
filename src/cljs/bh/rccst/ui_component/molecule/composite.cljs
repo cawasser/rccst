@@ -18,7 +18,7 @@
             [bh.rccst.ui-component.molecule.composite.util.ui :as ui]
             [bh.rccst.ui-component.molecule.component-layout :as cl]
             [bh.rccst.ui-component.atom.experimental.ui-element :as e]
-            [bh.rccst.ui-component.table :as real-table]
+            [bh.rccst.ui-component.atom.re-com.table :as rc-table]
             [bh.rccst.ui-component.atom.re-com.label :as rc-label]
             [bh.rccst.ui-component.atom.re-com.slider :as rc-slider]
             [bh.rccst.ui-component.utils :as ui-utils]
@@ -43,7 +43,7 @@
 
 (def meta-data-registry
   (merge
-    real-table/meta-data
+    rc-table/meta-data
     rc-label/meta-data
     rc-slider/meta-data
     {:table/selectable-table {:component e/selectable-table

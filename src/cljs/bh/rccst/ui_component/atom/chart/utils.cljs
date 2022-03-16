@@ -1,6 +1,6 @@
 (ns bh.rccst.ui-component.atom.chart.utils
   (:require [bh.rccst.events :as events]
-            [bh.rccst.ui-component.table :as table]
+            [bh.rccst.ui-component.atom.re-com.table :as table]
             [bh.rccst.ui-component.utils :as u]
             [bh.rccst.ui-component.utils.color :as color]
             [re-com.core :as rc]
