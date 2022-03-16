@@ -1,6 +1,7 @@
 (ns bh.rccst.ui-component.atom.re-com.table
   (:require [bh.rccst.ui-component.utils.helpers :as h]
             [re-com.core :as rc]
+            [bh.rccst.ui-component.atom.bh.simple-v-table :as bh]
             [reagent.core :as r]
             [taoensso.timbre :as log]))
 
@@ -20,42 +21,59 @@
       (into []))))
 
 
+(defn- table* [& {:keys [data max-rows width height cell-style-fn
+                         on-click-row-fn row-line-color]}]
+
+  (log/info "table*" data)
+
+  [:div {:style {:width (or width "300px") :height (or height "250px")}}
+   (if (empty? data)
+
+     [rc/alert-box :src (rc/at)
+      :alert-type :info
+      :heading "Waiting for data"]
+
+     [bh/simple-v-table :src (rc/at)
+      :model (r/atom data)
+      :columns (table-column-headers data 5 (or width 200) (or height))
+      :max-rows (or max-rows (count data))
+      :table-row-line-color (or row-line-color "#00fff0")
+      :on-click-row (or on-click-row-fn #())
+      :cell-style (or cell-style-fn #())])])
+
+
 (defn table [& {:keys [data max-rows width height cell-style-fn
                        on-click-row-fn row-line-color]}]
 
   (let [remote (h/resolve-value data)]
     (fn []
-      (log/info "table" data "//" @remote "//" cell-style-fn)
-
-      [rc/simple-v-table :src (rc/at)
-       :model remote
-       :columns (table-column-headers @remote 5 (or width 200) (or height))
-       :max-rows (or max-rows (count @remote))
-       :table-row-line-color (or row-line-color "#00fff0")
-       :on-click-row (or on-click-row-fn #())
-       :cell-style (or cell-style-fn #())])))
+      (log/info "table" data "//" @remote)
+      [table*
+       :data @remote
+       :max-rows max-rows
+       :row-line-color row-line-color
+       :on-click-row on-click-row-fn
+       :cell-style-fn cell-style-fn])))
 
 
 (defn meta-table [& {:keys [data max-rows width height cell-style-fn
                             on-click-row-fn row-line-color]}]
 
-  (let [d (r/atom (or (:data @(h/resolve-value data)) []))]
+  (let [d (h/resolve-value data)]
     (fn []
-      (log/info "meta-table" data "//" @d "//" (count @d))
-
-      [rc/simple-v-table :src (rc/at)
-       :model d
-       :columns (table-column-headers @d 5 (or width 200) (or height))
-       :max-rows (or max-rows (count @d))
-       :table-row-line-color (or row-line-color "#00fff0")
+      (log/info "meta-table" data "//" @d "//" (:data @d) "//" (count (:data @d)))
+      [table*
+       :data (:data @d)
+       :max-rows (or max-rows (count (:data @d)))
+       :row-line-color (or row-line-color "#00fff0")
        :on-click-row (or on-click-row-fn #())
-       :cell-style (or cell-style-fn #())])))
+       :cell-style-fn (or cell-style-fn #())])))
 
 
-(def meta-data {:rc-table/table      {:component table
-                                      :ports     {:data :port/sink}}
-                :rc-table/meta-table {:component meta-table
-                                      :ports     {:data :port/sink}}})
+(def meta-data {:rc/table      {:component table
+                                :ports     {:data :port/sink}}
+                :rc/meta-table {:component meta-table
+                                :ports     {:data :port/sink}}})
 
 
 (comment

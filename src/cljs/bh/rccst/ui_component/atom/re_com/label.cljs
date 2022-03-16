@@ -40,9 +40,9 @@
    :label @(h/resolve-value value)])
 
 
-(def meta-data {:rc-label/label    {:component label :ports {:value :port/sink}}
-                :rc-label/label-sm {:component label-sm :ports {:value :port/sink}}
-                :rc-label/label-md {:component label-md :ports {:value :port/sink}}
-                :rc-label/label-lg {:component label-lg :ports {:value :port/sink}}
-                :rc-label/label-hg {:component label-hg :ports {:value :port/sink}}})
+(def meta-data {:rc/label    {:component label :ports {:value :port/sink}}
+                :rc/label-sm {:component label-sm :ports {:value :port/sink}}
+                :rc/label-md {:component label-md :ports {:value :port/sink}}
+                :rc/label-lg {:component label-lg :ports {:value :port/sink}}
+                :rc/label-hg {:component label-hg :ports {:value :port/sink}}})
 

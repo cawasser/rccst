@@ -18,6 +18,7 @@
             [bh.rccst.ui-component.molecule.composite.util.ui :as ui]
             [bh.rccst.ui-component.molecule.component-layout :as cl]
             [bh.rccst.ui-component.atom.experimental.ui-element :as e]
+            [bh.rccst.ui-component.atom.bh.basic-table :as bh-table]
             [bh.rccst.ui-component.atom.re-com.table :as rc-table]
             [bh.rccst.ui-component.atom.re-com.label :as rc-label]
             [bh.rccst.ui-component.atom.re-com.slider :as rc-slider]
@@ -46,6 +47,7 @@
     rc-table/meta-data
     rc-label/meta-data
     rc-slider/meta-data
+    bh-table/meta-data
     {:table/selectable-table {:component e/selectable-table
                               :ports     {:data      :port/source-sink ; out this be {:data-in :port/sink} & {:data-out :port/source}?
                                           :selection :port/source}}

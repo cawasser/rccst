@@ -56,9 +56,11 @@
     keyword))
 
 
-(defn resolve-value [value]
+(defn resolve-value [value & opts]
   (let [ret (cond
-              (coll? value) (re-frame/subscribe value)
+              (and (coll? value)
+                (not (empty? value))
+                (every? keyword? value)) (re-frame/subscribe (reduce conj value opts))
               (instance? reagent.ratom.RAtom value) value
               (instance? Atom value) value
               :else (r/atom value))]

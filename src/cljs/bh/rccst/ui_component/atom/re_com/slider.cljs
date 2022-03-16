@@ -23,7 +23,8 @@
 
 
 
-(def meta-data {:rc-slider/slider {:component slider :ports {:value :port/source-sink
-                                                             :range :port/sink}}})
+(def meta-data {:rc/slider {:component slider
+                            :ports {:value :port/source-sink
+                                    :range :port/sink}}})
 
 
