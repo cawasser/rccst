@@ -66,8 +66,8 @@
 
 (defn chart [& {:keys [data component-id container-id component ui]}]
   (ui-utils/dispatch-local component-id [:container] container-id)
-  (log/info "chart" component-id "///" container-id "///" ui
-    "///" @(ui-utils/subscribe-local component-id [:container]))
+  ;(log/info "chart" component-id "///" container-id "///" ui
+  ;  "///" @(ui-utils/subscribe-local component-id [:container]))
 
   [component data component-id container-id ui])
 

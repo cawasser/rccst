@@ -12,8 +12,8 @@
   []
 
   [:div
+   [coverage-plan/example]
    [header-bar/example]
    [login/example]
    [two-d-three-d-globe/example]
-   [multi-chart/example]
-   [coverage-plan/example]])
+   [multi-chart/example]])

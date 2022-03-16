@@ -43,11 +43,10 @@
 
 (def meta-data-registry
   (merge
-    real-table/table-meta-data
+    real-table/meta-data
     rc-label/meta-data
     rc-slider/meta-data
-    {
-     :table/selectable-table {:component e/selectable-table
+    {:table/selectable-table {:component e/selectable-table
                               :ports     {:data      :port/source-sink ; out this be {:data-in :port/sink} & {:data-out :port/source}?
                                           :selection :port/source}}
 
@@ -168,7 +167,7 @@
         ; 1. build UI components (with subscription/event signals against the blackboard or remotes)
         composed-ui      (sig/process-ui component-lookup [] layout)]
 
-    (log/info "component-panel" component-id "//" composed-ui)
+    ;(log/info "component-panel" component-id "//" composed-ui)
 
     (fn [& {:keys [configuration component-id container-id]}]
 
@@ -1246,7 +1245,7 @@
   (let [actual-fn (->> configuration :components node :name)
         denorm    (->> configuration :denorm node)
 
-        _         (log/info "component->ui :source/fn" node "//" actual-fn "//" denorm)
+        ;_         (log/info "component->ui :source/fn" node "//" actual-fn "//" denorm)
 
         built-fn  (apply actual-fn
                     (seq

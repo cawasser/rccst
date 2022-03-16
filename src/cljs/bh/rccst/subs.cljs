@@ -21,6 +21,12 @@
 
 
 (re-frame/reg-sub
+  ::pub-sub-started?
+  (fn [db]
+    (:pub-sub-started? db)))
+
+
+(re-frame/reg-sub
   ::version
   (fn [db]
     (:version db)))

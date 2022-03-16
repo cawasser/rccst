@@ -19,7 +19,7 @@
     (map (fn [[target ports]]
            (let [[source-port target-port] ports
                  target-type (-> configuration :components target :type)
-                 remote (-> configuration :components target :name)]
+                 remote      (-> configuration :components target :name)]
              ;(log/info "make-params" target target-type remote)
              (if (= direction :outputs)
                {source-port (if (= :source/local target-type)
@@ -75,7 +75,7 @@
     ;(log/info "component->ui :source/remote" node "//" remote)
 
     ; 1. subscribe to the server (if needed)
-    (re-frame/dispatch [:bh.rccst.events/subscribe-to #{remote}])
+    (re-frame/dispatch-sync [:bh.rccst.events/subscribe-to #{remote}])
 
     ; 2. return the signal vector to the new data-source key
     [:bh.rccst.subs/source remote]))
@@ -94,7 +94,7 @@
 
 (defn process-components [configuration node-type registry container-id]
 
-  ;(log/info "process-components" container-id node-type)
+  ;(log/info "process-components" container-id node-type
   ;  "//" (->> configuration
   ;         :components
   ;         (filter (fn [[_ meta-data]]
@@ -106,7 +106,7 @@
       (filter (fn [[_ meta-data]]
                 (= node-type (:type meta-data))))
       (map (fn [[node meta-data]]
-             ;             (log/info "process-components (nodes)" node "//" meta-data "//" (:type meta-data))
+             ;(log/info "process-components (nodes)" node "//" meta-data "//" (:type meta-data))
              (component->ui {:node          node
                              :type          (:type meta-data)
                              :meta-data     meta-data

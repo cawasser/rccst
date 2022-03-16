@@ -8,42 +8,36 @@
 
 
 (defn label [& {:keys [value]}]
-  (let [v (h/resolve-value value)]
-    ;(log/info "label" value "//" (str v))
-    [rc/label :src (rc/at)
-     :label @v]))
+  ;(log/info "label" value "//" (str v))
+  [rc/label :src (rc/at)
+   :label @(h/resolve-value value)])
 
 
 (defn label-sm [& {:keys [value]}]
-  (let [v (h/resolve-value value)]
-    ;(log/info "label-sm" value "//" (str v))
-    [rc/label :src (rc/at)
-     :style {:font-size ".5em"}
-     :label @v]))
+  ;(log/info "label-sm" value "//" (str v))
+  [rc/label :src (rc/at)
+   :style {:font-size ".5em"}
+   :label @(h/resolve-value value)])
 
 
 (defn label-md [& {:keys [value]}]
-  (let [v (h/resolve-value value)]
-    ;(log/info "label-md" value "//" (str v))
-    [rc/label :src (rc/at)
-     :style {:font-size "1.5em"}
-     :label @v]))
+  [rc/label :src (rc/at)
+   :style {:font-size "1.5em"}
+   :label @(h/resolve-value value)])
 
 
 (defn label-lg [& {:keys [value]}]
-  (let [v (h/resolve-value value)]
-    ;(log/info "label-lg" value "//" (str v) "//" (str @v) "//")
-    [rc/label :src (rc/at)
-     :style {:font-size "2em"}
-     :label @v]))
+  ;(log/info "label-lg" value "//" (str v) "//" (str @v) "//")
+  [rc/label :src (rc/at)
+   :style {:font-size "2em"}
+   :label @(h/resolve-value value)])
 
 
 (defn label-hg [& {:keys [value]}]
-  (let [v (h/resolve-value value)]
-    ;(log/info "label-hg" value "//" (str v))
-    [rc/label :src (rc/at)
-     :style {:font-size "2.5em"}
-     :label @v]))
+  ;(log/info "label-hg" value "//" (str v))
+  [rc/label :src (rc/at)
+   :style {:font-size "2.5em"}
+   :label @(h/resolve-value value)])
 
 
 (def meta-data {:rc-label/label    {:component label :ports {:value :port/sink}}

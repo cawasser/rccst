@@ -46,7 +46,8 @@
 (re-frame/reg-event-fx
   :bh.rccst.events/login-success
   (fn-traced [{:keys [db]} [_ {:keys [logged-in user-id uuid] :as result}]]
-    (log/info ":bh.rccst.events/login-success" db
+    (log/info ":bh.rccst.events/login-success"
+      ;db
       "///" logged-in
       "///" user-id
       "///" uuid

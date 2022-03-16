@@ -2,7 +2,6 @@
   (:require [clojure.set :refer [union]]
             [clojure.tools.logging :as log]
             [com.stuartsierra.component :as component]
-
             [bh.rccst.components.system :as system]))
 
 
@@ -11,23 +10,25 @@
   "
   [socket subscribers [data-tag {:keys [id]} :as message]]
 
-  (log/info "publish!" data-tag id)
+  (log/info "publish!" data-tag
+    "//" id
+    "//" (get-in @subscribers [:sources id]))
 
   (doseq [sub (get-in @subscribers [:sources id])]
-    (log/info "publishing" message "to" sub)
+    (log/info "publishing" message
+      "//" sub
+      "//" (:chsk-send! socket))
     ((:chsk-send! socket) sub message)))
 
 
 (defn subscribe
   "
   "
-  [subscriptions uid data-tags]
+  [subscriptions lookup publish! uid data-tags]
 
   ;
-  ; if this is the first subscription to a tag...
-  ;    we need to start the "data-source provider" and pass it the :publish! function
+  ; register the subscription(s) first
   ;
-
   (reset! subscriptions
     (reduce (fn [subman tag]
               (-> subman
@@ -35,7 +36,16 @@
                   (union (get-in subman [:sources tag]) #{uid}))
                 (assoc-in [:subscribers uid]
                   (union (get-in subman [:subscribers uid]) #{tag}))))
-      @subscriptions data-tags)))
+      @subscriptions data-tags))
+
+    ;
+    ; now, (if this is the first subscription to a tag...)
+    ;    we need to start the "data-source provider" and pass it the :publish! function
+    ;
+  (let [source-fn (lookup (first data-tags))]
+    (log/info "subscribe source-fn" lookup "//" data-tags "//" source-fn)
+    (when source-fn
+      (source-fn publish!))))
 
 
 (defn cancel
@@ -76,7 +86,7 @@
                           (into {})))))))
 
 
-(defrecord PubSub [pub-sub socket]
+(defrecord PubSub [pub-sub socket data-sources]
   component/Lifecycle
 
   (start [component]
@@ -86,7 +96,11 @@
       (assoc component
         :pub-sub subscriptions
         :subscriptions subscriptions
-        :subscribe (partial subscribe subscriptions)
+        :lookup (:lookup data-sources)
+        :subscribe (partial subscribe
+                     subscriptions
+                     (:lookup data-sources)
+                     (partial publish! socket subscriptions))
         :cancel (partial cancel subscriptions)
         :cancel-all (partial cancel-all subscriptions)
         :publish! (partial publish! socket subscriptions))))
@@ -221,13 +235,19 @@
 ; test sending to bh.rccst.components.pub-sub via the socket
 (comment
   (def publish-fn (get-in @system/system [:pub-sub :publish!]))
-  (def subscibers (get-in @system/system [:pub-sub :subscriptions]))
+  (def subscribers (get-in @system/system [:pub-sub :subscriptions]))
+
+  (get-in @subscribers [:sources :source/satellites])
 
   (publish-fn [:publish/data-update {:id :nobody :value 100}])
 
   (publish-fn [:publish/data-update {:id :number :value 100}])
   (publish-fn [:publish/data-update {:id :number :value 999}])
 
+  (get-in @system/system [:pub-sub :publish!])
+  (get-in @system/system [:pub-sub :lookup])
+
+  ((get-in @system/system [:pub-sub :lookup]) :source/targets)
 
   (publish-fn [:publish/data-update
                {:id    :string
@@ -254,7 +274,7 @@
                         {:id "COVERAGE DATA":shapes []}]}])
 
 
-  (def id :topic/targets)
+  (def id :source/targets)
   (get-in @subscribers [:sources id])
 
   ())

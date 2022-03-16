@@ -10,6 +10,7 @@
             [bh.rccst.components.webserver :as server]
             [bh.rccst.components.websocket :as socket]
             [bh.rccst.components.pub-sub :as pub-sub]
+            [bh.rccst.components.data-sources :as data-sources]
             [bh.rccst.defaults :as default]))
 
 
@@ -120,13 +121,14 @@
   "
 
   [args _]
-  ;(let []
+
   (component/system-map
     :database (db/map->Database args)
     :server (component/using (server/map->HTTPServer args) [:socket :database :pub-sub])
     :nrepl (repl/map->nRepl args)
     :socket (socket/map->WebSocketServer args)
-    :pub-sub (component/using (pub-sub/map->PubSub args) [:socket])))
+    :pub-sub (component/using (pub-sub/map->PubSub args) [:socket :data-sources])
+    :data-sources (data-sources/map->DataSources args)))
 
 
 (defn start!
@@ -200,7 +202,7 @@
   (def db-type rccst-postgres)
   (def db-type rccst-sqlite)
 
-  ; dev-mode!
+  ; region ; dev-mode!
   (do
     ; leaving a few config params out to we test 'default'
     (set-init (partial new-system
@@ -213,8 +215,9 @@
     (start)
     (reset! system/system system)
     (tap> system))
+  ; endregion
 
-  ; prod-mode!
+  ; region ; prod-mode!
   (do
     (set-init (partial new-system
                 {:host              "localhost"
@@ -228,11 +231,13 @@
     (start)
     (reset! system/system system)
     (tap> system))
+  ; endregion
 
   (def r @last-req)
 
   (:server system)
   (:nrepl system)
+  (-> system :data-sources :registry)
   (tap> (:socket system))
   (tap> (get-in system [:socket :publish-all!]))
   ((get-in system [:socket :publish-all!]) [:publish/data-update
@@ -240,6 +245,7 @@
   (:broadcast system)
   (:subscribers system)
   (:pub-sub system)
+  (:data-sources system)
   (get-in system [:pub-sub :subscribe])
 
   (keys (:subscribers system))

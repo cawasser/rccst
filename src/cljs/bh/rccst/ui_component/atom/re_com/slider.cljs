@@ -9,13 +9,12 @@
 
 (defn slider [& {:keys [value range width disabled?]}]
 
-  (let [v (h/resolve-value value)
-        [min max] @(h/resolve-value range)]
+  (let [[min max] @(h/resolve-value range)]
 
     ;(log/info "slider" value "//" (str @v) "//" range "// [" min " " max "]")
 
     [rc/slider :src (rc/at)
-     :model v
+     :model (h/resolve-value value)
      :min min
      :max max
      :width (or width "300px")
