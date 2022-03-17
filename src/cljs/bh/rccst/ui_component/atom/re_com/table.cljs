@@ -52,9 +52,9 @@
        :max-rows max-rows
        :width width
        :height height
-       :row-line-color row-line-color
-       :on-click-row on-click-row-fn
-       :cell-style-fn cell-style-fn])))
+       :row-line-color (or row-line-color "#00fff0")
+       :on-click-row (or on-click-row-fn #())
+       :cell-style-fn (or cell-style-fn #())])))
 
 
 (defn meta-table [& {:keys [data max-rows width height cell-style-fn
@@ -64,7 +64,7 @@
     (fn []
       ;(log/info "meta-table" data "//" @d "//" (:data @d) "//" (count (:data @d)))
       [table*
-       :data (:data @d)
+       :data (if (:data @d) (:data @d) [])
        :max-rows (or max-rows (count (:data @d)))
        :width width
        :height height

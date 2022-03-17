@@ -22,6 +22,7 @@
 
 (defn- wrap-meta [data]
   {:title "Targets"
+   :c-o-c []
    :metadata {:type :tabular
               :id :id
               :fields {:id :string :data :string}}
