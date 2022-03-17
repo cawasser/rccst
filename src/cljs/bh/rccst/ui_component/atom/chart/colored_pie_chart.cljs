@@ -142,7 +142,7 @@
 
     (fn [data component-id container-id ui]
 
-      (log/info "colored-pie-chart" component-id "///" ui)
+      ;(log/info "colored-pie-chart" component-id "///" ui)
 
       [:> ResponsiveContainer
        [:> PieChart {:label true} (utils/override true ui :label)

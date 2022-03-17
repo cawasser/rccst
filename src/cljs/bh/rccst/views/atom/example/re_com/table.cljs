@@ -17,7 +17,7 @@
 
 
 (defn cell-styling-fn [{:keys [amt uv pv] :as row} {:keys [id] :as column}]
-  (log/info "cell-styling-fn")
+  ;(log/info "cell-styling-fn")
   (cond
     (= :uv id)
     {:background-color (cond

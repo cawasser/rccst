@@ -23,7 +23,7 @@
 (defn- table* [& {:keys [data max-rows width height cell-style-fn
                          on-click-row-fn row-line-color]}]
 
-  (log/info "table*" data)
+  ;(log/info "table*" data "//" width)
 
   [:div {:style {:width (or width "300px") :height (or height "250px")}}
    (if (empty? data)
@@ -46,10 +46,12 @@
 
   (let [remote (h/resolve-value data)]
     (fn []
-      (log/info "table" data "//" @remote)
+      ;(log/info "table" data "//" @remote)
       [table*
        :data @remote
        :max-rows max-rows
+       :width width
+       :height height
        :row-line-color row-line-color
        :on-click-row on-click-row-fn
        :cell-style-fn cell-style-fn])))
@@ -60,10 +62,12 @@
 
   (let [d (h/resolve-value data)]
     (fn []
-      (log/info "meta-table" data "//" @d "//" (:data @d) "//" (count (:data @d)))
+      ;(log/info "meta-table" data "//" @d "//" (:data @d) "//" (count (:data @d)))
       [table*
        :data (:data @d)
        :max-rows (or max-rows (count (:data @d)))
+       :width width
+       :height height
        :row-line-color (or row-line-color "#00fff0")
        :on-click-row (or on-click-row-fn #())
        :cell-style-fn (or cell-style-fn #())])))

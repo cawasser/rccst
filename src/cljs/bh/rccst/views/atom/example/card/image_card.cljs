@@ -23,9 +23,9 @@
     "A Card with an image, based upon [Bulma](https://bulma.io)"
     [layout/centered {:extra-classes :width-50}
      [card/card :title "Rich Hickey"
-      :image "imgs/rich-hickey.jpeg"
+      :image "imgs/giants/rich-hickey.jpeg"
       :content [layout/markdown-block
-                "Rich created the [Clojure]() programming language, and the [Datomic]() database."]
+                "Rich created the [Clojure](https://clojure.org) programming language, and the [Datomic](https://www.datomic.com) database."]
       :style node-style-square
       :image-style image-style]]
     card/source-code))

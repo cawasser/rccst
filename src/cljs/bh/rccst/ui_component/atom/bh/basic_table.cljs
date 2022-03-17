@@ -39,7 +39,7 @@
                ;(log/info "body" idx b)
                ^{:key idx} [:tr (for [key header]
                                   (do
-                                    (log/info "cell" key)
+                                    ;(log/info "cell" key)
                                     ^{:key key} [:td (str (get b (keyword key)))]))])))]]])))
 
 

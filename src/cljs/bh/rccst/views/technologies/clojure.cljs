@@ -34,11 +34,8 @@ Agent system that ensure clean, correct, multithreaded designs.
 > See also:
 >
 >[Clojure](https://clojure.org)
->
 >[Lisp](https://en.wikipedia.org/wiki/Lisp_(programming_language))
->
 >[Functional Programming ](https://en.wikipedia.org/wiki/Functional_programming)"]
-
       [layout/section "We use a number of libraries to provide critical server-side functionality:"]]]
 
     [ring-overview/overview]

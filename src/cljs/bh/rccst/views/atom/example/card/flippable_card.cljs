@@ -33,7 +33,7 @@
       :front [rc/v-box
               :gap "10px"
               :children [[:img {:style image-style
-                                :src   "/imgs/rich-hickey.jpeg"}]
+                                :src   "/imgs/giants/rich-hickey.jpeg"}]
                          [:p.title.is-4 "Rich Hickey"]]]
       :back [layout/markdown-block
              "Rich created the [Clojure](https://clojure.org/) programming language, and the [Datomic](https://www.datomic.com/) database."]]]

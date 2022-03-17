@@ -181,7 +181,7 @@
 
     (fn [data component-id container-id ui]
 
-      (log/info "area-chart" component-id "///" ui)
+      ;(log/info "area-chart" component-id "///" ui)
 
       [:> ResponsiveContainer
        [:> AreaChart {:data (get @data :data)}
@@ -234,7 +234,7 @@
   "
   [& {:keys [data component-id container-id ui]}]
 
-  (log/info "area-chart component" @data component-id container-id ui)
+  ;(log/info "area-chart component" @data component-id container-id ui)
 
   [c/base-chart
    :data data
