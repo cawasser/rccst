@@ -1,7 +1,11 @@
 (ns bh.rccst.ui-component.utils.locals
   (:require [re-frame.core :as re-frame]
             [day8.re-frame.tracing :refer-macros [fn-traced]]
-            [bh.rccst.ui-component.utils.helpers :as h]))
+            [bh.rccst.ui-component.utils.helpers :as h]
+            [taoensso.timbre :as log]))
+
+
+(log/info "bh.rccst.ui-component.utils.locals")
 
 
 (re-frame/reg-event-db
@@ -284,7 +288,9 @@
   [widget-id locals-and-defaults]
   (let [paths (process-locals [] nil locals-and-defaults)]
 
-    ;(log/info "init-widget" widget-id paths)
+    ;(log/info "init-widget" widget-id
+    ;  "//" paths
+    ;  "//" locals-and-defaults)
 
     ; load the app-db with the default values
     (init-local-values widget-id locals-and-defaults)
@@ -292,7 +298,8 @@
     ; create subscriptions
     (create-widget-sub widget-id)
     (doall
-      (map #(create-widget-local-sub widget-id % 0) paths))
+      ; TODO: consider using locals-and-defaults to put the actual default into the subscription rather than 'nil'
+      (map #(create-widget-local-sub widget-id % nil) paths))
 
     ; create event handlers
     (create-widget-event widget-id)
