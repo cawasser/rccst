@@ -1,7 +1,6 @@
 (ns bh.rccst.ui-component.atom.re-com.table
   (:require [bh.rccst.ui-component.utils.helpers :as h]
             [re-com.core :as rc]
-            [bh.rccst.ui-component.atom.bh.simple-v-table :as bh]
             [reagent.core :as r]
             [taoensso.timbre :as log]))
 
@@ -33,7 +32,7 @@
       :alert-type :info
       :heading "Waiting for data"]
 
-     [bh/simple-v-table :src (rc/at)
+     [rc/simple-v-table :src (rc/at)
       :model (r/atom data)
       :columns (table-column-headers data 5 (or width 200) (or height))
       :max-rows (or max-rows (count data))
