@@ -1,6 +1,7 @@
 (ns bh.rccst.data-source.targets
   (:require [bh.rccst.components.system :as system]
-            [clojure.tools.logging :as log]))
+            [clojure.tools.logging :as log]
+            [bh.rccst.version :as version]))
 
 
 (def source-id :source/targets)
@@ -22,7 +23,11 @@
 
 (defn- wrap-meta [data]
   {:title "Targets"
-   :c-o-c []
+   :c-o-c [{:step :generated
+            :by "bh.rccst.data-source.targets"
+            :version version/version
+            :at (str (java.util.Date.))
+            :signature (str (java.util.UUID/randomUUID))}]
    :metadata {:type :tabular
               :id :id
               :fields {:id :string :data :string}}

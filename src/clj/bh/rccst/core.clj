@@ -177,8 +177,9 @@
   > [Component](https://github.com/stuartsierra/component)
   "
   [& args]
-  (log/info "RCCST Starting up...")
-  (start! rccst-postgres))
+  (log/info "................. RCCST Starting up...")
+  (start! rccst-postgres)
+  (log/info ">>>>>>>>>>>>>>>>> RCCST Server READY!"))
 
 
 

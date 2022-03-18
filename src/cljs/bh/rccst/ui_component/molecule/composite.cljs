@@ -71,9 +71,6 @@
   {})
 
 
-
-
-
 ;;;;;;;;;;
 ;;;;;;;;;;
 ;
@@ -84,12 +81,10 @@
 ;; region
 
 
-
 (defn- definition-panel
   "show the text definition of the composed UI
   "
   [& {:keys [configuration]}]
-
 
   (let [components (:components configuration)
         links      (:links configuration)
