@@ -1,7 +1,6 @@
 (ns bh.rccst.ui-component.atom.bh.table
-  (:require [bh.rccst.ui-component.atom.chart.utils.example-data :as ex]
+  (:require [bh.rccst.ui-component.utils.example-data :as ex]
             [bh.rccst.ui-component.utils.helpers :as h]
-            [cljs-uuid-utils.core :as uuid]
             [re-com.core :as rc]
             [re-frame.core :as re-frame]
             [reagent.core :as r]
@@ -11,11 +10,7 @@
 (def sample-data ex/tabular-data)
 (def sample-meta-data ex/meta-tabular-data)
 (def sample-meta-coc-data (assoc ex/meta-tabular-data
-                            :c-o-c [{:step      :generated
-                                     :by        "bh.rccst.ui-component.atom.bh.table"
-                                     :version   (or @(re-frame/subscribe [:bh.rccst.subs/version]) "no version")
-                                     :at        (str (js/Date.))
-                                     :signature (uuid/uuid-string (uuid/make-random-uuid))}]))
+                            :c-o-c ex/default-coc))
 
 
 (defn- table* [& {:keys [data max-rows width height cell-style-fn

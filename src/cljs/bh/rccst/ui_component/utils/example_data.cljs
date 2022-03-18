@@ -1,4 +1,6 @@
-(ns bh.rccst.ui-component.atom.chart.utils.example-data)
+(ns bh.rccst.ui-component.utils.example-data
+  (:require [re-frame.core :as re-frame]
+            [cljs-uuid-utils.core :as uuid]))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -9,35 +11,45 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(def default-coc [{:step      :generated
+                   :by        "bh.rccst.ui-component.atom.bh.table"
+                   :version   (or @(re-frame/subscribe [:bh.rccst.subs/version]) "no version")
+                   :at        (str (js/Date.))
+                   :signature (uuid/uuid-string (uuid/make-random-uuid))}])
+
+
 (def tabular-data [{:name "Page A" :uv 4000 :pv 2400 :amt 2400}
                    {:name "Page B" :uv 3000 :pv 1398 :amt 2210}
                    {:name "Page C" :uv 2000 :pv 9800 :amt 2290}
                    {:name "Page D" :uv 2780 :pv 3908 :amt 2000}
-                   {:name "Page A" :uv 1890 :pv 4800 :amt 2181}
-                   {:name "Page A" :uv 2390 :pv 3800 :amt 2500}
+                   {:name "Page E" :uv 1890 :pv 4800 :amt 2181}
+                   {:name "Page F" :uv 2390 :pv 3800 :amt 2500}
                    {:name "Page G" :uv 3490 :pv 4300 :amt 2100}])
 
+
 (def tabular-data-org [{:name "Page A" :org "Alpha" :uv 4000 :pv 2400 :amt 2400}
-                       {:name "Page B" :org "Alpha" :uv 3000 :pv 1398 :amt 2210}
-                       {:name "Page C" :org "Bravo" :uv 2000 :pv 9800 :amt 2290}
-                       {:name "Page D" :org "Bravo" :uv 2780 :pv 3908 :amt 2000}
-                       {:name "Page A" :org "Charlie" :uv 1890 :pv 4800 :amt 2181}
-                       {:name "Page A" :org "Charlie" :uv 2390 :pv 3800 :amt 2500}
-                       {:name "Page G" :org "Charlie" :uv 3490 :pv 4300 :amt 2100}])
+                       {:name "Page B" :org "Bravo" :uv 3000 :pv 1398 :amt 2210}
+                       {:name "Page C" :org "Charlie" :uv 2000 :pv 9800 :amt 2290}
+                       {:name "Page D" :org "Delta" :uv 2780 :pv 3908 :amt 2000}
+                       {:name "Page E" :org "Echo" :uv 1890 :pv 4800 :amt 2181}
+                       {:name "Page F" :org "Foxtrot" :uv 2390 :pv 3800 :amt 2500}
+                       {:name "Page G" :org "Gamma" :uv 3490 :pv 4300 :amt 2100}])
+
 
 (def meta-tabular-data
   "docstring"
-  {:metadata {:type :tabular
-              :id :name
-              :title "Tabular Data with Metadata"
-              :fields {:name :string :uv :number :pv :number :tv :number :amt :number :owner :string}}
-   :data [{:name "Page A" :uv 4000 :pv 2400 :tv 1500 :amt 2400 :owner "Bob"}
-          {:name "Page B" :uv 3000 :pv 1398 :tv 1500 :amt 2210 :owner "Bob"}
-          {:name "Page C" :uv 2000 :pv 9800 :tv 1500 :amt 2290 :owner "Sally"}
-          {:name "Page D" :uv 2780 :pv 3908 :tv 1500 :amt 2000 :owner "Sally"}
-          {:name "Page E" :uv 1890 :pv 4800 :tv 1500 :amt 2181 :owner "Alex"}
-          {:name "Page F" :uv 2390 :pv 3800 :tv 1500 :amt 2500 :owner "Erin"}
-          {:name "Page G" :uv 3490 :pv 4300 :tv 1500 :amt 2100 :owner "Alvin"}]})
+  {:metadata {:type   :tabular
+              :id     :name
+              :title  "Tabular Data with Metadata"
+              :fields {:name :string :uv :number :pv :number :tv :number :amt :number}}
+   :data     [{:name "Page A" :uv 4000 :pv 2400 :tv 1500 :amt 2400}
+              {:name "Page B" :uv 3000 :pv 1398 :tv 1500 :amt 2210}
+              {:name "Page C" :uv 2000 :pv 9800 :tv 1500 :amt 2290}
+              {:name "Page D" :uv 2780 :pv 3908 :tv 1500 :amt 2000}
+              {:name "Page E" :uv 1890 :pv 4800 :tv 1500 :amt 2181}
+              {:name "Page F" :uv 2390 :pv 3800 :tv 1500 :amt 2500}
+              {:name "Page G" :uv 3490 :pv 4300 :tv 1500 :amt 2100}]})
+
 
 (def some-other-tabular [{:id "Page A" :a 4000 :b 2400 :c 2400}
                          {:id "Page B" :a 3000 :b 1398 :c 2210}
@@ -47,6 +59,7 @@
                          {:id "Page F" :a 2390 :b 3800 :c 2500}
                          {:id "Page G" :a 3490 :b 4300 :c 2100}])
 
+
 (def paired-data [{:name "Group A" :value 400}
                   {:name "Group B" :value 300}
                   {:name "Group C" :value 300}
@@ -54,12 +67,14 @@
                   {:name "Group E" :value 278}
                   {:name "Group F" :value 189}])
 
+
 (def triplet-data [{:x 100 :y 200 :z 200}
                    {:x 110 :y 280 :z 200}
                    {:x 120 :y 100 :z 260}
                    {:x 140 :y 250 :z 280}
                    {:x 150 :y 400 :z 500}
                    {:x 170 :y 300 :z 400}])
+
 
 (def hierarchy-data [{:name     "axis"
                       :children [{:name "Axis" :size 24593}
@@ -143,6 +158,7 @@
                                  {:name "OperatorSwitch" :size 2581}
                                  {:name "Operator" :size 2490}
                                  {:name "SortOperator" :size 2023}]}])
+
 
 (def dag-data {:nodes [{:name "Visit"}
                        {:name "Direct-Favourite"}

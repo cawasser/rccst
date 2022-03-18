@@ -1,9 +1,8 @@
 (ns bh.rccst.ui-component.atom.chart.sankey-chart
   (:require [bh.rccst.ui-component.atom.chart.utils :as utils]
-            [bh.rccst.ui-component.atom.chart.utils.example-data :as data]
+            [bh.rccst.ui-component.utils.example-data :as data]
             [bh.rccst.ui-component.atom.chart.wrapper :as c]
             [bh.rccst.ui-component.utils :as ui-utils]
-
             ["recharts" :refer [ResponsiveContainer Sankey Tooltip Layer Rectangle]]
             [re-com.core :as rc]
             [reagent.core :as r]))

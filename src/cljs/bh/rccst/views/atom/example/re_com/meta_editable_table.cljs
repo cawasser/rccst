@@ -1,22 +1,18 @@
-(ns bh.rccst.views.atom.example.re-com.full-table
-  (:require [bh.rccst.ui-component.full-table :as table]
-            [reagent.core :as r]
+(ns bh.rccst.views.atom.example.re-com.meta-editable-table
+  (:require [bh.rccst.ui-component.atom.re-com.editable-table :as table]
             [taoensso.timbre :as log]
             [woolybear.ad.catalog.utils :as acu]
             [woolybear.ad.layout :as layout]))
 
 
-(def data (r/atom
-            [{:id "Page A" :kp 2000 :uv 4000 :pv 2400 :amt 2400}
-             {:id "Page B" :kp 2000 :uv 3000 :pv 5598 :amt 2210}
-             {:id "Page C" :kp 2000 :uv 2000 :pv 9800 :amt 2290}
-             {:id "Page D" :kp 2000 :uv 2780 :pv 3908 :amt 2000}
-             {:id "Page E" :kp 2000 :uv 1890 :pv 4800 :amt 2181}
-             {:id "Page F" :kp 2000 :uv 2390 :pv 3800 :amt 2500}
-             {:id "Page G" :kp 2000 :uv 3490 :pv 4300 :amt 2100}]))
+(log/info "bh.rccst.views.atom.example.re-com.meta-editable-table")
 
 
-(defn cell-styling-fn [{:keys [amt uv pv] :as row} {:keys [id] :as column}]
+(def data table/meta-sample-data)
+
+
+(defn cell-styling-fn [{:keys [amt uv pv] :as row}
+                       {:keys [id] :as column}]
   (cond
     (= :uv id)
     {:background-color (cond
@@ -39,14 +35,16 @@
 
 
 (defn example []
-  (acu/demo "Editable Table"
-    "We're using the `v-table` from [Re-com](https://github.com/Day8/re-com)"
+  (acu/demo "Editable Table (with Metadata)"
+    "We're using the `v-table` from [Re-com](https://github.com/Day8/re-com)
 
-    [layout/centered ;{:extra-classes :width-50}
+> This example has data ***with*** metadata!"
+
+    [layout/centered
      [table/table
       :data data
       :max-rows 5
-      :width 500
+      ;:width 600
       :on-click-row #(log/info "on-click-row")
       :cell-style cell-styling-fn]]
 
@@ -54,7 +52,6 @@
       [table/table
        :data data
        :max-rows 5
-       :width 600
-       :table-row-line-color "#0fff00"
+       ;:width 600
        :on-click-row #(log/info "on-click-row")
        :cell-style cell-styling-fn]]))

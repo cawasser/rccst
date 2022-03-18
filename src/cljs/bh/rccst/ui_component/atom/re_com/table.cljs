@@ -46,7 +46,7 @@
 
   (let [remote (h/resolve-value data)]
     (fn []
-      (log/info "non-meta-table" data "//" @remote)
+      ;(log/info "non-meta-table" data "//" @remote)
       [:div {:style {:width  (or width "300px") :height (or height "250px")
                      :margin :auto}}
        [table*
@@ -98,7 +98,7 @@
                        on-click-row-fn row-line-color]}]
 
   (let [d (h/resolve-value data)]
-    (log/info "table" data "//" @d "//" (:data @d))
+    ;(log/info "table" data "//" @d "//" (:data @d))
     (if (:metadata @d)
       [meta-table
        :data data
