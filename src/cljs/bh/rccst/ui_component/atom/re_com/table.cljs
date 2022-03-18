@@ -41,12 +41,12 @@
      :cell-style (or cell-style-fn #())]))
 
 
-(defn table [& {:keys [data max-rows width height cell-style-fn
-                       on-click-row-fn row-line-color]}]
+(defn- non-meta-table [& {:keys [data max-rows width height cell-style-fn
+                                 on-click-row-fn row-line-color]}]
 
   (let [remote (h/resolve-value data)]
     (fn []
-      (log/info "table" data "//" @remote)
+      (log/info "non-meta-table" data "//" @remote)
       [:div {:style {:width  (or width "300px") :height (or height "250px")
                      :margin :auto}}
        [table*
@@ -59,8 +59,8 @@
         :cell-style-fn (or cell-style-fn #())]])))
 
 
-(defn meta-table [& {:keys [data max-rows width height cell-style-fn
-                            on-click-row-fn row-line-color]}]
+(defn- meta-table [& {:keys [data max-rows width height cell-style-fn
+                             on-click-row-fn row-line-color]}]
 
   (let [d (h/resolve-value data)]
     (fn []
@@ -94,9 +94,31 @@
                                           :max-rows 3]]]])]]]))))
 
 
+(defn table [& {:keys [data max-rows width height cell-style-fn
+                       on-click-row-fn row-line-color]}]
+
+  (let [d (h/resolve-value data)]
+    (log/info "table" data "//" @d "//" (:data @d))
+    (if (:metadata @d)
+      [meta-table
+       :data data
+       :max-rows max-rows
+       :width width
+       :height height
+       :cell-style-fn cell-style-fn
+       :on-click-row-fn on-click-row-fn
+       :row-line-color row-line-color]
+      [non-meta-table
+       :data data
+       :max-rows max-rows
+       :width width
+       :height height
+       :cell-style-fn cell-style-fn
+       :on-click-row-fn on-click-row-fn
+       :row-line-color row-line-color])))
+
+
 (def meta-data {:rc/table      {:component table
-                                :ports     {:data :port/sink}}
-                :rc/meta-table {:component meta-table
                                 :ports     {:data :port/sink}}})
 
 

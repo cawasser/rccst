@@ -29,6 +29,7 @@
   "docstring"
   {:metadata {:type :tabular
               :id :name
+              :title "Tabular Data with Metadata"
               :fields {:name :string :uv :number :pv :number :tv :number :amt :number :owner :string}}
    :data [{:name "Page A" :uv 4000 :pv 2400 :tv 1500 :amt 2400 :owner "Bob"}
           {:name "Page B" :uv 3000 :pv 1398 :tv 1500 :amt 2210 :owner "Bob"}

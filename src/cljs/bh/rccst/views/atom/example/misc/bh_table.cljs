@@ -1,7 +1,7 @@
-(ns bh.rccst.views.atom.example.misc.basic-table
+(ns bh.rccst.views.atom.example.misc.bh-table
   (:require [woolybear.ad.catalog.utils :as acu]
             [woolybear.ad.layout :as layout]
-            [bh.rccst.ui-component.atom.bh.basic-table :as table]))
+            [bh.rccst.ui-component.atom.bh.table :as table]))
 
 
 (defn example []

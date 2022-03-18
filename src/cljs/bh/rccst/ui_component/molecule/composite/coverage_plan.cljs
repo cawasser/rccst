@@ -82,8 +82,8 @@
 (def ui-definition (r/atom {:title        "Coverage Plan"
                             :component-id :coverage-plan
                             :components   {; ui components
-                                           :ui/targets                {:type :ui/component :name :rc/meta-table}
-                                           :ui/satellites             {:type :ui/component :name :rc/meta-table}
+                                           :ui/targets                {:type :ui/component :name :rc/table}
+                                           :ui/satellites             {:type :ui/component :name :rc/table}
                                            :ui/globe                  {:type :ui/component :name :globe/three-d-globe}
                                            :ui/time-slider            {:type :ui/component :name :rc/slider}
                                            :ui/current-time           {:type :ui/component :name :rc/label-lg}

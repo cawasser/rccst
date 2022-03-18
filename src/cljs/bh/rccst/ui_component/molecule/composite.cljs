@@ -18,7 +18,7 @@
             [bh.rccst.ui-component.molecule.composite.util.ui :as ui]
             [bh.rccst.ui-component.molecule.component-layout :as cl]
             [bh.rccst.ui-component.atom.experimental.ui-element :as e]
-            [bh.rccst.ui-component.atom.bh.basic-table :as bh-table]
+            [bh.rccst.ui-component.atom.bh.table :as bh-table]
             [bh.rccst.ui-component.atom.re-com.table :as rc-table]
             [bh.rccst.ui-component.atom.re-com.label :as rc-label]
             [bh.rccst.ui-component.atom.re-com.slider :as rc-slider]
