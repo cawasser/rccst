@@ -7,6 +7,7 @@
             [bh.rccst.ui-component.atom.worldwind.globe.projection :as proj]
             [bh.rccst.ui-component.atom.worldwind.globe.react-support :as rs]
             [bh.rccst.ui-component.atom.worldwind.globe.shape :as shape]
+            [bh.rccst.ui-component.utils.helpers :as h]
             [cljs-time.coerce :as coerce]
             [cljs-time.core :as cljs-time]
             [reagent.core :as r]
@@ -36,7 +37,7 @@
                   {:shape      :shape/circle :location [28.538336 -81.379234] :radius 1000000
                    :fill-color [0 1 0 0.5] :outline-color [1 1 1 1] :width 2}])
 
-(defn base-layers [globe-id]
+(defn- base-layers [globe-id]
   {(str globe-id " Blue Marble") (blue-marble/blue-marble (str globe-id " Blue Marble"))
    ;(str globe-id " day-only") (day-only/day-only (str globe-id " day-only"))})
    (str globe-id " Night")       (night/night (str globe-id " Night"))
@@ -44,7 +45,7 @@
    (str globe-id " Star Field")  (star-field/star-field (str globe-id " Star Field"))})
 
 
-(defn build-child-layer [id children]
+(defn- build-child-layer [id children]
   (log/info "build-child-layer" id children)
 
   (let [layer (WorldWind/RenderableLayer.)]
@@ -61,7 +62,7 @@
     layer))
 
 
-(defn globe* [props & children]
+(defn- globe* [props & children]
   (log/info "globe*" props children)
 
   (let [state    (atom {:children children})
@@ -97,22 +98,28 @@
             "Your browser does not support HTML5 Canvas."]))})))
 
 
-(defn globe [& {:keys [children component-id]}]
-  (log/info "globe" children component-id)
+(defn globe [& {:keys [shapes component-id]}]
+  (log/info "globe" shapes component-id)
 
-  [globe*
-   {:id         component-id
-    :min-max    :max
-    :time       (coerce/to-date (cljs-time/now))
-    :projection "3D"
-    :style      {:background-color :black
-                 :width            "100%"
-                 :height           "100%"}}
-   (merge
-     {}
-     (base-layers component-id)
-     {(str component-id " Shapes") (build-child-layer component-id children)})])
+  (let [s (h/resolve-value shapes)]
+    (fn [& {:keys [shapes component-id]}]
+      [:div {:style {:width "500px" :height "500px"}}
+       [globe*
+        {:id         component-id
+         :min-max    :max
+         :time       (coerce/to-date (cljs-time/now))
+         :projection "3D"
+         :style      {:background-color :black
+                      :width            "100%"
+                      :height           "100%"}}
+        (merge
+          {}
+          (base-layers component-id)
+          {(str component-id " Shapes") (build-child-layer component-id @s)})]])))
 
+
+(def meta-data {:ww/globe {:component globe
+                           :ports {:shapes :port/sink}}})
 
 
 (comment

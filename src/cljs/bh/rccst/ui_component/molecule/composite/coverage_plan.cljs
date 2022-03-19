@@ -26,7 +26,7 @@
   builds and registers the subscription provided by 'layers'
 
   "
-  [{:keys [targets satellites coverages current-time layers]}]
+  [{:keys [targets satellites coverages current-time shapes]}]
 
   ;(log/info "fn-coverage" layers
   ;  "//" targets
@@ -34,15 +34,15 @@
   ;  "//" coverages)
 
   (re-frame/reg-sub
-    (first layers)
+    (first shapes)
     :<- targets
     :<- satellites
     :<- coverages
     :<- current-time
     (fn [[t s c ct] _]
       (if (or (empty? c) (empty? (:data c)))
-        {}
-        (nth (:data c) ct)))))
+        []
+        [(nth bh.rccst.ui-component.atom.worldwind.globe/sample-data ct)]))))
 
 
 (defn fn-range
@@ -84,7 +84,7 @@
                             :components   {; ui components
                                            :ui/targets                {:type :ui/component :name :rc/table}
                                            :ui/satellites             {:type :ui/component :name :rc/table}
-                                           :ui/globe                  {:type :ui/component :name :globe/three-d-globe}
+                                           :ui/globe                  {:type :ui/component :name :ww/globe}
                                            :ui/time-slider            {:type :ui/component :name :rc/slider}
                                            :ui/current-time           {:type :ui/component :name :rc/label-lg}
 
@@ -97,14 +97,14 @@
                                            :topic/selected-targets    {:type :source/local :name :selected-targets :default []}
                                            :topic/selected-satellites {:type :source/local :name :selected-satellites :default []}
                                            :topic/current-time        {:type :source/local :name :current-time :default 0} ;(js/Date.)}
-                                           :topic/layers              {:type :source/local :name :layers}
+                                           :topic/shapes              {:type :source/local :name :shapes}
                                            :topic/time-range          {:type :source/local :name :time-range}
 
                                            ; transformation functions
                                            :fn/coverage               {:type  :source/fn :name fn-coverage
                                                                        :ports {:targets   :port/sink :satellites :port/sink
                                                                                :coverages :port/sink :current-time :port/sink
-                                                                               :layers    :port/source}}
+                                                                               :shapes    :port/source}}
                                            :fn/range                  {:type  :source/fn :name fn-range
                                                                        :ports {:data :port/sink :range :port/source}}}
 
@@ -120,7 +120,7 @@
                                            :ui/time-slider            {:value {:topic/current-time :data}}
 
                                            ; transformation functions publish to what?
-                                           :fn/coverage               {:layers {:topic/layers :data}}
+                                           :fn/coverage               {:shapes {:topic/shapes :data}}
                                            :fn/range                  {:range {:topic/time-range :data}}
 
                                            ; topics are inputs into what?
@@ -130,7 +130,7 @@
                                            :topic/selected-satellites {:data {:fn/coverage :satellites}}
                                            :topic/coverage-data       {:data {:fn/coverage :coverages
                                                                               :fn/range    :data}}
-                                           :topic/layers              {:data {:ui/globe :layers}}
+                                           :topic/shapes              {:data {:ui/globe :shapes}}
                                            :topic/current-time        {:data {:ui/current-time :value
                                                                               :ui/time-slider  :value
                                                                               :ui/globe        :current-time

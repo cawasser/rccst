@@ -22,6 +22,7 @@
             [bh.rccst.ui-component.atom.re-com.table :as rc-table]
             [bh.rccst.ui-component.atom.re-com.label :as rc-label]
             [bh.rccst.ui-component.atom.re-com.slider :as rc-slider]
+            [bh.rccst.ui-component.atom.worldwind.globe :as ww-globe]
             [bh.rccst.ui-component.utils :as ui-utils]
             [day8.re-frame.tracing :refer-macros [fn-traced]]
             [loom.graph :as lg]
@@ -48,6 +49,7 @@
     rc-label/meta-data
     rc-slider/meta-data
     bh-table/meta-data
+    ww-globe/meta-data
     {:table/selectable-table {:component e/selectable-table
                               :ports     {:data      :port/source-sink ; out this be {:data-in :port/sink} & {:data-out :port/source}?
                                           :selection :port/source}}

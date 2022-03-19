@@ -13,14 +13,6 @@
 (log/info "bh.rccst.views.molecule.example.composite.coverage-plan")
 
 
-(comment
-  (def logged-in? (re-frame/subscribe [::subs/logged-in?]))
-
-  (if (not @logged-in?)
-    (re-frame/dispatch [:bh.rccst.events/login "string" "string"]))
-
-  ())
-
 (defn example []
   (let [container-id "coverage-plan-demo"
         logged-in? (re-frame/subscribe [::subs/logged-in?])
@@ -45,3 +37,13 @@
           [rc/alert-box :src (rc/at)
            :alert-type :info
            :heading "Waiting for (demo) Log-in"])))))
+
+
+(comment
+  (def logged-in? (re-frame/subscribe [::subs/logged-in?]))
+
+  (if (not @logged-in?)
+    (re-frame/dispatch [:bh.rccst.events/login "string" "string"]))
+
+  ())
+

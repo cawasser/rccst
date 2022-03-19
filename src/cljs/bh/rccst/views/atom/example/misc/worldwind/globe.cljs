@@ -9,6 +9,6 @@
     (acu/demo "Worldwind Globe"
       "A 3D globe based on [Nasa WorldWind](https://github.com/WorldWindEarth/worldwindjs)."
       [globe/globe
-       :children globe/sample-data
+       :shapes globe/sample-data
        :component-id (h/path->keyword container-id "ww-globe")
        :container-id container-id])))
