@@ -31,7 +31,7 @@
   component/Lifecycle
   (start [component]
 
-    (log/info "starting Socket" socket-params socket)
+    (log/info "starting Socket" socket-params) ;socket)
     (tap> ["starting socket" socket-params socket])
 
     (let [{:keys [ch-recv send-fn connected-uids

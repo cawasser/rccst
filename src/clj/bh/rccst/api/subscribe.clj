@@ -38,7 +38,7 @@
   > [compojure.sweet](https://github.com/metosin/compojure-api)
   "
   [{:keys [subscribe cancel cancel-all] :as pub-sub}]
-  (log/info "subscription-handlers" pub-sub)
+  ;(log/info "subscription-handlers" pub-sub)
   (sweet/context "/subscribe" []
     :tags ["subscribe"]
 

@@ -1,6 +1,7 @@
 (ns bh.rccst.data-source.coverages
   (:require [bh.rccst.components.system :as system]
-            [clojure.tools.logging :as log]))
+            [clojure.tools.logging :as log]
+            [bh.rccst.version :as version]))
 
 
 (def source-id :source/coverages)
@@ -22,6 +23,11 @@
 
 (defn- wrap-meta [data]
   {:title "Coverages"
+   :c-o-c [{:step :generated
+            :by "bh.rccst.data-source.coverages"
+            :version version/version
+            :at (str (java.util.Date.))
+            :signature (str (java.util.UUID/randomUUID))}]
    :metadata {:type :tabular
               :id :id
               :fields {:id :string :data :string}}
@@ -33,8 +39,8 @@
 
   ; 2. send over the most recent data as a boot-strap
   (pub-sub [:publish/data-update {:id source-id
-                                  :value ;(wrap-meta
-                                           (fetch-data)}]))
+                                  :value (wrap-meta
+                                           (fetch-data))}]))
 
 
 (def meta-data {source-id start-listener})

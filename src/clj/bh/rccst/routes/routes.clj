@@ -29,7 +29,7 @@
   [{:keys [ring-ajax-post ring-ajax-get-or-ws-handshake]}
    database pub-sub dev-mode]
 
-  (log/info "setting up the routes" dev-mode database)
+  ;(log/info "setting up the routes" dev-mode database)
 
   (if dev-mode
 

@@ -40,9 +40,9 @@
     :<- coverages
     :<- current-time
     (fn [[t s c ct] _]
-      (if (empty? c)
+      (if (or (empty? c) (empty? (:data c)))
         {}
-        (nth c ct)))))
+        (nth (:data c) ct)))))
 
 
 (defn fn-range
@@ -62,7 +62,7 @@
     (first range)
     :<- data
     (fn [d _]
-      [0 (if d (dec (count d)) 1)])))
+      [0 (if (:data d) (dec (count (:data d))) 1)])))
 
 
 ;; components have "ports" which define their inputs and outputs:
@@ -82,7 +82,7 @@
 (def ui-definition (r/atom {:title        "Coverage Plan"
                             :component-id :coverage-plan
                             :components   {; ui components
-                                           :ui/targets                {:type :ui/component :name :rc/meta-table}
+                                           :ui/targets                {:type :ui/component :name :rc/table}
                                            :ui/satellites             {:type :ui/component :name :rc/table}
                                            :ui/globe                  {:type :ui/component :name :globe/three-d-globe}
                                            :ui/time-slider            {:type :ui/component :name :rc/slider}

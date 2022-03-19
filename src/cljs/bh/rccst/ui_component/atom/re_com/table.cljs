@@ -1,6 +1,7 @@
 (ns bh.rccst.ui-component.atom.re-com.table
   (:require [bh.rccst.ui-component.utils.helpers :as h]
             [re-com.core :as rc]
+            [re-frame.core :as re-frame]
             [reagent.core :as r]
             [taoensso.timbre :as log]))
 
@@ -25,65 +26,129 @@
 
   ;(log/info "table*" data "//" width)
 
-  [:div {:style {:width (or width "300px") :height (or height "250px")}}
-   (if (empty? data)
+  (if (empty? data)
 
-     [rc/alert-box :src (rc/at)
-      :alert-type :info
-      :heading "Waiting for data"]
+    [rc/alert-box :src (rc/at)
+     :alert-type :info
+     :heading "Waiting for data"]
 
-     [rc/simple-v-table :src (rc/at)
-      :model (r/atom data)
-      :columns (table-column-headers data 5 (or width 200) (or height))
-      :max-rows (or max-rows (count data))
-      :table-row-line-color (or row-line-color "#00fff0")
-      :on-click-row (or on-click-row-fn #())
-      :cell-style (or cell-style-fn #())])])
+    [rc/simple-v-table :src (rc/at)
+     :model (r/atom data)
+     :columns (table-column-headers data 5 (or width 200) (or height))
+     :max-rows (or max-rows (count data))
+     :table-row-line-color (or row-line-color "#00fff0")
+     :on-click-row (or on-click-row-fn #())
+     :cell-style (or cell-style-fn #())]))
+
+
+(defn- non-meta-table [& {:keys [data max-rows width height cell-style-fn
+                                 on-click-row-fn row-line-color]}]
+
+  (let [remote (h/resolve-value data)]
+    (fn []
+      ;(log/info "non-meta-table" data "//" @remote)
+      [:div {:style {:width  (or width "300px") :height (or height "250px")
+                     :margin :auto}}
+       [table*
+        :data @remote
+        :max-rows max-rows
+        :width width
+        :height height
+        :row-line-color (or row-line-color "#00fff0")
+        :on-click-row (or on-click-row-fn #())
+        :cell-style-fn (or cell-style-fn #())]])))
+
+
+(defn- meta-table [& {:keys [data max-rows width height cell-style-fn
+                             on-click-row-fn row-line-color]}]
+
+  (let [d (h/resolve-value data)]
+    (fn []
+      ;(log/info "meta-table" data "//" @d "//" (:data @d) "//" (count (:data @d)))
+      (let [coc? (r/atom false)]
+        [:div.card {:style  {:width (or width "90%") :height (or height "100%")
+                             :margin :auto}}
+         [rc/h-box :src (rc/at)
+          :gap "2px"
+          :children [[table*
+                      :data (if (:data @d) (:data @d) [])
+                      :max-rows (or max-rows (count (:data @d)))
+                      :width width
+                      :height height
+                      :row-line-color (or row-line-color "#00fff0")
+                      :on-click-row (or on-click-row-fn #())
+                      :cell-style-fn (or cell-style-fn #())]
+                     (when (seq (:c-o-c @d))
+                       [:div
+                        [rc/popover-anchor-wrapper :src (rc/at)
+                         :showing? coc?
+                         :position :below-center
+                         :anchor [rc/md-icon-button
+                                  :md-icon-name "zmdi zmdi-badge-check"
+                                  :tooltip "view chain-of-custody"
+                                  :on-click #(swap! coc? not)]
+                         :popover [rc/popover-content-wrapper :src (rc/at)
+                                   :title "Chain-of-Custody"
+                                   :body [table*
+                                          :data (:c-o-c @d)
+                                          :max-rows 3]]]])]]]))))
 
 
 (defn table [& {:keys [data max-rows width height cell-style-fn
                        on-click-row-fn row-line-color]}]
 
-  (let [remote (h/resolve-value data)]
-    (fn []
-      ;(log/info "table" data "//" @remote)
-      [table*
-       :data @remote
+  (let [d (h/resolve-value data)]
+    ;(log/info "table" data "//" @d "//" (:data @d))
+    (if (:metadata @d)
+      [meta-table
+       :data data
        :max-rows max-rows
        :width width
        :height height
-       :row-line-color row-line-color
-       :on-click-row on-click-row-fn
-       :cell-style-fn cell-style-fn])))
-
-
-(defn meta-table [& {:keys [data max-rows width height cell-style-fn
-                            on-click-row-fn row-line-color]}]
-
-  (let [d (h/resolve-value data)]
-    (fn []
-      ;(log/info "meta-table" data "//" @d "//" (:data @d) "//" (count (:data @d)))
-      [table*
-       :data (:data @d)
-       :max-rows (or max-rows (count (:data @d)))
+       :cell-style-fn cell-style-fn
+       :on-click-row-fn on-click-row-fn
+       :row-line-color row-line-color]
+      [non-meta-table
+       :data data
+       :max-rows max-rows
        :width width
        :height height
-       :row-line-color (or row-line-color "#00fff0")
-       :on-click-row (or on-click-row-fn #())
-       :cell-style-fn (or cell-style-fn #())])))
+       :cell-style-fn cell-style-fn
+       :on-click-row-fn on-click-row-fn
+       :row-line-color row-line-color])))
 
 
 (def meta-data {:rc/table      {:component table
-                                :ports     {:data :port/sink}}
-                :rc/meta-table {:component meta-table
                                 :ports     {:data :port/sink}}})
 
 
 (comment
+
+  (def value [{:generated-by "bh.rccst.data-source.targets",
+               :at           #inst "2022-03-17T20:40:28.006-00:00",
+               :signature    "53dbe964-a4cc-4c36-965a-3e03fdd84b53"}])
+  (def opts nil)
+
+  (and (coll? value)
+    (not (empty? value))
+    (every? keyword? value))
+  (instance? reagent.ratom.RAtom value)
+  (cond
+    (and (coll? value)
+      (not (empty? value))
+      (every? keyword? value)) (re-frame/subscribe (reduce conj value opts))
+    (instance? reagent.ratom.RAtom value) value
+    (instance? Atom value) value
+    :else (r/atom value))
+
+  (seq (:c-o-c {:c-o-c []}))
+
   (def data [:bh.rccst.subs/source :source/targets])
+  (def d (h/resolve-value data))
 
+  (seq (:c-o-c @d))
 
-  (def some-code {:dummy {:one :port/sink :alpha :port/sink}
+  (def some-code {:dummy  {:one :port/sink :alpha :port/sink}
                   :dummy2 {:two :port/source}})
 
   (str some-code)

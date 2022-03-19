@@ -45,7 +45,7 @@
     (log/info ";; DataSources")
     (let [registry (atom {})]
       (reset! registry (init-registry))
-      (log/info "starting data-sources" @registry)
+      ;(log/info "starting data-sources" @registry)
       (assoc component
         :registry registry
         :lookup (partial lookup registry))))

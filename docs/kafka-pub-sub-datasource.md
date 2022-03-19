@@ -65,3 +65,40 @@ to start and stop the individual topologies we might want to have.
 
 > like listening to multiple topics to provide data to connected clients.
 
+
+
+## What about data sources that have too much data for the client to process all at once?
+
+What about sources that just have too much data, say 10,000 entities, or 100,000 measurements, or
+20 years of history? There simply isn't a good way to visualize so much data.
+
+In a query-driven approach we could just "page" the data, ask for the data in workable chunks, say 100 entities, at 
+at time. Each result should include how much dat is actually available, and what range of that collection is
+present in the given result. This way the UI component can figure out what to ask for when teh User needs access.
+
+For example, a table control might only have screen space to show 5 rows at a time. The table could ask for 100
+rows worth, and let the use scroll around. Then when they get close to the "edge" the control then asks for more.
+
+But what do we do whn "push" is the default?
+
+Some options:
+
+### Subscriptions with Extra Parameters (:source/remote)
+
+We could build the remote subscriptions such that they could take extra parameters to specify the range of data, and then 
+do a "hidden fetch" to make sure the necessary data gets into the client's local cache. The change in the cache is what
+actually triggers the UI re-render. This requires some interesting work with the Re-frame subscriptions, since they aren't 
+really intended to generate side effects (that's the job of Events).
+
+
+
+### Subscriptions that are really just notifications (:source/remote-notify-query)
+
+There might be cases where the "push" is just a notification that some new data is available, maybe including which "entities" have
+the novelty (either new ID's or the ID's of entities that have updates). In this case, the IDs in the "push" would be checked
+against the client's local cache and a "hidden fetch" to get updates to entities in the cache. Again, it's the change in the cache 
+that actually triggers the UI re-render. This also implies building 2 different subscriptions; one to "catch" the "notification push"
+and one to actually provide the updated data to the UI for re-render.
+
+Obviously this is a significant amount of work, but it can be built just once (as we do currently) and leveraged by everything.
+

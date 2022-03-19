@@ -1,7 +1,7 @@
 (ns bh.rccst.ui-component.atom.chart.line-chart
   (:require [bh.rccst.ui-component.atom.chart.utils :as utils]
             [bh.rccst.ui-component.utils.color :as color]
-            [bh.rccst.ui-component.atom.chart.utils.example-data :as data]
+            [bh.rccst.ui-component.utils.example-data :as data]
             [bh.rccst.ui-component.atom.chart.wrapper :as c]
             [bh.rccst.ui-component.utils :as ui-utils]
             ["recharts" :refer [ResponsiveContainer LineChart Line Brush]]
