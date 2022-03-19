@@ -1,6 +1,5 @@
-(ns bh.rccst.ui-component.atom.globe.cell.util
-  (:require ["worldwindjs" :as WorldWind]
-            [taoensso.timbre :as log]))
+(ns bh.rccst.ui-component.atom.worldwind.globe.cell
+  (:require ["worldwindjs" :as WorldWind]))
 
 
 (defn- get-cell-lat [[row _]]
@@ -61,11 +60,3 @@
              (WorldWind/Location. lat lon)))
       (into-array))))
 
-
-
-(comment
-  (get cell-boundaries [0 0])
-  (boundary-locations [0 0])
-
-
-  ())
