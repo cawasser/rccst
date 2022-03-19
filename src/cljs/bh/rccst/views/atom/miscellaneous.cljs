@@ -7,13 +7,15 @@
             [bh.rccst.views.atom.example.misc.three-d-globe :as three-d-globe]
             [bh.rccst.views.atom.example.misc.bh-table :as bh-table]
             [bh.rccst.views.atom.example.misc.meta-bh-table :as meta-bh-table]
-            [bh.rccst.views.atom.example.misc.meta-coc-bh-table :as meta-coc-bh-table]))
+            [bh.rccst.views.atom.example.misc.meta-coc-bh-table :as meta-coc-bh-table]
+            [bh.rccst.views.atom.example.misc.worldwind.globe :as ww-globe]))
 
 
 (defn examples
   []
 
   [:div
+   [ww-globe/example]
    [bh-table/example]
    [meta-bh-table/example]
    [meta-coc-bh-table/example]

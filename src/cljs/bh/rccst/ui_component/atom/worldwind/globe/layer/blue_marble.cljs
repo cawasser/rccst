@@ -1,4 +1,4 @@
-(ns bh.rccst.ui-component.atom.globe.worldwind.layer.blue-marble
+(ns bh.rccst.ui-component.atom.worldwind.globe.layer.blue-marble
   (:require ["worldwindjs" :as WorldWind]
             [taoensso.timbre :as log]))
 
