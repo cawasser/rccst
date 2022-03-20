@@ -43,9 +43,9 @@
 
 (defn color
   ([r g b a]
-   (log/info "color" r g b a)
+   ;(log/info "color" r g b a)
    (WorldWind/Color. r g b a))
 
   ([[r g b a]]
-   (log/info "color" r g b a)
+   ;(log/info "color" r g b a)
    (WorldWind/Color. r g b a)))

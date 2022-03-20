@@ -62,7 +62,7 @@
     (first range)
     :<- data
     (fn [d _]
-      [0 (if (:data d) (dec (count (:data d))) 1)])))
+      [0 (dec (count bh.rccst.ui-component.atom.worldwind.globe/sample-data))])))
 
 
 ;; components have "ports" which define their inputs and outputs:

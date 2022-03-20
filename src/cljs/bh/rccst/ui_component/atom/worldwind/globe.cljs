@@ -11,7 +11,8 @@
             [cljs-time.coerce :as coerce]
             [cljs-time.core :as cljs-time]
             [reagent.core :as r]
-            [taoensso.timbre :as log]))
+            [taoensso.timbre :as log]
+            [cljs-uuid-utils.core :as uuid]))
 
 
 (log/info "bh.rccst.ui-component.atom.worldwind.globe")
@@ -20,22 +21,22 @@
 (def DEFAULT_BACKGROUND_COLOR "rgb(36,74,101)")
 
 
-(def sample-data [{:shape      :shape/polygon :locations [[30.0 -130.0] [30.0 -100.0]
-                                                          [0.0 -100.0] [0.0 -130.0]]
+(def sample-data [{:shape      :shape/polygon :id "square"
+                   :locations [[30.0 -130.0] [30.0 -100.0]
+                               [0.0 -100.0] [0.0 -130.0]]
                    :fill-color [1 0 0 0.3] :outline-color [1 0 0 1] :width 2}
-                  {:shape      :shape/polygon :locations [[37 -115.0]
-                                                          [32.0 -115.0]
-                                                          [33.0 -107.0]
-                                                          [31.0 -102.0]
-                                                          [35.0 -102.0]
-                                                          [37.0 -115.0]]
+                  {:shape      :shape/polygon :id "5-sided"
+                   :locations [[37 -115.0] [32.0 -115.0] [33.0 -107.0]
+                               [31.0 -102.0] [35.0 -102.0] [37.0 -115.0]]
                    :fill-color [1 0 0 0.6] :outline-color [1 0 0 1] :width 2}
-                  {:shape :shape/polyline :locations [[35 -75] [35 -125]]
+                  {:shape :shape/polyline :id "line1" :locations [[35 -75] [35 -125]]
                    :outline-color [1 1 0 1.0] :width 5}
-                  {:shape      :shape/circle :location [28.538336 -81.379234] :radius 1000000
+                  {:shape      :shape/circle :id "circle"
+                   :location [28.538336 -81.379234] :radius 1000000
                    :fill-color [0 1 0 0.5] :outline-color [1 1 1 1] :width 2}
-                  {:shape      :shape/circle :location [28.538336 -81.379234] :radius 1000000
-                   :fill-color [0 1 0 0.5] :outline-color [1 1 1 1] :width 2}])
+                  {:shape :shape/polyline :id "line2" :locations [[22 -55] [45 -105] [36 -125.7]]
+                   :outline-color [1 0.5 0.78 1.0] :width 5}])
+
 
 (defn- base-layers [globe-id]
   {(str globe-id " Blue Marble") (blue-marble/blue-marble (str globe-id " Blue Marble"))
@@ -46,24 +47,24 @@
 
 
 (defn- build-child-layer [id children]
-  (log/info "build-child-layer" id children)
+  ;(log/info "build-child-layer" id children)
 
   (let [layer (WorldWind/RenderableLayer.)]
-    (set! (.-displayName layer) (str id " Shapes"))
+    (set! (.-displayName layer) id)
 
     (doall
       (map (fn [child]
-             (log/info "build-child-layer (adding)" child)
+             ;(log/info "build-child-layer (adding)" child)
              (.addRenderable layer (shape/make-shape child)))
         children))
 
-    (log/info "build-child-layer (built)" id (count (.-renderables layer)))
+    ;(log/info "build-child-layer (built)" id (count (.-renderables layer)))
 
-    layer))
+    {id layer}))
 
 
 (defn- globe* [props & children]
-  (log/info "globe*" props children)
+  ;(log/info "globe-render" props children)
 
   (let [state    (atom {:children children})
         dom-node (r/atom nil)]
@@ -98,24 +99,38 @@
             "Your browser does not support HTML5 Canvas."]))})))
 
 
-(defn globe [& {:keys [shapes component-id]}]
-  (log/info "globe" shapes component-id)
+(defn- globe-inter [& {:keys [shapes component-id]}]
+  (let [new-id (str component-id "::" (uuid/uuid-string (uuid/make-random-uuid)))
+        shapes-layer (build-child-layer new-id shapes)
+        s (merge
+            {}
+            (base-layers component-id)
+            shapes-layer)]
 
-  (let [s (h/resolve-value shapes)]
-    (fn [& {:keys [shapes component-id]}]
+    ;(log/info "globe-inter" shapes "//" s "//" (count (.-renderables shapes-layer)))
+
+    [globe*
+     {:id         component-id
+      :min-max    :max
+      :time       (coerce/to-date (cljs-time/now))
+      :projection "3D"
+      :style      {:background-color :black
+                   :width            "100%"
+                   :height           "100%"}}
+     s]))
+
+
+(defn globe [& {:keys [shapes]}]
+
+  (let [s (h/resolve-value shapes)
+        component-id (uuid/uuid-string (uuid/make-random-uuid))]
+    ;(log/info "globe OUTER" shapes component-id)
+
+    (fn []
+      ;(log/info "globe INNER" shapes component-id)
+
       [:div {:style {:width "500px" :height "500px"}}
-       [globe*
-        {:id         component-id
-         :min-max    :max
-         :time       (coerce/to-date (cljs-time/now))
-         :projection "3D"
-         :style      {:background-color :black
-                      :width            "100%"
-                      :height           "100%"}}
-        (merge
-          {}
-          (base-layers component-id)
-          {(str component-id " Shapes") (build-child-layer component-id @s)})]])))
+       [globe-inter :shapes @s :component-id component-id]])))
 
 
 (def meta-data {:ww/globe {:component globe

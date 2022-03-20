@@ -17,9 +17,9 @@
 (defn getLayer [this layer-name]
   (let [layer (.filter (.. this -wwd -layers)
                 #(= (.-displayName %) layer-name))]
-    ;(log/info "getLayer"
-    ;  (.-length layer)
-    ;  (map #(.-displayName %) layer))
+    (log/info "getLayer"
+      (.-length layer)
+      (map #(.-displayName %) layer))
     (first layer)))
 
 
@@ -33,12 +33,12 @@
 
 
 (defn removeLayer [this layer-name]
-  ;(log/info "removeLayer" layer-name)
+  (log/info "removeLayer" layer-name)
 
   (if-let [layer (getLayer this layer-name)]
     (do
       (.removeLayer (.-wwd this) layer)
-      ;(log/info "removed?" (map #(.-displayName %)
-      ;                       (.. this -wwd -layers)))
+      (log/info "removed?" (map #(.-displayName %)
+                             (.. this -wwd -layers)))
       (.redraw (.-wwd this)))))
 

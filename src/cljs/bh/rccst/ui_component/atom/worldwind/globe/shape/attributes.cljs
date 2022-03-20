@@ -9,7 +9,7 @@
 
 (defn attributes [{:keys [fill-color outline-color width]}]
 
-  (log/info "attributes" fill-color "//" outline-color "//" width)
+  ;(log/info "attributes" fill-color "//" outline-color "//" width)
 
   (let [attributes (WorldWind/ShapeAttributes.)]
     (set! (.-interiorColor attributes) (color/color (or fill-color color/default-fill-color)))

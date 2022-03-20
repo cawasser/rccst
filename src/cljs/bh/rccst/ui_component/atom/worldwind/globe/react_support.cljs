@@ -7,7 +7,11 @@
             [bh.rccst.ui-component.atom.worldwind.globe.globe-time :as gt]
             [bh.rccst.ui-component.atom.worldwind.globe.layer :as l]
             [bh.rccst.ui-component.atom.worldwind.globe.layer.controls :as controls]
-            [bh.rccst.ui-component.atom.worldwind.globe.layer.coordinates :as coords]))
+            [bh.rccst.ui-component.atom.worldwind.globe.layer.coordinates :as coords]
+            [taoensso.timbre :as log]))
+
+
+(log/info "bh.rccst.ui-component.atom.worldwind.globe.react-support")
 
 
 (defn update-children [this new-children old-children]
@@ -93,9 +97,9 @@
 
     ;(log/info "component-did-update"
     ;  "old-children" (sort (keys old-children))
-    ;"//// old-props" old-props
-    ;"//// new-children" (sort (keys new-children)))
-    ;"//// new-props" new-props)
+      ;"//// old-props" old-props
+      ;"//// new-children" (sort (keys new-children))
+      ;"//// new-props" new-props)
 
     ;(log/info "projection"
     ;  (:projection old-props)

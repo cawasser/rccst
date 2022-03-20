@@ -11,11 +11,11 @@
 (defmulti make-shape (fn [{:keys [shape]}] shape))
 
 
-(defmethod make-shape :shape/polygon [{:keys [locations
+(defmethod make-shape :shape/polygon [{:keys [id locations
                                               fill-color outline-color
                                               width]}]
 
-  (log/info "polygon" locations "//" fill-color "//" outline-color "//" width)
+  ;(log/info "polygon" locations "//" fill-color "//" outline-color "//" width)
 
   (let [attributes (attributes/attributes
                      {:fill-color    fill-color
@@ -23,34 +23,44 @@
                       :width         width})
         locs       (->> locations
                      (map location/location)
-                     (into-array))]
-    (WorldWind/SurfacePolygon. locs attributes)))
+                     (into-array))
+        polygon    (WorldWind/SurfacePolygon. locs attributes)]
+    (set! (.-displayName polygon) id)
+    polygon))
 
 
-(defmethod make-shape :shape/circle [{:keys [location
+
+(defmethod make-shape :shape/circle [{:keys [id location
                                              fill-color outline-color
                                              width radius]}]
 
-  (log/info "circle" location "//" fill-color "//" outline-color "//" width "//" radius)
+  ;(log/info "circle" location "//" fill-color "//" outline-color "//" width "//" radius)
 
   (let [attributes (attributes/attributes
                      {:fill-color    fill-color
                       :outline-color outline-color
-                      :width         width})]
-    (WorldWind/SurfaceCircle. (location/location location) radius attributes)))
+                      :width         width})
+        circle     (WorldWind/SurfaceCircle. (location/location location)
+                     radius attributes)]
+    (set! (.-displayName circle) id)
+    circle))
 
 
-(defmethod make-shape :shape/polyline [{:keys [locations outline-color width]}]
 
-  (log/info "circle" locations "//" outline-color "//" width)
+(defmethod make-shape :shape/polyline [{:keys [id locations outline-color width]}]
+
+  ;(log/info "circle" locations "//" outline-color "//" width)
 
   (let [attributes (attributes/attributes
                      {:outline-color outline-color
                       :width         width})
         locs       (->> locations
                      (map location/location)
-                     (into-array))]
-    (WorldWind/SurfacePolyline. locs attributes)))
+                     (into-array))
+        polyline   (WorldWind/SurfacePolyline. locs attributes)]
+    (set! (.-displayName polyline) id)
+    polyline))
+
 
 (comment
   (do
