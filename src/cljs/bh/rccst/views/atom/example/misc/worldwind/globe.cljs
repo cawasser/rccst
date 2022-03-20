@@ -9,7 +9,7 @@
   (let [container-id "worldwind-globe-demo"]
     (acu/demo "Worldwind Globe"
       "A 3D globe based on [Nasa WorldWind](https://github.com/WorldWindEarth/worldwindjs)."
-      [layout/centered {:extra-classes :width-50}
+      [layout/centered ;{:extra-classes :width-50}
        [globe/globe
         :shapes globe/sample-data
         :component-id (h/path->keyword container-id "ww-globe")

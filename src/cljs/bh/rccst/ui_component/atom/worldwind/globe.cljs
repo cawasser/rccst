@@ -129,7 +129,7 @@
     (fn []
       ;(log/info "globe INNER" shapes component-id)
 
-      [:div {:style {:width "500px" :height "500px"}}
+      [:div {:style {:width "100%" :height "500px"}}
        [globe-inter :shapes @s :component-id component-id]])))
 
 
