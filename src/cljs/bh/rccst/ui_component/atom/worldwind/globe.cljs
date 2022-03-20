@@ -73,9 +73,9 @@
       {:display-name         (:id props)
 
        :constructor          (fn [this props children]
-                               (log/info "constructor" props
-                                 "////" (r/props this)
-                                 "////" (r/children this))
+                               ;(log/info "constructor" props
+                               ;  "////" (r/props this)
+                               ;  "////" (r/children this))
                                (swap! state assoc
                                  :wwd ()
                                  :canvasId (or (:id (r/props this)) (str "canvas_" (js/Date.now)))
