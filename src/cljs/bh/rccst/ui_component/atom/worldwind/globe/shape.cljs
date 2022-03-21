@@ -8,6 +8,14 @@
 (log/info "bh.rccst.ui-component.atom.worldwind.globe.shape")
 
 
+(defn- wrap-shape [id shape]
+  (let [layer (WorldWind/RenderableLayer.)]
+    (set! (.-displayName layer) id)
+    (.addRenderable layer shape)
+
+    {id layer}))
+
+
 (defmulti make-shape (fn [{:keys [shape]}] shape))
 
 
@@ -26,7 +34,7 @@
                      (into-array))
         polygon    (WorldWind/SurfacePolygon. locs attributes)]
     (set! (.-displayName polygon) id)
-    polygon))
+    (wrap-shape id polygon)))
 
 
 (defmethod make-shape :shape/circle [{:keys [id location
@@ -42,7 +50,7 @@
         circle     (WorldWind/SurfaceCircle. (location/location location)
                      radius attributes)]
     (set! (.-displayName circle) id)
-    circle))
+    (wrap-shape id circle)))
 
 
 (defmethod make-shape :shape/polyline [{:keys [id locations outline-color width]}]
@@ -57,7 +65,7 @@
                      (into-array))
         polyline   (WorldWind/SurfacePolyline. locs attributes)]
     (set! (.-displayName polyline) id)
-    polyline))
+    (wrap-shape id polyline)))
 
 
 

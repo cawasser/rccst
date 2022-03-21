@@ -1,7 +1,11 @@
 (ns bh.rccst.ui-component.atom.resium.globe
-  (:require ["resium" :refer (Viewer CameraFlyTo Globe Entity PolygonGraphics PolylineGraphics PointPrimitive LabelGraphics)]
+  (:require ["resium" :refer (Viewer CameraFlyTo Globe Entity PolygonGraphics PolylineGraphics PointPrimitive LabelGraphics LabelCollection Label)]
             ["cesium" :refer (Cartesian3 Ion Color CircleGeometry LabelStyle)]
+            [bh.rccst.ui-component.atom.resium.shape :as s]
             [taoensso.timbre :as log]))
+
+
+(log/info "bh.rccst.ui-component.atom.resium.globe")
 
 
 (def sample-data [{:shape      :shape/polygon :id "square"
@@ -14,50 +18,13 @@
                    :fill-color [1 0 0 0.6] :outline-color [1 0 0 1] :width 2}
                   {:shape :shape/polyline :id "line1" :locations [[35 -75] [35 -125]]
                    :outline-color [1 1 0 1.0] :width 5}
-                  ;{:shape      :shape/circle :id "circle"
-                  ; :location [28.538336 -81.379234] :radius 1000000
-                  ; :fill-color [0 1 0 0.5] :outline-color [1 1 1 1] :width 2}
+                  {:shape      :shape/circle :id "circle"
+                   :location [28.538336 -81.379234] :radius 1000000
+                   :fill-color [0 1 0 0.5] :outline-color [1 1 1 1] :width 2}
                   {:shape :shape/polyline :id "line2" :locations [[22 -55] [45 -105] [36 -125.7]]
-                   :outline-color [1 0.5 0.78 1.0] :width 5}])
-
-
-(defn- correct-locations
-  "Cesium/Resium locations are [lon lat] while Worldwind locations are [lat lon], so we need this
-  function to do the conversion (easier to go in this direction)
-  "
-  [locations]
-  (->> locations
-    (map (fn [[lat lon]] [lon lat]))
-    flatten))
-
-
-(defmulti make-shape (fn [{:keys [shape]}] shape))
-
-
-(defmethod make-shape :shape/polygon [{:keys [locations fill-color]}]
-  (let [[r b g a] fill-color]
-    [:> Entity
-     [:> PolygonGraphics {:hierarchy (.fromDegreesArray Cartesian3 (clj->js (correct-locations locations)))
-                          :material  (Color. r g b a)}]]))
-
-
-(defmethod make-shape :shape/polyline [{:keys [locations width outline-color]}]
-  (let [[r b g a] outline-color]
-    [:> Entity
-     [:> PolylineGraphics {:positions (.fromDegreesArray Cartesian3 (clj->js (correct-locations locations)))
-                           :width     width
-                           :material  (Color. r g b a)}]]))
-
-
-(defmethod make-shape :shape/label [{:keys [locations label font fill-color outline-color width]}]
-  (let [[r b g a] fill-color]
-    [:> Entity
-     [:> LabelGraphics {:position     (.fromDegrees Cartesian3 -75.1641667 39.9522222)
-                        :label        {:text "Aoi"}
-                        :font         "24px Helvetica"
-                        :fillColor    (Color. r g b a)
-                        :outlineColor (Color. r g b a)
-                        :outlineWidth width}]]))
+                   :outline-color [1 0.5 0.78 1.0] :width 5}
+                  {:shape :shape/label :id "orlando" :location [28.538336 -81.379234] :label "Orlando"
+                   :fill-color [1 0.5 0.78 1.0] :outline-color [1 0.5 0.78 1.0] :width 1}])
 
 
 (defn globe [& {:keys [shapes]}]
@@ -67,9 +34,12 @@
 
   [:> Viewer
    [:> Globe
+    [:> LabelCollection
+     [:> Label {:text "SAMPLE"
+                :position (.fromDegrees Cartesian3 -81 28)}]]
     (into [:<>]
       (doall (map-indexed (fn [idx shape]
-                            ^{:keys idx}(make-shape shape))
+                            ^{:keys idx}(s/make-shape shape))
                shapes)))]])
 
 

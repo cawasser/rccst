@@ -147,3 +147,5 @@ This concept could also be extended by adding a third Event which allows the UI 
 such as when a Table needs another page-worth of data. This event calls the server and puts the result into the same
 `:source` element as the others, so the standard subscription still causes the re-render when the query returns.
 
+Another alternative might be to add a contorl to all UI-components that indicate when the data it "stale"
+and the user can click to get the updated data.

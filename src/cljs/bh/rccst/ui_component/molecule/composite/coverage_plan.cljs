@@ -42,7 +42,9 @@
     (fn [[t s c ct] _]
       (if (or (empty? c) (empty? (:data c)))
         []
-        [(nth bh.rccst.ui-component.atom.worldwind.globe/sample-data ct)]))))
+        ; return "pairs" of shapes at each time-frame
+        (let [part-shapes (partition-all 2 1 bh.rccst.ui-component.atom.worldwind.globe/sample-data)]
+          (nth part-shapes ct))))))
 
 
 (defn fn-range

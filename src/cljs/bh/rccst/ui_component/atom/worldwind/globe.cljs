@@ -101,11 +101,11 @@
 
 (defn- globe-inter [& {:keys [shapes component-id]}]
   (let [new-id (str component-id "::" (uuid/uuid-string (uuid/make-random-uuid)))
-        shapes-layer (build-child-layer new-id shapes)
-        s (merge
-            {}
-            (base-layers component-id)
-            shapes-layer)]
+        shape-layers (->> shapes (map shape/make-shape) (into {}))
+        all-layer (merge
+                    {}
+                    (base-layers component-id)
+                    shape-layers)]
 
     ;(log/info "globe-inter" shapes "//" s "//" (count (.-renderables shapes-layer)))
 
@@ -117,20 +117,23 @@
       :style      {:background-color :black
                    :width            "100%"
                    :height           "100%"}}
-     s]))
+     all-layer]))
 
 
-(defn globe [& {:keys [shapes]}]
+(defn globe [& {:keys [shapes component-id container-id]}]
 
-  (let [s (h/resolve-value shapes)
-        component-id (uuid/uuid-string (uuid/make-random-uuid))]
+  (let [s (h/resolve-value shapes)]
+        ;component-id (uuid/uuid-string (uuid/make-random-uuid))]
     ;(log/info "globe OUTER" shapes component-id)
 
     (fn []
       ;(log/info "globe INNER" shapes component-id)
 
       [:div {:style {:width "100%" :height "500px"}}
-       [globe-inter :shapes @s :component-id component-id]])))
+       [globe-inter
+        :shapes @s
+        :component-id component-id
+        :container-id container-id]])))
 
 
 (def meta-data {:ww/globe {:component globe
