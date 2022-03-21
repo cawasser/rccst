@@ -100,7 +100,7 @@
 (defn relative-luminance
   "computes _relative luminance_ per the [W3C](https://www.w3.org/TR/WCAG20/#relativeluminancedef)
 
-  typically this value is uses to determine the proper color (`:white` or `:black`) ot use with a
+  typically, this value is uses to determine the proper color (`:white` or `:black`) to use with a
   colored background.
 
   ---

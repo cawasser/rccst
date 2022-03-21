@@ -86,7 +86,7 @@
 
   ---
 
-  - containerWidth : (number) with of the container, used to determine if the label shoule be ot the left or right of the rectangle
+  - containerWidth : (number) with of the container, used to determine if the label should be to the left or right of the rectangle
   - fill : (color) color to fill the rectangle
   - stroke : (color) color to use as the outline (stroke) of the rectangle
   - props : (has-map) additional props sent to the reagent/react component by the diagram itself

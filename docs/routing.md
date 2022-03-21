@@ -53,7 +53,7 @@ and wire them to the handler functions.
    1. specifically in that we can use all of clojure.core to manipulate, combine, filter, etc. the routes
    2. and that the data structure exists outside of program execution
       1. i.e., we can examine it even if the program is _NOT_ running
-2. Bi-directional, so we can find a URL form the handler and vice versa
+2. Bi-directional, so we can find a URL from the handler and vice versa
 
 ### Cons
 

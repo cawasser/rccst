@@ -3,6 +3,7 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Develop a More Complex API](#develop-a-more-complex-api)
+  - [Some other considerations](#some-other-considerations)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 

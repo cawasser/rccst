@@ -13,23 +13,22 @@
   needs to implement the correct usage anyway). The flow-diagram, on the other hand, is easier if we DO make the
   distinction, so we can quickly build all the Nodes and Handles used for the diagram...
   "
-  (:require [bh.rccst.ui-component.molecule.composite.util.signals :as sig]
-            [bh.rccst.ui-component.molecule.composite.util.digraph :as dig]
-            [bh.rccst.ui-component.molecule.composite.util.ui :as ui]
-            [bh.rccst.ui-component.molecule.component-layout :as cl]
+  (:require [bh.rccst.ui-component.atom.bh.table :as bh-table]
             [bh.rccst.ui-component.atom.experimental.ui-element :as e]
-            [bh.rccst.ui-component.atom.bh.table :as bh-table]
-            [bh.rccst.ui-component.atom.re-com.table :as rc-table]
             [bh.rccst.ui-component.atom.re-com.label :as rc-label]
             [bh.rccst.ui-component.atom.re-com.slider :as rc-slider]
+            [bh.rccst.ui-component.atom.re-com.table :as rc-table]
             [bh.rccst.ui-component.atom.worldwind.globe :as ww-globe]
+            [bh.rccst.ui-component.molecule.component-layout :as cl]
+            [bh.rccst.ui-component.molecule.composite.util.digraph :as dig]
+            [bh.rccst.ui-component.molecule.composite.util.signals :as sig]
+            [bh.rccst.ui-component.molecule.composite.util.ui :as ui]
             [bh.rccst.ui-component.utils :as ui-utils]
             [day8.re-frame.tracing :refer-macros [fn-traced]]
             [loom.graph :as lg]
             [re-com.core :as rc]
             [re-frame.core :as re-frame]
             [reagent.core :as r]
-            [taoensso.timbre :as log]
             [woolybear.ad.containers :as containers]
             [woolybear.ad.layout :as layout]
             ["dagre" :as dagre]
@@ -50,15 +49,21 @@
     rc-slider/meta-data
     bh-table/meta-data
     ww-globe/meta-data
-    {:table/selectable-table {:component e/selectable-table
+
+    ; "stunt" components to use as stand-ins
+    ;
+    {:stunt/selectable-table {:component e/selectable-table
                               :ports     {:data      :port/source-sink ; out this be {:data-in :port/sink} & {:data-out :port/source}?
                                           :selection :port/source}}
 
-     :globe/three-d-globe    {:component e/three-d-globe
+     :stunt/globe            {:component e/three-d-globe
                               :ports     {:layers       :port/sink
                                           :current-time :port/sink}}
 
-     :slider/slider          {:component e/slider
+     :stunt/label            {:component e/label
+                              :ports     {:value :port/sink}}
+
+     :stunt/slider           {:component e/slider
                               :ports     {:value :port/source-sink
                                           :range :port/sink}}}))
 

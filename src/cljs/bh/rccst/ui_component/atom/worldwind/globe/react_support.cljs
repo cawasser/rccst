@@ -39,8 +39,6 @@
         (.redraw (.-wwd this))))))
 
 
-
-
 (defn component-did-mount [dom-node state this]
   ;(log/info "component-did-mount" @state)
 

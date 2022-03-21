@@ -20,7 +20,7 @@
 
   ---
 
-  - uuid : (string) the uuid that uniquely identified this widget-ish, distinct form _all_ the others.
+  - uuid : (string) the uuid that uniquely identified this widget-ish, distinct from _all_ the others.
 
   > See also:
   >

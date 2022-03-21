@@ -1,3 +1,16 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Possible Refactoring](#possible-refactoring)
+  - [Data Source Metadata](#data-source-metadata)
+    - [Semantic](#semantic)
+    - [Atoms](#atoms)
+    - [Molecules (composed of Atoms)](#molecules-composed-of-atoms)
+    - [Collections (of Molecules)](#collections-of-molecules)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Possible Refactoring
 
 - _clj_

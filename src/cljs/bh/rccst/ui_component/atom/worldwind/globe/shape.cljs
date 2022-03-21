@@ -29,7 +29,6 @@
     polygon))
 
 
-
 (defmethod make-shape :shape/circle [{:keys [id location
                                              fill-color outline-color
                                              width radius]}]
@@ -46,7 +45,6 @@
     circle))
 
 
-
 (defmethod make-shape :shape/polyline [{:keys [id locations outline-color width]}]
 
   ;(log/info "circle" locations "//" outline-color "//" width)
@@ -60,6 +58,8 @@
         polyline   (WorldWind/SurfacePolyline. locs attributes)]
     (set! (.-displayName polyline) id)
     polyline))
+
+
 
 
 (comment

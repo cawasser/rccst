@@ -27,7 +27,7 @@
   `widget-id` is automatically converted into a `keyword`
 
   In cases where there are multiple widgets of the same 'type', using 'locals' keeps each
-  instance's local state away form all the others, so changing the state of one does _not_ change
+  instance's local state away from all the others, so changing the state of one does _not_ change
   them all.
 
   ---

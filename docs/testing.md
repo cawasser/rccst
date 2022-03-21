@@ -34,7 +34,7 @@ It isn't practical in that, as an application grows, the amount of code to perfo
 a problem in the kinds of "toy examples" typical in tutorials or other training materials, but it needs to be seriously 
 considered when building any real production system.
 
-On the other hand, a large, complex production system is just the kind of thing to benefit greatly form having a thorough
+On the other hand, a large, complex production system is just the kind of thing to benefit greatly from having a thorough
 unit testing approach, because large volumes of code tend to harbor large volumes of bugs.
 
 ### Potential Waste in "Test Everything"
