@@ -5,6 +5,7 @@
             [bh.rccst.ui-component.molecule.composite.util.signals :as sig]
             [bh.rccst.ui-component.molecule.composite.util.ui :as ui]
             [bh.rccst.ui-component.utils :as ui-utils]
+            [bh.rccst.ui-component.utils.locals :as locals]
             [loom.graph :as lg]
             [re-com.core :as rc]
             [reagent.core :as r]
@@ -12,6 +13,20 @@
 
 
 (log/info "bh.rccst.ui-component.molecule.grid-widget")
+
+
+(defn- config
+  "set up the local config keys, specifically we want the :layout key, so we can
+  track updates to the layout should the user drag/resize any of the internal
+  components.
+
+  the component-panel will subscribe to this 'local' using (locals/subscribe-local ...) and
+  dispatch updates (via on-layout-update) using (locals/dispatch-local ...)
+  "
+  [full-config]
+  {:blackboard {}
+   :container  ""
+   :layout (:grid-layout full-config)})
 
 
 (defn- build-ui [[id component]]
@@ -31,14 +46,14 @@
      component]]])
 
 
-(defn- on-layout-change [layout-atom new-layout]
+(defn- on-layout-change [component-id new-layout]
   (let [layout (js->clj new-layout :keywordize-keys true)
         fst    (first layout)]
 
-    (log/info "on-layout-change"
+    ;(log/info "on-layout-change")
       ;(js->clj new-layout)
-      "//" @layout-atom
-      "//" layout)
+      ;"//" @layout-atom
+      ;"//" layout)
     ;  "//" fst)
 
     (when (and
@@ -47,7 +62,7 @@
             (not= (:i fst) "null"))
       (let [cooked (map #(zipmap '(:i :x :y :w :h) %)
                      (map (juxt :i :x :y :w :h) layout))]
-        (reset! layout-atom (zipmap (map :i cooked) cooked))))))
+        (locals/dispatch-local component-id [:layout] cooked)))))
 
 
 (defn- component-panel [& {:keys [configuration component-id container-id]}]
@@ -60,8 +75,7 @@
   ;                              configuration :ui/component
   ;                              composite/meta-data-registry component-id)))
 
-  (let [layout           (r/atom (:grid-layout configuration))
-        layout-atom      (atom (:grid-layout configuration))
+  (let [layout           (locals/subscribe-local component-id [:layout])
         components       (:components configuration)
         component-lookup (into {}
                            (sig/process-components
@@ -81,7 +95,7 @@
         :class "layout"
         :children composed-ui
         :layout layout
-        :layoutFn #(on-layout-change layout-atom %)
+        :layoutFn #(on-layout-change component-id %)
         :isDraggable true
         :isResizable true
         :draggableHandle ".grid-toolbar"
@@ -105,7 +119,7 @@
     (fn []
       (when (nil? @id)
         (reset! id component-id)
-        (ui-utils/init-widget @id {:blackboard {} :container ""})
+        (ui-utils/init-widget @id (config full-config))
         (ui-utils/dispatch-local @id [:container] container-id)
         (ui/prep-environment full-config @id composite/meta-data-registry))
 
@@ -113,7 +127,7 @@
                      {:id :dag :label [:i {:class "zmdi zmdi-share"}]}
                      {:id :definition :label [:i {:class "zmdi zmdi-format-subject"}]}]]
 
-        [:div.box {:style {:width  "1000px" :height "800px"}}
+        [:div.box {:style {:width "1000px" :height "800px"}}
          [rc/h-box :src (rc/at)
           :justify :end
           :width "100%"
