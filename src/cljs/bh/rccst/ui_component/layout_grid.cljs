@@ -1,6 +1,5 @@
 (ns bh.rccst.ui-component.layout-grid
-  (:require [taoensso.timbre :as log]
-            ["react-grid-layout" :as ReactGridLayout]))
+  (:require ["react-grid-layout" :as ReactGridLayout]))
 
 
 
@@ -25,16 +24,20 @@
 >
 > [re-com](https://github.com/Day8/re-com)
   "
-  [& {:keys [id children layout layoutFn cols width rowHeight compactType]
-      :as args}]
+  [& {:keys [id children layout layoutFn cols width rowHeight compactType
+             draggableHandle draggableCancel]
+
+      :as   args}]
   ;(log/info "grid" id children layout layoutFn)
-  (into [:> ReactGridLayout {:id             id
-                             :layout         @layout
-                             :compactType    (or compactType nil)
-                             :cols           (or @cols 12)
-                             :width          (or width 600)
-                             :rowHeight      (or rowHeight 25)
-                             :onLayoutChange (or layoutFn #())}]
+  (into [:> ReactGridLayout {:id              id
+                             :layout          @layout
+                             :cols            (or @cols 12)
+                             :width           (or width 600)
+                             :draggableHandle (or draggableHandle "")
+                             :draggableCancel (or draggableCancel "")
+                             :rowHeight       (or rowHeight 25)
+                             :onLayoutChange  (or layoutFn #())
+                             :compactType     (or compactType :vertical)}]
     children))
 
 

@@ -1,0 +1,34 @@
+.widget {
+  overflow: hidden;
+}
+
+.widget .title-wrapper {
+    width: 100%;
+}
+.widget .title-wrapper .title {
+    padding: 10px;
+}
+
+.widget-parent {
+        display: flex;
+        overflow: hidden;
+        flex-flow: column;
+        height: 100%;
+}
+
+.widget-banner {
+                flex: 0 1 auto;
+}
+
+.widget-content {
+                 overflow: hidden;
+                 flex: 1 1 auto;
+}
+
+.move-cursor {
+    cursor:move;
+}
+
+.menu-cursor {
+    cursor:context-menu;
+}

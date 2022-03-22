@@ -142,7 +142,13 @@
                             :layout       [:v-box
                                            [[:h-box
                                              [[:v-box [:ui/targets :ui/satellites :ui/time-slider]]
-                                              [:v-box [:ui/globe :ui/current-time]]]]]]}))
+                                              [:v-box [:ui/globe :ui/current-time]]]]]]
+
+                            :grid-layout [{:i :ui/targets :x 0 :y 0 :w 6 :h 7}
+                                          {:i :ui/satellites :x 0 :y 7 :w 6 :h 8}
+                                          {:i :ui/time-slider :x 0 :y 14 :w 6 :h 2}
+                                          {:i :ui/globe :x 6 :y 0 :w 6 :h 15}
+                                          {:i :ui/current-time :x 6 :y 15 :w 6 :h 2}]}))
 
 
 
