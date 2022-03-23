@@ -8,7 +8,8 @@
 (log/info "bh.rccst.ui-component.atom.resium.globe")
 
 
-(def sample-data [{:shape      :shape/polygon :id "square"
+(def sample-data [
+                  {:shape      :shape/polygon :id "square"
                    :locations [[30.0 -130.0] [30.0 -100.0]
                                [0.0 -100.0] [0.0 -130.0]]
                    :fill-color [1 0 0 0.3] :outline-color [1 0 0 1] :width 2}
@@ -34,9 +35,9 @@
 
   [:> Viewer
    [:> Globe
-    [:> LabelCollection
-     [:> Label {:text "SAMPLE"
-                :position (.fromDegrees Cartesian3 -81 28)}]]
+    ;[:> LabelCollection
+    ; [:> Label {:text "SAMPLE"
+    ;            :position (.fromDegrees Cartesian3 -81 28)}]]
     (into [:<>]
       (doall (map-indexed (fn [idx shape]
                             ^{:keys idx}(s/make-shape shape))

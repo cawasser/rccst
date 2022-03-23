@@ -21,6 +21,12 @@
   [lon lat])
 
 
+(defn- cartesian3
+  ([[lon lat]] (.fromDegrees Cartesian3 lon lat))
+
+  ([lon lat] (.fromDegrees Cartesian3 lon lat)))
+
+
 (defmulti make-shape (fn [{:keys [shape]}] shape))
 
 
@@ -40,30 +46,26 @@
 
 
 (defmethod make-shape :shape/circle [{:keys [location radius fill-color outline-color width]}]
-  (log/info "make-shape :shape/circle" location radius fill-color outline-color width)
   (let [[f-r f-g f-b f-a] fill-color
         [o-r o-g o-b o-a] outline-color]
-    [:> Entity
-     [:> EllipseGraphics {:position (.fromDegrees Cartesian3 -111.0, 40.0, 150000.0)
-                          ;:position      ((fn [[lon lat]]
-                          ;                  (.fromDegrees Cartesian3 lon lat 100))
-                          ;                (clj->js (correct-location location)))
-                          :semiMajorAxis 300000.0
-                          :semiMinorAxis 300000.0
-                          ;:outlineWidth  width
-                          ;:outlineColor  (Color. o-r o-g o-b o-a)
-                          :outline       true}]]))
-                          ;:material      (.-GREEN Color)}]])) ;(Color. f-r f-g f-b f-a)}}]]))
+    [:> Entity {:position (cartesian3 (correct-location location))}
+     [:> EllipseGraphics {:semiMajorAxis radius
+                          :semiMinorAxis radius
+                          :outlineColor  (Color. o-r o-g o-b o-a)
+                          :outline       true
+                          :material      (Color. f-r f-g f-b f-a)}]])) ;(Color. f-r f-g f-b f-a)}}]]))
+
 
 (defmethod make-shape :shape/label [{:keys [location label font fill-color outline-color width]}]
-  (let [[r g b a] fill-color]
-    [:> Entity
-     [:> LabelGraphics {:position     (.fromDegrees Cartesian3 -81 27)
-                        :label        "Orlando"}]]))
-                        ;:font         "24px Helvetica"}]]))
-                        ;:fillColor    (Color. r g b a)
-                        ;:outlineColor (Color. r g b a)
-                        ;:outlineWidth width}]]))
+  (let [[f-r f-g f-b f-a] fill-color
+        [o-r o-g o-b o-a] outline-color]
+    [:> Entity {:position (cartesian3 (correct-location location))}
+     [:> LabelGraphics {:label        label
+                        :font         (or font "24px Helvetica")
+                        :fillColor    (Color. f-r f-g f-b f-a)
+                        :outlineColor (Color. o-r o-g o-b o-a)
+                        :outlineWidth width
+                        :show         true}]]))
 
 
 (defmethod make-shape :default [_]
