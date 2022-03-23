@@ -1,5 +1,5 @@
-(ns bh.rccst.ui-component.layout-grid
-  (:require ["react-grid-layout" :as ReactGridLayout]))
+(ns bh.rccst.ui-component.atom.layout.grid
+  (:require ["react-grid-layout" :as GridLayout]))
 
 
 
@@ -24,20 +24,26 @@
 >
 > [re-com](https://github.com/Day8/re-com)
   "
-  [& {:keys [id children layout layoutFn cols width rowHeight compactType
-             draggableHandle draggableCancel]
+  [& {:keys [id children layout layoutFn widthFn
+             cols width rowHeight compactType
+             draggableHandle draggableCancel
+             isDraggable isResizable]
 
       :as   args}]
   ;(log/info "grid" id children layout layoutFn)
-  (into [:> ReactGridLayout {:id              id
-                             :layout          @layout
-                             :cols            (or @cols 12)
-                             :width           (or width 600)
-                             :draggableHandle (or draggableHandle "")
-                             :draggableCancel (or draggableCancel "")
-                             :rowHeight       (or rowHeight 25)
-                             :onLayoutChange  (or layoutFn #())
-                             :compactType     (or compactType :vertical)}]
+  (into [:> GridLayout {:id              id
+                        :layout          @layout
+                        :cols            (or @cols 12)
+                        :width           (or width 600)
+                        :rowHeight       (or rowHeight 25)
+                        :onLayoutChange  (or layoutFn #())
+                        :onWidthChange   (or widthFn #())
+                        :isDraggable     (or isDraggable true)
+                        :isResizable     (or isResizable true)
+                        :draggableHandle (or draggableHandle ".grid-toolbar")
+                        :draggableCancel (or draggableCancel ".grid-content")
+                        :compactType     (or compactType :vertical)}]
     children))
+
 
 

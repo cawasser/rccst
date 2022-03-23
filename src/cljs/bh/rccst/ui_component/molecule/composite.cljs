@@ -176,8 +176,7 @@
     (fn [& {:keys [configuration component-id container-id]}]
 
       ; 5. return the composed component layout!
-      [:div {:style {:width "1000px" :height "100%"}}
-       composed-ui])))
+      composed-ui)))
 ;[stand-in components]])))
 
 
@@ -211,7 +210,7 @@
         [rc/h-box :src (rc/at)
          :width "1000px"
          :height "800px"
-         :justify :end
+         :justify :around                                   ;:end
          :children [(condp = @comp-or-dag?
                       :dag [dag-panel
                             :configuration full-config

@@ -26,7 +26,7 @@
         [example/component-example
          :title "Coverage Plan"
          :widget-id container-id
-         :description "First exercise in our new COMPOSABLE UI"
+         :description "First exercise in our new COMPOSABLE UI. Constructs 'coverage-plan', drawing the layout from `:layout` which uses `:v-box` and `:h-box`."
          :data coverage-plan/ui-definition
          :component composite/component
          :component-id (ui-utils/path->keyword container-id "component")

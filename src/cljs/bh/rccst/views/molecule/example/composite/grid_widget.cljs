@@ -20,7 +20,7 @@
     (fn []
       (if (and @logged-in? @pub-sub-started?)
         (acu/demo "Widget using a Grid for layout"
-          "This experiment uses a GRID to layout the various ui components that make up the 'composite'"
+          "This experiment uses a GRID to layout the various UI components that make up the 'composite'.  Constructs 'coverage-plan', drawing the layout from `:grid-layout` which provides X/Y/W/H for each component on the widget's internal grid."
           [layout/frame
            [grid/component
             :data plan/ui-definition

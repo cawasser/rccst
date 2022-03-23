@@ -66,8 +66,8 @@
     (fn []
       ;(log/info "meta-table" data "//" @d "//" (:data @d) "//" (count (:data @d)))
       (let [coc? (r/atom false)]
-        [:div.card {:style  {:width (or width "90%") :height (or height "100%")
-                             :margin :auto}}
+        [:div.card {:style {:width  (or width "90%") :height (or height "100%")
+                            :margin :auto}}
          [rc/h-box :src (rc/at)
           :gap "2px"
           :children [[table*
@@ -89,6 +89,7 @@
                                   :on-click #(swap! coc? not)]
                          :popover [rc/popover-content-wrapper :src (rc/at)
                                    :title "Chain-of-Custody"
+                                   ;:no-clip? true
                                    :body [table*
                                           :data (:c-o-c @d)
                                           :max-rows 3]]]])]]]))))
@@ -118,8 +119,8 @@
        :row-line-color row-line-color])))
 
 
-(def meta-data {:rc/table      {:component table
-                                :ports     {:data :port/sink}}})
+(def meta-data {:rc/table {:component table
+                           :ports     {:data :port/sink}}})
 
 
 (comment

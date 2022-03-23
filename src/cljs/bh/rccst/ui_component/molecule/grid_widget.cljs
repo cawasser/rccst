@@ -1,5 +1,5 @@
 (ns bh.rccst.ui-component.molecule.grid-widget
-  (:require [bh.rccst.ui-component.layout-grid :as grid]
+  (:require [bh.rccst.ui-component.atom.layout.grid :as grid]
             [bh.rccst.ui-component.molecule.composite :as composite]
             [bh.rccst.ui-component.molecule.composite.util.digraph :as dig]
             [bh.rccst.ui-component.molecule.composite.util.signals :as sig]
@@ -29,39 +29,51 @@
    :layout (:grid-layout full-config)})
 
 
-(defn- build-ui [[id component]]
+(defn- wrap-component [[id component]]
 
-  (log/info "build-ui" id)
+  (log/info "wrap-component" id)
 
   [:div.widget-parent {:key id}
    [:div.grid-toolbar (name id)]
    [:div.widget.widget-content
-    {:style         {:width       "100%"
-                     :height      "100%"
+    {:style         {;:width       "100%"
+                     ;:height      "100%"
                      :cursor      :default
                      :align-items :stretch
                      :display     :flex}
      :on-mouse-down #(.stopPropagation %)}
-    [:div {:style {:width "100%" :height "100%" :display :flex}}
-     component]]])
+    component]])
 
 
-(defn- on-layout-change [component-id new-layout]
-  (let [layout (js->clj new-layout :keywordize-keys true)
-        fst    (first layout)]
+(defn- on-width-update [width margin cols padding]
+  "
+  ---
 
-    ;(log/info "on-layout-change")
-      ;(js->clj new-layout)
-      ;"//" @layout-atom
-      ;"//" layout)
-    ;  "//" fst)
+  - width : (number) new width of the container
+  - margin : (vector) margin [left? right?]
+  - cols : (number) number of columns
+  - padding : (vector) padding [left? right?]
+  "
+
+  (log/info "on-width-update" width "//" margin "//" cols "//"padding)
+  ())
+
+
+(defn- on-layout-change [component-id new-layout all-layouts]
+  (let [new-layout* (js->clj new-layout :keywordize-keys true)
+        all-layouts* (js->clj all-layouts :keywordize-keys true)
+        fst    (first new-layout*)]
+
+    (log/info "on-layout-change" new-layout*
+      "//" all-layouts*
+      "//" (keys all-layouts*))
 
     (when (and
-            (not (empty? layout))
-            (<= 1 (count layout))
+            (not (empty? new-layout*))
+            (<= 1 (count new-layout*))
             (not= (:i fst) "null"))
       (let [cooked (map #(zipmap '(:i :x :y :w :h) %)
-                     (map (juxt :i :x :y :w :h) layout))]
+                     (map (juxt :i :x :y :w :h) new-layout*))]
         (locals/dispatch-local component-id [:layout] cooked)))))
 
 
@@ -83,9 +95,11 @@
                              composite/meta-data-registry component-id))
 
         ; 1. build UI components (with subscription/event signals against the blackboard or remotes)
-        composed-ui      (map build-ui component-lookup)]
+        composed-ui      (map wrap-component component-lookup)]
 
-    ;(log/info "component-panel INNER" component-id "//" composed-ui)
+    ;(log/info "component-panel INNER" component-id
+    ;  "//" @layout
+    ;  "//" composed-ui)
 
     (fn []
       ; 5. return the composed component layout!
@@ -95,14 +109,11 @@
         :class "layout"
         :children composed-ui
         :layout layout
-        :layoutFn #(on-layout-change component-id %)
-        :isDraggable true
-        :isResizable true
-        :draggableHandle ".grid-toolbar"
-        :draggableCancel ".grid-content"
         :cols (r/atom 12)
+        :width 900
         :rowHeight 25
-        :compactType :vertical]])))
+        :layoutFn #(on-layout-change component-id %1 %2)
+        :widthFn #(on-width-update %1 %2 %3 %4)]])))
 
 
 (defn component [& {:keys [data component-id container-id]}]

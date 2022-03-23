@@ -17,7 +17,7 @@
      :model (h/resolve-value value)
      :min min
      :max max
-     :width (or width "300px")
+     ;:width (or width "100%")
      :on-change #(h/handle-change value (js/parseInt %))
      :disabled? (or disabled? false)]))
 
