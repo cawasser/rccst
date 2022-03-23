@@ -102,7 +102,7 @@
             "Your browser does not support HTML5 Canvas."]))})))
 
 
-(defn- globe-inter [& {:keys [shapes component-id]}]
+(defn- globe-inter [& {:keys [shapes time component-id]}]
   (let [shape-layers (->> shapes (map shape/make-shape) (into {}))
         all-layer    (merge
                        {}
@@ -122,9 +122,10 @@
      all-layer]))
 
 
-(defn globe [& {:keys [shapes component-id container-id]}]
+(defn globe [& {:keys [shapes time component-id container-id]}]
 
-  (let [s (h/resolve-value shapes)]
+  (let [s (h/resolve-value shapes)
+        t (h/resolve-value time)]
     ;(log/info "globe OUTER" shapes component-id)
 
     (fn []
@@ -132,6 +133,7 @@
 
       [globe-inter
        :shapes @s
+       :time @t
        :component-id component-id
        :container-id container-id])))
 

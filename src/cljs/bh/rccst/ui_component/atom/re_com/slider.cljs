@@ -17,7 +17,8 @@
      :model (h/resolve-value value)
      :min min
      :max max
-     ;:width (or width "100%")
+     :parts {:wrapper {:style {:width "90%"}}}
+     :width (or width "100%")
      :on-change #(h/handle-change value (js/parseInt %))
      :disabled? (or disabled? false)]))
 

@@ -147,7 +147,7 @@
                             :grid-layout [{:i :ui/targets :x 0 :y 0 :w 4 :h 7}
                                           {:i :ui/satellites :x 0 :y 7 :w 4 :h 8}
                                           {:i :ui/time-slider :x 0 :y 15 :w 4 :h 2}
-                                          {:i :ui/globe :x 4 :y 0 :w 8 :h 15}
+                                          {:i :ui/globe :x 4 :y 0 :w 7 :h 15}
                                           {:i :ui/current-time :x 4 :y 15 :w 5 :h 2}]}))
 
 

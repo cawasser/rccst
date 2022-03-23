@@ -2,6 +2,7 @@
   (:require ["resium" :refer (Viewer CameraFlyTo Globe Entity PolygonGraphics PolylineGraphics PointPrimitive LabelGraphics LabelCollection Label)]
             ["cesium" :refer (Cartesian3 Ion Color CircleGeometry LabelStyle)]
             [bh.rccst.ui-component.atom.resium.shape :as s]
+            [bh.rccst.ui-component.utils.helpers :as h]
             [taoensso.timbre :as log]))
 
 
@@ -28,17 +29,19 @@
                    :fill-color [1 0.9 0.0 1.0] :outline-color [1 0.9 0.0 1.0] :width 1}])
 
 
-(defn globe [& {:keys [shapes]}]
+(defn globe [& {:keys [shapes time component-id container-id]}]
   ;(log/info "resium Globe" shapes)
 
   (set! (.-defaultAccessToken Ion) "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJkYWNiMDFiNy1iYzFiLTQ2NDMtYmJlNC0zMjRiNTIzMjM5ODQiLCJpZCI6ODQ1MDAsImlhdCI6MTY0NjMyODY1Mn0.Nax1YEWqQzM_eOqHPhblhU9TO9U42VJn4wCcolAkuhM")
 
-  [:> Viewer
-   [:> Globe
-    (into [:<>]
-      (doall (map-indexed (fn [idx shape]
-                            ^{:keys idx}(s/make-shape shape))
-               shapes)))]])
+  (let [s (h/resolve-value shapes)
+        t (h/resolve-value time)]
+    ;(log/info "globe OUTER" shapes component-id)
+    (fn []
+      [:> Viewer ;{:style {:width "100%" :height "100%"}}
+       [:> Globe
+        (into [:<>]
+          (doall (map s/make-shape @s)))]])))
 
 
 

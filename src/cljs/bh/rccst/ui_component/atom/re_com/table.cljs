@@ -38,7 +38,8 @@
      :max-rows (or max-rows (count data))
      :table-row-line-color (or row-line-color "#00fff0")
      :on-click-row (or on-click-row-fn #())
-     :cell-style (or cell-style-fn #())]))
+     :cell-style (or cell-style-fn #())
+     :parts {:simple-wrapper {:style {:border false}}}]))
 
 
 (defn- non-meta-table [& {:keys [data max-rows width height cell-style-fn

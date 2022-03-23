@@ -179,7 +179,6 @@
 
       ; 5. return the composed component layout!
       composed-ui)))
-;[stand-in components]])))
 
 
 (defn component

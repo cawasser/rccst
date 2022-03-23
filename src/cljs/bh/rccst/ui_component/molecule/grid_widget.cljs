@@ -88,7 +88,6 @@
   ;                              composite/meta-data-registry component-id)))
 
   (let [layout           (locals/subscribe-local component-id [:layout])
-        components       (:components configuration)
         component-lookup (into {}
                            (sig/process-components
                              configuration :ui/component

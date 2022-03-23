@@ -118,8 +118,8 @@
 
 (defn parse-token [lookup token]
   (condp = token
-    :v-box [rc/v-box :src (rc/at) :gap "10px"]
-    :h-box [rc/h-box :src (rc/at) :gap "10px"]
+    :v-box [rc/v-box :src (rc/at) :gap "10px" :max-width "1000px" :max-height "700px"]
+    :h-box [rc/h-box :src (rc/at) :gap "10px" :max-width "1000px" :max-height "700px"]
     (or (get lookup token)
       [rc/alert-box :src (rc/at)
        :alert-type :warning

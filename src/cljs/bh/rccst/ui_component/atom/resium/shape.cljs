@@ -30,50 +30,50 @@
 (defmulti make-shape (fn [{:keys [shape]}] shape))
 
 ; :shape/polygon
-(defmethod make-shape :shape/polygon [{:keys [locations fill-color outline-color width]}]
+(defmethod make-shape :shape/polygon [{:keys [id locations fill-color outline-color width]}]
   (let [[f-r f-g f-b f-a] fill-color
         [o-r o-g o-b o-a] outline-color]
-    [:> Entity
-     [:> PolygonGraphics {:hierarchy    (.fromDegreesArray Cartesian3 (clj->js (correct-locations locations)))
-                          :outlineColor (Color. o-r o-g o-b o-a)
-                          :outlineWidth width
-                          :outline      true
-                          :material     (Color. f-r f-g f-b f-a)}]]))
+    ^{:key id} [:> Entity
+                [:> PolygonGraphics {:hierarchy    (.fromDegreesArray Cartesian3 (clj->js (correct-locations locations)))
+                                     :outlineColor (Color. o-r o-g o-b o-a)
+                                     :outlineWidth width
+                                     :outline      true
+                                     :material     (Color. f-r f-g f-b f-a)}]]))
 
 
 ; :shape/polyline
-(defmethod make-shape :shape/polyline [{:keys [locations width outline-color]}]
+(defmethod make-shape :shape/polyline [{:keys [id locations width outline-color]}]
   (let [[r g b a] outline-color]
-    [:> Entity
-     [:> PolylineGraphics {:positions (.fromDegreesArray Cartesian3 (clj->js (correct-locations locations)))
-                           :width     width
-                           :material  (Color. r g b a)}]]))
+    ^{:key id} [:> Entity
+                [:> PolylineGraphics {:positions (.fromDegreesArray Cartesian3 (clj->js (correct-locations locations)))
+                                      :width     width
+                                      :material  (Color. r g b a)}]]))
 
 
 ; :shape/circle
-(defmethod make-shape :shape/circle [{:keys [location radius fill-color outline-color width]}]
+(defmethod make-shape :shape/circle [{:keys [id location radius fill-color outline-color width]}]
   (let [[f-r f-g f-b f-a] fill-color
         [o-r o-g o-b o-a] outline-color]
-    [:> Entity {:position (cartesian3 (correct-location location))}
-     [:> EllipseGraphics {:semiMajorAxis radius
-                          :semiMinorAxis radius
-                          :outlineColor  (Color. o-r o-g o-b o-a)
-                          :outlineWidth  width
-                          :outline       true
-                          :material      (Color. f-r f-g f-b f-a)}]]))
+    ^{:key id} [:> Entity {:position (cartesian3 (correct-location location))}
+                [:> EllipseGraphics {:semiMajorAxis radius
+                                     :semiMinorAxis radius
+                                     :outlineColor  (Color. o-r o-g o-b o-a)
+                                     :outlineWidth  width
+                                     :outline       true
+                                     :material      (Color. f-r f-g f-b f-a)}]]))
 
 
 ; :shape/label
-(defmethod make-shape :shape/label [{:keys [label location font fill-color outline-color width]}]
+(defmethod make-shape :shape/label [{:keys [id label location font fill-color outline-color width]}]
   (let [[f-r f-g f-b f-a] fill-color
         [o-r o-g o-b o-a] outline-color]
-    [:> Entity {:position (cartesian3 (correct-location location))}
-     [:> LabelGraphics {:text         label
-                        :font         (or font "24px Helvetica")
-                        :fillColor    (Color. f-r f-g f-b f-a)
-                        :outlineColor (Color. o-r o-g o-b o-a)
-                        :outlineWidth width
-                        :show         true}]]))
+    ^{:key id}  [:> Entity {:position (cartesian3 (correct-location location))}
+                 [:> LabelGraphics {:text         label
+                                    :font         (or font "24px Helvetica")
+                                    :fillColor    (Color. f-r f-g f-b f-a)
+                                    :outlineColor (Color. o-r o-g o-b o-a)
+                                    :outlineWidth width
+                                    :show         true}]]))
 
 
 (defmethod make-shape :default [_]
