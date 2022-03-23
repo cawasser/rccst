@@ -25,7 +25,7 @@
 
   ;(log/info "polygon" locations "//" fill-color "//" outline-color "//" width)
 
-  (let [attributes (attributes/attributes
+  (let [attributes (attributes/shape-attributes
                      {:fill-color    fill-color
                       :outline-color outline-color
                       :width         width})
@@ -43,7 +43,7 @@
 
   ;(log/info "circle" location "//" fill-color "//" outline-color "//" width "//" radius)
 
-  (let [attributes (attributes/attributes
+  (let [attributes (attributes/shape-attributes
                      {:fill-color    fill-color
                       :outline-color outline-color
                       :width         width})
@@ -57,7 +57,7 @@
 
   ;(log/info "circle" locations "//" outline-color "//" width)
 
-  (let [attributes (attributes/attributes
+  (let [attributes (attributes/shape-attributes
                      {:outline-color outline-color
                       :width         width})
         locs       (->> locations
@@ -67,6 +67,18 @@
     (set! (.-displayName polyline) id)
     (wrap-shape id polyline)))
 
+
+(defmethod make-shape :shape/label [{:keys [id label location fill-color outline-color width]}]
+
+  (log/info "label" location "//" label "//" fill-color "//" width)
+
+  (let [label      (WorldWind/GeographicText. (location/position location) label)
+        attributes (attributes/text-attributes
+                     {:fill-color fill-color
+                      :outline-color outline-color
+                      :width         width})]
+    (set! (.-attributes label) attributes)
+    (wrap-shape id label)))
 
 
 

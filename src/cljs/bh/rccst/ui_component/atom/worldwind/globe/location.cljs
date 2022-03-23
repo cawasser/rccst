@@ -10,5 +10,15 @@
    (WorldWind/Location. lat lon)))
 
 
+(defn position
+  ([[lat lon]]
+   (WorldWind/Position. lat lon 100))
+
+  ([lat lon]
+   (WorldWind/Position. lat lon 100)))
+
+
+
+
 
 

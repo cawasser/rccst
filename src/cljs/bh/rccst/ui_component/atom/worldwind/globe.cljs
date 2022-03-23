@@ -21,7 +21,8 @@
 (def DEFAULT_BACKGROUND_COLOR "rgb(36,74,101)")
 
 
-(def sample-data [{:shape      :shape/polygon :id "square"
+(def sample-data [
+                  {:shape      :shape/polygon :id "square"
                    :locations  [[30.0 -130.0] [30.0 -100.0]
                                 [0.0 -100.0] [0.0 -130.0]]
                    :fill-color [1 0 0 0.3] :outline-color [1 0 0 1] :width 2}
@@ -35,7 +36,9 @@
                    :location   [28.538336 -81.379234] :radius 1000000
                    :fill-color [0 1 0 0.5] :outline-color [1 1 1 1] :width 2}
                   {:shape         :shape/polyline :id "line2" :locations [[22 -55] [45 -105] [36 -125.7]]
-                   :outline-color [1 0.5 0.78 1.0] :width 5}])
+                   :outline-color [1 0.5 0.78 1.0] :width 5}
+                  {:shape :shape/label :id "orlando" :location [28.538336 -81.379234] :label "Orlando"
+                   :fill-color [1 0.9 0.0 1.0] :outline-color [1 0.9 0.0 1.0] :width 1}])
 
 
 (defn- base-layers [globe-id]

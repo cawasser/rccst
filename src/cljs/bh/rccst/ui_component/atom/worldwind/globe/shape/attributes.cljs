@@ -7,7 +7,7 @@
 (log/info "bh.rccst.ui-component.atom.worldwind.globe.shape.attributes")
 
 
-(defn attributes [{:keys [fill-color outline-color width]}]
+(defn shape-attributes [{:keys [fill-color outline-color width]}]
 
   ;(log/info "attributes" fill-color "//" outline-color "//" width)
 
@@ -19,8 +19,16 @@
     attributes))
 
 
-(comment
-  (color/color [0.0 0.5 0.0 0.3])
+(defn text-attributes [{:keys [fill-color outline-color width]}]
+
+  ;(log/info "attributes" fill-color "//" outline-color "//" width)
+
+  (let [attributes (WorldWind/TextAttributes.)]
+    (set! (.-color attributes) (color/color (or fill-color color/default-fill-color)))
+    (set! (.-outlineColor attributes) (color/color (or outline-color color/default-outline-color)))
+    (set! (.-outlineWidth attributes) (or width color/default-width))
+    (set! (.-depthTest attributes) false)
+
+    attributes))
 
 
-  ())

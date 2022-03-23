@@ -25,7 +25,7 @@
                   {:shape :shape/polyline :id "line2" :locations [[22 -55] [45 -105] [36 -125.7]]
                    :outline-color [1 0.5 0.78 1.0] :width 5}
                   {:shape :shape/label :id "orlando" :location [28.538336 -81.379234] :label "Orlando"
-                   :fill-color [1 0.5 0.78 1.0] :outline-color [1 0.5 0.78 1.0] :width 1}])
+                   :fill-color [1 0.9 0.0 1.0] :outline-color [1 0.9 0.0 1.0] :width 1}])
 
 
 (defn globe [& {:keys [shapes]}]
@@ -35,9 +35,6 @@
 
   [:> Viewer
    [:> Globe
-    ;[:> LabelCollection
-    ; [:> Label {:text "SAMPLE"
-    ;            :position (.fromDegrees Cartesian3 -81 28)}]]
     (into [:<>]
       (doall (map-indexed (fn [idx shape]
                             ^{:keys idx}(s/make-shape shape))
