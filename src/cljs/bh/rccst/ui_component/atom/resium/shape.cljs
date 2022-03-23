@@ -29,14 +29,19 @@
 
 (defmulti make-shape (fn [{:keys [shape]}] shape))
 
-
-(defmethod make-shape :shape/polygon [{:keys [locations fill-color]}]
-  (let [[r b g a] fill-color]
+; :shape/polygon
+(defmethod make-shape :shape/polygon [{:keys [locations fill-color outline-color width]}]
+  (let [[f-r f-g f-b f-a] fill-color
+        [o-r o-g o-b o-a] outline-color]
     [:> Entity
-     [:> PolygonGraphics {:hierarchy (.fromDegreesArray Cartesian3 (clj->js (correct-locations locations)))
-                          :material  (Color. r g b a)}]]))
+     [:> PolygonGraphics {:hierarchy    (.fromDegreesArray Cartesian3 (clj->js (correct-locations locations)))
+                          :outlineColor (Color. o-r o-g o-b o-a)
+                          :outlineWidth width
+                          :outline      true
+                          :material     (Color. f-r f-g f-b f-a)}]]))
 
 
+; :shape/polyline
 (defmethod make-shape :shape/polyline [{:keys [locations width outline-color]}]
   (let [[r g b a] outline-color]
     [:> Entity
@@ -45,6 +50,7 @@
                            :material  (Color. r g b a)}]]))
 
 
+; :shape/circle
 (defmethod make-shape :shape/circle [{:keys [location radius fill-color outline-color width]}]
   (let [[f-r f-g f-b f-a] fill-color
         [o-r o-g o-b o-a] outline-color]
@@ -52,15 +58,17 @@
      [:> EllipseGraphics {:semiMajorAxis radius
                           :semiMinorAxis radius
                           :outlineColor  (Color. o-r o-g o-b o-a)
+                          :outlineWidth  width
                           :outline       true
-                          :material      (Color. f-r f-g f-b f-a)}]])) ;(Color. f-r f-g f-b f-a)}}]]))
+                          :material      (Color. f-r f-g f-b f-a)}]]))
 
 
+; :shape/label
 (defmethod make-shape :shape/label [{:keys [label location font fill-color outline-color width]}]
   (let [[f-r f-g f-b f-a] fill-color
         [o-r o-g o-b o-a] outline-color]
     [:> Entity {:position (cartesian3 (correct-location location))}
-     [:> LabelGraphics {:text        label
+     [:> LabelGraphics {:text         label
                         :font         (or font "24px Helvetica")
                         :fillColor    (Color. f-r f-g f-b f-a)
                         :outlineColor (Color. o-r o-g o-b o-a)
