@@ -56,11 +56,11 @@
                           :material      (Color. f-r f-g f-b f-a)}]])) ;(Color. f-r f-g f-b f-a)}}]]))
 
 
-(defmethod make-shape :shape/label [{:keys [location label font fill-color outline-color width]}]
+(defmethod make-shape :shape/label [{:keys [text location font fill-color outline-color width]}]
   (let [[f-r f-g f-b f-a] fill-color
         [o-r o-g o-b o-a] outline-color]
     [:> Entity {:position (cartesian3 (correct-location location))}
-     [:> LabelGraphics {:label        label
+     [:> LabelGraphics {:text        text
                         :font         (or font "24px Helvetica")
                         :fillColor    (Color. f-r f-g f-b f-a)
                         :outlineColor (Color. o-r o-g o-b o-a)
