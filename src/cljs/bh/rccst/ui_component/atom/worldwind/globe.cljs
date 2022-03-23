@@ -137,7 +137,8 @@
 
 
 (def meta-data {:ww/globe {:component globe
-                           :ports     {:shapes :port/sink}}})
+                           :ports     {:shapes :port/sink
+                                       :time :port/sink}}})
 
 
 (comment

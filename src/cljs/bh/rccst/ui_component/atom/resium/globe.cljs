@@ -42,6 +42,10 @@
 
 
 
+(def meta-data {:r/globe {:component globe
+                          :ports     {:shapes :port/sink
+                                      :time :port/sink}}})
+
 
 (comment
   (def shapes example-shapes)

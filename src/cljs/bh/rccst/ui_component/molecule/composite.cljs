@@ -19,6 +19,7 @@
             [bh.rccst.ui-component.atom.re-com.slider :as rc-slider]
             [bh.rccst.ui-component.atom.re-com.table :as rc-table]
             [bh.rccst.ui-component.atom.worldwind.globe :as ww-globe]
+            [bh.rccst.ui-component.atom.resium.globe :as r-globe]
             [bh.rccst.ui-component.molecule.component-layout :as cl]
             [bh.rccst.ui-component.molecule.composite.util.digraph :as dig]
             [bh.rccst.ui-component.molecule.composite.util.signals :as sig]
@@ -49,6 +50,7 @@
     rc-slider/meta-data
     bh-table/meta-data
     ww-globe/meta-data
+    r-globe/meta-data
 
     ; "stunt" components to use as stand-ins
     ;
