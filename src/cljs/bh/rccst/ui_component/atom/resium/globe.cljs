@@ -22,7 +22,7 @@
                    :outline-color [1 1 0 1.0] :width 5}
                   {:shape      :shape/circle :id "circle"
                    :location [28.538336 -81.379234] :radius 1000000
-                   :fill-color [0 1 0 0.5] :outline-color [1 1 1 1] :width 2}
+                   :fill-color [0 1 0 0.5] :outline-color [1 1 1 1] :width 2 :height 2}
                   {:shape :shape/polyline :id "line2" :locations [[22 -55] [45 -105] [36 -125.7]]
                    :outline-color [1 0.5 0.78 1.0] :width 5}
                   {:shape :shape/label :id "orlando" :location [28.538336 -81.379234] :label "Orlando"

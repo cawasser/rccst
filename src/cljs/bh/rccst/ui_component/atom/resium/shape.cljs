@@ -51,20 +51,21 @@
 
 
 ; :shape/circle
-(defmethod make-shape :shape/circle [{:keys [id location radius fill-color outline-color width]}]
+(defmethod make-shape :shape/circle [{:keys [id location radius fill-color outline-color width height]}]
   (let [[f-r f-g f-b f-a] fill-color
         [o-r o-g o-b o-a] outline-color]
     ^{:key id} [:> Entity {:position (cartesian3 (correct-location location))}
                 [:> EllipseGraphics {:semiMajorAxis radius
                                      :semiMinorAxis radius
+                                     :material      (Color. f-r f-g f-b f-a)
                                      :outlineColor  (Color. o-r o-g o-b o-a)
                                      :outlineWidth  width
-                                     :outline       true
-                                     :material      (Color. f-r f-g f-b f-a)}]]))
+                                     :height        height
+                                     :outline       true}]]))
 
 
 ; :shape/label
-(defmethod make-shape :shape/label [{:keys [id label location font fill-color outline-color width]}]
+(defmethod make-shape :shape/label [{:keys [id location label font fill-color outline-color width]}]
   (let [[f-r f-g f-b f-a] fill-color
         [o-r o-g o-b o-a] outline-color]
     ^{:key id}  [:> Entity {:position (cartesian3 (correct-location location))}
