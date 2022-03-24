@@ -18,23 +18,30 @@
             [bh.rccst.ui-component.atom.re-com.label :as rc-label]
             [bh.rccst.ui-component.atom.re-com.slider :as rc-slider]
             [bh.rccst.ui-component.atom.re-com.table :as rc-table]
-            [bh.rccst.ui-component.atom.worldwind.globe :as ww-globe]
             [bh.rccst.ui-component.atom.resium.globe :as r-globe]
+            [bh.rccst.ui-component.atom.worldwind.globe :as ww-globe]
             [bh.rccst.ui-component.molecule.component-layout :as cl]
             [bh.rccst.ui-component.molecule.composite.util.digraph :as dig]
             [bh.rccst.ui-component.molecule.composite.util.signals :as sig]
             [bh.rccst.ui-component.molecule.composite.util.ui :as ui]
+            [bh.rccst.ui-component.molecule.composite.util.node-config-ui :as config]
             [bh.rccst.ui-component.utils :as ui-utils]
+            [bh.rccst.ui-component.utils.helpers :as h]
+            [bh.rccst.ui-component.utils.locals :as l]
             [day8.re-frame.tracing :refer-macros [fn-traced]]
             [loom.graph :as lg]
             [re-com.core :as rc]
             [re-frame.core :as re-frame]
             [reagent.core :as r]
+            [taoensso.timbre :as log]
             [woolybear.ad.containers :as containers]
             [woolybear.ad.layout :as layout]
             ["dagre" :as dagre]
             ["graphlib" :as graphlib]
             ["react-flow-renderer" :refer (ReactFlowProvider Controls Handle Background) :default ReactFlow]))
+
+
+(log/info "bh.rccst.ui-component.molecule.composite")
 
 
 (re-frame/reg-event-db
@@ -70,14 +77,24 @@
                                           :range :port/sink}}}))
 
 
+(def component-needs {:ui/component  {:name :id}
+                      :source/remote {:name :id}
+                      :source/local  {:name :id :default {:choices #{"" 0 [] {} #{}}}}
+                      :source/fn     {:name  :id
+                                      :ports {:name :id
+                                              :type #{:port/source :port/sink :port/source-sink}}}})
+
+
 (def source-code '[composite
                    :data component/ui-definition
                    :component-id :container.component
                    :container-id :container])
 
 
-(defn config []
-  {})
+(defn config [full-config]
+  {:blackboard {:defs {:source full-config
+                       :dag    {:open-details ""}}}
+   :container  ""})
 
 
 ;;;;;;;;;;
@@ -121,27 +138,58 @@
                    [layout/text-block (str layout)]]]])))
 
 
+(defn- details-panel [component-id item]
+  (let [components   @(l/subscribe-local component-id [:blackboard :defs :source :components])
+        details      ((h/string->keyword item) components)
+        detail-types (:type details)]
+
+    (log/info "detail-panel" (str item) "//" details "//" detail-types)
+
+    [config/make-config-panel details])) ;(map (fn [[k v]] [:div (str k "-" v)]) details)]))
+
+
+
+(comment
+  (do
+    (def component-id :widget-grid-demo.grid-widget)
+    (def item :topic/target-data)
+    (def components   @(l/subscribe-local component-id [:blackboard :defs :source :components]))
+    (def details      ((h/string->keyword item) components))
+    (def detail-types (:type details)))
+
+  (map config/make-config-panel details)
+  ())
+
+
+
 (defn- dag-panel
   "show the DAG, built form the configuration passed into the component, in a panel
   (beside the actual UI)
   "
   [& {:keys [configuration component-id container-id ui]}]
-  (let [config-flow (ui/make-flow configuration)
-        node-types  {":ui/component"  (partial ui/custom-node :ui/component)
-                     ":source/remote" (partial ui/custom-node :source/remote)
-                     ":source/local"  (partial ui/custom-node :source/local)
-                     ":source/fn"     (partial ui/custom-node :source/fn)}]
-    [:div {:style {:width "100%" :height "100%"}}
-     [:> ReactFlowProvider
-      [:> ReactFlow {:className        component-id
-                     :elements         config-flow
-                     :nodeTypes        node-types
-                     :edgeTypes        {}
-                     :zoomOnScroll     false
-                     :preventScrolling false
-                     :onConnect        #()}
-       [:> Background]
-       [:> Controls]]]]))
+  (let [open-details (l/subscribe-local component-id [:blackboard :defs :dag :open-details])
+        config-flow  (ui/make-flow configuration)
+        node-types   {":ui/component"  (partial ui/custom-node component-id :ui/component)
+                      ":source/remote" (partial ui/custom-node component-id :source/remote)
+                      ":source/local"  (partial ui/custom-node component-id :source/local)
+                      ":source/fn"     (partial ui/custom-node component-id :source/fn)}]
+    [:div {:style {:width "100%" :height "100%" :border ""}}
+     [rc/h-box :src (rc/at)
+      :gap "2px"
+      :children [[:div {:style {:width "15%" :height "100%"}} "Pick here"]
+                 [:div {:style {:width "600px" :height "700px"}}
+                  [:> ReactFlowProvider
+                   [:> ReactFlow {:className        component-id
+                                  :elements         config-flow
+                                  :nodeTypes        node-types
+                                  :edgeTypes        {}
+                                  :zoomOnScroll     false
+                                  :preventScrolling false
+                                  :onConnect        #()}
+                    [:> Background]
+                    [:> Controls]]]]
+                 [:div {:style {:width "20%" :height "100%"}}
+                  (details-panel component-id @open-details)]]]]))
 
 
 (defn stand-in [components]
@@ -199,7 +247,7 @@
     (fn []
       (when (nil? @id)
         (reset! id component-id)
-        (ui-utils/init-widget @id {:blackboard {} :container ""})
+        (ui-utils/init-widget @id (config full-config))
         (ui-utils/dispatch-local @id [:container] container-id)
 
         (ui/prep-environment full-config @id meta-data-registry))
@@ -208,11 +256,17 @@
                      {:id :dag :label [:i {:class "zmdi zmdi-share"}]}
                      {:id :definition :label [:i {:class "zmdi zmdi-format-subject"}]}]]
 
-        [rc/h-box :src (rc/at)
+        [rc/v-box :src (rc/at)
          :width "1000px"
          :height "800px"
-         :justify :around                                   ;:end
-         :children [(condp = @comp-or-dag?
+         :gap "5px"
+         :children [[rc/h-box :src (rc/at)
+                     :justify :end
+                     :children [[rc/horizontal-bar-tabs
+                                 :model comp-or-dag?
+                                 :tabs buttons
+                                 :on-change #(reset! comp-or-dag? %)]]]
+                    (condp = @comp-or-dag?
                       :dag [dag-panel
                             :configuration full-config
                             :component-id @id
@@ -225,12 +279,9 @@
                                    :configuration configuration]
                       :default [rc/alert-box :src (rc/at)
                                 :alert-type :warning
-                                :body "There is a problem with this component."])
+                                :body "There is a problem with this component."])]]))))
 
-                    [rc/horizontal-bar-tabs
-                     :model comp-or-dag?
-                     :tabs buttons
-                     :on-change #(reset! comp-or-dag? %)]]]))))
+
 
 
 (defn composite

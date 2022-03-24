@@ -24,9 +24,10 @@
   dispatch updates (via on-layout-update) using (locals/dispatch-local ...)
   "
   [full-config]
-  {:blackboard {}
+  {:blackboard {:defs {:source full-config
+                       :dag    {:open-details ""}}}
    :container  ""
-   :layout (:grid-layout full-config)})
+   :layout     (:grid-layout full-config)})
 
 
 (defn- wrap-component [[id component]]
@@ -55,14 +56,14 @@
   - padding : (vector) padding [left? right?]
   "
 
-  (log/info "on-width-update" width "//" margin "//" cols "//"padding)
+  (log/info "on-width-update" width "//" margin "//" cols "//" padding)
   ())
 
 
 (defn- on-layout-change [component-id new-layout all-layouts]
-  (let [new-layout* (js->clj new-layout :keywordize-keys true)
+  (let [new-layout*  (js->clj new-layout :keywordize-keys true)
         all-layouts* (js->clj all-layouts :keywordize-keys true)
-        fst    (first new-layout*)]
+        fst          (first new-layout*)]
 
     (log/info "on-layout-change" new-layout*
       "//" all-layouts*
@@ -76,6 +77,7 @@
                      (map (juxt :i :x :y :w :h) new-layout*))]
         (locals/dispatch-local component-id [:layout] cooked)))))
 
+;[:blackboard :defs :source :grid-layout]
 
 (defn- component-panel [& {:keys [configuration component-id container-id]}]
   ;(log/info "component-panel" component-id
@@ -138,11 +140,18 @@
                      {:id :definition :label [:i {:class "zmdi zmdi-format-subject"}]}]]
 
         [:div.box {:style {:width "1000px" :height "800px"}}
-         [rc/h-box :src (rc/at)
+         [rc/v-box :src (rc/at)
           :justify :end
           :width "100%"
           :height "100%"
-          :children [(condp = @comp-or-dag?
+          :gap "5px"
+          :children [[rc/h-box :src (rc/at)
+                      :justify :end
+                      :children [[rc/horizontal-bar-tabs
+                                  :model comp-or-dag?
+                                  :tabs buttons
+                                  :on-change #(reset! comp-or-dag? %)]]]
+                     (condp = @comp-or-dag?
                        :dag [composite/dag-panel
                              :configuration full-config
                              :component-id @id
@@ -155,9 +164,4 @@
                                     :configuration configuration]
                        :default [rc/alert-box :src (rc/at)
                                  :alert-type :warning
-                                 :body "There is a problem with this component."])
-
-                     [rc/horizontal-bar-tabs
-                      :model comp-or-dag?
-                      :tabs buttons
-                      :on-change #(reset! comp-or-dag? %)]]]]))))
+                                 :body "There is a problem with this component."])]]]))))

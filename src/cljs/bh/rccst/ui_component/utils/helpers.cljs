@@ -56,6 +56,13 @@
     keyword))
 
 
+(defn string->keyword [s]
+  (-> s
+    str
+    (clojure.string/replace #":" "")
+    keyword))
+
+
 (defn resolve-value [value & opts]
   (let [ret (cond
               (and (coll? value)

@@ -4,9 +4,13 @@
             [bh.rccst.ui-component.utils.locals :as ul]
             [day8.re-frame.tracing :refer-macros [fn-traced]]
             [reagent.core :as r]
+            [taoensso.timbre :as log]
             ["dagre" :as dagre]
             ["graphlib" :as graphlib]
             ["react-flow-renderer" :refer (ReactFlowProvider Controls Handle Background) :default ReactFlow]))
+
+
+(log/info "bh.rccst.ui-component.molecule.composite.util.ui")
 
 
 (def handle-style {:width "8px" :height "8px" :borderRadius "50%"})
@@ -48,12 +52,17 @@
        (into [:<>])))])
 
 
+(defn- open-details [component-id item]
+  (log/info "open-details" component-id item)
+  (ul/dispatch-local component-id [:blackboard :defs :dag :open-details] item))
+
+
 (defn custom-node
   "build a custom node for the flow diagram, this time for :ui/component, so
   green, since this is a 'view', and one Handle for each input (along the top)
   and output (along the bottom)
   "
-  [type d]
+  [component-id type d]
   (let [data    (js->clj d)
         label   (get-in data ["data" "label"])
         inputs  (get-in data ["data" "inputs"])
@@ -63,7 +72,7 @@
     ;(log/info "custom-node" label data "///" inputs "///" outputs)
 
     (r/as-element
-      [:div {:style style}
+      [:div {:style style :on-click #(open-details component-id label)}
        [:h5 {:style (merge {:textAlign :center} style)} label]
        (input-output-handles label inputs outputs)])))
 
