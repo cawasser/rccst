@@ -20,19 +20,19 @@
 (def sample-data
   (r/atom
     {:nodes [{:id       ":ui/targets"
-              ;:type     ":ui/component"
+              :type     ":ui/component"
               :data     {:label   ":ui/targets"
                          :inputs  []
                          :outputs []}
               :position {:x 0 :y 100}}
              {:id       ":topic/target-data"
-              ;:type     ":source/remote"
+              :type     ":source/remote"
               :data     {:label   ":topic/target-data"
                          :inputs  []
                          :outputs []}
               :position {:x 100 :y 0}}
              {:id       ":topic/selected-targets"
-              ;:type     ":source/local"
+              :type     ":source/local"
               :data     {:label   ":topic/selected-targets"
                          :inputs  []
                          :outputs []}
@@ -96,7 +96,7 @@
   green, since this is a 'view', and one Handle for each input (along the top)
   and output (along the bottom)
   "
-  [component-id type d]
+  [type d]
   (let [data    (js->clj d :keywordize-keys true)
         label   (get-in data [:data :label])
         inputs  (get-in data [:data :inputs])
@@ -107,8 +107,8 @@
 
     (r/as-element
       [:div {:style style}                                  ;:on-click #(open-details component-id label)}
-       [:h5 {:style (merge {:textAlign :center} style)} label]
-       (input-output-handles label inputs outputs)])))
+       [:h5 {:style (merge {:textAlign :center} style)} label]])))
+       ;(input-output-handles label inputs outputs)])))
 
 
 (defn- source-panel [])
@@ -118,14 +118,20 @@
   (first (filter #(= id (:id %)) nodes)))
 
 
+(def default-node-types {":ui/component" (partial custom-node :ui/component)
+                         ":source/remote" (partial custom-node :source/remote)
+                         ":source/local" (partial custom-node :source/local)
+                         ":source/fn" (partial custom-node :source/fn)})
 
-(defn- flow* [& {:keys [component-id nodes edges on-change-nodes on-change-edges
+(defn- flow* [& {:keys [component-id nodes edges
+                        node-types edge-types
+                        on-change-nodes on-change-edges
                         zoom-on-scroll preventScrolling connectFn]}]
   [:> ReactFlow {:nodes               nodes
                  :edges               edges
                  ;:nodesDraggable      true
                  ;:nodesConnectable    true
-                 ;:nodeTypes           {}
+                 ;:nodeTypes           (clj->js default-node-types)
                  ;:edgeTypes           {}
                  :onNodesChange       on-change-nodes
                  :onEdgesChange       on-change-edges
@@ -140,6 +146,7 @@
 
 
 (defn- editable-flow [& {:keys [component-id nodes edges
+                                node-types edge-types
                                 zoom-on-scroll preventScrolling connectFn]}]
   (let [[ns set-nodes on-change-nodes] (useNodesState (clj->js nodes))
         [es set-edges on-change-edges] (useEdgesState (clj->js edges))]
