@@ -153,12 +153,10 @@
    [:> Controls]])
 
 
-(defn- Flow []
+(defn- editable-flow [n e]
   ;(log/info "editable-flow" n "//" e "//" component-id)
 
-  (let [n               (:nodes @sample-data)
-        e               (:edges @sample-data)
-        ;[nodes set-nodes] (react/useState (clj->js n))
+  (let [;[nodes set-nodes] (react/useState (clj->js n))
         ;[edges set-edges] (react/useState (clj->js e))
         ;on-change-nodes (react/useCallback
         ;                  (fn [changes] (set-nodes (fn [nds] (do
@@ -202,6 +200,6 @@
 
   [:div {:style {:width "1000px" :height "700px"}}
    ;[:f> example 100]])
-   [:f> Flow]])
+   [:f> editable-flow (:nodes @data) (:edges @data)]])
 
 
