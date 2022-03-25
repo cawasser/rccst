@@ -119,7 +119,8 @@
 
 
 
-(defn- flow* [component-id nodes edges on-change-nodes on-change-edges]
+(defn- flow* [& {:keys [component-id nodes edges on-change-nodes on-change-edges
+                        zoom-on-scroll preventScrolling connectFn]}]
   [:> ReactFlow {:nodes               nodes
                  :edges               edges
                  ;:nodesDraggable      true
@@ -128,9 +129,9 @@
                  ;:edgeTypes           {}
                  :onNodesChange       on-change-nodes
                  :onEdgesChange       on-change-edges
-                 :zoomOnScroll        false
-                 :preventScrolling    false
-                 ;:onConnect           (or connectFn #())
+                 :zoomOnScroll        (or zoom-on-scroll false)
+                 :preventScrolling    (or preventScrolling false)
+                 :onConnect           (or connectFn #())
                  :fitView             true
                  :attributionPosition "top-right"}
    [:> MiniMap]
@@ -138,7 +139,8 @@
    [:> Controls]])
 
 
-(defn- editable-flow [component-id nodes edges]
+(defn- editable-flow [& {:keys [component-id nodes edges
+                                zoom-on-scroll preventScrolling connectFn]}]
   (let [[ns set-nodes on-change-nodes] (useNodesState (clj->js nodes))
         [es set-edges on-change-edges] (useEdgesState (clj->js edges))]
 
@@ -147,7 +149,14 @@
     ;  "//" set-nodes
     ;  "//" on-change-nodes)
 
-    [flow* component-id ns es on-change-nodes on-change-edges]))
+    [flow*
+     :component-id component-id
+     :nodes ns  :edges es
+     :on-change-nodes on-change-nodes
+     :on-change-edges on-change-edges
+     :connectFn connectFn
+     :zoom-on-scroll zoom-on-scroll
+     :preventScrolling preventScrolling]))
 
 
 (defn component [& {:keys [data node-types edge-types connectFn
@@ -155,6 +164,14 @@
                            component-id container-id]}]
 
   [:div {:style {:width "1000px" :height "700px"}}
-   [:f> editable-flow component-id (:nodes @data) (:edges @data)]])
+   [:f> editable-flow
+    :component-id component-id
+    :nodes (:nodes @data)
+    :edges (:edges @data)
+    :node-types node-types
+    :edge-types edge-types
+    :connectFn connectFn
+    :zoom-on-scroll zoom-on-scroll
+    :preventScrolling preventScrolling]])
 
 
