@@ -24,7 +24,8 @@
     title
     description
     [layout/centered (or extra-classes {})
-     [component :data data :component-id component-id :container-id container-id]]
+     [:div {:style {:width "1000px" :height "700px"}}
+      [component :data data :component-id component-id :container-id container-id]]]
     source-code))
 
 
@@ -47,5 +48,6 @@
       [config-key data-key tab-panel selected-tab]
       [data-panel data]
       [config-panel data container-id]
-      [component-panel data container-id]
+      [:div {:style {:width "1500px" :height "700px"}}
+       [component-panel data container-id]]
       source-code)))

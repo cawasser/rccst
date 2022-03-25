@@ -1,12 +1,10 @@
 (ns bh.rccst.ui-component.molecule.composite.util.ui
-  (:require [bh.rccst.ui-component.molecule.composite.util.signals :as sig]
-            [bh.rccst.ui-component.utils :as ui-utils]
+  (:require [bh.rccst.ui-component.atom.diagram.diagram.dagre-support :as dagre]
+            [bh.rccst.ui-component.molecule.composite.util.signals :as sig]
             [bh.rccst.ui-component.utils.locals :as ul]
-            [day8.re-frame.tracing :refer-macros [fn-traced]]
             [reagent.core :as r]
+            [day8.re-frame.tracing :refer-macros [fn-traced]]
             [taoensso.timbre :as log]
-            ["dagre" :as dagre]
-            ["graphlib" :as graphlib]
             ["react-flow-renderer" :refer (ReactFlowProvider Controls Handle Background) :default ReactFlow]))
 
 
@@ -81,60 +79,60 @@
   (:el-type node))
 
 
-(defn dump-dagre [dagreGraph]
-  (doall
-    (map (fn [n]
-           (println "node" (js->clj n)))
-      (.nodes dagreGraph)))
-  (doall
-    (map (fn [n]
-           (println "edge" (js->clj n)))
-      (.edges dagreGraph))))
-
-
-(defn dagre-graph
-  "copy the nodes and edges from Look to dagre, so we can use dagre layout function to put them
-  onto the display without drawing over each other
-  "
-  [graph]
-  (let [dagreGraph (new (.-Graph graphlib))
-        nodeWidth  172
-        nodeHeight 36]
-
-    (.setDefaultEdgeLabel dagreGraph (clj->js {}))
-    (.setGraph dagreGraph (clj->js {:rankdir "tb"}))
-
-    (doall
-      (map (fn [element]
-             (condp = (:el-type element)
-               :node (.setNode dagreGraph (:id element)
-                       (clj->js {:width nodeWidth :height nodeHeight}))
-               :edge (.setEdge dagreGraph (:source element)
-                       (:target element))))
-        graph))
-
-    dagreGraph))
-
-
-(defn build-layout
-  "use dagre (see https://reactflow.dev/examples/layouting/) to perform an auto-layout of the nodes,
-  which are then connected by the edges."
-  [graph]
-  (let [dagreGraph (dagre-graph graph)
-        nodeWidth  172
-        nodeHeight 36]
-
-    (.layout dagre dagreGraph)
-
-    (doall
-      (map (fn [element]
-             ;(log/info "element" (:id element) (.node dagreGraph (clj->js (:id element))))
-             (condp = (:el-type element)
-               :node (let [dagreNode (.node dagreGraph (clj->js (:id element)))]
-                       (assoc element :position {:x (- (.-x dagreNode) (/ nodeWidth 2))
-                                                 :y (- (.-y dagreNode) (/ nodeHeight 2))}))
-               :edge element))
-        graph))))
+;(defn dump-dagre [dagreGraph]
+;  (doall
+;    (map (fn [n]
+;           (println "node" (js->clj n)))
+;      (.nodes dagreGraph)))
+;  (doall
+;    (map (fn [n]
+;           (println "edge" (js->clj n)))
+;      (.edges dagreGraph))))
+;
+;
+;(defn dagre-graph
+;  "copy the nodes and edges from Look to dagre, so we can use dagre layout function to put them
+;  onto the display without drawing over each other
+;  "
+;  [graph]
+;  (let [dagreGraph (new (.-Graph graphlib))
+;        nodeWidth  172
+;        nodeHeight 36]
+;
+;    (.setDefaultEdgeLabel dagreGraph (clj->js {}))
+;    (.setGraph dagreGraph (clj->js {:rankdir "tb"}))
+;
+;    (doall
+;      (map (fn [element]
+;             (condp = (:el-type element)
+;               :node (.setNode dagreGraph (:id element)
+;                       (clj->js {:width nodeWidth :height nodeHeight}))
+;               :edge (.setEdge dagreGraph (:source element)
+;                       (:target element))))
+;        graph))
+;
+;    dagreGraph))
+;
+;
+;(defn build-layout
+;  "use dagre (see https://reactflow.dev/examples/layouting/) to perform an auto-layout of the nodes,
+;  which are then connected by the edges."
+;  [graph]
+;  (let [dagreGraph (dagre-graph graph)
+;        nodeWidth  172
+;        nodeHeight 36]
+;
+;    (.layout dagre dagreGraph)
+;
+;    (doall
+;      (map (fn [element]
+;             ;(log/info "element" (:id element) (.node dagreGraph (clj->js (:id element))))
+;             (condp = (:el-type element)
+;               :node (let [dagreNode (.node dagreGraph (clj->js (:id element)))]
+;                       (assoc element :position {:x (- (.-x dagreNode) (/ nodeWidth 2))
+;                                                 :y (- (.-y dagreNode) (/ nodeHeight 2))}))
+;               :edge element))
+;        graph))))
 
 
 (defn create-flow-node
@@ -145,7 +143,6 @@
   (let [node-type (get-in configuration [:components node-id :type])]
     ;(log/info "node" node-id node-type)
     {:id       (str node-id)
-     :el-type  :node
      :type     (str node-type)
      :data     {:label   (str node-id)
                 :inputs  (->>
@@ -173,13 +170,12 @@
     ;(log/info "flow-edge" idx "/" node-id "/" source-handle "///" target-id "/" target-handle)
 
     {:id            (str idx)
-     :el-type       :edge
      :source        (str node-id)
      :sourceHandle  (str source-handle)
      :target        (str target-id)
      :targetHandle  (str target-handle)
      :label         (str target-handle)
-     :style         {:stroke-width 1 :stroke :black}
+     :style         {:strokeWidth 1 :stroke :black}
      :arrowHeadType "arrowclosed"
      :animated      false}))
 
@@ -204,12 +200,11 @@
   "take the Loom graph and turn it into what react-flow needs to draw it onto the display
   "
   [configuration]
-  (let [flow (apply conj
-               (map #(create-flow-node configuration %) (:nodes configuration))
-               (map-indexed (fn [idx node]
-                              (create-flow-edge configuration idx node))
-                 (:edges configuration)))]
-    (build-layout flow)))
+  (let [flow {:nodes (map #(create-flow-node configuration %) (:nodes configuration))
+              :edges (map-indexed (fn [idx node]
+                                    (create-flow-edge configuration idx node))
+                       (:edges configuration))}]
+    (dagre/build-layout flow)))
 
 
 (defn prep-environment [configuration component-id registry]

@@ -14,92 +14,91 @@
 
 
 (def sample-data
-  (r/atom [{:id        "viirs-5"
-            :el-type   :node
-            :type      "globe"
-            :data      {:label "viirs-5"
-                        :chart pie-chart/component
-                        :ui    {:legend false :tooltip false :label false}}
-            :draggable false
-            :position  (diagram-cell 0 1)}
+  (r/atom {:nodes [{:id        "viirs-5"
+                    :el-type   :node
+                    :type      "globe"
+                    :data      {:label "viirs-5"
+                                :chart pie-chart/component
+                                :ui    {:legend false :tooltip false :label false}}
+                    :draggable false
+                    :position  (diagram-cell 0 1)}
 
-           {:id        "abi-meso-11"
-            :el-type   :node
-            :type      "globe"
-            :data      {:label "abi-meso-11"
-                        :chart pie-chart/component
-                        :ui    {:legend false :tooltip false :label false}}
-            :draggable false
-            :position  (diagram-cell 0 0)}
+                   {:id        "abi-meso-11"
+                    :el-type   :node
+                    :type      "globe"
+                    :data      {:label "abi-meso-11"
+                                :chart pie-chart/component
+                                :ui    {:legend false :tooltip false :label false}}
+                    :draggable false
+                    :position  (diagram-cell 0 0)}
 
-           {:id        "goes-east"
-            :el-type   :node
-            :type      "platform"
-            :data      {:label "GOES East"
-                        :image "/images/icons/Weather-Satellite-PNG-Clipart.png"
-                        :chart area-chart/component
-                        :ui    {:x-axis false :y-axis false
-                                :legend false :tooltip false}}
-            :draggable false
-            :position  (diagram-cell 1 0)}
+                   {:id        "goes-east"
+                    :el-type   :node
+                    :type      "platform"
+                    :data      {:label "GOES East"
+                                :image "/images/icons/Weather-Satellite-PNG-Clipart.png"
+                                :chart area-chart/component
+                                :ui    {:x-axis false :y-axis false
+                                        :legend false :tooltip false}}
+                    :draggable false
+                    :position  (diagram-cell 1 0)}
 
-           {:id        "central"
-            :el-type   :node
-            :type      "downlink-terminal"
-            :data      {:label "Wallops"
-                        :image "/images/icons/downlink-terminal.png"
-                        :chart bar-chart/component
-                        :ui    {:grid false :x-axis false :y-axis false
-                                :legend false :tooltip false}}
-            :draggable false
-            :position  (diagram-cell 2 0)}
+                   {:id        "central"
+                    :el-type   :node
+                    :type      "downlink-terminal"
+                    :data      {:label "Wallops"
+                                :image "/images/icons/downlink-terminal.png"
+                                :chart bar-chart/component
+                                :ui    {:grid   false :x-axis false :y-axis false
+                                        :legend false :tooltip false}}
+                    :draggable false
+                    :position  (diagram-cell 2 0)}
 
-           {:id        "washington"
-            :el-type   :node
-            :type      "processing-center"
-            :data      {:label "NSOF Suitland"
-                        :image "/images/icons/processing-center.png"
-                        :chart line-chart/component
-                        :ui    {:grid false :x-axis false :y-axis false
-                                :legend false :tooltip false}}
-            :draggable false
-            :position  (diagram-cell 3 0)}
+                   {:id        "washington"
+                    :el-type   :node
+                    :type      "processing-center"
+                    :data      {:label "NSOF Suitland"
+                                :image "/images/icons/processing-center.png"
+                                :chart line-chart/component
+                                :ui    {:grid   false :x-axis false :y-axis false
+                                        :legend false :tooltip false}}
+                    :draggable false
+                    :position  (diagram-cell 3 0)}
 
-           {:id        "noaa-xx"
-            :el-type   :node
-            :type      "platform"
-            :data      {:label "NOAA XX"
-                        :image "/images/icons/Weather-Satellite-PNG-Clipart.png"
-                        :chart area-chart/component
-                        :ui    {:x-axis false :y-axis false
-                                :legend false :tooltip false}}
-            :draggable false
-            :position  (diagram-cell 1 1)}
+                   {:id        "noaa-xx"
+                    :el-type   :node
+                    :type      "platform"
+                    :data      {:label "NOAA XX"
+                                :image "/images/icons/Weather-Satellite-PNG-Clipart.png"
+                                :chart area-chart/component
+                                :ui    {:x-axis false :y-axis false
+                                        :legend false :tooltip false}}
+                    :draggable false
+                    :position  (diagram-cell 1 1)}
 
-           {:id        "mountain"
-            :el-type   :node
-            :type      "downlink-terminal"
-            :data      {:label "Svalbaard/McMurdo"
-                        :image "/images/icons/downlink-terminal.png"
-                        :chart bar-chart/component
-                        :ui    {:grid false :x-axis false :y-axis false
-                                :legend false :tooltip false}}
-            :draggable false
-            :position  (diagram-cell 2 1)}
+                   {:id        "mountain"
+                    :el-type   :node
+                    :type      "downlink-terminal"
+                    :data      {:label "Svalbaard/McMurdo"
+                                :image "/images/icons/downlink-terminal.png"
+                                :chart bar-chart/component
+                                :ui    {:grid   false :x-axis false :y-axis false
+                                        :legend false :tooltip false}}
+                    :draggable false
+                    :position  (diagram-cell 2 1)}]
 
-           ; edges
-           {:id    "11-n" :el-type :edge :source "abi-meso-11" :target "goes-east"
-            :style {:stroke-width 20 :stroke :gray} :animated true}
-           {:id    "v5-n" :el-type :edge :source "viirs-5" :target "noaa-xx"
-            :style {:stroke-width 20 :stroke :gray} :animated true}
-           {:id    "e-c" :el-type :edge :source "goes-east" :target "central"
-            :style {:stroke-width 50 :stroke :orange} :animated true}
-           {:id    "c-w" :el-type :edge :source "central" :target "washington"
-            :style {:stroke-width 25 :stroke "#f00"} :animated true}
-           {:id    "n-m" :el-type :edge :source "noaa-xx" :target "mountain"
-            :style {:stroke-width 30 :stroke :lightgreen} :animated true}
-           {:id    "m-w" :el-type :edge :source "mountain" :target "washington"
-            :style {:stroke-width 5} :animated true}]))
+           :edges [{:id    "11-n" :el-type :edge :source "abi-meso-11" :target "goes-east"
+                    :style {:strokeWidth 20 :stroke :gray} :animated true}
+                   {:id    "v5-n" :el-type :edge :source "viirs-5" :target "noaa-xx"
+                    :style {:strokeWidth 20 :stroke :gray} :animated true}
+                   {:id    "e-c" :el-type :edge :source "goes-east" :target "central"
+                    :style {:strokeWidth 50 :stroke :orange} :animated true}
+                   {:id    "c-w" :el-type :edge :source "central" :target "washington"
+                    :style {:strokeWidth 25 :stroke "#f00"} :animated true}
+                   {:id    "n-m" :el-type :edge :source "noaa-xx" :target "mountain"
+                    :style {:strokeWidth 30 :stroke :lightgreen} :animated true}
+                   {:id    "m-w" :el-type :edge :source "mountain" :target "washington"
+                    :style {:strokeWidth 5} :animated true}]}))
 
 
 (def data-sources {"GOES East"         area-chart/sample-data
@@ -113,7 +112,8 @@
 
 (def source-code '[:> ReactFlowProvider
                    [:> ReactFlow {:className        component-id
-                                  :elements         @data
+                                  :nodes            (:nodes @data)
+                                  :edges            (:edges @data)
                                   :nodeTypes        {}
                                   :edgeTypes        {}
                                   :zoomOnScroll     false
@@ -204,19 +204,25 @@
                    :style handle-style}]])))
 
 
-(defn component [& {:keys [data component-id container-id]}]
-  [:div {:style {:width "1000px" :height "500px"}}
-   [:> ReactFlowProvider
-    [:> ReactFlow {:className        component-id
-                   :elements         @data
-                   :nodeTypes        {"globe"             (partial node platform-node data-sources)
-                                      "platform"          (partial node platform-node data-sources)
-                                      "downlink-terminal" (partial node platform-node data-sources)
-                                      "processing-center" (partial node platform-node data-sources)}
-                   :edgeTypes        {}
-                   :zoomOnScroll     false
-                   :preventScrolling false
-                   :onConnect        #()}
-     [:> MiniMap]
-     [:> Controls]]]])
+(def sample-node-types {"globe"             (partial node platform-node data-sources)
+                        "platform"          (partial node platform-node data-sources)
+                        "downlink-terminal" (partial node platform-node data-sources)
+                        "processing-center" (partial node platform-node data-sources)})
+
+
+(defn component [& {:keys [data node-types edge-types connectFn
+                           zoom-on-scroll preventScrolling
+                           component-id container-id]}]
+  [:> ReactFlowProvider
+   [:> ReactFlow {:className        component-id
+                  :nodes            (:nodes @data)
+                  :edges            (:edges @data)
+                  :nodeTypes        (or node-types sample-node-types)
+                  :edgeTypes        (or edge-types {})
+                  :zoomOnScroll     (or zoom-on-scroll false)
+                  :preventScrolling (or preventScrolling false)
+                  :onConnect        (or connectFn #())
+                  :fitView          true}
+    [:> MiniMap]
+    [:> Controls]]])
 

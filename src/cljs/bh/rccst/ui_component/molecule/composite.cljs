@@ -22,9 +22,9 @@
             [bh.rccst.ui-component.atom.worldwind.globe :as ww-globe]
             [bh.rccst.ui-component.molecule.component-layout :as cl]
             [bh.rccst.ui-component.molecule.composite.util.digraph :as dig]
+            [bh.rccst.ui-component.molecule.composite.util.node-config-ui :as config]
             [bh.rccst.ui-component.molecule.composite.util.signals :as sig]
             [bh.rccst.ui-component.molecule.composite.util.ui :as ui]
-            [bh.rccst.ui-component.molecule.composite.util.node-config-ui :as config]
             [bh.rccst.ui-component.utils :as ui-utils]
             [bh.rccst.ui-component.utils.helpers :as h]
             [bh.rccst.ui-component.utils.locals :as l]
@@ -145,7 +145,7 @@
 
     (log/info "detail-panel" (str item) "//" details "//" detail-types)
 
-    [config/make-config-panel details])) ;(map (fn [[k v]] [:div (str k "-" v)]) details)]))
+    [config/make-config-panel details]))                    ;(map (fn [[k v]] [:div (str k "-" v)]) details)]))
 
 
 
@@ -153,8 +153,8 @@
   (do
     (def component-id :widget-grid-demo.grid-widget)
     (def item :topic/target-data)
-    (def components   @(l/subscribe-local component-id [:blackboard :defs :source :components]))
-    (def details      ((h/string->keyword item) components))
+    (def components @(l/subscribe-local component-id [:blackboard :defs :source :components]))
+    (def details ((h/string->keyword item) components))
     (def detail-types (:type details)))
 
   (map config/make-config-panel details)
@@ -168,7 +168,7 @@
   "
   [& {:keys [configuration component-id container-id ui]}]
   (let [open-details (l/subscribe-local component-id [:blackboard :defs :dag :open-details])
-        config-flow  (ui/make-flow configuration)
+        {:keys [nodes edges]} (ui/make-flow configuration)
         node-types   {":ui/component"  (partial ui/custom-node component-id :ui/component)
                       ":source/remote" (partial ui/custom-node component-id :source/remote)
                       ":source/local"  (partial ui/custom-node component-id :source/local)
@@ -180,7 +180,10 @@
                  [:div {:style {:width "600px" :height "700px"}}
                   [:> ReactFlowProvider
                    [:> ReactFlow {:className        component-id
-                                  :elements         config-flow
+                                  :nodes            nodes
+                                  :onNodesChange    nodes
+                                  :onEdgesChange    edges
+                                  :edges            edges
                                   :nodeTypes        node-types
                                   :edgeTypes        {}
                                   :zoomOnScroll     false

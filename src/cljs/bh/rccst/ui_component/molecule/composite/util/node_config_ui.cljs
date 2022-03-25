@@ -63,6 +63,11 @@
   [:div.source-fn (str type " - " name)])
 
 
+(defmethod make-config-panel :default [_]
+  (log/info "make-config-panel :default")
+  [:div])
+
+
 
 (comment
   (do
