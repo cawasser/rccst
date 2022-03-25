@@ -14,21 +14,6 @@
 (log/info "bh.rccst.ui-component.atom.diagram.editable-digraph")
 
 
-(defn example [initial-value]
-  (log/info "example OUTER" (js->clj initial-value))
-  (let [[count set-count] (react/useState (js->clj initial-value))]
-    (log/info "example INNER" count)
-    (r/as-element
-      [:div
-       [:p "You clicked " count " times"]
-       [:button
-        {:on-click #(set-count inc)}
-        "Click"]])))
-
-
-
-
-
 (declare node)
 
 
@@ -153,45 +138,16 @@
    [:> Controls]])
 
 
-(defn- editable-flow [n e]
-  ;(log/info "editable-flow" n "//" e "//" component-id)
+(defn- editable-flow [component-id nodes edges]
+  (let [[ns set-nodes on-change-nodes] (useNodesState (clj->js nodes))
+        [es set-edges on-change-edges] (useEdgesState (clj->js edges))]
 
-  (let [;[nodes set-nodes] (react/useState (clj->js n))
-        ;[edges set-edges] (react/useState (clj->js e))
-        ;on-change-nodes (react/useCallback
-        ;                  (fn [changes] (set-nodes (fn [nds] (do
-        ;                                                       (log/info "nodeChange" (js->clj changes) "//" (js->clj nds))
-        ;                                                       (applyNodeChanges changes nds)))))
-        ;                  #js [set-nodes])
-        ;on-change-edges (react/useCallback
-        ;                  (fn [changes] (set-edges (fn [nds] (applyEdgeChanges changes nds))))
-        ;                  #js [set-edges])]
-        [nodes set-nodes on-change-nodes] (useNodesState (clj->js n))
-        [edges set-edges on-change-edges] (useEdgesState (clj->js e))]
+    ;(log/info "editable-flow"
+    ;  "//" ns
+    ;  "//" set-nodes
+    ;  "//" on-change-nodes)
 
-    (log/info "editable-flow"
-      "//" nodes
-      "//" set-nodes
-      "//" on-change-nodes)
-
-    [:> ReactFlow {:nodes               nodes
-                   :edges               edges
-                   ;:nodesDraggable      true
-                   ;:nodesConnectable    true
-                   ;:nodeTypes           {}
-                   ;:edgeTypes           {}
-                   :onNodesChange       on-change-nodes
-                   ;:onEdgesChange       on-change-edges
-                   :zoomOnScroll        false
-                   :preventScrolling    false
-                   ;:onConnect           (or connectFn #())
-                   :fitView             true}
-                   ;:attributionPosition "top-right"}
-     [:> MiniMap]
-     [:> Background]
-     [:> Controls]]))
-
-    ;[flow* component-id nodes edges on-change-nodes on-change-edges]))
+    [flow* component-id ns es on-change-nodes on-change-edges]))
 
 
 (defn component [& {:keys [data node-types edge-types connectFn
@@ -199,7 +155,6 @@
                            component-id container-id]}]
 
   [:div {:style {:width "1000px" :height "700px"}}
-   ;[:f> example 100]])
-   [:f> editable-flow (:nodes @data) (:edges @data)]])
+   [:f> editable-flow component-id (:nodes @data) (:edges @data)]])
 
 
