@@ -135,24 +135,22 @@
 
 
 (defn- flow* [component-id nodes edges on-change-nodes on-change-edges]
-  (r/as-element
-    [:> ReactFlowProvider
-     [:> ReactFlow {:nodes               nodes
-                    :edges               edges
-                    :nodesDraggable      true
-                    :nodesConnectable    true
-                    :nodeTypes           {}
-                    :edgeTypes           {}
-                    ;:onNodesChange       on-change-nodes
-                    ;:onEdgesChange       on-change-edges
-                    ;:zoomOnScroll        (or zoomOnScroll false)
-                    ;:preventScrolling    (or preventScrolling false)
-                    ;:onConnect           (or connectFn #())
-                    :fitView             true
-                    :attributionPosition "top-right"}
-      [:> MiniMap]
-      [:> Background]
-      [:> Controls]]]))
+  [:> ReactFlow {:nodes               nodes
+                 :edges               edges
+                 ;:nodesDraggable      true
+                 ;:nodesConnectable    true
+                 ;:nodeTypes           {}
+                 ;:edgeTypes           {}
+                 :onNodesChange       on-change-nodes
+                 :onEdgesChange       on-change-edges
+                 :zoomOnScroll        false
+                 :preventScrolling    false
+                 ;:onConnect           (or connectFn #())
+                 :fitView             true
+                 :attributionPosition "top-right"}
+   [:> MiniMap]
+   [:> Background]
+   [:> Controls]])
 
 
 (defn- Flow []
@@ -160,18 +158,18 @@
 
   (let [n               (:nodes @sample-data)
         e               (:edges @sample-data)
-        [nodes set-nodes] (react/useState (clj->js n))
-        [edges set-edges] (react/useState (clj->js e))
-        on-change-nodes (react/useCallback
-                          (fn [changes] (set-nodes (fn [nds] (do
-                                                               (log/info "nodeChange" (js->clj changes) "//" (js->clj nds))
-                                                               (applyNodeChanges changes nds)))))
-                          #js [set-nodes])
-        on-change-edges (react/useCallback
-                          (fn [changes] (set-edges (fn [nds] (applyEdgeChanges changes nds))))
-                          #js [set-edges])]
-        ;[nodes set-nodes on-change-nodes] (useNodesState (clj->js n))
-        ;[edges set-edges on-change-edges] (useEdgesState (clj->js e))]
+        ;[nodes set-nodes] (react/useState (clj->js n))
+        ;[edges set-edges] (react/useState (clj->js e))
+        ;on-change-nodes (react/useCallback
+        ;                  (fn [changes] (set-nodes (fn [nds] (do
+        ;                                                       (log/info "nodeChange" (js->clj changes) "//" (js->clj nds))
+        ;                                                       (applyNodeChanges changes nds)))))
+        ;                  #js [set-nodes])
+        ;on-change-edges (react/useCallback
+        ;                  (fn [changes] (set-edges (fn [nds] (applyEdgeChanges changes nds))))
+        ;                  #js [set-edges])]
+        [nodes set-nodes on-change-nodes] (useNodesState (clj->js n))
+        [edges set-edges on-change-edges] (useEdgesState (clj->js e))]
 
     (log/info "editable-flow"
       "//" nodes
