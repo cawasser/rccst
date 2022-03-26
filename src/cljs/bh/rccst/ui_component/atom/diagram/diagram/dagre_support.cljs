@@ -11,51 +11,60 @@
   "copy the nodes and edges from Look to dagre, so we can use dagre layout function to put them
   onto the display without drawing over each other
   "
-  [graph]
-  (let [dagreGraph (new (.-Graph graphlib))
-        nodeWidth  172
-        nodeHeight 36]
+  ([nodes edges]
+   (let [dagreGraph (new (.-Graph graphlib))
+         nodeWidth  172
+         nodeHeight 36]
 
-    (.setDefaultEdgeLabel dagreGraph (clj->js {}))
-    (.setGraph dagreGraph (clj->js {:rankdir "tb"}))
+     (.setDefaultEdgeLabel dagreGraph (clj->js {}))
+     (.setGraph dagreGraph (clj->js {:rankdir "TB" :align "UL"}))
 
-    (doall
-      (map (fn [element]
-             (.setNode dagreGraph (:id element)
-               (clj->js {:width nodeWidth :height nodeHeight})))
-        (:nodes graph))
+     (doall
+       (map (fn [element]
+              (.setNode dagreGraph (:id element)
+                (clj->js {:width nodeWidth :height nodeHeight})))
+         nodes)
 
-      (map (fn [element]
-             (.setEdge dagreGraph (:source element)
-               (:target element)))
-        (:edges graph)))
+       (map (fn [element]
+              (.setEdge dagreGraph (:source element) (:target element)))
+         edges))
 
-    dagreGraph))
+     dagreGraph))
+
+  ([graph]
+   (dagre-graph (:nodes graph) (:edges graph))))
 
 
 (defn build-layout
   "use dagre (see https://reactflow.dev/examples/layouting/) to perform an auto-layout of the nodes,
   which are then connected by the edges.
   "
-  [graph]
-  (let [dagreGraph (dagre-graph graph)
-        nodeWidth  172
-        nodeHeight 36]
+  ([nodes edges]
+   (let [dagreGraph (dagre-graph nodes edges)
+         nodeWidth  172
+         nodeHeight 36]
 
-    (.layout dagre dagreGraph)
+     (.layout dagre dagreGraph)
 
-    (let [ret {:nodes (doall
-                        (map (fn [element]
-                               (let [dagreNode (.node dagreGraph (clj->js (:id element)))]
-                                 (assoc element :position {:x (- (.-x dagreNode) (/ nodeWidth 2))
-                                                           :y (- (.-y dagreNode) (/ nodeHeight 2))})))
-                          (:nodes graph)))
-               :edges (doall
-                        (map (fn [element] element)
-                          (:edges graph)))}]
-      (log/info "build-layout" ret)
-      ret)))
+     (let [ret {:nodes (doall
+                         (map (fn [element]
+                                (let [dagreNode (.node dagreGraph (clj->js (:id element)))
+                                      x         (- (.-x dagreNode) (/ nodeWidth 2))
+                                      y         (- (.-y dagreNode) (/ nodeHeight 2))]
+                                  (log/info "pos" (:id element) x y "//" (.-x dagreNode) (.-y dagreNode))
+                                  (assoc element :position {:x x :y y}
+                                                 :targetPosition "top"
+                                                 :sourcePosition "bottom")))
+                           nodes))
+                :edges edges}]
+                ;(doall
+                ;  (map (fn [element] element)
+                ;    edges))}]
+       ;(log/info "build-layout" ret)
+       ret)))
 
+  ([graph]
+   (build-layout (:nodes graph) (:edges graph))))
 
 
 (defn dump-dagre [dagreGraph]

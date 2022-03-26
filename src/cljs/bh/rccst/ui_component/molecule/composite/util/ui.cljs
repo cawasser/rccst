@@ -75,66 +75,6 @@
        (input-output-handles label inputs outputs)])))
 
 
-(defn node-type [node]
-  (:el-type node))
-
-
-;(defn dump-dagre [dagreGraph]
-;  (doall
-;    (map (fn [n]
-;           (println "node" (js->clj n)))
-;      (.nodes dagreGraph)))
-;  (doall
-;    (map (fn [n]
-;           (println "edge" (js->clj n)))
-;      (.edges dagreGraph))))
-;
-;
-;(defn dagre-graph
-;  "copy the nodes and edges from Look to dagre, so we can use dagre layout function to put them
-;  onto the display without drawing over each other
-;  "
-;  [graph]
-;  (let [dagreGraph (new (.-Graph graphlib))
-;        nodeWidth  172
-;        nodeHeight 36]
-;
-;    (.setDefaultEdgeLabel dagreGraph (clj->js {}))
-;    (.setGraph dagreGraph (clj->js {:rankdir "tb"}))
-;
-;    (doall
-;      (map (fn [element]
-;             (condp = (:el-type element)
-;               :node (.setNode dagreGraph (:id element)
-;                       (clj->js {:width nodeWidth :height nodeHeight}))
-;               :edge (.setEdge dagreGraph (:source element)
-;                       (:target element))))
-;        graph))
-;
-;    dagreGraph))
-;
-;
-;(defn build-layout
-;  "use dagre (see https://reactflow.dev/examples/layouting/) to perform an auto-layout of the nodes,
-;  which are then connected by the edges."
-;  [graph]
-;  (let [dagreGraph (dagre-graph graph)
-;        nodeWidth  172
-;        nodeHeight 36]
-;
-;    (.layout dagre dagreGraph)
-;
-;    (doall
-;      (map (fn [element]
-;             ;(log/info "element" (:id element) (.node dagreGraph (clj->js (:id element))))
-;             (condp = (:el-type element)
-;               :node (let [dagreNode (.node dagreGraph (clj->js (:id element)))]
-;                       (assoc element :position {:x (- (.-x dagreNode) (/ nodeWidth 2))
-;                                                 :y (- (.-y dagreNode) (/ nodeHeight 2))}))
-;               :edge element))
-;        graph))))
-
-
 (defn create-flow-node
   "convert the nodes, currently organized by Loom (https://github.com/aysylu/loom), into
   the format needed by react-flow (https://reactflow.dev)
@@ -157,7 +97,7 @@
                                   (let [[sp tp] v]
                                     {(str k) [(str sp) (str tp)]})))
                            (into {}))}
-     :position {}}))
+     :position {:x 0 :y 0}}))
 
 
 (defn create-flow-edge

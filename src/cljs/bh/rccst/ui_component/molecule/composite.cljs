@@ -173,6 +173,9 @@
                       ":source/remote" (partial ui/custom-node component-id :source/remote)
                       ":source/local"  (partial ui/custom-node component-id :source/local)
                       ":source/fn"     (partial ui/custom-node component-id :source/fn)}]
+
+    (log/info "dag-panel" (js->clj nodes) (js->clj edges))
+
     [:div {:style {:width "100%" :height "100%" :border ""}}
      [rc/h-box :src (rc/at)
       :gap "2px"
