@@ -17,14 +17,15 @@
          nodeHeight 36]
 
      (.setDefaultEdgeLabel dagreGraph (clj->js {}))
-     (.setGraph dagreGraph (clj->js {:rankdir "TB" :align "UL"}))
+     (.setGraph dagreGraph (clj->js {:rankdir "tb"}))
 
      (doall
        (map (fn [element]
               (.setNode dagreGraph (:id element)
                 (clj->js {:width nodeWidth :height nodeHeight})))
-         nodes)
+         nodes))
 
+     (doall
        (map (fn [element]
               (.setEdge dagreGraph (:source element) (:target element)))
          edges))
