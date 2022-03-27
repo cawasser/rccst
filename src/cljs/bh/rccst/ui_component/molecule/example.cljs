@@ -13,7 +13,8 @@
                                    component
                                    component-id
                                    source-code
-                                   extra-classes]}]
+                                   extra-classes
+                                   extra-params]}]
 
   ;(log/info "component-example" title  "///" widget-id
   ;  "///" component-id "///" component)
@@ -25,7 +26,9 @@
     description
     [layout/centered (or extra-classes {})
      [:div {:style {:width "1000px" :height "700px"}}
-      [component :data data :component-id component-id :container-id container-id]]]
+      (apply into
+        [component :data data :component-id component-id :container-id container-id]
+        extra-params)]]
     source-code))
 
 
@@ -51,3 +54,16 @@
       [:div {:style {:width "1500px" :height "700px"}}
        [component-panel data container-id]]
       source-code)))
+
+
+
+(comment
+  (def extra-params {:node-types "dummy"})
+  (def params {})
+
+  (let [{:keys [extra-params]} params]
+    (apply into
+      ["component" :data "data" :component-id "component-id" :container-id "container-id"]
+      extra-params))
+
+  ())

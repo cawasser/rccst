@@ -52,7 +52,7 @@
                                 (let [dagreNode (.node dagreGraph (clj->js (:id element)))
                                       x         (- (.-x dagreNode) (/ nodeWidth 2))
                                       y         (- (.-y dagreNode) (/ nodeHeight 2))]
-                                  (log/info "pos" (:id element) x y "//" (.-x dagreNode) (.-y dagreNode))
+                                  ;(log/info "pos" (:id element) x y "//" (.-x dagreNode) (.-y dagreNode))
                                   (assoc element :position {:x x :y y}
                                                  :targetPosition "top"
                                                  :sourcePosition "bottom")))
