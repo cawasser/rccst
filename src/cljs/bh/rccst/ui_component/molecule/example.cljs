@@ -26,9 +26,12 @@
     description
     [layout/centered (or extra-classes {})
      [:div {:style {:width "1000px" :height "700px"}}
-      (apply into
-        [component :data data :component-id component-id :container-id container-id]
-        extra-params)]]
+      (reduce conj
+        [component]
+        (flatten (seq
+                   (apply merge
+                     {:data data :component-id component-id :container-id container-id}
+                     extra-params))))]]
     source-code))
 
 
@@ -59,11 +62,25 @@
 
 (comment
   (def extra-params {:node-types "dummy"})
-  (def params {})
+  (def extra-params {:node-types "diagraph/default-node-types"
+                     :minimap-styles "diagraph/default-minimap-styles"})
+  (def params {:extra-params extra-params})
+
+
+  (map (fn [[k v]]
+         {:k k :v v})
+    extra-params)
 
   (let [{:keys [extra-params]} params]
-    (apply into
-      ["component" :data "data" :component-id "component-id" :container-id "container-id"]
-      extra-params))
+    (reduce conj
+      ["container"]
+      (flatten
+        (seq
+          (apply merge
+            {:data "data" :component-id "component-id" :container-id "container-id"}
+            extra-params)))))
+
+  (reduce conj ["container"] (flatten (seq {:one "one" :two "two"})))
+
 
   ())
