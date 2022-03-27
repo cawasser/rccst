@@ -1,19 +1,20 @@
 (ns bh.rccst.ui-component.molecule.composite
-  "provides a \"container\" to hold and organize other atoms and molecules
-  components have \"ports\" which define their inputs and outputs:
+  "provides a 'container' to hold and organize other atoms and molecules
+components have 'ports' which define their inputs and outputs:
 
-      you SUBSCRIBE with a :port/sink, ie, data come IN   (re-frame/subscribe ...)
+    you SUBSCRIBE with a :port/sink, ie, data come IN   (re-frame/subscribe ...)
 
-      you PUBLISH to a :port/source, ie, data goes OUT    (re-frame/dispatch ...)
+    you PUBLISH to a :port/source, ie, data goes OUT    (re-frame/dispatch ...)
 
-      you do BOTH with :port/source-sink (both)           should we even have this, or should we spell out both directions?
+    you do BOTH with :port/source-sink (both)           should we even have this, or should we spell out both directions?
 
-  the question about :port/source-sink arises because building the layout (the call for the UI itself) doesn't actually
-  need to make a distinction (in fact the code is a bit cleaner if we don't) and we have the callee sort it out (since it
-  needs to implement the correct usage anyway). The flow-diagram, on the other hand, is easier if we DO make the
-  distinction, so we can quickly build all the Nodes and Handles used for the diagram...
-  "
+the question about :port/source-sink arises because building the layout (the call for the UI itself) doesn't actually
+need to make a distinction (in fact the code is a bit cleaner if we don't) and we have the callee sort it out (since it
+needs to implement the correct usage anyway). The flow-diagram, on the other hand, is easier if we DO make the
+distinction, so we can quickly build all the Nodes and Handles used for the diagram...
+"
   (:require [bh.rccst.ui-component.atom.bh.table :as bh-table]
+            [bh.rccst.ui-component.atom.diagram.editable-digraph :as digraph]
             [bh.rccst.ui-component.atom.experimental.ui-element :as e]
             [bh.rccst.ui-component.atom.re-com.label :as rc-label]
             [bh.rccst.ui-component.atom.re-com.slider :as rc-slider]
@@ -35,10 +36,7 @@
             [reagent.core :as r]
             [taoensso.timbre :as log]
             [woolybear.ad.containers :as containers]
-            [woolybear.ad.layout :as layout]
-            ["dagre" :as dagre]
-            ["graphlib" :as graphlib]
-            ["react-flow-renderer" :refer (ReactFlowProvider Controls Handle Background) :default ReactFlow]))
+            [woolybear.ad.layout :as layout]))
 
 
 (log/info "bh.rccst.ui-component.molecule.composite")
@@ -107,6 +105,11 @@
 ;; region
 
 
+(def color-pallet {":ui/component"  "#00ff00"
+                   ":source/remote" "#FFA500"
+                   ":source/local"  "#0000ff"
+                   ":source/fn"     "#FFC0CB"})
+
 (defn- definition-panel
   "show the text definition of the composed UI
   "
@@ -145,21 +148,7 @@
 
     (log/info "detail-panel" (str item) "//" details "//" detail-types)
 
-    [config/make-config-panel details]))                    ;(map (fn [[k v]] [:div (str k "-" v)]) details)]))
-
-
-
-(comment
-  (do
-    (def component-id :widget-grid-demo.grid-widget)
-    (def item :topic/target-data)
-    (def components @(l/subscribe-local component-id [:blackboard :defs :source :components]))
-    (def details ((h/string->keyword item) components))
-    (def detail-types (:type details)))
-
-  (map config/make-config-panel details)
-  ())
-
+    [config/make-config-panel details]))
 
 
 (defn- dag-panel
@@ -167,33 +156,28 @@
   (beside the actual UI)
   "
   [& {:keys [configuration component-id container-id ui]}]
-  (let [open-details (l/subscribe-local component-id [:blackboard :defs :dag :open-details])
-        {:keys [nodes edges]} (ui/make-flow configuration)
-        node-types   {":ui/component"  (partial ui/custom-node component-id :ui/component)
-                      ":source/remote" (partial ui/custom-node component-id :source/remote)
-                      ":source/local"  (partial ui/custom-node component-id :source/local)
-                      ":source/fn"     (partial ui/custom-node component-id :source/fn)}]
-
-    (log/info "dag-panel" (js->clj nodes) (js->clj edges))
+  (let [open-details   (l/subscribe-local component-id [:blackboard :defs :dag :open-details])
+        flow           (r/atom (ui/make-flow configuration))
+        node-types     #js {":ui/component"  (partial ui/custom-node component-id :ui/component)
+                            ":source/remote" (partial ui/custom-node component-id :source/remote)
+                            ":source/local"  (partial ui/custom-node component-id :source/local)
+                            ":source/fn"     (partial ui/custom-node component-id :source/fn)}
+        minimap-styles {:nodeStrokeColor  (partial digraph/custom-minimap-node-color
+                                            color-pallet digraph/color-white)
+                        :node-color       (partial digraph/custom-minimap-node-color
+                                            color-pallet digraph/color-black)
+                        :nodeBorderRadius 5}]
 
     [:div {:style {:width "100%" :height "100%" :border ""}}
      [rc/h-box :src (rc/at)
       :gap "2px"
       :children [[:div {:style {:width "15%" :height "100%"}} "Pick here"]
-                 [:div {:style {:width "600px" :height "700px"}}
-                  [:> ReactFlowProvider
-                   [:> ReactFlow {:className        component-id
-                                  :nodes            nodes
-                                  :onNodesChange    nodes
-                                  :onEdgesChange    edges
-                                  :edges            edges
-                                  :nodeTypes        node-types
-                                  :edgeTypes        {}
-                                  :zoomOnScroll     false
-                                  :preventScrolling false
-                                  :onConnect        #()}
-                    [:> Background]
-                    [:> Controls]]]]
+                 [:div {:style {:width "700px" :height "600px"}}
+                  [digraph/component
+                   :component-id component-id
+                   :data flow
+                   :node-types node-types
+                   :minimap-styles minimap-styles]]
                  [:div {:style {:width "20%" :height "100%"}}
                   (details-panel component-id @open-details)]]]]))
 
@@ -389,22 +373,6 @@
 
   (def config-graph (apply lg/digraph (compute-edges composite-def)))
   (def config-flow (make-flow config-graph))
-
-
-  ())
-
-
-;; dagre
-(comment
-  (def graph (apply lg/digraph (compute-edges @bh.rccst.ui-component.molecule.composite.coverage-plan/ui-definition)))
-  (def dagreGraph (dagre-graph graph))
-
-  (make-flow graph)
-
-  (clj->js {:width 10 :height 10})
-  (clj->js {:width :thing :height 10})
-
-  (.node ("my-id"))
 
 
   ())
@@ -1341,5 +1309,12 @@
                    [[:div "3"] [:div "4"]]])
 
   (update-in c [:widgets id :components] (partial apply conj) components)
+
+  ())
+
+
+(comment
+
+
 
   ())
