@@ -122,7 +122,7 @@
   (def composite-def bh.rccst.ui-component.molecule.composite.multi-chart/composite-def)
 
   ; dummy login so subscription work at all
-  (re-frame/dispatch [:bh.rccst.events/login "string" "string"])
+  (re-frame/dispatch [:bh.rccst.events/login "test-user" "test-pwd"])
 
 
   ; build up the layout

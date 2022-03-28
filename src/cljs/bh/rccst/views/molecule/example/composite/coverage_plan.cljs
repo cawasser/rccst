@@ -19,7 +19,7 @@
         pub-sub-started? (re-frame/subscribe [::subs/pub-sub-started?])]
 
     (if (not @logged-in?)
-      (re-frame/dispatch [:bh.rccst.events/login "string" "string"]))
+      (re-frame/dispatch [:bh.rccst.events/login "test-user" "test-pwd"]))
 
     (fn []
       (if (and @logged-in? @pub-sub-started?)
@@ -43,7 +43,7 @@
   (def logged-in? (re-frame/subscribe [::subs/logged-in?]))
 
   (if (not @logged-in?)
-    (re-frame/dispatch [:bh.rccst.events/login "string" "string"]))
+    (re-frame/dispatch [:bh.rccst.events/login "test-user" "test-pwd"]))
 
   ())
 

@@ -153,7 +153,7 @@
 
 
 (comment
-  (re-frame/dispatch [:bh.rccst.events/login "string" "string"])
+  (re-frame/dispatch [:bh.rccst.events/login "test-user" "test-pwd"])
 
   (re-frame/subscribe [:bh.rccst.subs/source :string])
 
