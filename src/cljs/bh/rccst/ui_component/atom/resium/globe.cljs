@@ -3,7 +3,9 @@
             ["cesium" :refer (Cartesian3 Ion Color CircleGeometry LabelStyle)]
             [bh.rccst.ui-component.atom.resium.shape :as s]
             [bh.rccst.ui-component.utils.helpers :as h]
-            [taoensso.timbre :as log]))
+            [taoensso.timbre :as log]
+            [cljs-time.coerce :as coerce]
+            [cljs-time.core :as cljs-time]))
 
 
 (log/info "bh.rccst.ui-component.atom.resium.globe")
@@ -29,17 +31,18 @@
                    :fill-color [1 0.9 0.0 1.0] :outline-color [1 0.9 0.0 1.0] :width 1}])
 
 
-(defn globe [& {:keys [shapes time component-id container-id]}]
+(defn globe [& {:keys [shapes current-time component-id container-id]}]
   ;(log/info "resium Globe" shapes)
 
   (set! (.-defaultAccessToken Ion) "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJkYWNiMDFiNy1iYzFiLTQ2NDMtYmJlNC0zMjRiNTIzMjM5ODQiLCJpZCI6ODQ1MDAsImlhdCI6MTY0NjMyODY1Mn0.Nax1YEWqQzM_eOqHPhblhU9TO9U42VJn4wCcolAkuhM")
 
   (let [s (h/resolve-value shapes)
-        t (h/resolve-value time)]
+        t (h/resolve-value current-time)]
     ;(log/info "globe OUTER" shapes component-id)
     (fn []
       [:> Viewer ;{:style {:width "100%" :height "100%"}}
-       [:> Globe
+       ; TODO: add another function that converts integer value to current real time
+       [:> Globe {:enableLighting true :currentTime (coerce/to-date (cljs-time/now))}
         (into [:<>]
           (doall (map s/make-shape @s)))]])))
 
@@ -47,7 +50,7 @@
 
 (def meta-data {:r/globe {:component globe
                           :ports     {:shapes :port/sink
-                                      :time :port/sink}}})
+                                      :current-time :port/sink}}})
 
 
 (comment
@@ -61,5 +64,11 @@
      (doall (map-indexed (fn [idx shape]
                            ^{:keys idx}(make-shape shape))
               shapes)))]
+
+  (def v [:a :b :c])
+
+  (v 0)
+
+  {:a 1 :b 2}
 
   ())

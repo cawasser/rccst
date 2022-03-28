@@ -76,6 +76,5 @@
                                     :outlineWidth width
                                     :show         true}]]))
 
-
 (defmethod make-shape :default [_]
   [:> Entity])
