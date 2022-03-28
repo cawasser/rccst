@@ -114,7 +114,7 @@
      :sourceHandle  (str source-handle)
      :target        (str target-id)
      :targetHandle  (str target-handle)
-     :label         (str target-handle)
+     :label         (str source-handle "->" target-handle)
      :style         {:strokeWidth 1 :stroke :black}
      :arrowHeadType "arrowclosed"
      :animated      false}))
