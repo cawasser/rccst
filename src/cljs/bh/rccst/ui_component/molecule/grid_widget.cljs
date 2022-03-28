@@ -35,7 +35,7 @@
   (log/info "wrap-component" id)
 
   [:div.widget-parent {:key id}
-   [:div.grid-toolbar (name id)]
+   [:div.grid-toolbar.title-wrapper.move-cursor (name id)]
    [:div.widget.widget-content
     {:style         {;:width       "100%"
                      ;:height      "100%"

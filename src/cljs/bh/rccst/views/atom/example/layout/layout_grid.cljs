@@ -10,7 +10,7 @@
 
 
 (defn- make-widget [[id icon bk-color txt-color]]
-  [:div.grid-toolbar
+  [:div.grid-toolbar.title-wrapper.move-cursor
    {:key id :style {:border           :solid
                     :background-color bk-color
                     :color            txt-color}}
