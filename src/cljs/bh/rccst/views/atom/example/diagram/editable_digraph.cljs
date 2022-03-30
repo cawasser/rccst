@@ -15,25 +15,25 @@
       :data diagraph/sample-data
       :component diagraph/component
       :component-id (utils/path->keyword container-id "editable-digraph")
-      :source-code diagraph/source-code]
-
-     [example/component-example
-      :widget-id container-id
-      :title "Editable Digraph (more data)"
-      :description "An Editable Digraph,  built using [react-flow](https://reactflow.dev)"
-      :data diagraph/sample-data-2
-      :extra-params {:node-types diagraph/default-node-types
-                     :minimap-styles diagraph/default-minimap-styles}
-      :component diagraph/component
-      :component-id (utils/path->keyword container-id "editable-digraph-2")
-      :source-code diagraph/source-code]
-
-     [example/component-example
-      :widget-id container-id
-      :title "Editable Digraph (example data)"
-      :description "An Editable Digraph,  built using [react-flow](https://reactflow.dev)"
-      :data diagraph/sample-data-3
-      :component diagraph/component
-      :component-id (utils/path->keyword container-id "editable-digraph-3")
       :source-code diagraph/source-code]]))
+
+     ;[example/component-example
+     ; :widget-id container-id
+     ; :title "Editable Digraph (more data)"
+     ; :description "An Editable Digraph,  built using [react-flow](https://reactflow.dev)"
+     ; :data diagraph/sample-data-2
+     ; :extra-params {:node-types diagraph/default-node-types
+     ;                :minimap-styles diagraph/default-minimap-styles}
+     ; :component diagraph/component
+     ; :component-id (utils/path->keyword container-id "editable-digraph-2")
+     ; :source-code diagraph/source-code]
+     ;
+     ;[example/component-example
+     ; :widget-id container-id
+     ; :title "Editable Digraph (example data)"
+     ; :description "An Editable Digraph,  built using [react-flow](https://reactflow.dev)"
+     ; :data diagraph/sample-data-3
+     ; :component diagraph/component
+     ; :component-id (utils/path->keyword container-id "editable-digraph-3")
+     ; :source-code diagraph/source-code]]))
 

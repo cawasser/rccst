@@ -1,6 +1,6 @@
 (ns bh.rccst.ui-component.atom.diagram.editable-digraph
-  (:require [bh.rccst.ui-component.atom.diagram.diagram.dagre-support :as dagre]
-            [clojure.set :as set]
+  (:require [clojure.set :as set]
+            [re-com.core :as rc]
             [reagent.core :as r]
             [taoensso.timbre :as log]
             ["react" :as react]
@@ -285,7 +285,7 @@
      (->> inputs
        (map-indexed (fn [idx [target ports]]
                       (let [[source-port target-port] ports]
-                        (log/info "input-handle" label target-port)
+                        ;(log/info "input-handle" label target-port)
                         [:> Handle {:id    target-port :type "target" :position position
                                     :style (merge handle-style {:left (+ 20 (* 10 idx))})}])))
        (into [:<>])))])
@@ -301,7 +301,7 @@
      (->> outputs
        (map-indexed (fn [idx [target ports]]
                       (let [[source-port target-port] ports]
-                        (log/info "output-handle" label source-port)
+                        ;(log/info "output-handle" label source-port)
                         [:> Handle {:id    source-port :type "source" :position position
                                     :style (merge handle-style {:right (+ 20 (* 10 idx))})}])))
        (into [:<>])))])
@@ -333,7 +333,7 @@
         outputs (get-in data [:data :outputs])
         style   (merge default-node-style (type node-style))]
 
-    (log/info "custom-node" label type data "///" inputs "///" outputs)
+    ;(log/info "custom-node" label type data "///" inputs "///" outputs)
 
     (r/as-element
       [:div {:style style}                                  ;:on-click #(open-details component-id label)}
@@ -441,13 +441,93 @@
                              :nodeBorderRadius 5})
 
 
+(defn- on-drag-start [node-type event]
+  (.setData (.-dataTransfer event) "editable-flow" node-type)
+  (set! (.-effectAllowed (.-dataTransfer event)) "move"))
+
+
+(defn- on-drag-over [event]
+  (.preventDefault event)
+  (set! (.-dropEffect (.-dataTransfer event)) "move"))
+
+
+(defn- on-drop [set-nodes-fn wrapper event]
+  (.preventDefault event)
+  (let [node-type       (.getData (.-dataTransfer event) "editable-flow")
+        x               (.-clientX event)
+        y               (.-clientY event)
+        reactFlowBounds (.getBoundingClientRect @wrapper)]
+
+    ;(log/info "on-drop" node-type
+      ;"//" @wrapper)
+      ;"//" (.-current @wrapper)
+      ;"//" (.getBoundingClientRect @wrapper))
+      ;"//" (js->clj reactFlowBounds)
+
+    (when (not= node-type "undefined")
+      (let [new-id   (str node-type "-new")
+            new-node {:id       new-id
+                      :data     {:label   new-id
+                                 :inputs  []
+                                 :outputs []}
+                      :position {:x (- x (.-left reactFlowBounds))
+                                 :y (- y (.-top reactFlowBounds))}}]
+        ; TODO: need to trigger a "get back into CLJS and SAVE" operation
+        (set-nodes-fn (fn [nds] (.concat nds (clj->js new-node))))))))
+
+
+(comment
+  (def data [{:id "one"} {:id "two"}])
+
+  (conj data {:id "three"})
+
+
+  ())
+
+
+(defn- make-draggable-node [[k {:keys [label type color text-color]}]]
+  ;(log/info "make-draggable-node" label type)
+  ^{:key label} [:div.draggable
+                 {:style       {:width           "150px" :height "50px"
+                                :margin-bottom   "5px"
+                                :display         :flex
+                                :justify-content :center
+                                :align-items     :center
+                                :cursor          :grab
+                                :border-radius   "3px" :padding "2px"
+                                :background      color :color text-color}
+                  :onDragStart #(on-drag-start type %)
+                  :draggable   true}
+                 label])
+
+
+(def default-tool-types {:ui/component  {:label ":ui/component" :type :ui/component :color "green" :text-color :white}
+                         :source/remote {:label ":source/remote" :type :source/remote :color "orange" :text-color :black}
+                         :source/local  {:label ":source/local" :type :source/local :color "blue" :text-color :white}
+                         :source/fn     {:label ":source/fn" :type :source/fn :color "pink" :text-color :black}})
+
+
+(defn- tool-panel [tool-types]
+  ;(log/info "tool-panel" tool-types)
+  [:div#tool-panel {:display         :flex
+                    :flex-direction  :column
+                    :justify-content :center
+                    :align-items     :center
+                    :style           {:width         "200px" :height "100%"
+                                      :border-radius "5px" :padding "15px 10px"
+                                      :background    :white :box-shadow "5px 5px 5px #888888"}}
+   (doall
+     (map make-draggable-node tool-types))])
+
+
 (defn- flow* [& {:keys [component-id nodes edges
                         node-types edge-types
                         minimap-styles
-                        on-change-nodes on-change-edges
+                        on-change-nodes on-change-edges on-drop on-drag-over
                         zoom-on-scroll preventScrolling connectFn]}]
 
-  ;(log/info "flow(star)" component-id "//" (or minimap-styles {})
+  ;(log/info "flow(star)" component-id)
+  ;"//" (or minimap-styles {}))
   ; "//" (js->clj minimap-styles) "//" (type minimap-styles))
 
   (let [params (apply merge {:nodes               nodes
@@ -458,7 +538,9 @@
                              :preventScrolling    (or preventScrolling false)
                              :onConnect           (or connectFn #())
                              :fitView             true
-                             :attributionPosition "top-right"}
+                             :attributionPosition "top-right"
+                             :onDrop              (or on-drop #())
+                             :onDragOver          (or on-drag-over #())}
                  (when node-types {:node-types node-types})
                  (when edge-types {:edge-types node-types}))]
 
@@ -468,30 +550,39 @@
      [:> Controls]]))
 
 
-(defn- editable-flow [& {:keys [component-id nodes edges
+(defn- editable-flow [& {:keys [component-id
+                                nodes edges
                                 node-types edge-types
-                                minimap-styles
+                                minimap-styles on-drop on-drag-over
                                 zoom-on-scroll preventScrolling connectFn]}]
-  (let [{n :nodes e :edges} (dagre/build-layout nodes edges)
-        [ns set-nodes on-change-nodes] (useNodesState (clj->js n))
-        [es set-edges on-change-edges] (useEdgesState (clj->js e))]
+  (let [;{n :nodes e :edges} (dagre/build-layout nodes edges)
+        [ns set-nodes on-change-nodes] (useNodesState (clj->js nodes))
+        [es set-edges on-change-edges] (useEdgesState (clj->js edges))
+        !wrapper (clojure.core/atom nil)]
+
 
     ;(log/info "editable-flow"
     ;  "//" ns
+    ;  "//" nodes)
     ;  "//" set-nodes
     ;  "//" on-change-nodes)
 
-    [flow*
-     :component-id component-id
-     :nodes ns :edges es
-     :on-change-nodes on-change-nodes
-     :on-change-edges on-change-edges
-     :node-types node-types
-     :edge-types edge-types
-     :minimap-styles minimap-styles
-     :connectFn connectFn
-     :zoom-on-scroll zoom-on-scroll
-     :preventScrolling preventScrolling]))
+    [:div#wrapper {:style {:width "800px" :height "700px"}
+                   :ref (fn [el]
+                          (reset! !wrapper el))}
+     [flow*
+      :component-id component-id
+      :nodes ns :edges es
+      :on-change-nodes on-change-nodes
+      :on-change-edges on-change-edges
+      :node-types node-types
+      :edge-types edge-types
+      :minimap-styles minimap-styles
+      :connectFn connectFn
+      :zoom-on-scroll zoom-on-scroll
+      :preventScrolling preventScrolling
+      :on-drop (partial on-drop set-nodes !wrapper)
+      :on-drag-over on-drag-over]]))
 
 
 (defn component [& {:keys [data
@@ -500,15 +591,30 @@
                            connectFn zoom-on-scroll preventScrolling
                            component-id container-id]}]
 
-  [:f> editable-flow
-   :component-id component-id
-   :nodes (:nodes @data)
-   :edges (:edges @data)
-   :node-types node-types
-   :edge-types edge-types
-   :minimap-styles minimap-styles
-   :connectFn connectFn
-   :zoom-on-scroll zoom-on-scroll
-   :preventScrolling preventScrolling])
+  ;(log/info "component (DIGRAPH)" "//" (:nodes @data))
+
+  [rc/h-box :src (rc/at)
+   :gap "10px"
+   :children [[tool-panel default-tool-types]
+              [:f> editable-flow
+               :component-id component-id
+               :nodes (:nodes @data)
+               :edges (:edges @data)
+               :node-types node-types
+               :edge-types edge-types
+               :on-drop on-drop
+               :on-drag-over on-drag-over
+               :minimap-styles minimap-styles
+               :connectFn connectFn
+               :zoom-on-scroll zoom-on-scroll
+               :preventScrolling preventScrolling]]])
+
+
+(comment
+  (:nodes @sample-data)
+  (swap! sample-data assoc :nodes (conj (:nodes @sample-data)
+                                    {:id "dummy-node" :position {:x 0 :y 0}}))
+
+  ())
 
 
