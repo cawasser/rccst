@@ -1,5 +1,6 @@
 (ns bh.rccst.ui-component.atom.diagram.editable-digraph
-  (:require [clojure.set :as set]
+  (:require [bh.rccst.ui-component.atom.diagram.diagram.dagre-support :as dagre]
+            [clojure.set :as set]
             [re-com.core :as rc]
             [reagent.core :as r]
             [taoensso.timbre :as log]
@@ -51,110 +52,101 @@
               :markerEnd {:type (.-ArrowClosed MarkerType)}}]}))
 (def sample-data-2
   (r/atom
-    {:nodes [
-             {:id       ":fn/range"
-              :type     ":source/fn"
-              :data     {:label   ":fn/range"
-                         :inputs  {":topic/coverage-data" [":data" ":data"]}
-                         :outputs {":topic/time-range" [":range" ":data"]}}
-              :position {:x 0 :y 0}}
-             {:id       ":ui/globe"
-              :type     ":ui/component"
-              :data     {:label   ":ui/globe"
-                         :inputs  {":topic/shapes"       [":data" ":shapes"]
-                                   ":topic/current-time" [":data" ":current-time"]}
-                         :outputs {}}
-              :position {:x 0 :y 86}}
-             {:id       ":topic/coverage-data"
-              :type     ":source/remote"
-              :data     {:label   ":topic/coverage-data"
-                         :inputs  {}
-                         :outputs {":fn/coverage" [":data" ":coverages"]
-                                   ":fn/range"    [":data" ":data"]}}
-              :position {:x 0 :y 172}}
-             {:id       ":topic/shapes"
-              :type     ":source/local"
-              :data     {:label   ":topic/shapes"
-                         :inputs  {":fn/coverage" [":shapes" ":data"]}
-                         :outputs {":ui/globe" [":data" ":shapes"]}}
-              :position {:x 0 :y 258}}
-             {:id       ":ui/satellites"
-              :type     ":ui/component"
-              :data     {:label   ":ui/satellites"
-                         :inputs  {":topic/satellite-data" [":data" ":data"]}
-                         :outputs {":topic/satellite-data"      [":data" ":data"]
-                                   ":topic/selected-satellites" [":selection" ":data"]}}
-              :position {:x 0 :y 344}}
-             {:id       ":topic/current-time"
-              :type     ":source/local"
-              :data     {:label   ":topic/current-time"
-                         :inputs  {":ui/time-slider" [":value" ":data"]}
-                         :outputs {":ui/current-time" [":data" ":value"]
-                                   ":ui/time-slider"  [":data" ":value"]
-                                   ":ui/globe"        [":data" ":current-time"]
-                                   ":fn/coverage"     [":data" ":current-time"]}}
-              :position {:x 0 :y 430}}
-             {:id       ":fn/coverage"
-              :type     ":source/fn"
-              :data     {:label   ":fn/coverage"
-                         :inputs  {":topic/coverage-data"       [":data" ":coverages"]
-                                   ":topic/current-time"        [":data" ":current-time"]
-                                   ":topic/selected-targets"    [":data" ":targets"]
-                                   ":topic/selected-satellites" [":data" ":satellites"]}
-                         :outputs {":topic/shapes" [":shapes" ":data"]}}
-              :position {:x 0 :y 516}}
-             {:id       ":topic/time-range"
-              :type     ":source/local"
-              :data     {:label   ":topic/time-range"
-                         :inputs  {":fn/range" [":range" ":data"]}
-                         :outputs {":ui/time-slider" [":data" ":range"]}}
-              :position {:x 222 :y 0}}
-             {:id       ":ui/time-slider"
-              :type     ":ui/component"
-              :data     {:label   ":ui/time-slider"
-                         :inputs  {":topic/current-time" [":data" ":value"]
-                                   ":topic/time-range"   [":data" ":range"]}
-                         :outputs {":topic/current-time" [":value" ":data"]}}
-              :position {:x 0 :y 602}}
-             {:id       ":topic/target-data"
-              :type     ":source/remote"
-              :data     {:label   ":topic/target-data"
-                         :inputs  {":ui/targets" [":selection" ""]}
-                         :outputs {":ui/targets" [":data" ":data"]}}
-              :position {:x 0 :y 688}}
-             {:id       ":topic/satellite-data"
-              :type     ":source/remote"
-              :data     {:label   ":topic/satellite-data"
-                         :inputs  {":ui/satellites" [":selection" ""]}
-                         :outputs {":ui/satellites" [":data" ":data"]}}
-              :position {:x 0 :y 774}}
-             {:id       ":ui/targets"
-              :type     ":ui/component"
-              :data     {:label   ":ui/targets"
-                         :inputs  {":topic/target-data" [":data" ":data"]}
-                         :outputs {":topic/target-data"      [":data" ":data"]
-                                   ":topic/selected-targets" [":selection" ":data"]}}
-              :position {:x 0 :y 860}}
-             {:id       ":topic/selected-targets"
-              :type     ":source/local"
-              :data     {:label   ":topic/selected-targets"
-                         :inputs  {":ui/targets" [":selection" ":data"]}
-                         :outputs {":fn/coverage" [":data" ":targets"]}}
-              :position {:x 0 :y 946}}
-             {:id       ":topic/selected-satellites"
-              :type     ":source/local"
-              :data     {:label   ":topic/selected-satellites"
-                         :inputs  {":ui/satellites" [":selection" ":data"]}
-                         :outputs {":fn/coverage" [":data" ":satellites"]}}
-              :position {:x 0 :y 1032}}
-             {:id       ":ui/current-time"
-              :type     ":ui/component"
-              :data     {:label   ":ui/current-time"
-                         :inputs  {":topic/current-time" [":data" ":value"]}
-                         :outputs {}}
-              :position {:x 0 :y 1118}}]
-     :edges [
-             {:targetHandle ":data" :animated false
+    {:nodes [{:id       ":fn/range",
+              :type     ":source/fn",
+              :data     {:label   ":fn/range",
+                         :inputs  {":topic/coverage-data" [":data" ":data"]},
+                         :outputs {":topic/time-range" [":range" ":data"]}},
+              :position {:x 0, :y 86}}
+             {:id       ":ui/globe",
+              :type     ":ui/component",
+              :data     {:label   ":ui/globe",
+                         :inputs  {":topic/shapes" [":data" ":shapes"], ":topic/current-time" [":data" ":current-time"]},
+                         :outputs {}},
+              :position {:x 0, :y 602}}
+             {:id       ":topic/coverage-data",
+              :type     ":source/remote",
+              :data     {:label   ":topic/coverage-data",
+                         :inputs  {},
+                         :outputs {":fn/coverage" [":data" ":coverages"], ":fn/range" [":data" ":data"]}},
+              :position {:x 454, :y 0}}
+             {:id       ":topic/shapes",
+              :type     ":source/local",
+              :data     {:label   ":topic/shapes",
+                         :inputs  {":fn/coverage" [":shapes" ":data"]},
+                         :outputs {":ui/globe" [":data" ":shapes"]}},
+              :position {:x 615.5, :y 516}}
+             {:id       ":ui/satellites",
+              :type     ":ui/component",
+              :data     {:label   ":ui/satellites",
+                         :inputs  {":topic/satellite-data" [":data" ":data"]},
+                         :outputs {":topic/satellite-data" [":data" ":data"], ":topic/selected-satellites" [":selection" ":data"]}},
+              :position {:x 333, :y 258}}
+             {:id       ":topic/current-time",
+              :type     ":source/local",
+              :data     {:label   ":topic/current-time",
+                         :inputs  {":ui/time-slider" [":value" ":data"]},
+                         :outputs {":ui/current-time" [":data" ":value"],
+                                   ":ui/time-slider"  [":data" ":value"],
+                                   ":ui/globe"        [":data" ":current-time"],
+                                   ":fn/coverage"     [":data" ":current-time"]}},
+              :position {:x 0, :y 344}}
+             {:id       ":fn/coverage",
+              :type     ":source/fn",
+              :data     {:label   ":fn/coverage",
+                         :inputs  {":topic/coverage-data"       [":data" ":coverages"],
+                                   ":topic/current-time"        [":data" ":current-time"],
+                                   ":topic/selected-targets"    [":data" ":targets"],
+                                   ":topic/selected-satellites" [":data" ":satellites"]},
+                         :outputs {":topic/shapes" [":shapes" ":data"]}},
+              :position {:x 615.5, :y 430}}
+             {:id       ":topic/time-range",
+              :type     ":source/local",
+              :data     {:label   ":topic/time-range",
+                         :inputs  {":fn/range" [":range" ":data"]},
+                         :outputs {":ui/time-slider" [":data" ":range"]}},
+              :position {:x 0, :y 172}}
+             {:id       ":ui/time-slider",
+              :type     ":ui/component",
+              :data     {:label   ":ui/time-slider",
+                         :inputs  {":topic/current-time" [":data" ":value"], ":topic/time-range" [":data" ":range"]},
+                         :outputs {":topic/current-time" [":value" ":data"]}},
+              :position {:x 0, :y 258}}
+             {:id       ":topic/target-data",
+              :type     ":source/remote",
+              :data     {:label   ":topic/target-data",
+                         :inputs  {":ui/targets" [":selection" ""]},
+                         :outputs {":ui/targets" [":data" ":data"]}},
+              :position {:x 666, :y 172}}
+             {:id       ":topic/satellite-data",
+              :type     ":source/remote",
+              :data     {:label   ":topic/satellite-data",
+                         :inputs  {":ui/satellites" [":selection" ""]},
+                         :outputs {":ui/satellites" [":data" ":data"]}},
+              :position {:x 222, :y 344}}
+             {:id       ":ui/targets",
+              :type     ":ui/component",
+              :data     {:label   ":ui/targets",
+                         :inputs  {":topic/target-data" [":data" ":data"]},
+                         :outputs {":topic/target-data" [":data" ":data"], ":topic/selected-targets" [":selection" ":data"]}},
+              :position {:x 666, :y 258}}
+             {:id       ":topic/selected-targets",
+              :type     ":source/local",
+              :data     {:label   ":topic/selected-targets",
+                         :inputs  {":ui/targets" [":selection" ":data"]},
+                         :outputs {":fn/coverage" [":data" ":targets"]}},
+              :position {:x 666, :y 344}}
+             {:id       ":topic/selected-satellites",
+              :type     ":source/local",
+              :data     {:label   ":topic/selected-satellites",
+                         :inputs  {":ui/satellites" [":selection" ":data"]},
+                         :outputs {":fn/coverage" [":data" ":satellites"]}},
+              :position {:x 444, :y 344}}
+             {:id       ":ui/current-time",
+              :type     ":ui/component",
+              :data     {:label ":ui/current-time", :inputs {":topic/current-time" [":data" ":value"]}, :outputs {}},
+              :position {:x 60.5, :y 430}}]
+     :edges [{:targetHandle ":data" :animated false
               :source       ":fn/range" :style {:strokeWidth 1 :stroke :black}
               :label        ":data" :id "0" :markerEnd {:type (.-ArrowClosed MarkerType)}
               :sourceHandle ":range" :target ":topic/time-range"}
@@ -459,14 +451,15 @@
         reactFlowBounds (.getBoundingClientRect @wrapper)]
 
     ;(log/info "on-drop" node-type
-      ;"//" @wrapper)
-      ;"//" (.-current @wrapper)
-      ;"//" (.getBoundingClientRect @wrapper))
-      ;"//" (js->clj reactFlowBounds)
+    ;"//" @wrapper)
+    ;"//" (.-current @wrapper)
+    ;"//" (.getBoundingClientRect @wrapper))
+    ;"//" (js->clj reactFlowBounds)
 
     (when (not= node-type "undefined")
       (let [new-id   (str node-type "-new")
             new-node {:id       new-id
+                      :type     node-type
                       :data     {:label   new-id
                                  :inputs  []
                                  :outputs []}
@@ -568,8 +561,8 @@
     ;  "//" on-change-nodes)
 
     [:div#wrapper {:style {:width "800px" :height "700px"}
-                   :ref (fn [el]
-                          (reset! !wrapper el))}
+                   :ref   (fn [el]
+                            (reset! !wrapper el))}
      [flow*
       :component-id component-id
       :nodes ns :edges es
@@ -618,3 +611,15 @@
   ())
 
 
+
+(comment
+  (let {nodes :nodes edges :edges} (dagre/build-layout
+                                     (:nodes @sample-data-2)
+                                     (:edges @sample-data-2)))
+
+  (->> (dagre/build-layout (:nodes @sample-data-2)
+         (:edges @sample-data-2))
+    :nodes
+    (map #(dissoc % :targetPosition :sourcePosition)))
+
+  ())
