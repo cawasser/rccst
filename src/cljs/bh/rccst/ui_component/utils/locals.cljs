@@ -269,7 +269,7 @@
 
 
 (defn init-widget
-  "1. adds the `locals-and`defaults` into the `app-db` in the correct location
+  "1. adds the `locals-and-defaults` into the `app-db` in the correct location
   2. creates and registers a subscription to `:widgets/<widget-id>`
   3. creates and registers a subscription (cascaded off `:widgets/<widget-id>`) for each relative path in `locals-and-defaults`
   4. creates and registers an event handler for`:widgets/<widget-id>`

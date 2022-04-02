@@ -2,7 +2,11 @@
   (:require [re-frame.core :as re-frame]
             [day8.re-frame.tracing :refer-macros [fn-traced]]
             [bh.rccst.ui-component.utils.helpers :as h]
-            [bh.rccst.ui-component.utils.locals :as l]))
+            [bh.rccst.ui-component.utils.locals :as l]
+            [taoensso.timbre :as log]))
+
+
+(log/info "bh.rccst.ui-component.utils.container")
 
 
 (def default-composite {:blackboard {}})
@@ -26,7 +30,7 @@
         c          (h/path->keyword :widgets container-id)
         blackboard (h/path->keyword container-id "blackboard")]
 
-    ;(log/info "init-container" container-id id c blackboard)
+    (log/info "init-container" container-id id c blackboard)
 
     (re-frame/reg-sub
       c
