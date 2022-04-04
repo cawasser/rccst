@@ -112,8 +112,7 @@
 
     [globe*
      {:id         component-id
-      :min-max    :max
-      :time       (coerce/to-date (cljs-time/now))
+      :time       time ;(coerce/to-date (cljs-time/now))
       :projection "3D"
       :style      {:background-color :black
                    :border-radius    "3px"
@@ -122,11 +121,12 @@
      all-layer]))
 
 
-(defn globe [& {:keys [shapes time component-id container-id]}]
+(defn globe [& {:keys [shapes current-time component-id container-id]}]
 
   (let [s (h/resolve-value shapes)
-        t (h/resolve-value time)]
-    ;(log/info "globe OUTER" @s @t component-id)
+        t (h/resolve-value current-time)]
+
+    (log/info "globe OUTER" shapes current-time "//" @s @t "//" component-id)
 
     (fn []
       ;(log/info "globe INNER" shapes time component-id)
@@ -140,7 +140,7 @@
 
 (def meta-data {:ww/globe {:component globe
                            :ports     {:shapes :port/sink
-                                       :time   :port/sink}}})
+                                       :current-time   :port/sink}}})
 
 
 (comment
