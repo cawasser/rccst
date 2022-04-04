@@ -139,7 +139,8 @@
                      {:id :dag :label [:i {:class "zmdi zmdi-share"}]}
                      {:id :definition :label [:i {:class "zmdi zmdi-format-subject"}]}]]
 
-        [:div.box {:style {:width "1000px" :height "800px"}}
+        [:div.box {:style {:width "1000px" :height "800px"
+                           :background "#faeee8"}}
          [rc/v-box :src (rc/at)
           :justify :end
           :width "100%"

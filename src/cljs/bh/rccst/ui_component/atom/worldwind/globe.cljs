@@ -10,7 +10,6 @@
             [bh.rccst.ui-component.utils.helpers :as h]
             [cljs-time.coerce :as coerce]
             [cljs-time.core :as cljs-time]
-            [cljs-uuid-utils.core :as uuid]
             [reagent.core :as r]
             [taoensso.timbre :as log]))
 
@@ -37,7 +36,7 @@
                    :fill-color [0 1 0 0.5] :outline-color [1 1 1 1] :width 2}
                   {:shape         :shape/polyline :id "line2" :locations [[22 -55] [45 -105] [36 -125.7]]
                    :outline-color [1 0.5 0.78 1.0] :width 5}
-                  {:shape :shape/label :id "orlando" :location [28.538336 -81.379234] :label "Orlando"
+                  {:shape      :shape/label :id "orlando" :location [28.538336 -81.379234] :label "Orlando"
                    :fill-color [1 0.9 0.0 1.0] :outline-color [1 0.9 0.0 1.0] :width 1}])
 
 
@@ -109,7 +108,7 @@
                        (base-layers component-id)
                        shape-layers)]
 
-    ;(log/info "globe-inter" shapes "//" s "//" (count (.-renderables shapes-layer)))
+    (log/info "globe-inter" shapes "//" time "//" (count (.-renderables shape-layers)))
 
     [globe*
      {:id         component-id
@@ -117,6 +116,7 @@
       :time       (coerce/to-date (cljs-time/now))
       :projection "3D"
       :style      {:background-color :black
+                   :border-radius    "3px"
                    :width            "100%"
                    :height           "100%"}}
      all-layer]))
@@ -126,10 +126,10 @@
 
   (let [s (h/resolve-value shapes)
         t (h/resolve-value time)]
-    ;(log/info "globe OUTER" shapes component-id)
+    ;(log/info "globe OUTER" @s @t component-id)
 
     (fn []
-      ;(log/info "globe INNER" shapes component-id)
+      ;(log/info "globe INNER" shapes time component-id)
 
       [globe-inter
        :shapes @s
@@ -140,7 +140,7 @@
 
 (def meta-data {:ww/globe {:component globe
                            :ports     {:shapes :port/sink
-                                       :time :port/sink}}})
+                                       :time   :port/sink}}})
 
 
 (comment
