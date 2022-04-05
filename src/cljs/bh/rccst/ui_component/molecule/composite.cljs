@@ -171,8 +171,7 @@ distinction, so we can quickly build all the Nodes and Handles used for the diag
     [:div {:style {:width "100%" :height "100%" :border ""}}
      [rc/h-box :src (rc/at)
       :gap "2px"
-      :children [[:div {:style {:width "15%" :height "100%"}} "Pick here"]
-                 [:div {:style {:width "700px" :height "600px"}}
+      :children [[:div {:style {:width "800px" :height "600px"}}
                   [digraph/component
                    :component-id component-id
                    :data flow
