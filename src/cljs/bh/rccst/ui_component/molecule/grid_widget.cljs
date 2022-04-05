@@ -6,6 +6,7 @@
             [bh.rccst.ui-component.molecule.composite.util.ui :as ui]
             [bh.rccst.ui-component.utils :as ui-utils]
             [bh.rccst.ui-component.utils.locals :as locals]
+            [bh.rccst.ui-component.atom.re-com.configure-toggle :as ct]
             [loom.graph :as lg]
             [re-com.core :as rc]
             [re-frame.core :as re-frame]
@@ -101,11 +102,7 @@
 
         ; 1. build UI components (with subscription/event signals against the blackboard or remotes)
         composed-ui         (map wrap-component component-lookup)
-        make-editable-style {:md-icon-name "zmdi-wrench"
-                             :tooltip      "configure this chart"}
-        save-editable-style {:md-icon-name "zmdi-lock-outline"
-                             :tooltip      "Save the configuration"}]
-
+        open?               (r/atom false)]
 
     (fn []
       ;(log/info "component-panel INNER" component-id
@@ -115,14 +112,8 @@
       ; 5. return the composed component layout!
       [rc/v-box :src (rc/at)
        :gap "2px"
-       :children [(reduce conj [rc/md-icon-button]
-                    (flatten
-                      (seq
-                        (merge {:class    "button"
-                                :on-click #(locals/apply-local component-id
-                                             [:layout] toggle-editable)}
-                          (if (-> @layout first :static)
-                            make-editable-style save-editable-style)))))
+       :children [[ct/configure-toggle open? #(locals/apply-local component-id
+                                                [:layout] toggle-editable)]
                   [:div.grid-container {:style {:width "100%" :height "100%"}}
                    [grid/grid
                     :id component-id
