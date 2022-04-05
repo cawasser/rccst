@@ -8,6 +8,7 @@
             [bh.rccst.ui-component.utils.locals :as locals]
             [loom.graph :as lg]
             [re-com.core :as rc]
+            [re-frame.core :as re-frame]
             [reagent.core :as r]
             [taoensso.timbre :as log]))
 
@@ -65,19 +66,22 @@
         all-layouts* (js->clj all-layouts :keywordize-keys true)
         fst          (first new-layout*)]
 
-    (log/info "on-layout-change" new-layout*
-      "//" all-layouts*
-      "//" (keys all-layouts*))
+    ;(log/info "on-layout-change" new-layout*
+    ;  "//" all-layouts*
+    ;  "//" (keys all-layouts*))
 
     (when (and
             (not (empty? new-layout*))
             (<= 1 (count new-layout*))
             (not= (:i fst) "null"))
-      (let [cooked (map #(zipmap '(:i :x :y :w :h) %)
-                     (map (juxt :i :x :y :w :h) new-layout*))]
+      (let [cooked (map #(zipmap '(:i :x :y :w :h :static) %)
+                     (map (juxt :i :x :y :w :h :static) new-layout*))]
         (locals/dispatch-local component-id [:layout] cooked)))))
 
-;[:blackboard :defs :source :grid-layout]
+
+(defn- toggle-editable [orig-value]
+  (map #(assoc % :static (-> % :static not)) orig-value))
+
 
 (defn- component-panel [& {:keys [configuration component-id container-id]}]
   ;(log/info "component-panel" component-id
@@ -89,32 +93,47 @@
   ;                              configuration :ui/component
   ;                              composite/meta-data-registry component-id)))
 
-  (let [layout           (locals/subscribe-local component-id [:layout])
-        component-lookup (into {}
-                           (sig/process-components
-                             configuration :ui/component
-                             composite/meta-data-registry component-id))
+  (let [layout              (locals/subscribe-local component-id [:layout])
+        component-lookup    (into {}
+                              (sig/process-components
+                                configuration :ui/component
+                                composite/meta-data-registry component-id))
 
         ; 1. build UI components (with subscription/event signals against the blackboard or remotes)
-        composed-ui      (map wrap-component component-lookup)]
+        composed-ui         (map wrap-component component-lookup)
+        make-editable-style {:md-icon-name "zmdi-wrench"
+                             :tooltip      "configure this chart"}
+        save-editable-style {:md-icon-name "zmdi-lock-outline"
+                             :tooltip      "Save the configuration"}]
 
-    ;(log/info "component-panel INNER" component-id
-    ;  "//" @layout
-    ;  "//" composed-ui)
 
     (fn []
+      ;(log/info "component-panel INNER" component-id
+      ;  "//" @layout
+      ;  "//" composed-ui)
+
       ; 5. return the composed component layout!
-      [:div.grid-container {:style {:width "100%" :height "100%"}}
-       [grid/grid
-        :id component-id
-        :class "layout"
-        :children composed-ui
-        :layout layout
-        :cols (r/atom 12)
-        :width 900
-        :rowHeight 25
-        :layoutFn #(on-layout-change component-id %1 %2)
-        :widthFn #(on-width-update %1 %2 %3 %4)]])))
+      [rc/v-box :src (rc/at)
+       :gap "2px"
+       :children [(reduce conj [rc/md-icon-button]
+                    (flatten
+                      (seq
+                        (merge {:class    "button"
+                                :on-click #(locals/apply-local component-id
+                                             [:layout] toggle-editable)}
+                          (if (-> @layout first :static)
+                            make-editable-style save-editable-style)))))
+                  [:div.grid-container {:style {:width "100%" :height "100%"}}
+                   [grid/grid
+                    :id component-id
+                    :class "layout"
+                    :children composed-ui
+                    :layout @layout
+                    :cols (r/atom 12)
+                    :width 900
+                    :rowHeight 25
+                    :layoutFn #(on-layout-change component-id %1 %2)
+                    :widthFn #(on-width-update %1 %2 %3 %4)]]]])))
 
 
 (defn component [& {:keys [data component-id container-id]}]
@@ -139,7 +158,7 @@
                      {:id :dag :label [:i {:class "zmdi zmdi-share"}]}
                      {:id :definition :label [:i {:class "zmdi zmdi-format-subject"}]}]]
 
-        [:div.box {:style {:width "1000px" :height "800px"
+        [:div.box {:style {:width      "1000px" :height "800px"
                            :background "#faeee8"}}
          [rc/v-box :src (rc/at)
           :justify :end
@@ -166,3 +185,41 @@
                        :default [rc/alert-box :src (rc/at)
                                  :alert-type :warning
                                  :body "There is a problem with this component."])]]]))))
+
+
+
+
+(comment
+  (def component-id :widget-grid-demo.grid-widget)
+
+
+  (locals/subscribe-local component-id [:layout])
+  (locals/apply-local component-id [:layout] toggle-editable)
+
+
+  (def orig-value @(re-frame/subscribe [:widget-grid-demo.grid-widget.layout]))
+  (toggle-editable orig-value)
+
+
+  ())
+
+
+(comment
+  (def component-id :widget-grid-demo.grid-widget)
+  (def layout (r/atom [{:id 1 :static true}]))
+  (def make-editable-style {:md-icon-name "zmdi-wrench"
+                            :tooltip      "configure this chart"})
+  (def save-editable-style {:md-icon-name "zmdi-lock-outline"
+                            :tooltip      "Save the configuration"})
+
+  (reduce conj [rc/md-icon-button] (flatten (seq {:class "button"})))
+
+  (reduce conj [rc/md-icon-button]
+    (flatten
+      (seq
+        (merge {:class    "button"
+                :on-click #(locals/apply-local component-id [:layout] toggle-editable)}
+          (if (-> @layout first :static) make-editable-style save-editable-style)))))
+
+  ())
+

@@ -32,7 +32,7 @@
       :as   args}]
   ;(log/info "grid" id children layout layoutFn)
   (into [:> GridLayout {:id              id
-                        :layout          @layout
+                        :layout          layout
                         :cols            (or @cols 12)
                         :width           (or width 600)
                         :rowHeight       (or rowHeight 25)

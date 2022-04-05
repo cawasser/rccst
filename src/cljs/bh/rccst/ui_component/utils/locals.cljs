@@ -398,6 +398,27 @@
     (re-frame/dispatch [p new-val])))
 
 
+(defn apply-local
+  "applies the given function (fn-to-apply) to the value found in the app-db and then
+  dispatches that new value to replace the old value using dispatch-local with the
+  original value-path vector
+
+  ---
+
+  - fn-to-apply : (function) takes 1 parameter, the original value at the scubscription vector
+  "
+  [widget-id [a & more :as value-path] fn-to-apply]
+
+  (let [p (h/path->keyword widget-id a more)
+        orig-value @(re-frame/subscribe [p])
+        new-value (fn-to-apply orig-value)]
+    ;(log/info "apply-local"
+    ;  "//" p
+    ;  "//" orig-value
+    ;  "//" new-value)
+    (dispatch-local widget-id [value-path] new-value)))
+
+
 (defn build-subs
   "build the subscription needed to access all the 'local' configuration
   properties
