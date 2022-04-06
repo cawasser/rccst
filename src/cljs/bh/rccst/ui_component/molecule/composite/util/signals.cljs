@@ -35,13 +35,13 @@
                           type))
 
 
-(defmethod component->ui :ui/component [{:keys [node registry configuration container-id]}]
+(defmethod component->ui :ui/component [{:keys [node registry configuration component-id container-id]}]
   ;(log/info "component->ui :ui/component" node)
 
   (let [ui-type      (->> configuration :components node :name)
         ui-component (->> registry ui-type :component)]
     {node
-     (reduce into [ui-component]
+     (reduce into [ui-component :component-id component-id]
        (seq
          (merge
            (make-params configuration node :inputs container-id)
