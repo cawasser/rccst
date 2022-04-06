@@ -19,5 +19,19 @@ running in the spike project.
 When I attempted to use webpack in rccst, we ran into a problem with the
 cesium project. Trial and error and a lot of google-fu helped us resolve that.
 
+##Basic Solution
+
+Modify shadow-cljs.edn to let Shadow know that an external javascript bundler will be used.
+Shadow will generate a js file (we call it requires.js) containing a require statement for the 
+node-modules we are using.
+
+Run the webpack bundler from the command line.  This will injest the shadow-created requires.js and
+produce a file we call bundle.js.
+
+Make sure to include the bundle.js as a script file in index.html BEFORE our app.js file.
 
 ##Required Packages
+
+###Webpack
+
+###React
