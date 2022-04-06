@@ -32,6 +32,10 @@
 		"worldwindjs": "^1.8.0"
 	},
 	"devDependencies": {
-		"shadow-cljs": "2.16.12"
+		"copy-webpack-plugin": "^10.2.4",
+		"imports-loader": "^3.1.1",
+		"shadow-cljs": "2.16.12",
+		"webpack": "^5.71.0",
+		"webpack-cli": "^4.9.2"
 	}
 }

@@ -33,5 +33,6 @@ Make sure to include the bundle.js as a script file in index.html BEFORE our app
 ##Required Packages
 
 ###Webpack
+webpack, webpack-cli, copy-webpack-plugin, imports-loader
 
 ###React
