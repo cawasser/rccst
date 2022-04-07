@@ -1,5 +1,8 @@
 (ns bh.rccst.ui-component.atom.diagram.editable-digraph
   (:require [bh.rccst.ui-component.atom.diagram.diagram.dagre-support :as dagre]
+            [bh.rccst.ui-component.utils.helpers :as h]
+            [bh.rccst.ui-component.utils.locals :as l]
+            [bh.rccst.ui-component.molecule.composite.util.node-config-ui :as config]
             [clojure.set :as set]
             [re-com.core :as rc]
             [reagent.core :as r]
@@ -19,6 +22,8 @@
 
 (declare node)
 
+
+;; region ; sample data
 
 (def sample-data
   (r/atom
@@ -246,6 +251,7 @@
              {:id "e56" :source "5 " :target "6 " :type "smoothstep" :animated true}
              {:id "e57" :source "5 " :target "7 " :type "smoothstep" :animated true}]}))
 
+;; endregion
 
 (def source-code '[])
 
@@ -263,9 +269,7 @@
 (defn- source-panel [])
 
 
-(defn- find-node-by-id [nodes id]
-  (first (filter #(= id (:id %)) nodes)))
-
+;; region ; adding handles to nodes in the digraph
 
 (defn- input-handles
   "
@@ -314,7 +318,10 @@
     (input-handles label in-only input-position)
     (output-handles label out-only output-position)))
 
+;; endregion
 
+
+;; region ; custom-node multi-method
 (defmulti custom-node (fn [type _] type))
 
 
@@ -407,6 +414,10 @@
 
   (custom-node type d))
 
+;; endregion
+
+
+;; region ; default styles and such
 
 (def default-color-pallet {":ui/component"  "#00ff00"
                            ":source/remote" "#FFA500"
@@ -432,6 +443,10 @@
                                                  default-color-pallet color-black)
                              :nodeBorderRadius 5})
 
+;; endregion
+
+
+;; region ; digraph drag-and-drop support
 
 (defn- on-drag-start [node-type event]
   (.setData (.-dataTransfer event) "editable-flow" node-type)
@@ -443,7 +458,7 @@
   (set! (.-dropEffect (.-dataTransfer event)) "move"))
 
 
-(defn- on-drop [set-nodes-fn wrapper event]
+(defn- on-drop [component-id set-nodes-fn wrapper event]
   (.preventDefault event)
   (let [node-type       (.getData (.-dataTransfer event) "editable-flow")
         x               (.-clientX event)
@@ -493,6 +508,8 @@
                   :draggable   true}
                  label])
 
+;; endregion
+
 
 (def default-tool-types {:ui/component  {:label ":ui/component" :type :ui/component :color "green" :text-color :white}
                          :source/remote {:label ":source/remote" :type :source/remote :color "orange" :text-color :black}
@@ -500,17 +517,47 @@
                          :source/fn     {:label ":source/fn" :type :source/fn :color "pink" :text-color :black}})
 
 
-(defn- tool-panel [tool-types]
-  ;(log/info "tool-panel" tool-types)
-  [:div#tool-panel {:display         :flex
-                    :flex-direction  :column
-                    :justify-content :center
-                    :align-items     :center
-                    :style           {:width         "200px" :height "100%"
-                                      :border-radius "5px" :padding "15px 10px"
-                                      :background    :white :box-shadow "5px 5px 5px #888888"}}
-   (doall
-     (map make-draggable-node tool-types))])
+(defn- details-panel [component-id item]
+  (let [components   @(l/subscribe-local component-id [:blackboard :defs :source :components])
+        details      ((h/string->keyword item) components)
+        detail-types (:type details)]
+
+    (log/info "detail-panel" (str item) "//" details "//" detail-types)
+
+    [config/make-config-panel details]))
+
+
+
+(comment
+  (def component-id :coverage-plan-demo-ww.grid-widget)
+
+  @(l/subscribe-local component-id [:blackboard :defs :dag :open-details])
+  @(l/subscribe-local component-id [:blackboard :defs :source :components])
+
+  ())
+
+
+
+(defn- tool-panel [component-id tool-types]
+  (let [open-details   (l/subscribe-local component-id [:blackboard :defs :dag :open-details])]
+    [:div#tool-panel {:display         :flex
+                      :flex-direction  :column
+                      :justify-content :center
+                      :align-items     :center
+                      :style           {:width         "20%" :height "100%"
+                                        :border-radius "5px" :padding "15px 10px"
+                                        :background    :white :box-shadow "5px 5px 5px #888888"}}
+     [rc/v-box :src (rc/at)
+      :gap "2px"
+      :children [[rc/v-box :src (rc/at)
+                  :gap "2px"
+                  :justify :center
+                  :align :center
+                  :children [(doall
+                               (map make-draggable-node tool-types))]]
+                 [rc/line :size "2px"]
+                 [:div {:style {:width "20%" :height "100%"}}
+                  (details-panel component-id @open-details)]]]]))
 
 
 (defn- flow* [& {:keys [component-id nodes edges
@@ -531,7 +578,7 @@
                              :preventScrolling    (or preventScrolling false)
                              :onConnect           (or connectFn #())
                              :fitView             true
-                             :attributionPosition "top-right"
+                             :attributionPosition "bottom-left"
                              :onDrop              (or on-drop #())
                              :onDragOver          (or on-drag-over #())}
                  (when node-types {:node-types node-types})
@@ -574,7 +621,7 @@
       :connectFn connectFn
       :zoom-on-scroll zoom-on-scroll
       :preventScrolling preventScrolling
-      :on-drop (partial on-drop set-nodes !wrapper)
+      :on-drop (partial on-drop component-id set-nodes !wrapper)
       :on-drag-over on-drag-over]]))
 
 
@@ -588,7 +635,7 @@
 
   [rc/h-box :src (rc/at)
    :gap "10px"
-   :children [[tool-panel default-tool-types]
+   :children [[tool-panel component-id default-tool-types]
               [:f> editable-flow
                :component-id component-id
                :nodes (:nodes @data)
@@ -603,13 +650,14 @@
                :preventScrolling preventScrolling]]])
 
 
+
+
 (comment
   (:nodes @sample-data)
   (swap! sample-data assoc :nodes (conj (:nodes @sample-data)
                                     {:id "dummy-node" :position {:x 0 :y 0}}))
 
   ())
-
 
 
 (comment
