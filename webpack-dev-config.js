@@ -2,6 +2,7 @@ const path = require('path');
 const webpack = require('webpack');
 const CopywebpackPlugin = require('copy-webpack-plugin');
 
+const astroCSS = 'node_modules/@astrouxds/astro-web-components/dist/astro-web-components'
 const cesiumModule = 'node_modules/cesium/Build/CesiumUnminified/Cesium';
 const cesiumSource = 'node_modules/cesium/Build/CesiumUnminified';
 const cesiumWorkers = '../Build/CesiumUnminified/Workers';
@@ -49,7 +50,8 @@ module.exports = {
             patterns: [
                 { from: path.join(cesiumSource, 'Workers'), to: 'Workers' },
                 { from: path.join(cesiumSource, 'Assets'), to: 'Assets' },
-                { from: path.join(cesiumSource, 'Widgets'), to: 'Widgets' }
+                { from: path.join(cesiumSource, 'Widgets'), to: 'Widgets' },
+                { from: path.join(astroCSS, 'astro-web-components.css'), to: 'Assets'},
             ]
         }),
         new webpack.DefinePlugin({

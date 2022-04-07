@@ -10,8 +10,9 @@ Step 1: Clone or pull latest from repo.
 
 Step 2: Open a command window and navigate to your project root.
 
-Step 3: Execute the following command to install packages you will need:
+Step 3: Execute the following commands to install packages you will need:
             npm install --save-dev webpack webpack-cli copy-webpack-plugin imports-loader
+            npm install @astrouxds/react
 
 Step 4: Execute the following command to have shadow-cljs create a file we need:
             npx shadow-cljs compile app
