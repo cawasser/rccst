@@ -3,11 +3,11 @@ const webpack = require('webpack');
 const CopywebpackPlugin = require('copy-webpack-plugin');
 
 const cesiumModule = 'node_modules/cesium/Build/Cesium/Cesium';
-const cesiumSource = 'node_modules/cesium/Source';
+const cesiumSource = 'node_modules/cesium/Build/Cesium';
 const cesiumWorkers = '../Build/Cesium/Workers';
 
 module.exports = {
-    mode: "development",
+    mode: "production",
     resolve: {
       alias: {
         // CesiumJS module name
@@ -30,6 +30,7 @@ module.exports = {
     },
     module: {
         rules: [
+           // this handles a problem with 'process' from react
           {
             test: /node_modules\/vfile\/core\.js/,
             use: [{
@@ -46,7 +47,7 @@ module.exports = {
         // Copy Cesium Assets, Widgets, and Workers to a static directory
         new CopywebpackPlugin({
             patterns: [
-                { from: path.join(cesiumSource, cesiumWorkers), to: 'Workers' },
+                { from: path.join(cesiumSource, 'Workers'), to: 'Workers' },
                 { from: path.join(cesiumSource, 'Assets'), to: 'Assets' },
                 { from: path.join(cesiumSource, 'Widgets'), to: 'Widgets' }
             ]
