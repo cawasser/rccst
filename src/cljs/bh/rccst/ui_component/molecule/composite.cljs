@@ -23,12 +23,9 @@ distinction, so we can quickly build all the Nodes and Handles used for the diag
             [bh.rccst.ui-component.atom.worldwind.globe :as ww-globe]
             [bh.rccst.ui-component.molecule.component-layout :as cl]
             [bh.rccst.ui-component.molecule.composite.util.digraph :as dig]
-            [bh.rccst.ui-component.molecule.composite.util.node-config-ui :as config]
             [bh.rccst.ui-component.molecule.composite.util.signals :as sig]
             [bh.rccst.ui-component.molecule.composite.util.ui :as ui]
             [bh.rccst.ui-component.utils :as ui-utils]
-            [bh.rccst.ui-component.utils.helpers :as h]
-            [bh.rccst.ui-component.utils.locals :as l]
             [day8.re-frame.tracing :refer-macros [fn-traced]]
             [loom.graph :as lg]
             [re-com.core :as rc]
@@ -147,10 +144,10 @@ distinction, so we can quickly build all the Nodes and Handles used for the diag
   "
   [& {:keys [configuration component-id container-id ui]}]
   (let [flow           (r/atom (ui/make-flow configuration))
-        node-types     #js {":ui/component"  (partial ui/custom-node component-id :ui/component)
-                            ":source/remote" (partial ui/custom-node component-id :source/remote)
-                            ":source/local"  (partial ui/custom-node component-id :source/local)
-                            ":source/fn"     (partial ui/custom-node component-id :source/fn)}
+        node-types     {":ui/component"  (partial ui/custom-node :ui/component)
+                        ":source/remote" (partial ui/custom-node :source/remote)
+                        ":source/local"  (partial ui/custom-node :source/local)
+                        ":source/fn"     (partial ui/custom-node :source/fn)}
         minimap-styles {:nodeStrokeColor  (partial digraph/custom-minimap-node-color
                                             color-pallet digraph/color-white)
                         :node-color       (partial digraph/custom-minimap-node-color

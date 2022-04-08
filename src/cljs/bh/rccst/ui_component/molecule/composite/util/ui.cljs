@@ -50,9 +50,9 @@
        (into [:<>])))])
 
 
-(defn- open-details [component-id item]
-  (log/info "open-details" component-id item)
-  (ul/dispatch-local component-id [:blackboard :defs :dag :open-details] item))
+(defn- open-details [open-details? item]
+  ;(log/info "open-details" item "//" @open-details?)
+  (reset! open-details? item))
 
 
 (defn custom-node
@@ -60,7 +60,7 @@
   green, since this is a 'view', and one Handle for each input (along the top)
   and output (along the bottom)
   "
-  [component-id type d]
+  [type open-details? d]
   (let [data    (js->clj d)
         label   (get-in data ["data" "label"])
         inputs  (get-in data ["data" "inputs"])
@@ -70,7 +70,7 @@
     ;(log/info "custom-node" label data "///" inputs "///" outputs)
 
     (r/as-element
-      [:div {:style style :on-click #(open-details component-id label)}
+      [:div {:style style :on-click #(open-details open-details? label)}
        [:h5 {:style (merge {:textAlign :center} style)} label]
        (input-output-handles label inputs outputs)])))
 
