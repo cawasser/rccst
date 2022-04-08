@@ -40,32 +40,45 @@
 ;
 ;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;
-(defmulti make-config-panel (fn [{:keys [type]}] type))
+(defmulti make-config-panel* (fn [type node] type))
 
 
-(defmethod make-config-panel :ui/component [{:keys [type name]}]
-  (log/info "make-config-panel :ui/component" type name)
-  [:div.ui-component (str type " - " name)])
+(defmethod make-config-panel* :ui/component [type {:strs [id] :as node}]
+  (log/info "make-config-panel* :ui/component" type id)
+  [:div.ui-component (str type " - " id)])
 
 
-(defmethod make-config-panel :source/remote [{:keys [type name]}]
-  (log/info "make-config-panel :source/remote" type name)
-  [:div.source-remote (str type " - " name)])
+(defmethod make-config-panel* :source/remote [type {:strs [id] :as node}]
+  (log/info "make-config-panel* :source/remote" type id)
+  [:div.source-remote (str type " - " id)])
 
 
-(defmethod make-config-panel :source/local [{:keys [type name]}]
-  (log/info "make-config-panel :source/local" type name)
-  [:div.source-local (str type " - " name)])
+(defmethod make-config-panel* :source/local [type {:strs [id] :as node}]
+  (log/info "make-config-panel* :source/local" type id)
+  [:div.source-local (str type " - " id)])
 
 
-(defmethod make-config-panel :source/fn [{:keys [type name]}]
-  (log/info "make-config-panel :source/fn" type name)
-  [:div.source-fn (str type " - " name)])
+(defmethod make-config-panel* :source/fn [type {:strs [id] :as node}]
+  (log/info "make-config-panel* :source/fn" type id)
+  [:div.source-fn (str type " - " id)])
 
 
-(defmethod make-config-panel :default [_]
-  (log/info "make-config-panel :default")
+(defmethod make-config-panel* :default [{:strs [id] :as node}]
+  (log/info "make-config-panel* :default" type id "//" node)
   [:div])
+
+
+(defn make-config-panel [node]
+  (let [node-type (get node "type")
+        kw-node-type (get {":ui/component" :ui/component
+                           ":source/remote" :source/remote
+                           ":source/local" :source/local
+                           ":source/fn" :source/fn}
+                       node-type)]
+
+    (log/info "make-config-panel" node "//" node-type "//" kw-node-type)
+
+    (make-config-panel* kw-node-type node)))
 
 
 
@@ -82,6 +95,17 @@
 
   (make-config-panel details)
 
+  (defmulti dummy (fn [type] (keyword (get type "type"))))
+  (defmethod dummy :one [_] 1)
+  (defmethod dummy :two [_] 2)
+
+  (dummy {"type" ":one"})
+
+
+  (get {"type" ":one"} "type")
+
+  (let [{:strs [type]} {"type" ":one"}]
+    (keyword type))
   ())
 
 
