@@ -1,6 +1,6 @@
 (ns bh.rccst.ui-component.atom.resium.globe
-  (:require ["resium" :refer (Viewer CameraFlyTo Globe Entity PolygonGraphics PolylineGraphics PointPrimitive LabelGraphics LabelCollection Label)]
-            ["cesium" :refer (Cartesian3 Ion Color CircleGeometry LabelStyle)]
+  (:require ["resium" :refer (Viewer Globe Clock)]
+            ["cesium" :refer (Cartesian3 Ion JulianDate)]
             [bh.rccst.ui-component.atom.resium.shape :as s]
             [bh.rccst.ui-component.utils.helpers :as h]
             [taoensso.timbre :as log]
@@ -40,9 +40,10 @@
         t (h/resolve-value current-time)]
     ;(log/info "globe OUTER" shapes component-id)
     (fn []
-      [:> Viewer ;{:style {:width "100%" :height "100%"}}
+      [:> Viewer {:style {:width "100%" :height "100%"}}
        ; TODO: add another function that converts integer value to current real time
-       [:> Globe {:enableLighting true :currentTime (coerce/to-date (cljs-time/now))}
+       [:> Globe {:enableLighting true}
+        [:> Clock {:currentTime (.fromDate JulianDate (or @t (coerce/to-date (cljs-time/now))))}]
         (into [:<>]
           (doall (map s/make-shape @s)))]])))
 

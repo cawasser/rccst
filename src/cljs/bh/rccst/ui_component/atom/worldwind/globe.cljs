@@ -8,8 +8,8 @@
             [bh.rccst.ui-component.atom.worldwind.globe.react-support :as rs]
             [bh.rccst.ui-component.atom.worldwind.globe.shape :as shape]
             [bh.rccst.ui-component.utils.helpers :as h]
-            [cljs-time.coerce :as coerce]
             [cljs-time.core :as cljs-time]
+            [cljs-time.coerce :as coerce]
             [reagent.core :as r]
             [taoensso.timbre :as log]))
 
@@ -41,6 +41,7 @@
 
 
 (defn- base-layers [globe-id]
+  ;(log/info "base-layers" globe-id)
   {(str globe-id " Blue Marble") (blue-marble/blue-marble (str globe-id " Blue Marble"))
    ;(str globe-id " day-only") (day-only/day-only (str globe-id " day-only"))})
    (str globe-id " Night")       (night/night (str globe-id " Night"))
@@ -101,19 +102,20 @@
             "Your browser does not support HTML5 Canvas."]))})))
 
 
-(defn- globe-inter [& {:keys [shapes time component-id]}]
+(defn- globe-inter [& {:keys [shapes current-time component-id]}]
   (let [shape-layers (->> shapes (map shape/make-shape) (into {}))
         all-layer    (merge
                        {}
                        (base-layers component-id)
                        shape-layers)]
 
-    (log/info "globe-inter" shapes "//" time "//" (count (.-renderables shape-layers)))
+    ;(log/info "globe-inter" shapes "//" current-time "//" (count (.-renderables shape-layers)))
 
     [globe*
      {:id         component-id
-      :time       time ;(coerce/to-date (cljs-time/now))
+      :time       (coerce/to-date current-time)
       :projection "3D"
+      :min-max    :max
       :style      {:background-color :black
                    :border-radius    "3px"
                    :width            "100%"
@@ -126,21 +128,21 @@
   (let [s (h/resolve-value shapes)
         t (h/resolve-value current-time)]
 
-    (log/info "globe OUTER" shapes current-time "//" @s @t "//" component-id)
+    ;(log/info "globe" shapes "//" current-time "//" @s "//" @t "//" component-id)
 
     (fn []
       ;(log/info "globe INNER" shapes time component-id)
 
       [globe-inter
        :shapes @s
-       :time @t
+       :current-time (or @t (cljs-time/now))
        :component-id component-id
        :container-id container-id])))
 
 
 (def meta-data {:ww/globe {:component globe
-                           :ports     {:shapes :port/sink
-                                       :current-time   :port/sink}}})
+                           :ports     {:shapes       :port/sink
+                                       :current-time :port/sink}}})
 
 
 (comment

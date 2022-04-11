@@ -8,6 +8,7 @@
 
             [bh.rccst.subs :as subs]
             [bh.rccst.ui-component.navbar :as navbar]
+            [bh.rccst.views.molecule.welcome :as welcome]
             [bh.rccst.views.atoms :as atoms]
             [bh.rccst.views.molecules :as molecules]
             [bh.rccst.views.templates :as templates]
@@ -17,7 +18,8 @@
             [bh.rccst.ui-component.tabbed-pane.utils :as tab-utils]))
 
 
-(def main-navbar [[:app-bar/atoms "'Atoms'"]
+(def main-navbar [[:app-bar/welcome "Welcome!"]
+                  [:app-bar/atoms "'Atoms'"]
                   [:app-bar/molecules "'Molecules'"]
                   [:app-bar/templates "'Templates'"]
                   [:app-bar/tech "Technologies"]
@@ -30,7 +32,7 @@
   "
   []
 
-  (tab-utils/init-tabbed-panel "app-bar" :app-bar/atoms)
+  (tab-utils/init-tabbed-panel "app-bar" :app-bar/welcome)
 
   (let [logged-in? (re-frame/subscribe [::subs/logged-in?])]
     (fn []
@@ -45,11 +47,14 @@
          [tab-panel/tab-panel {:extra-classes             :rccst
                                :subscribe-to-selected-tab [:app-bar/value]}
 
-          [tab-panel/sub-panel {:panel-id :app-bar/molecules}
-           [molecules/page]]
+          [tab-panel/sub-panel {:panel-id :app-bar/welcome}
+           [welcome/page]]
 
           [tab-panel/sub-panel {:panel-id :app-bar/atoms}
            [atoms/page]]
+
+          [tab-panel/sub-panel {:panel-id :app-bar/molecules}
+           [molecules/page]]
 
           [tab-panel/sub-panel {:panel-id :app-bar/templates}
            [templates/page]]

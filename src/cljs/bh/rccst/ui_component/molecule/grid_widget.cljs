@@ -145,12 +145,11 @@
         (ui-utils/dispatch-local @id [:container] container-id)
         (ui/prep-environment full-config @id composite/meta-data-registry))
 
-      (let [buttons [{:id :component :label [:i {:class "zmdi zmdi-view-compact"}]}
-                     {:id :dag :label [:i {:class "zmdi zmdi-share"}]}
-                     {:id :definition :label [:i {:class "zmdi zmdi-format-subject"}]}]]
+      (let [buttons [{:id :component :tooltip "Widget view" :label [:i {:class "zmdi zmdi-view-compact"}]}
+                     {:id :dag :tooltip "Event model view" :label [:i {:class "zmdi zmdi-share"}]}
+                     {:id :definition :tooltip "Text view"  :label [:i {:class "zmdi zmdi-format-subject"}]}]]
 
-        [:div.box {:style {:width      "1000px" :height "800px"
-                           :background "#faeee8"}}
+        [:div.box {:style {:background "#faeee8"}}
          [rc/v-box :src (rc/at)
           :justify :end
           :width "100%"
