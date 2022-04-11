@@ -41,7 +41,7 @@
              com.lucasbradstreet/cljs-uuid-utils           {:mvn/version "1.0.2"}
              aysylu/loom                                   {:mvn/version "1.0.2"}
 
-             metasoarous/oz                                {:mvn/version "2.0.0-alpha2"}}
+             metasoarous/oz                                {:mvn/version "2.0.0-alpha5"}}
 
 
  :aliases   {:run         {:main-opts ["-m" "bh.rccst.core"]}
