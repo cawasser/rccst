@@ -71,4 +71,15 @@
 
   {:a 1 :b 2}
 
+  (defn lister [items]
+        [:ul
+         (for [item items]
+           ^{:key item} [:li "Item " item])])
+
+  (defn lister-user []
+          [:div
+           "Here is a list:"
+           [lister (range 3)]])
+
+
   ())
