@@ -269,7 +269,7 @@
 
 
 (defn init-widget
-  "1. adds the `locals-and`defaults` into the `app-db` in the correct location
+  "1. adds the `locals-and-defaults` into the `app-db` in the correct location
   2. creates and registers a subscription to `:widgets/<widget-id>`
   3. creates and registers a subscription (cascaded off `:widgets/<widget-id>`) for each relative path in `locals-and-defaults`
   4. creates and registers an event handler for`:widgets/<widget-id>`
@@ -396,6 +396,27 @@
   (let [p (h/path->keyword widget-id a more)]
     ;(log/info "dispatch-local" widget-id "//" value-path "//" p "//" new-val)
     (re-frame/dispatch [p new-val])))
+
+
+(defn apply-local
+  "applies the given function (fn-to-apply) to the value found in the app-db and then
+  dispatches that new value to replace the old value using dispatch-local with the
+  original value-path vector
+
+  ---
+
+  - fn-to-apply : (function) takes 1 parameter, the original value at the scubscription vector
+  "
+  [widget-id [a & more :as value-path] fn-to-apply]
+
+  (let [p (h/path->keyword widget-id a more)
+        orig-value @(re-frame/subscribe [p])
+        new-value (fn-to-apply orig-value)]
+    ;(log/info "apply-local"
+    ;  "//" p
+    ;  "//" orig-value
+    ;  "//" new-value)
+    (dispatch-local widget-id [value-path] new-value)))
 
 
 (defn build-subs

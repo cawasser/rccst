@@ -15,14 +15,19 @@
         pub-sub-started? (re-frame/subscribe [::subs/pub-sub-started?])]
 
     (if (not @logged-in?)
-      (re-frame/dispatch [:bh.rccst.events/login "string" "string"]))
+      (re-frame/dispatch [:bh.rccst.events/login "test-user" "test-pwd"]))
 
     (fn []
       (if (and @logged-in? @pub-sub-started?)
-        (acu/demo "Widget using a Grid for layout"
+        (acu/demo "Coverage Plan using a Grid for layout"
           "This experiment uses a GRID to layout the various UI components that make up the 'composite'.  Constructs 'coverage-plan', drawing the layout from `:grid-layout` which provides X/Y/W/H for each component on the widget's internal grid."
           [layout/frame
            [grid/component
             :data plan/ui-definition
             :component-id (h/path->keyword container-id "grid-widget")
-            :container-id container-id]])))))
+            :container-id container-id]])
+        (acu/demo
+          "Coverage Plan"
+          [rc/alert-box :src (rc/at)
+           :alert-type :info
+           :heading "Waiting for (demo) Log-in"])))))

@@ -71,7 +71,7 @@
               (instance? reagent.ratom.RAtom value) value
               (instance? Atom value) value
               :else (r/atom value))]
-    ;(log/info "resolve-value" value "//" ret "//" (str @ret))
+    ;(log/info "resolve-value" value "//" opts "//" ret "//" (str @ret))
     ret))
 
 

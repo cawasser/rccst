@@ -1,5 +1,6 @@
 (ns bh.rccst.ui-component.atom.chart.wrapper
   (:require [bh.rccst.ui-component.utils :as ui-utils]
+            [bh.rccst.ui-component.atom.re-com.configure-toggle :as ct]
             [re-com.core :as rc]
             [reagent.core :as r]
             [taoensso.timbre :as log]
@@ -39,14 +40,7 @@
        :gap "2px"
        :children [[rc/h-box :src (rc/at)
                    :justify :end
-                   :children [[rc/md-icon-button
-                               :md-icon-name "zmdi-settings"
-                               :tooltip "configure this chart"
-                               :on-click #(do
-                                            (log/info "toggle" @open?)
-                                            (swap! open? not)
-                                            (log/info "now" @open?))]]]
-
+                   :children [[ct/configure-toggle open?]]]
                   [layout/centered {:extra-classes :is-one-third}
                    [rc/h-box :src (rc/at)
                     :gap "5px"

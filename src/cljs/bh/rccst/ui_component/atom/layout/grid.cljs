@@ -1,6 +1,9 @@
 (ns bh.rccst.ui-component.atom.layout.grid
-  (:require ["react-grid-layout" :as GridLayout]))
+  (:require ["react-grid-layout" :as GridLayout]
+            [taoensso.timbre :as log]))
 
+
+(log/info "bh.rccst.ui-component.atom.layout.grid")
 
 
 (defn grid
@@ -30,9 +33,11 @@
              isDraggable isResizable]
 
       :as   args}]
-  ;(log/info "grid" id children layout layoutFn)
+
+  ;(log/info "grid" id "//" children "//" layout "//" layoutFn)
+
   (into [:> GridLayout {:id              id
-                        :layout          @layout
+                        :layout          layout
                         :cols            (or @cols 12)
                         :width           (or width 600)
                         :rowHeight       (or rowHeight 25)

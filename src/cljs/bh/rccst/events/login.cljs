@@ -70,6 +70,6 @@
 
 ; try out the calls to the server
 (comment
-  (re-frame/dispatch [:bh.rccst.events/login "string" "string"])
+  (re-frame/dispatch [:bh.rccst.events/login "test-user" "test-pwd"])
 
   ())

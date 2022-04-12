@@ -4,6 +4,8 @@
   (:require [re-frame.core :as re-frame]
             [reagent.core :as r]
             [taoensso.timbre :as log]
+            [cljs-time.core :as t]
+            [cljs-time.coerce :as coerce]
             ["dagre" :as dagre]
             ["graphlib" :as graphlib]
             ["react-flow-renderer" :refer (ReactFlowProvider Controls Handle Background) :default ReactFlow]))
@@ -67,6 +69,17 @@
       [0 (dec (count bh.rccst.ui-component.atom.worldwind.globe/sample-data))])))
 
 
+(defn fn-current-time [{:keys [value current-time]}]
+  (log/info "fn-current-time" value "//" current-time)
+
+  (re-frame/reg-sub
+    (first current-time)
+    :<- value
+    (fn [v _]
+      (coerce/to-date (t/plus (t/now) (t/hours v))))))
+
+
+
 ;; components have "ports" which define their inputs and outputs:
 ;;
 ;;      you SUBSCRIBE with a :port/sink, ie, data come IN   (re-frame/subscribe ...)
@@ -81,79 +94,84 @@
 ;; distinction, so we can quickly build all the Nodes and Handles used for the diagram...
 
 
-(def ui-definition (r/atom {:title        "Coverage Plan"
-                            :component-id :coverage-plan
-                            :components   {; ui components
-                                           :ui/targets                {:type :ui/component :name :rc/table}
-                                           :ui/satellites             {:type :ui/component :name :rc/table}
-                                           :ui/globe                  {:type :ui/component :name :ww/globe}
-                                           :ui/time-slider            {:type :ui/component :name :rc/slider}
-                                           :ui/current-time           {:type :ui/component :name :rc/label-lg}
+(def ui-definition {:title        "Coverage Plan"
+                    :component-id :coverage-plan
+                    :components   {; ui components
+                                   :ui/targets                {:type :ui/component :name :rc/table}
+                                   :ui/satellites             {:type :ui/component :name :rc/table}
+                                   :ui/globe                  {:type :ui/component :name :ww/globe}
+                                   :ui/time-slider            {:type :ui/component :name :rc/slider}
+                                   :ui/current-time           {:type :ui/component :name :rc/label-md}
 
-                                           ; remote data sources
-                                           :topic/target-data         {:type :source/remote :name :source/targets}
-                                           :topic/satellite-data      {:type :source/remote :name :source/satellites}
-                                           :topic/coverage-data       {:type :source/remote :name :source/coverages}
+                                   ; remote data sources
+                                   :topic/target-data         {:type :source/remote :name :source/targets}
+                                   :topic/satellite-data      {:type :source/remote :name :source/satellites}
+                                   :topic/coverage-data       {:type :source/remote :name :source/coverages}
 
-                                           ; composite-local data sources
-                                           :topic/selected-targets    {:type :source/local :name :selected-targets :default []}
-                                           :topic/selected-satellites {:type :source/local :name :selected-satellites :default []}
-                                           :topic/current-time        {:type :source/local :name :current-time :default 0} ;(js/Date.)}
-                                           :topic/shapes              {:type :source/local :name :shapes}
-                                           :topic/time-range          {:type :source/local :name :time-range}
+                                   ; composite-local data sources
+                                   :topic/selected-targets    {:type :source/local :name :selected-targets :default []}
+                                   :topic/selected-satellites {:type :source/local :name :selected-satellites :default []}
+                                   :topic/current-time        {:type :source/local :name :current-time :default 0} ;(js/Date.)}
+                                   :topic/shapes              {:type :source/local :name :shapes}
+                                   :topic/time-range          {:type :source/local :name :time-range}
+                                   :topic/current-slider      {:type :source/local :name :current-slider :default 0}
 
-                                           ; transformation functions
-                                           :fn/coverage               {:type  :source/fn :name fn-coverage
-                                                                       :ports {:targets   :port/sink :satellites :port/sink
-                                                                               :coverages :port/sink :current-time :port/sink
-                                                                               :shapes    :port/source}}
-                                           :fn/range                  {:type  :source/fn :name fn-range
-                                                                       :ports {:data :port/sink :range :port/source}}}
+                                   ; transformation functions
+                                   :fn/coverage               {:type  :source/fn :name fn-coverage
+                                                               :ports {:targets   :port/sink :satellites :port/sink
+                                                                       :coverages :port/sink :current-time :port/sink
+                                                                       :shapes    :port/source}}
+                                   :fn/range                  {:type  :source/fn :name fn-range
+                                                               :ports {:data :port/sink :range :port/source}}
+                                   :fn/current-time           {:type  :source/fn :name fn-current-time
+                                                               :ports {:value :port/sink :current-time :port/source}}}
 
-                            :links        {; components publish to what? via which port?
-                                           ;
-                                           ; <source>                 {<source-port>  {<target> <target-port>
-                                           ;                                           <target> <target-port>}}
-                                           ;
-                                           :ui/targets                {:data      {:topic/target-data :data}
-                                                                       :selection {:topic/selected-targets :data}}
-                                           :ui/satellites             {:data      {:topic/satellite-data :data}
-                                                                       :selection {:topic/selected-satellites :data}}
-                                           :ui/time-slider            {:value {:topic/current-time :data}}
+                    :links        {; components publish to what? via which port?
+                                   ;
+                                   ; <source>                 {<source-port>  {<target> <target-port>
+                                   ;                                           <target> <target-port>}}
+                                   ;
+                                   :ui/targets                {:data      {:topic/target-data :data}
+                                                               :selection {:topic/selected-targets :data}}
+                                   :ui/satellites             {:data      {:topic/satellite-data :data}
+                                                               :selection {:topic/selected-satellites :data}}
+                                   :ui/time-slider            {:value {:topic/current-slider :data}}
 
-                                           ; transformation functions publish to what?
-                                           :fn/coverage               {:shapes {:topic/shapes :data}}
-                                           :fn/range                  {:range {:topic/time-range :data}}
+                                   ; transformation functions publish to what?
+                                   :fn/coverage               {:shapes {:topic/shapes :data}}
+                                   :fn/range                  {:range {:topic/time-range :data}}
+                                   :fn/current-time           {:current-time {:topic/current-time :data}}
 
-                                           ; topics are inputs into what?
-                                           :topic/target-data         {:data {:ui/targets :data}}
-                                           :topic/satellite-data      {:data {:ui/satellites :data}}
-                                           :topic/selected-targets    {:data {:fn/coverage :targets}}
-                                           :topic/selected-satellites {:data {:fn/coverage :satellites}}
-                                           :topic/coverage-data       {:data {:fn/coverage :coverages
-                                                                              :fn/range    :data}}
-                                           :topic/shapes              {:data {:ui/globe :shapes}}
-                                           :topic/current-time        {:data {:ui/current-time :value
-                                                                              :ui/time-slider  :value
-                                                                              :ui/globe        :current-time
-                                                                              :fn/coverage     :current-time}}
-                                           :topic/time-range          {:data {:ui/time-slider :range}}}
+                                   ; topics are inputs into what?
+                                   :topic/target-data         {:data {:ui/targets :data}}
+                                   :topic/satellite-data      {:data {:ui/satellites :data}}
+                                   :topic/selected-targets    {:data {:fn/coverage :targets}}
+                                   :topic/selected-satellites {:data {:fn/coverage :satellites}}
+                                   :topic/coverage-data       {:data {:fn/coverage :coverages
+                                                                      :fn/range    :data}}
+                                   :topic/shapes              {:data {:ui/globe :shapes}}
+                                   :topic/current-time        {:data {:ui/current-time :value
+                                                                      :ui/globe        :current-time}}
+                                   :topic/current-slider      {:data {:fn/current-time :value
+                                                                      :ui/time-slider  :value
+                                                                      :fn/coverage     :current-time}}
+                                   :topic/time-range          {:data {:ui/time-slider :range}}}
 
-                            :layout       [:v-box
-                                           [[:h-box
-                                             [[:v-box [:ui/targets :ui/satellites :ui/time-slider]]
-                                              [:v-box [:ui/globe :ui/current-time]]]]]]
+                    :layout       [:v-box
+                                   [[:h-box
+                                     [[:v-box [:ui/targets :ui/satellites :ui/time-slider]]
+                                      [:v-box [:ui/globe :ui/current-time]]]]]]
 
-                            :grid-layout [{:i :ui/targets :x 0 :y 0 :w 4 :h 7}
-                                          {:i :ui/satellites :x 0 :y 7 :w 4 :h 8}
-                                          {:i :ui/time-slider :x 0 :y 15 :w 4 :h 2}
-                                          {:i :ui/globe :x 4 :y 0 :w 7 :h 15}
-                                          {:i :ui/current-time :x 4 :y 15 :w 5 :h 2}]}))
+                    :grid-layout  [{:i :ui/targets :x 0 :y 0 :w 4 :h 7 :static true}
+                                   {:i :ui/satellites :x 0 :y 7 :w 4 :h 8 :static true}
+                                   {:i :ui/time-slider :x 0 :y 15 :w 4 :h 2 :static true}
+                                   {:i :ui/globe :x 4 :y 0 :w 7 :h 15 :static true}
+                                   {:i :ui/current-time :x 4 :y 15 :w 7 :h 2 :static true}]})
 
 
 
 (comment
-  (re-frame/dispatch [:bh.rccst.events/login "string" "string"])
+  (re-frame/dispatch [:bh.rccst.events/login "test-user" "test-pwd"])
 
   (re-frame/subscribe [:bh.rccst.subs/source :string])
 
