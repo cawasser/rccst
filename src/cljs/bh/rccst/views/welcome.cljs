@@ -36,6 +36,10 @@
        [o/overview "How to use this application"]]
 
       [layout/frame
+       [o/overview "Rationale"
+        "There are several reasons to provide a rationale for any decision made:"]]
+
+      [layout/frame
        [o/overview "Examples"]]
 
       [layout/frame
