@@ -11,7 +11,8 @@
             [bh.rccst.components.websocket :as socket]
             [bh.rccst.components.pub-sub :as pub-sub]
             [bh.rccst.components.data-sources :as data-sources]
-            [bh.rccst.defaults :as default]))
+            [bh.rccst.defaults :as default])
+            (:gen-class))
 
 
 (def rccst-postgres

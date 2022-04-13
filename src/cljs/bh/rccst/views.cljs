@@ -8,7 +8,7 @@
 
             [bh.rccst.subs :as subs]
             [bh.rccst.ui-component.navbar :as navbar]
-            [bh.rccst.views.molecule.welcome :as welcome]
+            [bh.rccst.views.welcome :as welcome]
             [bh.rccst.views.atoms :as atoms]
             [bh.rccst.views.molecules :as molecules]
             [bh.rccst.views.templates :as templates]

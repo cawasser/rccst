@@ -120,6 +120,11 @@
                            :main-opts  ["-m" "metav.release"
                                         "--without-sign"]}
 
+             ;; Useage at the command line, run from the this projects directory:
+             ;; clojure -T:build uber
+             :build       {:deps {io.github.seancorfield/build-clj {:git/tag "v0.8.0" :git/sha "9bd8b8a"}}
+                           :ns-default build}
+
 
              ; use this alias at the CLI to generate the version.clj file
              ; see https://github.com/jgrodziski/metav#spit-or-render-current-version-in-a-file

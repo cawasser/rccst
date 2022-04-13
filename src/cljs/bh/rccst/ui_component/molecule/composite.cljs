@@ -15,6 +15,7 @@ distinction, so we can quickly build all the Nodes and Handles used for the diag
 "
   (:require [bh.rccst.ui-component.atom.bh.table :as bh-table]
             [bh.rccst.ui-component.atom.diagram.editable-digraph :as digraph]
+            [bh.rccst.ui-component.atom.diagram.diagram.composite-dag-support :as dag-support]
             [bh.rccst.ui-component.atom.experimental.ui-element :as e]
             [bh.rccst.ui-component.atom.re-com.label :as rc-label]
             [bh.rccst.ui-component.atom.re-com.slider :as rc-slider]
@@ -102,10 +103,10 @@ distinction, so we can quickly build all the Nodes and Handles used for the diag
 ;; region
 
 
-(def color-pallet {":ui/component"  "#00ff00"
-                   ":source/remote" "#FFA500"
-                   ":source/local"  "#0000ff"
-                   ":source/fn"     "#FFC0CB"})
+;(def color-pallet {":ui/component"  "#00ff00"
+;                   ":source/remote" "#FFA500"
+;                   ":source/local"  "#0000ff"
+;                   ":source/fn"     "#FFC0CB"})
 
 (defn- definition-panel
   "show the text definition of the composed UI
@@ -148,10 +149,10 @@ distinction, so we can quickly build all the Nodes and Handles used for the diag
                         ":source/remote" (partial ui/custom-node :source/remote)
                         ":source/local"  (partial ui/custom-node :source/local)
                         ":source/fn"     (partial ui/custom-node :source/fn)}
-        minimap-styles {:nodeStrokeColor  (partial digraph/custom-minimap-node-color
-                                            color-pallet digraph/color-white)
-                        :node-color       (partial digraph/custom-minimap-node-color
-                                            color-pallet digraph/color-black)
+        minimap-styles {:nodeStrokeColor  (partial dag-support/custom-minimap-node-color
+                                            dag-support/default-color-pallet digraph/color-white)
+                        :node-color       (partial dag-support/custom-minimap-node-color
+                                            dag-support/default-color-pallet digraph/color-black)
                         :nodeBorderRadius 5}]
 
     [digraph/component
