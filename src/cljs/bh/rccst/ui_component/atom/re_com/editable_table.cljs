@@ -166,7 +166,7 @@
 
         fib-ratio                 0.618                     ;; fibonacci ratios to make the visuals look pretty
         unit-50                   50                        ;; base for fibonacci calulations
-        unit-31                   (js/Math.round (* unit-50 fib-ratio))
+        unit-31                   (js/Math.round (* unit-50 fib-ratio))  
 
         num-rows                  (or max-rows 5)
         row-height                unit-31
@@ -180,6 +180,7 @@
 
       [rc/v-table :src (rc/at)
        :model dataset
+       :max-width "inherit"
 
        ;; Data Rows (section 5)
        ;:row-renderer            (fn [_row_index, _row] [box-with-border {:name (str (:id _row)) :background light-blue :height row-height :width width-of-main-row-content}])

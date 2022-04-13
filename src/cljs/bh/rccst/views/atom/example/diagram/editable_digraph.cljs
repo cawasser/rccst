@@ -1,7 +1,9 @@
 (ns bh.rccst.views.atom.example.diagram.editable-digraph
-  (:require [bh.rccst.ui-component.atom.diagram.editable-digraph :as diagraph]
+  (:require [bh.rccst.ui-component.atom.diagram.editable-digraph :as digraph]
+            [bh.rccst.ui-component.atom.diagram.diagram.composite-dag-support :as support]
             [bh.rccst.ui-component.molecule.example :as example]
             [bh.rccst.ui-component.utils :as utils]
+            [reagent.core :as r]
             [taoensso.timbre :as log]))
 
 
@@ -11,29 +13,35 @@
      [example/component-example
       :widget-id container-id
       :title "Editable Digraph"
-      :description "An Editable Digraph,  built using [react-flow](https://reactflow.dev)"
-      :data diagraph/sample-data
-      :component diagraph/component
+      :description "An Editable Digraph, built using [react-flow](https://reactflow.dev)"
+      :data (r/atom digraph/sample-data)
+      :extra-params {:node-types support/default-node-types
+                     :tool-types support/default-tool-types}
+      :component digraph/component
       :component-id (utils/path->keyword container-id "editable-digraph")
-      :source-code diagraph/source-code]
+      :source-code digraph/source-code]
 
      [example/component-example
       :widget-id container-id
-      :title "Editable Digraph (more data)"
-      :description "An Editable Digraph,  built using [react-flow](https://reactflow.dev)"
-      :data diagraph/sample-data-2
-      :extra-params {:node-types diagraph/default-node-types
-                     :minimap-styles diagraph/default-minimap-styles}
-      :component diagraph/component
+      :title "Editable Digraph using data used for building Composite UI components (ie, \"widgets\")"
+      :description "An Editable Digraph, built using [react-flow](https://reactflow.dev)"
+      :data (r/atom support/sample-data)
+      :extra-params {:node-types support/default-node-types
+                     :tool-types support/default-tool-types
+                     :minimap-styles support/default-minimap-styles}
+      :component digraph/component
       :component-id (utils/path->keyword container-id "editable-digraph-2")
-      :source-code diagraph/source-code]
+      :source-code digraph/source-code]
 
      [example/component-example
       :widget-id container-id
       :title "Editable Digraph (example data)"
-      :description "An Editable Digraph,  built using [react-flow](https://reactflow.dev)"
-      :data diagraph/sample-data-3
-      :component diagraph/component
+      :description "An Editable Digraph, built using [react-flow](https://reactflow.dev)"
+      :data (r/atom digraph/sample-data-3)
+      :extra-params {:node-types support/default-node-types
+                     :tool-types support/default-tool-types}
+      :extra-params {:force-layout? true}
+      :component digraph/component
       :component-id (utils/path->keyword container-id "editable-digraph-3")
-      :source-code diagraph/source-code]]))
+      :source-code digraph/source-code]]))
 

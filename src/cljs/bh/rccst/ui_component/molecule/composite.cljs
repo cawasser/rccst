@@ -15,6 +15,7 @@ distinction, so we can quickly build all the Nodes and Handles used for the diag
 "
   (:require [bh.rccst.ui-component.atom.bh.table :as bh-table]
             [bh.rccst.ui-component.atom.diagram.editable-digraph :as digraph]
+            [bh.rccst.ui-component.atom.diagram.diagram.composite-dag-support :as dag-support]
             [bh.rccst.ui-component.atom.experimental.ui-element :as e]
             [bh.rccst.ui-component.atom.re-com.label :as rc-label]
             [bh.rccst.ui-component.atom.re-com.slider :as rc-slider]
@@ -23,12 +24,9 @@ distinction, so we can quickly build all the Nodes and Handles used for the diag
             [bh.rccst.ui-component.atom.worldwind.globe :as ww-globe]
             [bh.rccst.ui-component.molecule.component-layout :as cl]
             [bh.rccst.ui-component.molecule.composite.util.digraph :as dig]
-            [bh.rccst.ui-component.molecule.composite.util.node-config-ui :as config]
             [bh.rccst.ui-component.molecule.composite.util.signals :as sig]
             [bh.rccst.ui-component.molecule.composite.util.ui :as ui]
             [bh.rccst.ui-component.utils :as ui-utils]
-            [bh.rccst.ui-component.utils.helpers :as h]
-            [bh.rccst.ui-component.utils.locals :as l]
             [day8.re-frame.tracing :refer-macros [fn-traced]]
             [loom.graph :as lg]
             [re-com.core :as rc]
@@ -105,10 +103,10 @@ distinction, so we can quickly build all the Nodes and Handles used for the diag
 ;; region
 
 
-(def color-pallet {":ui/component"  "#00ff00"
-                   ":source/remote" "#FFA500"
-                   ":source/local"  "#0000ff"
-                   ":source/fn"     "#FFC0CB"})
+;(def color-pallet {":ui/component"  "#00ff00"
+;                   ":source/remote" "#FFA500"
+;                   ":source/local"  "#0000ff"
+;                   ":source/fn"     "#FFC0CB"})
 
 (defn- definition-panel
   "show the text definition of the composed UI
@@ -117,7 +115,7 @@ distinction, so we can quickly build all the Nodes and Handles used for the diag
 
   (let [components (:components configuration)
         links      (:links configuration)
-        layout     (:layout configuration)]
+        layout     (:grid-layout configuration)]
 
     ;(log/info "definition-panel" components)
     ;(log/info "definition-panel" links)
@@ -126,7 +124,7 @@ distinction, so we can quickly build all the Nodes and Handles used for the diag
     (fn [& {:keys [configuration]}]
       [rc/v-box :src (rc/at)
        :width "70%"
-       :height "100%"
+       ;:height "100%"
        :gap "10px"
        :children [[:h3 "Components"]
                   [containers/v-scroll-pane {:height "10em"}
@@ -141,60 +139,27 @@ distinction, so we can quickly build all the Nodes and Handles used for the diag
                    [layout/text-block (str layout)]]]])))
 
 
-(defn- details-panel [component-id item]
-  (let [components   @(l/subscribe-local component-id [:blackboard :defs :source :components])
-        details      ((h/string->keyword item) components)
-        detail-types (:type details)]
-
-    (log/info "detail-panel" (str item) "//" details "//" detail-types)
-
-    [config/make-config-panel details]))
-
-
 (defn- dag-panel
   "show the DAG, built form the configuration passed into the component, in a panel
   (beside the actual UI)
   "
   [& {:keys [configuration component-id container-id ui]}]
-  (let [open-details   (l/subscribe-local component-id [:blackboard :defs :dag :open-details])
-        flow           (r/atom (ui/make-flow configuration))
-        node-types     #js {":ui/component"  (partial ui/custom-node component-id :ui/component)
-                            ":source/remote" (partial ui/custom-node component-id :source/remote)
-                            ":source/local"  (partial ui/custom-node component-id :source/local)
-                            ":source/fn"     (partial ui/custom-node component-id :source/fn)}
-        minimap-styles {:nodeStrokeColor  (partial digraph/custom-minimap-node-color
-                                            color-pallet digraph/color-white)
-                        :node-color       (partial digraph/custom-minimap-node-color
-                                            color-pallet digraph/color-black)
+  (let [flow           (r/atom (ui/make-flow configuration))
+        node-types     {":ui/component"  (partial ui/custom-node :ui/component)
+                        ":source/remote" (partial ui/custom-node :source/remote)
+                        ":source/local"  (partial ui/custom-node :source/local)
+                        ":source/fn"     (partial ui/custom-node :source/fn)}
+        minimap-styles {:nodeStrokeColor  (partial dag-support/custom-minimap-node-color
+                                            dag-support/default-color-pallet digraph/color-white)
+                        :node-color       (partial dag-support/custom-minimap-node-color
+                                            dag-support/default-color-pallet digraph/color-black)
                         :nodeBorderRadius 5}]
 
-    [:div {:style {:width "100%" :height "100%" :border ""}}
-     [rc/h-box :src (rc/at)
-      :gap "2px"
-      :children [[:div {:style {:width "15%" :height "100%"}} "Pick here"]
-                 [:div {:style {:width "700px" :height "600px"}}
-                  [digraph/component
-                   :component-id component-id
-                   :data flow
-                   :node-types node-types
-                   :minimap-styles minimap-styles]]
-                 [:div {:style {:width "20%" :height "100%"}}
-                  (details-panel component-id @open-details)]]]]))
-
-
-(defn stand-in [components]
-  [rc/v-box
-   :style {:textAlign :center}
-   :gap "15px"
-   :width "100%" :height "100%"
-   :children [[:h2 "The composed UI will display here"]
-              [rc/line :size "2px" :color "blue"]
-              (into [:<>]
-                (map (fn [[node meta-data]]
-                       ^{:key node} [:h3 (str node)])
-                  (filter (fn [[node {:keys [type]}]]
-                            (= :ui/component type))
-                    components)))]])
+    [digraph/component
+     :component-id component-id
+     :data flow
+     :node-types node-types
+     :minimap-styles minimap-styles]))
 
 
 (defn- component-panel

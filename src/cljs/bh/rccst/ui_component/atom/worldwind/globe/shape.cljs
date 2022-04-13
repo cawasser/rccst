@@ -70,7 +70,7 @@
 
 (defmethod make-shape :shape/label [{:keys [id label location fill-color outline-color width]}]
 
-  (log/info "label" location "//" label "//" fill-color "//" width)
+  ;(log/info "label" location "//" label "//" fill-color "//" width)
 
   (let [label      (WorldWind/GeographicText. (location/position location) label)
         attributes (attributes/text-attributes

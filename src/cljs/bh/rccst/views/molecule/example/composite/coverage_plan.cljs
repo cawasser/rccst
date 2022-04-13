@@ -1,21 +1,22 @@
 (ns bh.rccst.views.molecule.example.composite.coverage-plan
-  (:require [bh.rccst.ui-component.molecule.composite.coverage-plan :as coverage-plan]
-            [bh.rccst.ui-component.molecule.composite :as composite]
-            [bh.rccst.ui-component.molecule.example :as example]
-            [bh.rccst.ui-component.utils :as ui-utils]
-            [re-frame.core :as re-frame]
+  (:require [bh.rccst.subs :as subs]
+            [bh.rccst.ui-component.molecule.composite.coverage-plan :as coverage-plan]
+            [bh.rccst.ui-component.molecule.grid-widget :as grid]
+            [bh.rccst.ui-component.utils.helpers :as h]
             [re-com.core :as rc]
-            [bh.rccst.subs :as subs]
+            [re-frame.core :as re-frame]
+            [reagent.core :as r]
             [taoensso.timbre :as log]
-            [woolybear.ad.catalog.utils :as acu]))
+            [woolybear.ad.catalog.utils :as acu]
+            [woolybear.ad.layout :as layout]))
 
 
 (log/info "bh.rccst.views.molecule.example.composite.coverage-plan")
 
 
-(defn example []
-  (let [container-id "coverage-plan-demo"
-        logged-in? (re-frame/subscribe [::subs/logged-in?])
+(defn ww-example []
+  (let [container-id     "coverage-plan-demo-ww"
+        logged-in?       (re-frame/subscribe [::subs/logged-in?])
         pub-sub-started? (re-frame/subscribe [::subs/pub-sub-started?])]
 
     (if (not @logged-in?)
@@ -23,20 +24,47 @@
 
     (fn []
       (if (and @logged-in? @pub-sub-started?)
-        [example/component-example
-         :title "Coverage Plan"
-         :widget-id container-id
-         :description "First exercise in our new COMPOSABLE UI. Constructs 'coverage-plan', drawing the layout from `:layout` which uses `:v-box` and `:h-box`."
-         :data coverage-plan/ui-definition
-         :component composite/component
-         :component-id (ui-utils/path->keyword container-id "component")
-         :container-id container-id
-         :source-code composite/source-code]
+        (acu/demo "Coverage Plan using a Grid for layout (Worldwind globe)"
+          "This experiment uses a GRID to layout the various UI components that make up the 'composite'.  Constructs 'coverage-plan', drawing the layout from `:grid-layout` which provides X/Y/W/H for each component on the widget's internal grid."
+          [layout/frame
+           [:div {:style {:width "1000px" :height "800px"}}
+            [grid/component
+             :data (r/atom coverage-plan/ui-definition)
+             :component-id (h/path->keyword container-id "grid-widget")
+             :container-id container-id]]])
         (acu/demo
           "Coverage Plan"
           [rc/alert-box :src (rc/at)
            :alert-type :info
            :heading "Waiting for (demo) Log-in"])))))
+
+
+(defn r-example []
+  (let [container-id     "coverage-plan-demo-r"
+        logged-in?       (re-frame/subscribe [::subs/logged-in?])
+        pub-sub-started? (re-frame/subscribe [::subs/pub-sub-started?])]
+
+    (if (not @logged-in?)
+      (re-frame/dispatch [:bh.rccst.events/login "test-user" "test-pwd"]))
+
+    (fn []
+      (if (and @logged-in? @pub-sub-started?)
+        (acu/demo "Coverage Plan using a Grid for layout (Resium globe)"
+          "This experiment uses a GRID to layout the various UI components that make up the 'composite'.  Constructs 'coverage-plan', drawing the layout from `:grid-layout` which provides X/Y/W/H for each component on the widget's internal grid."
+          [layout/frame
+           [:div {:style {:width "1000px" :height "800px"}}
+            [grid/component
+             :data (r/atom
+                     (assoc-in coverage-plan/ui-definition
+                       [:components :ui/globe :name] :r/globe))
+             :component-id (h/path->keyword container-id "grid-widget")
+             :container-id container-id]]])
+        (acu/demo
+          "Coverage Plan"
+          [rc/alert-box :src (rc/at)
+           :alert-type :info
+           :heading "Waiting for (demo) Log-in"])))))
+
 
 
 (comment

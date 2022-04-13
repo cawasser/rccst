@@ -5,7 +5,7 @@
 
 
 (defn overview [title description-md & logo-img]
-  [layout/frame
+  [:<>
    [:h2 title]
    [rc/h-box
     :children [[rc/box
