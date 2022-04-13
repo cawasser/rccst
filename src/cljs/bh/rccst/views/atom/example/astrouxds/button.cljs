@@ -6,16 +6,30 @@
 (defn- button-sm []
   [button/button :label "small" :size "small"])
 
+(defn- button-md []
+  [button/button :label "medium" :size "medium"])
+
+(defn- button-lg []
+  [button/button :label "large" :size "large"])
+
+(defn- button-lg-icon []
+  [button/button :label "large w/ icon" :size "large" :icon "settings"])
+
 (defn example []
   (acu/demo
     "Buttons"
-    [rc/v-box :src (rc/at)
-     :gap "5px"
-     :children [[button-sm]]]))
+    [rc/h-box :src (rc/at)
+     :gap "50px"
+     :children [[rc/v-box :src (rc/at)
+                 :align :center
+                 :children [[button-sm]]]
+                [rc/v-box :src (rc/at)
+                 :align :center
+                 :children [[button-md]]]
+                [rc/v-box :src (rc/at)
+                 :align :center
+                 :children [[button-lg]]]
+                [rc/v-box :src (rc/at)
+                 :align :center
+                 :children [[button-lg-icon]]]]]))
 
-    ;'[:div
-    ;  [label/label :value (r/atom "This is a \"regular\" label")]
-    ;  [label/label-sm :value (r/atom "This is a \"small\" label")]
-    ;  [label/label-md :value (r/atom "This is a \"medium\" label")]
-    ;  [label/label-lg :value (r/atom "This is a \"large\" label")]
-    ;  [label/label-hg :value (r/atom "This is a \"huge\" label")]]))
