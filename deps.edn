@@ -1,4 +1,4 @@
-{:paths     ["src/clj" "resources"]
+{:paths     ["src/clj" "src/cljs" "resources"]
 
  :deps      {org.clojure/clojure                           {:mvn/version "1.10.3"}
              org.clojure/core.async                        {:mvn/version "1.5.648"}
@@ -40,8 +40,9 @@
              org.clojars.ertucetin/re-frame-flow           {:mvn/version "0.1.4"}
              com.lucasbradstreet/cljs-uuid-utils           {:mvn/version "1.0.2"}
              aysylu/loom                                   {:mvn/version "1.0.2"}
-
-             metasoarous/oz                                {:mvn/version "2.0.0-alpha5"}}
+             thheller/shadow-cljs                          {:mvn/version "2.16.12"}
+             io.github.kovasap/oz {:git/tag "vega-import-fix" :git/sha "4bf14e7"}}
+             ;metasoarous/oz                                {:mvn/version "2.0.0-alpha5"}}
 
 
  :aliases   {:run         {:main-opts ["-m" "bh.rccst.core"]}
