@@ -21,18 +21,20 @@
 
   (ui-utils/init-container component-id)
 
-  (acu/demo
-    title
-    description
-    [layout/centered (or extra-classes {})
-     [:div {:style {:width "1000px" :height "700px"}}
-      (reduce conj
-        [component]
-        (flatten (seq
-                   (apply merge
-                     {:data data :component-id component-id :container-id container-id}
-                     extra-params))))]]
-    source-code))
+  (let [params (flatten (seq
+                          (apply merge
+                            {:data data :component-id component-id :container-id container-id}
+                            extra-params)))]
+
+    ;(log/info "component-example" component-id "//" params)
+
+    (acu/demo
+      title
+      description
+      [layout/centered (or extra-classes {})
+       [:div {:style {:width "1000px" :height "700px"}}
+        (reduce conj [component] params)]]
+      source-code)))
 
 
 (defn example [& {:keys [title container-id description
@@ -40,7 +42,7 @@
                          data-panel config-panel component-panel
                          source-code]}]
 
-  ;(log/info "example widget" title config)
+  ;(log/info "example" title config)
 
   (ui-utils/init-widget container-id config)
 
@@ -48,6 +50,7 @@
         data-key (keyword container-id "data")
         tab-panel (keyword container-id "tab-panel")
         selected-tab (keyword container-id "tab-panel.value")]
+
     (bcu/configurable-demo
       title
       description

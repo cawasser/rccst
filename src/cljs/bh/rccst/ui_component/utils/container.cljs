@@ -30,7 +30,7 @@
         c          (h/path->keyword :widgets container-id)
         blackboard (h/path->keyword container-id "blackboard")]
 
-    (log/info "init-container" container-id id c blackboard)
+    ;(log/info "init-container" container-id id c blackboard)
 
     (re-frame/reg-sub
       c

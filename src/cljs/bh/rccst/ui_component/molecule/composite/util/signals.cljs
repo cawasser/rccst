@@ -94,26 +94,29 @@
 
 (defn process-components [configuration node-type registry container-id]
 
-  ;(log/info "process-components" container-id node-type
-  ;  "//" (->> configuration
-  ;         :components
-  ;         (filter (fn [[_ meta-data]]
-  ;                   (= node-type (:type meta-data))))))
+  (let [components (->> configuration
+                     :components
+                     (filter (fn [[_ meta-data]]
+                               (= node-type (:type meta-data)))))
+        all-exist (map (fn [{:keys [name]}] (get registry name)) components)]
 
-  (doall
-    (->> configuration
-      :components
-      (filter (fn [[_ meta-data]]
-                (= node-type (:type meta-data))))
-      (map (fn [[node meta-data]]
-             ;(log/info "process-components (nodes)" node "//" meta-data "//" (:type meta-data))
-             (component->ui {:node          node
-                             :type          (:type meta-data)
-                             :meta-data     meta-data
-                             :configuration configuration
-                             :registry      registry
-                             :component-id  (ui-utils/path->keyword container-id node)
-                             :container-id  container-id}))))))
+    ;(log/info "process-components" container-id node-type
+    ;  "//" components "//" all-exist)
+
+    (doall
+      (->> configuration
+        :components
+        (filter (fn [[_ meta-data]]
+                  (= node-type (:type meta-data))))
+        (map (fn [[node meta-data]]
+               ;(log/info "process-components (nodes)" node "//" meta-data "//" (:type meta-data))
+               (component->ui {:node          node
+                               :type          (:type meta-data)
+                               :meta-data     meta-data
+                               :configuration configuration
+                               :registry      registry
+                               :component-id  (ui-utils/path->keyword container-id node)
+                               :container-id  container-id})))))))
 
 
 (defn parse-token [lookup token]
