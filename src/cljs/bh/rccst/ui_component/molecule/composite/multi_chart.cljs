@@ -23,38 +23,31 @@
 (def composite-def
   "this data structure defines the composite in terms of the:
 
-  - :components - the subcomponents, like tables, charts, and such used for the actual UI as well as
+  - :components   - the subcomponents, like tables, charts, and such used for the actual UI as well as
   remote data sources (mapped to a local name) and internal pub/sub \"topics\"
-  - :links      - linkages between the components
-  - :layout     - a \"DSL\" which defined how the components are to be organized on the display,
-                  treated as a grid of rows and columns
-
-
+  - :links        - linkages between the components
+  - :grid-layout  - vector of layout data for the react-grid-layout component that positions the children
   "
   {; the ui components (looked up in a registry), mapped to local names
-   :components {:line-chart   {:type :chart/line-chart :configurable false}
-                :bar-chart    {:type :chart/bar-chart :configurable false}
-                :config-panel {:type config-panel}
-                :tabular-data {:type :source/remote :name :source/sequence-of-measurements}
-                :server-time  {:type :source/remote :name :source/server-time}
-                :dag-data     {:type :source/remote :name :source/dag-data}
-                :selected     {:type :source/local :name :selected}
-                :active-aoi   {:type :source/local :name :active-aoi}
-                :current-time {:type :source/local :name :current-time}}
+   :components {:ui/line       {:type :ui/component :name :bh/line-chart :configurable false}
+                :ui/bar        {:type :ui/component :name :bh/bar-chart :configurable false}
+                :ui/data-table {:type :ui/component :name :rc/table}
+                :ui/config     {:type :ui/component :name config-panel}
+                :topic/data    {:type :source/local :name :topic/data}
+                :topic/config  {:type :source/local :name :topic/config :default {}}}
+
 
    ; links - how the different components get their data and if they publish or
    ; subscribe to the composite
-   :links      {:line-chart   {:subs {:data      :tabular-data
-                                      :selection :selected
-                                      :time      :current-time}}
-                :bar-chart    {:subs {:data :tabular-data
-                                      :time :current-time}}
-                :config-panel {:subs {:data :tabular-data}}
-                :time-slider  {:pubs {:time :current-time}
-                               :subs {:time :current-time}}}
+   :links      {:ui/config    {:data {:topic/config :data}}
+                :topic/data   {:data {:ui/line   :data :ui/bar :data
+                                      :ui/config :data :ui/data-table :data}}
+                :topic/config {:data {:ui/line :config-data :ui/bar :config-data}}}
 
    ; the physical layout of the components on the display
-   :layout     [[:line-chart :config-panel :bar-chart]]})
+   :gridlayout [{:i :ui/line :x 0 :y 0 :w 4 :h 7 :static true}
+                {:i :ui/config :x 4 :y 0 :w 4 :h 7 :static true}
+                {:i :ui/bar :x 8 :y 0 :w 4 :h 7 :static true}]})
 
 
 (def source-code '[:div])

@@ -23,8 +23,6 @@
 (declare node)
 
 
-;; region ; sample data
-
 (def sample-data
   {:nodes [{:id       ":ui/targets"
             ;:type     ":ui/component"
@@ -77,7 +75,6 @@
            {:id "e56" :source "5 " :target "6 " :type "smoothstep" :animated true}
            {:id "e57" :source "5 " :target "7 " :type "smoothstep" :animated true}]})
 
-;; endregion
 
 (def source-code '[])
 
@@ -210,13 +207,13 @@
 (defn- details-panel [components component-id node]
   (let [details (get node "data")]
 
-    (log/info "detail-panel" node "//" details)
+    ;(log/info "detail-panel" node "//" details)
 
     [config/make-config-panel details]))
 
 
 (defn- tool-panel [open-details? components component-id tool-types]
-  ;(log/info "tool-panel" open-details? component-id)
+  ;(log/info "tool-panel" @open-details? "//" component-id "//" tool-types)
 
   [:div#tool-panel {:display         :flex
                     :flex-direction  :column
@@ -283,6 +280,7 @@
 
 
     ;(log/info "editable-flow"
+    ;  "//" (js->clj node-types))
     ;  "//" ns
     ;  "//" nodes)
     ;  "//" set-nodes
@@ -322,7 +320,7 @@
                         (into {})
                         (clj->js))]
 
-    (log/info "component (DIGRAPH)" "//" data "//" @d "//" node-types "//" n-types)
+    ;(log/info "component (DIGRAPH)" "//" data "//" @d "// node-types" node-types "// n-types" (js->clj n-types))
 
     (fn []
       [rc/h-box :src (rc/at)

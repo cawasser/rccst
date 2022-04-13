@@ -2,6 +2,7 @@
   (:require [bh.rccst.data-source.coverages :as coverages]
             [bh.rccst.data-source.satellites :as satellites]
             [bh.rccst.data-source.targets :as targets]
+            [bh.rccst.data-source.measurements :as measurements]
 
             [clojure.tools.logging :as log]
             [com.stuartsierra.component :as component]))
@@ -15,16 +16,8 @@
   (merge {}
     targets/meta-data
     satellites/meta-data
-    coverages/meta-data))
-
-
-(comment
-  (atom (init-registry))
-
-  (def r (atom {}))
-  (reset! r (init-registry))
-
-  ())
+    coverages/meta-data
+    measurements/meta-data))
 
 
 (defn- default-source [source-id pub-sub]
@@ -60,3 +53,15 @@
 (defn new-data-sources
   []
   (map->DataSources {}))
+
+
+
+(comment
+  (atom (init-registry))
+
+  (def r (atom {}))
+  (reset! r (init-registry))
+
+  ())
+
+
