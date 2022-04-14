@@ -210,14 +210,15 @@
 
 
 (defn custom-minimap-node-color [color-pallet default-color node]
+  ;(log/info "custom-minimap-node-color" node)
   (or (get color-pallet (.-type node)) default-color))
 
 
 (defn default-custom-node
   "build a custom node for the flow diagram, based on the :type property of the node
   "
-  [type open-details? d]
+  [type open-details? d & extras?]
 
-  (log/info "default-custom-node" type)
+  ;(log/info "default-custom-node" type "//" @open-details? "//" d "//" extras?)
 
   (ui/custom-node type open-details? d))

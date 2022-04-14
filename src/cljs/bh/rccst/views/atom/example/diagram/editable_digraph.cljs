@@ -11,7 +11,6 @@
   (let [container-id "editable-flow-diagram-demo"]
     [:<>
      [example/component-example
-      :widget-id container-id
       :title "Editable Digraph"
       :description "An Editable Digraph, built using [react-flow](https://reactflow.dev)"
       :data (r/atom digraph/sample-data)
@@ -22,7 +21,6 @@
       :source-code digraph/source-code]
 
      [example/component-example
-      :widget-id container-id
       :title "Editable Digraph using data used for building Composite UI components (ie, \"widgets\")"
       :description "An Editable Digraph, built using [react-flow](https://reactflow.dev)"
       :data (r/atom support/sample-data)
@@ -34,7 +32,6 @@
       :source-code digraph/source-code]
 
      [example/component-example
-      :widget-id container-id
       :title "Editable Digraph (example data)"
       :description "An Editable Digraph, built using [react-flow](https://reactflow.dev)"
       :data (r/atom digraph/sample-data-3)

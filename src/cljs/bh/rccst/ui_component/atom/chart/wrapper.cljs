@@ -1,6 +1,7 @@
 (ns bh.rccst.ui-component.atom.chart.wrapper
   (:require [bh.rccst.ui-component.utils :as ui-utils]
             [bh.rccst.ui-component.atom.re-com.configure-toggle :as ct]
+            [bh.rccst.ui-component.utils.helpers :as h]
             [re-com.core :as rc]
             [reagent.core :as r]
             [taoensso.timbre :as log]
@@ -22,6 +23,9 @@
   Returns : (hiccup) the Reagent component representing the entire 'package' (component + config-panel + button)
   "
   [& {:keys [data component-id container-id config-panel data-panel component ui]}]
+
+  (log/info "configurable-chart" data "//" component-id "//" container-id "//" component)
+
   (let [open? (r/atom false)
         config-key (keyword component-id "config")
         data-key (keyword component-id "data")
@@ -60,8 +64,12 @@
 
 (defn chart [& {:keys [data component-id container-id component ui]}]
   (ui-utils/dispatch-local component-id [:container] container-id)
-  ;(log/info "chart" component-id "///" container-id "///" ui
-  ;  "///" @(ui-utils/subscribe-local component-id [:container]))
+
+  (log/info "chart" component-id "//" container-id
+    "//" data "//" @data
+    "//" ui
+    ;"//" component
+    "//" @(ui-utils/subscribe-local component-id [:container]))
 
   [component data component-id container-id ui])
 
@@ -71,12 +79,15 @@
                             data-panel config-panel component-panel
                             ui]}]
 
-  ;(log/info "base-chart"
-  ;  data component-id container-id
-  ;  data-panel config-panel component-panel)
+  (log/info "base-chart" component-id container-id)
 
   (let [id (r/atom nil)
-        not-configurable? (nil? config-panel)]
+        not-configurable? (nil? config-panel)
+        d (h/resolve-value data)]
+
+    (log/info "base-chart"
+      component-id container-id
+      "//" data "//" @d)
 
     (fn []
       (when (nil? @id)
@@ -86,14 +97,14 @@
 
       (if not-configurable?
         [chart
-         :data data
+         :data d
          :component-id @id
          :container-id container-id
          :component component-panel
          :ui ui]
 
         [configurable-chart
-         :data data
+         :data d
          :component-id @id
          :container-id container-id
          :data-panel data-panel
