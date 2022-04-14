@@ -1,6 +1,7 @@
 (ns bh.rccst.views.atom.charts
   (:require [bh.rccst.views.atom.example.chart.area-chart :as area-chart]
             [bh.rccst.views.atom.example.chart.bar-chart :as bar-chart]
+            [bh.rccst.views.atom.example.chart.bar-chart-2 :as bar-chart-2]
             [bh.rccst.views.atom.example.chart.colored-pie-chart :as colored-pie-chart]
             [bh.rccst.views.atom.example.chart.line-chart :as line-chart]
             [bh.rccst.views.atom.example.chart.pie-chart :as pie-chart]
@@ -15,16 +16,17 @@
 
 (defn examples []
   [:div
-   [area-chart/example]
-   [bar-chart/example]
-   [colored-pie-chart/example]
-   [funnel-chart/example]
-   [line-chart/simple-example]
-   [pie-chart/example]
-   [radar-chart/example]
-   [radial-bar-chart/example]
-   [sankey-chart/example]
-   [scatter-chart/example]
-   [treemap-chart/example]])
+   ;[area-chart/example]
+   ;[bar-chart/example]
+   [bar-chart-2/example]])
+   ;[colored-pie-chart/example]
+   ;[funnel-chart/example]
+   ;[line-chart/simple-example]
+   ;[pie-chart/example]
+   ;[radar-chart/example]
+   ;[radial-bar-chart/example]
+   ;[sankey-chart/example]
+   ;[scatter-chart/example]
+   ;[treemap-chart/example]])
 
 

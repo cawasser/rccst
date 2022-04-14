@@ -12,7 +12,7 @@
   :events/init-widget-locals
   (fn-traced [db [_ container init-vals]]
     ;(log/info "::init-widget-locals" container init-vals)
-    (if (get-in db [:widgets container])
+    (if (= (get-in db [:widgets container]) init-vals)
       (do
         ;(log/info "::init-widget-locals // already exists")
         db)
@@ -187,9 +187,9 @@
         dep  (compute-deps widget-id a more)
         item (h/path->keyword (if more (last more) a))]
 
-    ;(log/info "create-widget-local-sub" p
-    ;  ":<-" dep
-    ;  "item" item)
+    (log/info "create-widget-local-sub" p
+      ":<-" dep
+      "item" item)
 
     (re-frame/reg-sub
       p
@@ -288,9 +288,9 @@
   [widget-id locals-and-defaults]
   (let [paths (process-locals [] nil locals-and-defaults)]
 
-    ;(log/info "init-widget" widget-id
-    ;  "//" paths
-    ;  "//" locals-and-defaults)
+    (log/info "init-widget" widget-id
+      "//" paths
+      "//" locals-and-defaults)
 
     ; load the app-db with the default values
     (init-local-values widget-id locals-and-defaults)
@@ -428,14 +428,33 @@
   3. put the result into a hash-map
   "
   [component-id local-config]
-  (->> (process-locals [] nil local-config)
-    (map (fn [path]
-           {path (subscribe-local component-id path)}))
-    (into {})))
+
+  (log/info "build-subs" component-id "//" local-config)
+
+  (let [ret (->> (process-locals [] nil local-config)
+              (map (fn [path]
+                     {path (subscribe-local component-id path)}))
+              (into {}))]
+
+    (log/info "build-subs" component-id "//" ret)
+    ret))
 
 
 (defn resolve-sub [subs path]
   (deref (get subs (->> path
                      (map h/path->keyword)
                      (into [])))))
+
+
+(comment
+  (re-frame/subscribe [:chart-remote-data-demo.widget])
+  (re-frame/subscribe [:chart-remote-data-demo.widget.ui.bar-chart])
+  (re-frame/subscribe [:chart-remote-data-demo.widget.ui.bar-chart.x-axis])
+  (re-frame/subscribe [:chart-remote-data-demo.widget.ui.bar-chart.x-axis.include])
+
+  ())
+
+
+
+
 

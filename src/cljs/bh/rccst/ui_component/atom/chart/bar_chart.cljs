@@ -142,6 +142,9 @@
 
 
 (defn- make-bar-display [chart-id data subscriptions isAnimationActive?]
+  (log/info "make-bar-display" data "//" @data "//" @isAnimationActive?
+    "//" subscriptions)
+
   (->> (get-in @data [:metadata :fields])
     (filter (fn [[_ v]] (= :number v)))
     keys
@@ -167,25 +170,56 @@
   "
   [data component-id container-id ui]
 
+  (log/info "component-panel" component-id "//" container-id "//" data)
+
   (let [d                  (h/resolve-value data)
         container          (ui-utils/subscribe-local component-id [:container])
         isAnimationActive? (ui-utils/subscribe-local component-id [:isAnimationActive])
         override-subs      @(ui-utils/subscribe-local component-id [:sub])
-        local-subs         (ui-utils/build-subs component-id (local-config data))
+        l-c                (local-config d)
+        local-subs         (ui-utils/build-subs component-id l-c)
         subscriptions      (ui-utils/override-subs container-id local-subs override-subs)]
 
-    ;(log/info "component-panel" component-id "//" data "//" @d)
+    (log/info "component-panel" component-id "//" data
+      "// resolved" @d
+      "// l-c" l-c
+      "// local-subs" local-subs
+      "// subs" subscriptions)
 
     (fn []
-      [:> ResponsiveContainer
-       [:> BarChart {:data (get @d :data)}
+      (if (empty? @d)
+        [rc/alert-box :src (rc/at)
+         :alert-type :info
+         :style {:width "100%"}
+         :heading "Waiting for data"]
 
-        (utils/standard-chart-components component-id ui)
+        [:> ResponsiveContainer
+         [:> BarChart {:data (get @d :data)}
 
-        (when (ui-utils/resolve-sub subscriptions [:brush]) [:> Brush])
+          (utils/standard-chart-components component-id ui)
 
-        (make-bar-display component-id d subscriptions isAnimationActive?)]])))
+          (when (ui-utils/resolve-sub subscriptions [:brush]) [:> Brush])
 
+          (make-bar-display component-id d subscriptions isAnimationActive?)]]))))
+
+
+
+(comment
+  (do
+    (def component-id ":chart-remote-data-demo.widget.ui.bar-chart")
+    (def container-id ":chart-remote-data-demo.widget")
+    (def data [:bh.rccst.subs/source :source/measurements])
+
+    (def d (h/resolve-value data))
+    (def container (ui-utils/subscribe-local component-id [:container]))
+    (def isAnimationActive? (ui-utils/subscribe-local component-id [:isAnimationActive]))
+    (def override-subs @(ui-utils/subscribe-local component-id [:sub]))
+    (def local-subs (ui-utils/build-subs component-id (local-config d)))
+    (def subscriptions (ui-utils/override-subs container-id
+                         local-subs override-subs)))
+
+
+  ())
 
 (defn configurable-component
   "the chart to draw, taking cues from the settings of the configuration panel
@@ -225,7 +259,8 @@
   [& {:keys [data component-id container-id ui]}]
 
   (let [d (h/resolve-value data)]
-    ;(log/info "component" data "//" d "//" @d)
+
+    (log/info "component" data "//" d "//" @d)
 
     [c/base-chart
      :data data
