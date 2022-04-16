@@ -1,12 +1,15 @@
 (ns bh.rccst.ui-component.atom.chart.bar-chart-2
   (:require [bh.rccst.ui-component.atom.chart.utils :as utils]
+            [bh.rccst.ui-component.atom.re-com.configure-toggle :as ct]
             [bh.rccst.ui-component.utils :as ui-utils]
             [bh.rccst.ui-component.utils.color :as color]
             [bh.rccst.ui-component.utils.example-data :as example-data]
             [bh.rccst.ui-component.utils.helpers :as h]
+            [bh.rccst.ui-component.utils.locals :as l]
             [re-com.core :as rc]
             [reagent.core :as r]
             [taoensso.timbre :as log]
+            [woolybear.ad.layout :as layout]
             ["recharts" :refer [ResponsiveContainer BarChart Bar Brush
                                 XAxis YAxis CartesianGrid Tooltip Legend]]))
 
@@ -55,45 +58,47 @@
     ret))
 
 
-(defn- bar-config [chart-id label path position]
+(defn- bar-config [component-id label path position]
   [rc/v-box :src (rc/at)
    :gap "5px"
-   :children [[utils/boolean-config chart-id label (conj path :include)]
-              [utils/color-config chart-id ":fill" (conj path :fill) position]
-              [utils/text-config chart-id ":stackId" (conj path :stackId)]]])
+   :children [[utils/boolean-config component-id label (conj path :include)]
+              [utils/color-config component-id ":fill" (conj path :fill) position]
+              [utils/text-config component-id ":stackId" (conj path :stackId)]]])
 
 
-(defn- make-bar-config [chart-id data]
-  ;(log/info "make-bar-config" chart-id "//" data)
+(defn- make-bar-config [component-id data]
+  ;(log/info "make-bar-config" component-id "//" @data)
 
   (->> (get-in @data [:metadata :fields])
     (filter (fn [[k v]] (= :number v)))
     keys
     (map-indexed (fn [idx a]
-                   [bar-config chart-id a [a] :above-right]))
+                   [bar-config component-id a [a] :above-right]))
     (into [])))
 
 
-(defn config-panel [data chart-id]
+(defn config-panel [data component-id]
+  ;(log/info "config-panel" component-id "//" @data)
+
   [rc/v-box :src (rc/at)
    :gap "10px"
    :width "50%"
    :style {:padding          "15px"
            :border-top       "1px solid #DDD"
            :background-color "#f7f7f7"}
-   :children [[utils/standard-chart-config data chart-id]
+   :children [[utils/standard-chart-config data component-id]
               [rc/line :src (rc/at) :size "2px"]
               [rc/h-box :src (rc/at)
                :width "100%"
                :style ui-utils/h-wrap
                :gap "10px"
-               :children (make-bar-config chart-id data)]
+               :children (make-bar-config component-id data)]
               [rc/line :src (rc/at) :size "2px"]
-              [utils/boolean-config chart-id ":brush?" [:brush]]]])
+              [utils/boolean-config component-id ":brush?" [:brush]]]])
 
 
 (defn- make-bar-display [data subscriptions isAnimationActive?]
-  (log/info "make-bar-display" data "//" subscriptions)
+  ;(log/info "make-bar-display" data "//" subscriptions)
 
   (let [ret (->> (get-in data [:metadata :fields])
               (filter (fn [[_ v]] (= :number v)))
@@ -116,7 +121,7 @@
 (defn- component-panel* [& {:keys [data component-id container-id subscriptions isAnimationActive?]}]
   (let [d (if (empty? data) [] (get data :data))]
 
-    (log/info "component-panel*" component-id "//" data "//" d)
+    ;(log/info "component-panel*" component-id "//" data "//" d)
 
     [:> ResponsiveContainer
      [:> BarChart {:data d}
@@ -131,19 +136,20 @@
 (defn- component-panel [& {:keys [data component-id container-id]}]
 
   (let [d                  (h/resolve-value data)
-        isAnimationActive? (ui-utils/subscribe-local component-id [:isAnimationActive])
-        override-subs      @(ui-utils/subscribe-local component-id [:sub])]
+        isAnimationActive? (ui-utils/subscribe-local component-id [:isAnimationActive])]
+        ;override-subs      @(ui-utils/subscribe-local component-id [:sub])]
 
-    (log/info "component-panel" data "//" @d)
+    ;(log/info "component-panel" data "//" @d)
 
     (fn []
-      (ui-utils/init-widget component-id (config component-id d))
+
+      (l/update-local-values component-id (local-config d))
 
       (let [l-c           (local-config d)
-            local-subs    (ui-utils/build-subs component-id l-c)
-            subscriptions (ui-utils/override-subs container-id local-subs override-subs)]
+            local-subs    (ui-utils/build-subs component-id l-c)]
+            ;subscriptions (ui-utils/override-subs container-id local-subs override-subs)]
 
-        (log/info "component-panel (render)" component-id "//" @d "//" subscriptions)
+        ;(log/info "component-panel (render)" component-id "//" @d "//" local-subs)
 
         (if (empty? @d)
           [rc/alert-box :src (rc/at)
@@ -155,51 +161,48 @@
            :data @d
            :component-id component-id
            :container-id container-id
-           :subscriptions subscriptions
+           :subscriptions local-subs
            :isAnimationActive? isAnimationActive?])))))
 
 
-;(defn configurable-component [& {:keys [data component-id container-id]}]
-;
-;  (let [open? (r/atom false)
-;        config-key (keyword component-id "config")
-;        data-key (keyword component-id "data")
-;        tab-panel (ui-utils/path->keyword component-id "tab-panel")
-;        selected-tab (ui-utils/path->keyword component-id "tab-panel.value")
-;        chart-events [config-key data-key tab-panel selected-tab]
-;        d (h/resolve-value data)]
-;
-;    (log/info "configurable-component" component-id "//" data "//" @d)
-;
-;    ;  "///" container-id "///" ui
-;    ;  "///" chart-events)
-;
-;    (ui-utils/dispatch-local component-id [:container] container-id)
-;
-;    (fn []
-;      [rc/v-box :src (rc/at)
-;       :gap "2px"
-;       :children [[rc/h-box :src (rc/at)
-;                   :justify :end
-;                   :children [[ct/configure-toggle open?]]]
-;                  [layout/centered {:extra-classes :is-one-third}
-;                   [rc/h-box :src (rc/at)
-;                    :gap "5px"
-;                    :width "600px"
-;                    :height "600px"
-;                    :children (conj
-;                                (if @open?
-;                                  [[layout/centered {:extra-classes :is-one-third}
-;                                    [:div {:width "75%"}
-;                                     [ui-utils/chart-config
-;                                      chart-events
-;                                      [utils/meta-tabular-data-panel @d]
-;                                      [config-panel d component-id]]]]]
-;                                  [])
-;                                [component-panel
-;                                 :data data
-;                                 :component-id component-id
-;                                 :container-id container-id])]]]])))
+(defn configurable-component-panel [& {:keys [data component-id container-id]}]
+
+  (let [open?        (r/atom false)
+        config-key   (keyword component-id "config")
+        data-key     (keyword component-id "data")
+        tab-panel    (ui-utils/path->keyword component-id "tab-panel")
+        selected-tab (ui-utils/path->keyword component-id "tab-panel.value")
+        chart-events [config-key data-key tab-panel selected-tab]
+        d            (h/resolve-value data)]
+
+    ;(log/info "configurable-component" component-id "//" data "//" @d)
+
+    (ui-utils/init-widget component-id (config component-id d))
+
+    (fn []
+      [rc/v-box :src (rc/at)
+       :gap "2px"
+       :children [[rc/h-box :src (rc/at)
+                   :justify :end
+                   :children [[ct/configure-toggle open?]]]
+                  [layout/centered {:extra-classes :is-one-third}
+                   [rc/h-box :src (rc/at)
+                    :gap "5px"
+                    :width "600px"
+                    :height "600px"
+                    :children (conj
+                                (if @open?
+                                  [[layout/centered {:extra-classes :is-one-third}
+                                    [:div {:width "75%"}
+                                     [ui-utils/chart-config
+                                      chart-events
+                                      [utils/meta-tabular-data-panel @d]
+                                      [config-panel d component-id]]]]]
+                                  [])
+                                [component-panel
+                                 :data data
+                                 :component-id component-id
+                                 :container-id container-id])]]]])))
 
 
 (defn component [& {:keys [data component-id container-id]}]
@@ -208,16 +211,16 @@
         d  (h/resolve-value data)
         c  (config component-id d)]
 
-    (log/info "component" data "//" d "//" @d)
+    ;(log/info "component" data "//" d "//" @d)
 
     (fn []
       (when (nil? @id)
-        (log/info "initializing" component-id)
+        ;(log/info "initializing" component-id)
         (reset! id component-id)
         (ui-utils/init-widget @id c)
         (ui-utils/dispatch-local @id [:container] container-id))
 
-      [component-panel
+      [configurable-component-panel
        :data data
        :component-id component-id
        :container-id (or container-id "")])))
