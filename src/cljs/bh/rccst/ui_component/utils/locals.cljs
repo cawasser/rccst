@@ -217,9 +217,9 @@
         dep  (compute-deps widget-id a more)
         item (h/path->keyword (if more (last more) a))]
 
-    (log/info "create-widget-local-sub" p
-      ":<-" dep
-      "item" item)
+    ;(log/info "create-widget-local-sub" p
+    ;  ":<-" dep
+    ;  "item" item)
 
     (re-frame/reg-sub
       p

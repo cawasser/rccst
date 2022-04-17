@@ -41,22 +41,17 @@
 
 
 (defn config [chart-id data]
-
-  (log/info "config" chart-id "//" @data)
-
-  (let [ret (-> ui-utils/default-pub-sub
-              (merge
-                utils/default-config
-                {:tab-panel {:value     (keyword chart-id "config")
-                             :data-path [:widgets (keyword chart-id) :tab-panel]}}
-                (local-config data))
-              (assoc-in [:x-axis :dataKey] :name)
-              ; TODO: this should be produced by a function that processes the data
-              (assoc-in [:sub] [[:brush]
-                                [:uv :include] [:uv :stroke] [:uv :fill]
-                                [:pv :include] [:pv :stroke] [:pv :fill]]))]
-    (log/info "config" ret)
-    ret))
+  (-> ui-utils/default-pub-sub
+    (merge
+      utils/default-config
+      {:tab-panel {:value     (keyword chart-id "config")
+                   :data-path [:widgets (keyword chart-id) :tab-panel]}}
+      (local-config data))
+    (assoc-in [:x-axis :dataKey] :name)))
+    ;; TODO: this should be produced by a function that processes the data
+    ;(assoc-in [:sub] [[:brush]
+    ;                  [:uv :include] [:uv :stroke] [:uv :fill]
+    ;                  [:pv :include] [:pv :stroke] [:pv :fill]])))
 
 
 (defn- bar-config [component-id label path position]
@@ -151,7 +146,6 @@
    :config-panel config-panel
    :config config
    :local-config local-config])
-
 
 
 (def meta-data {:rechart/bar-2 {:component component
