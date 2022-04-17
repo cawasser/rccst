@@ -16,17 +16,17 @@
 
 (defn examples []
   [:div
-   [area-chart/example]
-   [bar-chart/example]
-   [bar-chart-2/example]
-   [colored-pie-chart/example]
-   [funnel-chart/example]
-   [line-chart/simple-example]
-   [pie-chart/example]
-   [radar-chart/example]
-   [radial-bar-chart/example]
-   [sankey-chart/example]
-   [scatter-chart/example]
-   [treemap-chart/example]])
+   ;[area-chart/example]
+   ;[bar-chart/example]
+   [bar-chart-2/example]])
+   ;[colored-pie-chart/example]
+   ;[funnel-chart/example]
+   ;[line-chart/simple-example]
+   ;[pie-chart/example]
+   ;[radar-chart/example]
+   ;[radial-bar-chart/example]
+   ;[sankey-chart/example]
+   ;[scatter-chart/example]
+   ;[treemap-chart/example]])
 
 

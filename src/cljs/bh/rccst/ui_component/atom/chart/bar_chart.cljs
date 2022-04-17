@@ -142,8 +142,8 @@
 
 
 (defn- make-bar-display [chart-id data subscriptions isAnimationActive?]
-  (log/info "make-bar-display" data "//" @data "//" @isAnimationActive?
-    "//" subscriptions)
+  ;(log/info "make-bar-display" data "//" @data "//" @isAnimationActive?
+  ;  "//" subscriptions)
 
   (->> (get-in @data [:metadata :fields])
     (filter (fn [[_ v]] (= :number v)))
@@ -170,7 +170,7 @@
   "
   [data component-id container-id ui]
 
-  (log/info "component-panel" component-id "//" container-id "//" data)
+  ;(log/info "component-panel" component-id "//" container-id "//" data)
 
   (let [d                  (h/resolve-value data)
         container          (ui-utils/subscribe-local component-id [:container])
