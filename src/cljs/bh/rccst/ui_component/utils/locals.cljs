@@ -10,6 +10,7 @@
 
 (declare process-locals)
 (declare create-widget-local-sub)
+(declare create-widget-local-event)
 
 
 (re-frame/reg-event-db
@@ -73,7 +74,10 @@
 
       (doall
         ; TODO: consider using locals-and-defaults to put the actual default into the subscription rather than 'nil'
-        (map #(create-widget-local-sub component-id % nil) new-vals-paths)))))
+        (map #(create-widget-local-sub component-id % nil) new-vals-paths))
+
+      (doall
+        (map #(create-widget-local-event component-id %) new-vals-paths)))))
 
 
 (defn process-branch [accum root k v]
