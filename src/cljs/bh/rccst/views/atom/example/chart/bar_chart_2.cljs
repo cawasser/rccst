@@ -40,7 +40,7 @@
                                                     {:name "Page Q" :uv 1100
                                                      :pv   1100 :tv 1100 :amt 1100}))
                            :label "Add 'Q'"]
-                          [rc/button :on-click #(swap! data assoc :data (drop-last 2 (:data @data)))
+                          [rc/button :on-click #(swap! data assoc :data (into [] (drop-last 2 (:data @data))))
                            :label "Drop Last 2"]
                           [rc/button :on-click #(reset! data (-> @data
                                                                (assoc-in [:metadata :fields :new-item] :number)
@@ -73,6 +73,8 @@
 
   (assoc-in {:dummy '({:one 1})} [:dummy 0 :new] 1000)
   (assoc-in @data [:data 0 :uv] 10000)
+  (assoc @data :data (into [] (drop-last 2
+                                (:data @data))))
   (-> @data
     (assoc-in [:metadata :fields :new] :number)
     (assoc :data (map #(assoc % :new 1750) (:data @data))))
@@ -87,8 +89,8 @@
       {:name "Page Q" :uv 1100
        :pv   1100 :tv 1100 :amt 1100}))
 
-  (swap! data assoc :data (drop-last 2
-                            (:data @data)))
+  (swap! data assoc :data (into [] (drop-last 2
+                                     (:data @data))))
 
   (reset! data (-> @data
                  (assoc-in [:metadata :fields :new-item] :number)
