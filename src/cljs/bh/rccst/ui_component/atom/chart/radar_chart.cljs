@@ -36,7 +36,7 @@
                       (distinct))
         domainMin   (apply min all-values)
         domainMax   (apply max all-values)]
-    (log/info "domain min = " domainMin, "domain max = " domainMax)
+    ;(log/info "domain min = " domainMin, "domain max = " domainMax)
     (if (= domainMin domainMax)
       {:domain [0 domainMax]}
       {:domain [domainMin domainMax]})))

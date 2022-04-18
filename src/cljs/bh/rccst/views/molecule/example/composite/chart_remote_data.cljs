@@ -30,8 +30,7 @@
            [:div {:style {:width "1000px" :height "800px"}}
             [grid/component
              :data (r/atom chart-remote-data/ui-definition)
-             :component-id (h/path->keyword container-id "widget")
-             :container-id container-id]]])
+             :component-id (h/path->keyword container-id "widget")]]])
         (acu/demo
           "Coverage Plan"
           [rc/alert-box :src (rc/at)

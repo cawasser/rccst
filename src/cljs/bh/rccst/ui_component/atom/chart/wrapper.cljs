@@ -24,7 +24,7 @@
   "
   [& {:keys [data component-id container-id config-panel data-panel component ui]}]
 
-  (log/info "configurable-chart" data "//" component-id "//" container-id "//" component)
+  ;(log/info "configurable-chart" data "//" component-id "//" container-id "//" component)
 
   (let [open? (r/atom false)
         config-key (keyword component-id "config")
@@ -65,13 +65,12 @@
 (defn chart [& {:keys [data component-id container-id component ui]}]
   (ui-utils/dispatch-local component-id [:container] container-id)
 
-  (log/info "chart" component-id "//" container-id
-    "//" data "//" @data
-    "//" ui
-    ;"//" component
-    "//" @(ui-utils/subscribe-local component-id [:container]))
+  (let [d (h/resolve-value data)]
+    ;(log/info "chart" component-id "//" container-id
+    ;  "//" data "//" @d
+    ;  "//" ui)
 
-  [component data component-id container-id ui])
+    [component data component-id container-id ui]))
 
 
 (defn base-chart [& {:keys [data config
@@ -79,25 +78,26 @@
                             data-panel config-panel component-panel
                             ui]}]
 
-  (log/info "base-chart" component-id container-id)
+  ;(log/info "base-chart" component-id container-id)
 
   (let [id (r/atom nil)
         not-configurable? (nil? config-panel)
         d (h/resolve-value data)]
 
-    (log/info "base-chart"
-      component-id container-id
-      "//" data "//" @d)
+    ;(log/info "base-chart"
+    ;  component-id container-id
+    ;  "//" data "//" @d)
 
     (fn []
       (when (nil? @id)
+        (log/info "initializing" component-id)
         (reset! id component-id)
         (ui-utils/init-widget @id config)
         (ui-utils/dispatch-local @id [:container] container-id))
 
       (if not-configurable?
         [chart
-         :data d
+         :data data
          :component-id @id
          :container-id container-id
          :component component-panel
