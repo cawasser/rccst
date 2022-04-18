@@ -23,7 +23,6 @@
                :data data
                :component-id component-id
                :container-id container-id
-               :component* chart/component-panel*
                :component-panel chart/component
                :data-panel chart-utils/meta-tabular-data-panel
                :config-panel chart/config-panel]
@@ -44,9 +43,10 @@
                            :label "Drop Last 2"]
                           [rc/button :on-click #(reset! data (-> @data
                                                                (assoc-in [:metadata :fields :new-item] :number)
-                                                               (assoc :data (map (fn [x]
-                                                                                   (assoc x :new-item 1750))
-                                                                              (:data @data)))))
+                                                               (assoc :data (into []
+                                                                              (map (fn [x]
+                                                                                     (assoc x :new-item 1750))
+                                                                                (:data @data))))))
                            :label "Add :new-item"]]]]])
 
 

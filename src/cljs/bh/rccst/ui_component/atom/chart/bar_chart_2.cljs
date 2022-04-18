@@ -130,7 +130,6 @@
 
 
 (defn component [& {:keys [data component-id container-id
-                           component*
                            component-panel
                            data-panel config-panel] :as params}]
 
@@ -140,7 +139,7 @@
    :data data
    :component-id component-id
    :container-id container-id
-   :component* component*
+   :component* component-panel*
    :component-panel component-panel
    :data-panel data-panel
    :config-panel config-panel
