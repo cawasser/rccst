@@ -164,6 +164,7 @@ distinction, so we can quickly build all the Nodes and Handles used for the diag
      :component-id component-id
      :data flow
      :node-types node-types
+     :tool-types dag-support/default-tool-types
      :minimap-styles minimap-styles]))
 
 
