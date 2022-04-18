@@ -23,12 +23,12 @@
   ;(log/info "chart-config" config data panel tab)
   (let [data-or-config [[config "config"]
                         [data "data"]]]
-    [:div.chart-config {:style {:width "100%"}}
+    [:div.chart-config ;{:style {:width "100%" :height "100%"}}
      [navbar/navbar data-or-config [panel]]
 
-     [rc/scroller
+     [rc/scroller :src (rc/at)
       :v-scroll :auto
-      :height "500px"
+      :height "400px"
       :child [tab-panel/tab-panel {:extra-classes             :rccst
                                    :subscribe-to-selected-tab [tab]}
 

@@ -78,8 +78,8 @@
 
   [rc/v-box :src (rc/at)
    :gap "10px"
-   :width "50%"
-   :style {:padding          "15px"
+   :width "100%"
+   :style {:padding          "5px"
            :border-top       "1px solid #DDD"
            :background-color "#f7f7f7"}
    :children [[utils/standard-chart-config data component-id]

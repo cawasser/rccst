@@ -44,14 +44,18 @@
 
   [rc/v-box :src (rc/at)
    :gap "10px"
-   :children [[chart/component
-               :data data
-               :component-id component-id
-               :container-id container-id
-               :component-panel chart/component
-               :data-panel chart-utils/meta-tabular-data-panel
-               :config-panel chart/config-panel]
-              [data-tools]]])
+   :width "900px"
+   :height "600px"
+   :children [[:div.chart-part {:style {:width "100%" :height "90%"}}
+               [chart/component
+                :data data
+                :component-id component-id
+                :container-id container-id
+                :component-panel chart/component
+                :data-panel chart-utils/meta-tabular-data-panel
+                :config-panel chart/config-panel]]
+              [:div.data-tools-part {:style {:width "100%"}}
+               [data-tools]]]])
 
 
 (defn example []

@@ -30,23 +30,23 @@
 
         ;(log/info "component-panel (render)" component-id "//" @d "//" local-subs)
 
-        [layout/centered {:extra-classes :is-one-third}
-         [rc/h-box :src (rc/at)
-          :gap "5px"
-          :width "600px"
-          :height "600px"
-          :children [(if (empty? @d)
-                       [rc/alert-box :src (rc/at)
-                        :alert-type :info
-                        :style {:width "100%" :height "100%"}
-                        :heading "Waiting for data"]
+        ;[layout/centered {:extra-classes :is-one-third}
+        [rc/h-box :src (rc/at)
+         :gap "5px"
+         :width "100%"
+         :height "100%"
+         :children [(if (empty? @d)
+                      [rc/alert-box :src (rc/at)
+                       :alert-type :info
+                       :style {:width "100%" :height "100%"}
+                       :heading "Waiting for data"]
 
-                       [component*
-                        :data @d
-                        :component-id component-id
-                        :container-id container-id
-                        :subscriptions local-subs
-                        :isAnimationActive? isAnimationActive?])]]]))))
+                      [component*
+                       :data @d
+                       :component-id component-id
+                       :container-id container-id
+                       :subscriptions local-subs
+                       :isAnimationActive? isAnimationActive?])]]))))
 
 
 (defn configurable-component-panel [& {:keys [data component-id container-id
@@ -68,30 +68,39 @@
 
     (fn []
       [rc/v-box :src (rc/at)
+       :class "configurable-component-panel"
        :gap "2px"
+       :width "100%"
+       :height "100%"
        :children [[rc/h-box :src (rc/at)
+                   :class "chart-config-tools"
                    :justify :end
                    :children [[ct/configure-toggle open?]]]
-                  [layout/centered {:extra-classes :is-one-third}
-                   [rc/h-box :src (rc/at)
-                    :gap "5px"
-                    :width "600px"
-                    :height "600px"
-                    :children (conj
-                                (if @open?
-                                  [[layout/centered {:extra-classes :is-one-third}
-                                    [:div {:width "75%"}
-                                     [ui-utils/chart-config
-                                      chart-events
-                                      [data-panel @d]
-                                      [config-panel d component-id]]]]]
-                                  [])
-                                [component-panel
+                  [rc/h-box :src (rc/at)
+                   :class "chart-itself"
+                   :gap "5px"
+                   :width "100%"
+                   :height "90%"
+                   :children (if @open?
+                               [[:div.chart-config-panel {:style {:width "40%" :height "100%"}}
+                                  [ui-utils/chart-config
+                                   chart-events
+                                   [data-panel @d]
+                                   [config-panel d component-id]]]
+                                [:div.chart-content {:style {:width "60%" :height "100%"}}
+                                 [component-panel
+                                  :component* component*
+                                  :local-config local-config
+                                  :data data
+                                  :component-id component-id
+                                  :container-id container-id]]]
+
+                               [[component-panel
                                  :component* component*
                                  :local-config local-config
                                  :data data
                                  :component-id component-id
-                                 :container-id container-id])]]]])))
+                                 :container-id container-id]])]]])))
 
 
 (defn base-chart [& {:keys [data config
@@ -118,23 +127,24 @@
         (ui-utils/init-widget @id c)
         (ui-utils/dispatch-local @id [:container] container-id))
 
-      (if not-configurable?
-        [component-panel
-         :data data
-         :config config
-         :local-config local-config
-         :component-id @id
-         :container-id container-id
-         :component* component*]
+      [:div.base-chart {:style {:width "100%" :height "100%"}}
+       (if not-configurable?
+         [component-panel
+          :data data
+          :config config
+          :local-config local-config
+          :component-id @id
+          :container-id container-id
+          :component* component*]
 
-        [configurable-component-panel
-         :data d
-         :config config
-         :local-config local-config
-         :component-id @id
-         :container-id container-id
-         :data-panel data-panel
-         :config-panel config-panel
-         :component* component*]))))
+         [configurable-component-panel
+          :data d
+          :config config
+          :local-config local-config
+          :component-id @id
+          :container-id container-id
+          :data-panel data-panel
+          :config-panel config-panel
+          :component* component*])])))
 
 
