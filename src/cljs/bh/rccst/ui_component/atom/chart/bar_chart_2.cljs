@@ -102,22 +102,22 @@
               (map (fn [a]
                      (if (ui-utils/resolve-sub subscriptions [a :include])
                        [:> Bar (merge {:type "monotone" :dataKey a
-                                       ;:isAnimationActive @isAnimationActive?
+                                       :isAnimationActive @isAnimationActive?
                                        :fill (ui-utils/resolve-sub subscriptions [a :fill])}
                                  (when (seq (ui-utils/resolve-sub subscriptions [a :stackId]))
                                    {:stackId (ui-utils/resolve-sub subscriptions [a :stackId])}))]
                        [])))
               (remove empty?)
               (into [:<>]))]
-    (log/info "ret" ret)
+    ;(log/info "ret" ret)
 
     ret))
 
 
-(defn- component-panel* [& {:keys [data component-id container-id subscriptions isAnimationActive?]}]
+(defn- component-panel* [& {:keys [data component-id container-id
+                                   subscriptions isAnimationActive?]
+                            :as params}]
   (let [d (if (empty? data) [] (get data :data))]
-
-    ;(log/info "component-panel*" component-id "//" data "//" d)
 
     [:> ResponsiveContainer
      [:> BarChart {:data d}

@@ -18,7 +18,7 @@
         isAnimationActive? (ui-utils/subscribe-local component-id [:isAnimationActive])]
     ;override-subs      @(ui-utils/subscribe-local component-id [:sub])]
 
-    ;(log/info "component-panel" data "//" @d)
+    (log/info "component-panel" data "//" @d)
 
     (fn []
 
@@ -30,18 +30,23 @@
 
         ;(log/info "component-panel (render)" component-id "//" @d "//" local-subs)
 
-        (if (empty? @d)
-          [rc/alert-box :src (rc/at)
-           :alert-type :info
-           :style {:width "100%" :height "100%"}
-           :heading "Waiting for data"]
+        [layout/centered {:extra-classes :is-one-third}
+         [rc/h-box :src (rc/at)
+          :gap "5px"
+          :width "600px"
+          :height "600px"
+          :children [(if (empty? @d)
+                       [rc/alert-box :src (rc/at)
+                        :alert-type :info
+                        :style {:width "100%" :height "100%"}
+                        :heading "Waiting for data"]
 
-          [component*
-           :data @d
-           :component-id component-id
-           :container-id container-id
-           :subscriptions local-subs
-           :isAnimationActive? isAnimationActive?])))))
+                       [component*
+                        :data @d
+                        :component-id component-id
+                        :container-id container-id
+                        :subscriptions local-subs
+                        :isAnimationActive? isAnimationActive?])]]]))))
 
 
 (defn configurable-component-panel [& {:keys [data component-id container-id

@@ -24,7 +24,7 @@
   "
   [& {:keys [data component-id container-id config-panel data-panel component ui]}]
 
-  (log/info "configurable-chart" data "//" component-id "//" container-id "//" component)
+  ;(log/info "configurable-chart" data "//" component-id "//" container-id "//" component)
 
   (let [open? (r/atom false)
         config-key (keyword component-id "config")
@@ -66,9 +66,9 @@
   (ui-utils/dispatch-local component-id [:container] container-id)
 
   (let [d (h/resolve-value data)]
-    (log/info "chart" component-id "//" container-id
-      "//" data "//" @d
-      "//" ui)
+    ;(log/info "chart" component-id "//" container-id
+    ;  "//" data "//" @d
+    ;  "//" ui)
 
     [component data component-id container-id ui]))
 
@@ -78,15 +78,15 @@
                             data-panel config-panel component-panel
                             ui]}]
 
-  (log/info "base-chart" component-id container-id)
+  ;(log/info "base-chart" component-id container-id)
 
   (let [id (r/atom nil)
         not-configurable? (nil? config-panel)
         d (h/resolve-value data)]
 
-    (log/info "base-chart"
-      component-id container-id
-      "//" data "//" @d)
+    ;(log/info "base-chart"
+    ;  component-id container-id
+    ;  "//" data "//" @d)
 
     (fn []
       (when (nil? @id)

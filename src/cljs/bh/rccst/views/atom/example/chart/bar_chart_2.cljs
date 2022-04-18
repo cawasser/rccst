@@ -14,8 +14,33 @@
 (defonce data (r/atom chart/sample-data))
 
 
+(defn- data-tools []
+  [rc/h-box :src (rc/at)
+   :gap "10px"
+   :style {:border     "1px solid" :border-radius "3px"
+           :box-shadow "5px 5px 5px 2px"
+           :margin     "5px" :padding "5px"}
+   :children [[rc/button :on-click #(reset! data []) :label "Empty"]
+              [rc/button :on-click #(reset! data chart/sample-data) :label "Default"]
+              [rc/button :on-click #(swap! data assoc-in [:data 0 :uv] 10000) :label "A -> 10,000"]
+              [rc/button :on-click #(swap! data assoc :data
+                                      (conj (-> @data :data)
+                                        {:name "Page Q" :uv 1100
+                                         :pv   1100 :tv 1100 :amt 1100}))
+               :label "Add 'Q'"]
+              [rc/button :on-click #(swap! data assoc :data (into [] (drop-last 2 (:data @data))))
+               :label "Drop Last 2"]
+              [rc/button :on-click #(reset! data (-> @data
+                                                   (assoc-in [:metadata :fields :new-item] :number)
+                                                   (assoc :data (into []
+                                                                  (map (fn [x]
+                                                                         (assoc x :new-item 1750))
+                                                                    (:data @data))))))
+               :label "Add :new-item"]]])
+
+
 (defn- data-update-example [& {:keys [data container-id component-id] :as params}]
-  (log/info "data-update-example" params)
+  (log/info "data-update-example (params)" params)
 
   [rc/v-box :src (rc/at)
    :gap "10px"
@@ -26,28 +51,7 @@
                :component-panel chart/component
                :data-panel chart-utils/meta-tabular-data-panel
                :config-panel chart/config-panel]
-              [rc/h-box :src (rc/at)
-               :gap "10px"
-               :style {:border     "1px solid" :border-radius "3px"
-                       :box-shadow "5px 5px 5px 2px"
-                       :margin     "5px" :padding "5px"}
-               :children [[rc/button :on-click #(reset! data []) :label "Empty"]
-                          [rc/button :on-click #(reset! data chart/sample-data) :label "Default"]
-                          [rc/button :on-click #(swap! data assoc-in [:data 0 :uv] 10000) :label "A -> 10,000"]
-                          [rc/button :on-click #(swap! data assoc :data
-                                                  (conj (-> @data :data)
-                                                    {:name "Page Q" :uv 1100
-                                                     :pv   1100 :tv 1100 :amt 1100}))
-                           :label "Add 'Q'"]
-                          [rc/button :on-click #(swap! data assoc :data (into [] (drop-last 2 (:data @data))))
-                           :label "Drop Last 2"]
-                          [rc/button :on-click #(reset! data (-> @data
-                                                               (assoc-in [:metadata :fields :new-item] :number)
-                                                               (assoc :data (into []
-                                                                              (map (fn [x]
-                                                                                     (assoc x :new-item 1750))
-                                                                                (:data @data))))))
-                           :label "Add :new-item"]]]]])
+              [data-tools]]])
 
 
 (defn example []
