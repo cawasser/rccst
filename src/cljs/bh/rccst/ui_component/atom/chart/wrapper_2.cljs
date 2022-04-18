@@ -31,22 +31,18 @@
         ;(log/info "component-panel (render)" component-id "//" @d "//" local-subs)
 
         ;[layout/centered {:extra-classes :is-one-third}
-        [rc/h-box :src (rc/at)
-         :gap "5px"
-         :width "100%"
-         :height "100%"
-         :children [(if (empty? @d)
-                      [rc/alert-box :src (rc/at)
-                       :alert-type :info
-                       :style {:width "100%" :height "100%"}
-                       :heading "Waiting for data"]
+        (if (empty? @d)
+          [rc/alert-box :src (rc/at)
+           :alert-type :info
+           :style {:width "100%" :height "100%"}
+           :heading "Waiting for data"]
 
-                      [component*
-                       :data @d
-                       :component-id component-id
-                       :container-id container-id
-                       :subscriptions local-subs
-                       :isAnimationActive? isAnimationActive?])]]))))
+          [component*
+           :data @d
+           :component-id component-id
+           :container-id container-id
+           :subscriptions local-subs
+           :isAnimationActive? isAnimationActive?])))))
 
 
 (defn configurable-component-panel [& {:keys [data component-id container-id
@@ -103,7 +99,7 @@
                                  :container-id container-id]])]]])))
 
 
-(defn base-chart [& {:keys [data config
+(defn base-chart [& {:keys [data
                             component-id container-id
                             component*
                             config local-config
@@ -116,9 +112,9 @@
         d                 (h/resolve-value data)
         c                 (config component-id d)]
 
-    (log/info "base-chart"
-      component-id container-id
-      "//" data "//" @d)
+    ;(log/info "base-chart"
+    ;  component-id container-id
+    ;  "//" data "//" @d)
 
     (fn []
       (when (nil? @id)

@@ -114,9 +114,9 @@
     ret))
 
 
-(defn- component-panel* [& {:keys [data component-id container-id
-                                   subscriptions isAnimationActive?]
-                            :as params}]
+(defn- component* [& {:keys [data component-id container-id
+                             subscriptions isAnimationActive?]
+                      :as params}]
   (let [d (if (empty? data) [] (get data :data))]
 
     [:> ResponsiveContainer
@@ -130,7 +130,6 @@
 
 
 (defn component [& {:keys [data component-id container-id
-                           component-panel
                            data-panel config-panel] :as params}]
 
   (log/info "component-2" params)
@@ -139,8 +138,8 @@
    :data data
    :component-id component-id
    :container-id container-id
-   :component* component-panel*
-   :component-panel component-panel
+   :component* component*
+   :component-panel wrapper/component-panel
    :data-panel data-panel
    :config-panel config-panel
    :config config

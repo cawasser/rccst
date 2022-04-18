@@ -44,8 +44,8 @@
 
   [rc/v-box :src (rc/at)
    :gap "10px"
-   :width "900px"
-   :height "600px"
+   :width "100%"
+   :height "100%"
    :children [[:div.chart-part {:style {:width "100%" :height "90%"}}
                [chart/component
                 :data data
