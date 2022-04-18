@@ -239,27 +239,27 @@
                         node-types edge-types
                         minimap-styles
                         on-change-nodes on-change-edges on-drop on-drag-over
-                        zoom-on-scroll preventScrolling connectFn]}]
+                        zoom-on-scroll preventScrolling connectFn] :as params}]
 
-  ;(log/info "flow(star)" component-id)
-  ;"//" (or minimap-styles {}))
-  ; "//" (js->clj minimap-styles) "//" (type minimap-styles))
+  ;(log/info "flow-star (params)" params)
 
-  (let [params (apply merge {:nodes               nodes
-                             :edges               edges
-                             :onNodesChange       on-change-nodes
-                             :onEdgesChange       on-change-edges
-                             :zoomOnScroll        (or zoom-on-scroll false)
-                             :preventScrolling    (or preventScrolling false)
-                             :onConnect           (or connectFn #())
-                             :fitView             true
-                             :attributionPosition "bottom-left"
-                             :onDrop              (or on-drop #())
-                             :onDragOver          (or on-drag-over #())}
-                 (when node-types {:node-types node-types})
-                 (when edge-types {:edge-types node-types}))]
+  (let [local-params (apply merge {:nodes               nodes
+                                   :edges               edges
+                                   :onNodesChange       on-change-nodes
+                                   :onEdgesChange       on-change-edges
+                                   :zoomOnScroll        (or zoom-on-scroll false)
+                                   :preventScrolling    (or preventScrolling false)
+                                   :onConnect           (or connectFn #())
+                                   :fitView             true
+                                   :attributionPosition "bottom-left"
+                                   :onDrop              (or on-drop #())
+                                   :onDragOver          (or on-drag-over #())}
+                       (when node-types {:node-types node-types})
+                       (when edge-types {:edge-types node-types}))]
 
-    [:> ReactFlow params
+    ;(log/info "flow-star (local-params)" local-params)
+
+    [:> ReactFlow local-params
      [:> MiniMap (if minimap-styles minimap-styles {})]
      [:> Background]
      [:> Controls]]))
@@ -270,7 +270,10 @@
                                 node-types edge-types
                                 minimap-styles on-drop on-drag-over
                                 zoom-on-scroll preventScrolling connectFn
-                                force-layout?]}]
+                                force-layout?] :as params}]
+
+  ;(log/info "editable-flow (params)" params)
+
   (let [{n :nodes e :edges} (if force-layout?
                               (dagre/build-layout nodes edges)
                               {:nodes nodes :edges edges})
