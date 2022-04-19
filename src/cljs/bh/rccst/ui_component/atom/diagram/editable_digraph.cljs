@@ -321,8 +321,8 @@
         n-types       (->> node-types
                         (map (fn [[k v]]
                                {k (partial v open-details?)}))
-                        (into {})
-                        (clj->js))]
+                        (into {}))]
+                        ;(clj->js))]
 
     (log/info "component (DIGRAPH)" "//" data "//" @d "// node-types" node-types "// n-types" (js->clj n-types))
 

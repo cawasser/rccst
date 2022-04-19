@@ -20,7 +20,7 @@
 (declare config-panel)
 
 
-(def composite-def
+(def ui-definition
   "this data structure defines the composite in terms of the:
 
   - :components   - the subcomponents, like tables, charts, and such used for the actual UI as well as
@@ -29,25 +29,25 @@
   - :grid-layout  - vector of layout data for the react-grid-layout component that positions the children
   "
   {; the ui components (looked up in a registry), mapped to local names
-   :components {:ui/line       {:type :ui/component :name :bh/line-chart :configurable false}
-                :ui/bar        {:type :ui/component :name :bh/bar-chart :configurable false}
-                :ui/data-table {:type :ui/component :name :rc/table}
-                :ui/config     {:type :ui/component :name config-panel}
-                :topic/data    {:type :source/local :name :topic/data}
-                :topic/config  {:type :source/local :name :topic/config :default {}}}
+   :components {:ui/line       {:type :ui/component :name :rechart/bar-2}
+                :ui/bar        {:type :ui/component :name :rechart/bar-2}
+                ;:ui/data-table {:type :ui/component :name :rc/table}
+                ;:ui/config     {:type :ui/component :name config-panel}
+                :topic/data    {:type :source/local :name :topic/data :default @sample-data}}
+                ;:topic/config  {:type :source/local :name :topic/config :default {}}}
 
 
    ; links - how the different components get their data and if they publish or
    ; subscribe to the composite
-   :links      {:ui/config    {:data {:topic/config :data}}
-                :topic/data   {:data {:ui/line   :data :ui/bar :data
-                                      :ui/config :data :ui/data-table :data}}
-                :topic/config {:data {:ui/line :config-data :ui/bar :config-data}}}
+   :links      {;:ui/config    {:data {:topic/config :data}}
+                :topic/data   {:data {:ui/line   :data :ui/bar :data}}}
+                                      ;:ui/config :data :ui/data-table :data}}}
+                ;:topic/config {:data {:ui/line :config-data :ui/bar :config-data}}}
 
    ; the physical layout of the components on the display
-   :gridlayout [{:i :ui/line :x 0 :y 0 :w 4 :h 7 :static true}
-                {:i :ui/config :x 4 :y 0 :w 4 :h 7 :static true}
-                {:i :ui/bar :x 8 :y 0 :w 4 :h 7 :static true}]})
+   :grid-layout [{:i :ui/line :x 0 :y 0 :w 5 :h 11 :static true}
+                 ;{:i :ui/config :x 4 :y 0 :w 4 :h 7 :static true}
+                 {:i :ui/bar :x 5 :y 0 :w 5 :h 11 :static true}]})
 
 
 (def source-code '[:div])
