@@ -14,10 +14,9 @@
                                    component-id
                                    source-code
                                    extra-classes
-                                   extra-params]}]
+                                   extra-params] :as params}]
 
-  ;(log/info "component-example" title  "///" widget-id
-  ;  "///" component-id "///" component)
+  ;(log/info "component-example" params)
 
   (ui-utils/init-container component-id)
 
@@ -40,9 +39,9 @@
 (defn example [& {:keys [title container-id description
                          data config
                          data-panel config-panel component-panel
-                         source-code]}]
+                         source-code] :as params}]
 
-  ;(log/info "example" title config)
+  (log/info "example" params)
 
   (ui-utils/init-widget container-id config)
 

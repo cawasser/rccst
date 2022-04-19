@@ -66,7 +66,7 @@
           :width "90%"
           :style {:margin-left :auto :margin-right :auto}
           :on-change #(do
-                        (log/info "slider" (str %))
+                        ;(log/info "slider" (str %))
                         (re-frame/dispatch-sync (conj value %)))
           :disabled? false]
          [:div {:style {:width "200px" :margin :auto}}

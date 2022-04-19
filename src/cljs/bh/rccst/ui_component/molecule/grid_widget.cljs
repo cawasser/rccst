@@ -84,7 +84,7 @@
   (map #(assoc % :static (-> % :static not)) orig-value))
 
 
-(defn- component-panel [& {:keys [configuration component-id container-id]}]
+(defn- component-panel [& {:keys [configuration component-id]}]
   ;(log/info "component-panel" component-id
   ;  "//" (keys configuration)
   ;  "// dummy-layout" dummy-layout
@@ -128,6 +128,9 @@
 
 
 (defn component [& {:keys [data component-id container-id]}]
+
+  (log/info "component" data "//" component-id "//" container-id)
+
   (let [id            (r/atom nil)
         configuration @data
         graph         (apply lg/digraph (ui/compute-edges configuration))

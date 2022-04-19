@@ -1,6 +1,6 @@
-(ns bh.rccst.views.molecule.example.composite.chart-remote-data
+(ns bh.rccst.views.molecule.example.composite.multi-chart-widget
   (:require [bh.rccst.subs :as subs]
-            [bh.rccst.ui-component.molecule.composite.chart-remote-data :as chart-remote-data]
+            [bh.rccst.ui-component.molecule.composite.multi-chart :as widget]
             [bh.rccst.ui-component.molecule.grid-widget :as grid]
             [bh.rccst.ui-component.utils.helpers :as h]
             [re-com.core :as rc]
@@ -11,11 +11,11 @@
             [woolybear.ad.layout :as layout]))
 
 
-(log/info "bh.rccst.views.molecule.example.composite.chart-remote-data")
+(log/info "bh.rccst.views.molecule.example.composite.multi-chart-widget")
 
 
 (defn example []
-  (let [container-id     "chart-remote-data-demo"
+  (let [container-id     "multi-chart-widget"
         logged-in?       (re-frame/subscribe [::subs/logged-in?])
         pub-sub-started? (re-frame/subscribe [::subs/pub-sub-started?])]
 
@@ -24,17 +24,15 @@
 
     (fn []
       (if (and @logged-in? @pub-sub-started?)
-        (acu/demo "Bar chart of remote data"
-          "This example shows a Bar Chart displaying data via a subscription to the Server"
+        (acu/demo "Multiple Charts in a Widget"
+          ""
           [layout/frame
            [:div {:style {:width "1000px" :height "800px"}}
             [grid/component
-             :data (r/atom chart-remote-data/ui-definition)
+             :data (r/atom widget/ui-definition)
              :component-id (h/path->keyword container-id "widget")]]])
         (acu/demo
-          "Coverage Plan"
+          "Multiple Charts in a Widget"
           [rc/alert-box :src (rc/at)
            :alert-type :info
            :heading "Waiting for (demo) Log-in"])))))
-
-
