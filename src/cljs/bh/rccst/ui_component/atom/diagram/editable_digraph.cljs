@@ -241,26 +241,25 @@
                         on-change-nodes on-change-edges on-drop on-drag-over
                         zoom-on-scroll preventScrolling connectFn] :as params}]
 
-  ;(log/info "flow-star (params)" params)
+  ;(log/info "flow-star (params)" params "// (edge-types)" edge-types)
 
-  (let [local-params (apply merge
-                      {:nodes               nodes
-                       :edges               edges
-                       :onNodesChange       on-change-nodes
-                       :onEdgesChange       on-change-edges
-                       :zoomOnScroll        (or zoom-on-scroll false)
-                       :preventScrolling    (or preventScrolling false)
-                       :onConnect           (or connectFn #())
-                       :fitView             true
-                       :attributionPosition "bottom-left"
-                       :onDrop              (or on-drop #())
-                       :onDragOver          (or on-drag-over #())}
-                      (if node-types {:node-types node-types} {:node-types {}})
-                      (if edge-types {:edge-types edge-types} {:edge-types {}}))]
+  (let [params (apply merge {:nodes               nodes
+                             :edges               edges
+                             :onNodesChange       on-change-nodes
+                             :onEdgesChange       on-change-edges
+                             :zoomOnScroll        (or zoom-on-scroll false)
+                             :preventScrolling    (or preventScrolling false)
+                             :onConnect           (or connectFn #())
+                             :fitView             true
+                             :attributionPosition "bottom-left"
+                             :onDrop              (or on-drop #())
+                             :onDragOver          (or on-drag-over #())}
+                (when node-types {:node-types node-types})
+                (when edge-types {:edge-types edge-types}))]
 
     ;(log/info "flow-star (local-params)" local-params)
 
-    [:> ReactFlow local-params
+    [:> ReactFlow params
      [:> MiniMap (if minimap-styles minimap-styles {})]
      [:> Background]
      [:> Controls]]))
@@ -321,10 +320,10 @@
         n-types       (->> node-types
                         (map (fn [[k v]]
                                {k (partial v open-details?)}))
-                        (into {}))]
-                        ;(clj->js))]
+                        (into {})
+                        (clj->js))]
 
-    (log/info "component (DIGRAPH)" "//" data "//" @d "// node-types" node-types "// n-types" (js->clj n-types))
+    ;(log/info "component (DIGRAPH)" "//" data "//" @d "// node-types" node-types "// n-types" (js->clj n-types))
 
     (fn []
       [rc/h-box :src (rc/at)
