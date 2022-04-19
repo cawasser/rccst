@@ -39,8 +39,7 @@
 
   ; 2. send over the most recent data as a boot-strap
   (pub-sub [:publish/data-update {:id source-id
-                                  :value (wrap-meta
-                                           (fetch-data))}]))
+                                  :value (wrap-meta (fetch-data))}]))
 
 
 (def meta-data {source-id start-listener})

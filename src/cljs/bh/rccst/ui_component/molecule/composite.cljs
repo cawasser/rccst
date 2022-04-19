@@ -27,6 +27,8 @@ distinction, so we can quickly build all the Nodes and Handles used for the diag
             [bh.rccst.ui-component.molecule.composite.util.signals :as sig]
             [bh.rccst.ui-component.molecule.composite.util.ui :as ui]
             [bh.rccst.ui-component.utils :as ui-utils]
+            [bh.rccst.ui-component.atom.chart.bar-chart :as bar-chart]
+            [bh.rccst.ui-component.atom.chart.bar-chart-2 :as bar-chart-2]
             [day8.re-frame.tracing :refer-macros [fn-traced]]
             [loom.graph :as lg]
             [re-com.core :as rc]
@@ -54,6 +56,9 @@ distinction, so we can quickly build all the Nodes and Handles used for the diag
     bh-table/meta-data
     ww-globe/meta-data
     r-globe/meta-data
+
+    bar-chart/meta-data
+    bar-chart-2/meta-data
 
     ; "stunt" components to use as stand-ins
     ;
@@ -159,6 +164,7 @@ distinction, so we can quickly build all the Nodes and Handles used for the diag
      :component-id component-id
      :data flow
      :node-types node-types
+     :tool-types dag-support/default-tool-types
      :minimap-styles minimap-styles]))
 
 

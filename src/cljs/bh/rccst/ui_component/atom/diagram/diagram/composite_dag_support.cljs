@@ -7,8 +7,20 @@
 (log/info "bh.rccst.ui-component.atom.diagram.diagram.composite-dag-support")
 
 
-(declare custom-minimap-node-color)
-(declare default-custom-node)
+(defn custom-minimap-node-color [color-pallet default-color node]
+  ;(log/info "custom-minimap-node-color" node)
+  (or (get color-pallet (.-type node)) default-color))
+
+
+(defn default-custom-node
+  "build a custom node for the flow diagram, based on the :type property of the node
+  "
+  [type open-details? node & extras?]
+
+  ;(log/info "default-custom-node" type "//" @open-details? "//" node "//" extras?)
+
+  (ui/custom-node type open-details? node))
+
 
 (def color-black "#000000")
 (def color-white "#ffffff")
@@ -209,15 +221,3 @@
             :sourceHandle ":data" :target ":fn/coverage"}]})
 
 
-(defn custom-minimap-node-color [color-pallet default-color node]
-  (or (get color-pallet (.-type node)) default-color))
-
-
-(defn default-custom-node
-  "build a custom node for the flow diagram, based on the :type property of the node
-  "
-  [type open-details? d]
-
-  (log/info "default-custom-node" type)
-
-  (ui/custom-node type open-details? d))

@@ -1,10 +1,12 @@
 (ns bh.rccst.ui-component.atom.chart.bar-chart
   (:require [bh.rccst.ui-component.atom.chart.utils :as utils]
-            [bh.rccst.ui-component.utils.color :as color]
-            [bh.rccst.ui-component.utils.example-data :as data]
             [bh.rccst.ui-component.atom.chart.wrapper :as c]
             [bh.rccst.ui-component.utils :as ui-utils]
+            [bh.rccst.ui-component.utils.color :as color]
+            [bh.rccst.ui-component.utils.example-data :as data]
+            [bh.rccst.ui-component.utils.helpers :as h]
             [re-com.core :as rc]
+            [re-frame.core :as re-frame]
             [reagent.core :as r]
             [taoensso.timbre :as log]
             ["recharts" :refer [ResponsiveContainer BarChart Bar Brush]]))
@@ -41,6 +43,9 @@
 > [tabular-data]()
   "
   [data]
+
+  ;(log/info "local-data" data)
+
   (merge
     {:brush false}
     (->> (get-in @data [:metadata :fields])
@@ -72,6 +77,9 @@
   - data : (atom) metadata wrapped data  to display
   "
   [chart-id data]
+
+  ;(log/info "config" chart-id "//" data)
+
   (-> ui-utils/default-pub-sub
     (merge
       utils/default-config
@@ -94,6 +102,8 @@
 
 
 (defn- make-bar-config [chart-id data]
+  ;(log/info "make-bar-config" chart-id "//" data)
+
   (->> (get-in @data [:metadata :fields])
     (filter (fn [[k v]] (= :number v)))
     keys
@@ -132,6 +142,9 @@
 
 
 (defn- make-bar-display [chart-id data subscriptions isAnimationActive?]
+  ;(log/info "make-bar-display" data "//" @data "//" @isAnimationActive?
+  ;  "//" subscriptions)
+
   (->> (get-in @data [:metadata :fields])
     (filter (fn [[_ v]] (= :number v)))
     keys
@@ -156,22 +169,57 @@
   - widget-id : (string) unique identifier for this specific widget
   "
   [data component-id container-id ui]
-  (let [container          (ui-utils/subscribe-local component-id [:container])
+
+  ;(log/info "component-panel" component-id "//" container-id "//" data)
+
+  (let [d                  (h/resolve-value data)
+        container          (ui-utils/subscribe-local component-id [:container])
         isAnimationActive? (ui-utils/subscribe-local component-id [:isAnimationActive])
         override-subs      @(ui-utils/subscribe-local component-id [:sub])
-        local-subs         (ui-utils/build-subs component-id (local-config data))
+        l-c                (local-config d)
+        local-subs         (ui-utils/build-subs component-id l-c)
         subscriptions      (ui-utils/override-subs container-id local-subs override-subs)]
 
+    (log/info "component-panel" component-id "//" data
+      "// resolved" @d
+      "// l-c" l-c
+      "// local-subs" local-subs
+      "// subs" subscriptions)
+
     (fn []
-      [:> ResponsiveContainer
-       [:> BarChart {:data (get @data :data)}
+      (if (empty? @d)
+        [rc/alert-box :src (rc/at)
+         :alert-type :info
+         :style {:width "100%"}
+         :heading "Waiting for data"]
 
-        (utils/standard-chart-components component-id ui)
+        [:> ResponsiveContainer
+         [:> BarChart {:data (get @d :data)}
 
-        (when (ui-utils/resolve-sub subscriptions [:brush]) [:> Brush])
+          (utils/standard-chart-components component-id ui)
 
-        (make-bar-display component-id data subscriptions isAnimationActive?)]])))
+          (when (ui-utils/resolve-sub subscriptions [:brush]) [:> Brush])
 
+          (make-bar-display component-id d subscriptions isAnimationActive?)]]))))
+
+
+
+(comment
+  (do
+    (def component-id ":chart-remote-data-demo.widget.ui.bar-chart")
+    (def container-id ":chart-remote-data-demo.widget")
+    (def data [:bh.rccst.subs/source :source/measurements])
+
+    (def d (h/resolve-value data))
+    (def container (ui-utils/subscribe-local component-id [:container]))
+    (def isAnimationActive? (ui-utils/subscribe-local component-id [:isAnimationActive]))
+    (def override-subs @(ui-utils/subscribe-local component-id [:sub]))
+    (def local-subs (ui-utils/build-subs component-id (local-config d)))
+    (def subscriptions (ui-utils/override-subs container-id
+                         local-subs override-subs)))
+
+
+  ())
 
 (defn configurable-component
   "the chart to draw, taking cues from the settings of the configuration panel
@@ -184,16 +232,17 @@
   - data : (atom) any data shown by the component's ui
   - container-id : (string) name of the container this chart is inside of
   "
-  ([& {:keys [data component-id container-id ui]}]
-   [c/base-chart
-    :data data
-    :config (config component-id data)
-    :component-id component-id
-    :container-id (or container-id "")
-    :data-panel utils/meta-tabular-data-panel
-    :config-panel config-panel
-    :component-panel component-panel
-    :ui ui]))
+  [& {:keys [data component-id container-id ui]}]
+
+  [c/base-chart
+   :data data
+   :config (config component-id data)
+   :component-id component-id
+   :container-id (or container-id "")
+   :data-panel utils/meta-tabular-data-panel
+   :config-panel config-panel
+   :component-panel component-panel
+   :ui ui])
 
 
 (defn component
@@ -207,14 +256,38 @@
   - data : (atom) any data shown by the component's ui
   - container-id : (string) name of the container this chart is inside of
   "
-  ([& {:keys [data component-id container-id ui]}]
-   [c/base-chart
-    :data data
-    :config (config component-id data)
-    :component-id component-id
-    :container-id (or container-id "")
-    :component-panel component-panel
-    :ui ui]))
+  [& {:keys [data component-id container-id ui]}]
+
+  (let [d (h/resolve-value data)]
+
+    (log/info "component" data "//" d "//" @d)
+
+    [c/base-chart
+     :data data
+     :config (config component-id d)
+     :component-id component-id
+     :container-id (or container-id "")
+     :component-panel component-panel
+     :ui ui]))
+
+
+(def meta-data {:rechart/bar {:component              component
+                              :configurable-component configurable-component
+                              :ports                  {:data :port/sink}
+                              :sources                {:data :source-type/meta-tabular}
+                              :pubs                   []
+                              :subs                   []}})
+
+
+
+
+(comment
+
+  (def d (re-frame/subscribe [:bh.rccst.subs/source :source/measurements]))
+
+  @d
+
+  ())
 
 
 (comment
@@ -242,10 +315,3 @@
     (into [:<>]))
 
   ())
-
-
-(def meta-data {:component              component
-                :configurable-component configurable-component
-                :sources                {:data :source-type/meta-tabular}
-                :pubs                   []
-                :subs                   []})

@@ -63,8 +63,8 @@
   [:div.source-fn (str type " - " id)])
 
 
-(defmethod make-config-panel* :default [{:strs [id] :as node}]
-  (log/info "make-config-panel* :default" type id "//" node)
+(defmethod make-config-panel* :default [type {:strs [id] :as node}]
+  (log/info "make-config-panel* :default" type "//" id "//" node)
   [:div])
 
 

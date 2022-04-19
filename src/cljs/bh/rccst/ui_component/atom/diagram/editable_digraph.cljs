@@ -23,8 +23,6 @@
 (declare node)
 
 
-;; region ; sample data
-
 (def sample-data
   {:nodes [{:id       ":ui/targets"
             ;:type     ":ui/component"
@@ -77,7 +75,6 @@
            {:id "e56" :source "5 " :target "6 " :type "smoothstep" :animated true}
            {:id "e57" :source "5 " :target "7 " :type "smoothstep" :animated true}]})
 
-;; endregion
 
 (def source-code '[])
 
@@ -210,13 +207,13 @@
 (defn- details-panel [components component-id node]
   (let [details (get node "data")]
 
-    (log/info "detail-panel" node "//" details)
+    ;(log/info "detail-panel" node "//" details)
 
     [config/make-config-panel details]))
 
 
 (defn- tool-panel [open-details? components component-id tool-types]
-  ;(log/info "tool-panel" open-details? component-id)
+  ;(log/info "tool-panel" @open-details? "//" component-id "//" tool-types)
 
   [:div#tool-panel {:display         :flex
                     :flex-direction  :column
@@ -242,27 +239,28 @@
                         node-types edge-types
                         minimap-styles
                         on-change-nodes on-change-edges on-drop on-drag-over
-                        zoom-on-scroll preventScrolling connectFn]}]
+                        zoom-on-scroll preventScrolling connectFn] :as params}]
 
-  ;(log/info "flow(star)" component-id)
-  ;"//" (or minimap-styles {}))
-  ; "//" (js->clj minimap-styles) "//" (type minimap-styles))
+  ;(log/info "flow-star (params)" params)
 
-  (let [params (apply merge {:nodes               nodes
-                             :edges               edges
-                             :onNodesChange       on-change-nodes
-                             :onEdgesChange       on-change-edges
-                             :zoomOnScroll        (or zoom-on-scroll false)
-                             :preventScrolling    (or preventScrolling false)
-                             :onConnect           (or connectFn #())
-                             :fitView             true
-                             :attributionPosition "bottom-left"
-                             :onDrop              (or on-drop #())
-                             :onDragOver          (or on-drag-over #())}
-                 (when node-types {:node-types node-types})
-                 (when edge-types {:edge-types node-types}))]
+  (let [local-params (apply merge
+                      {:nodes               nodes
+                       :edges               edges
+                       :onNodesChange       on-change-nodes
+                       :onEdgesChange       on-change-edges
+                       :zoomOnScroll        (or zoom-on-scroll false)
+                       :preventScrolling    (or preventScrolling false)
+                       :onConnect           (or connectFn #())
+                       :fitView             true
+                       :attributionPosition "bottom-left"
+                       :onDrop              (or on-drop #())
+                       :onDragOver          (or on-drag-over #())}
+                      (if node-types {:node-types node-types} {:node-types {}})
+                      (if edge-types {:edge-types edge-types} {:edge-types {}}))]
 
-    [:> ReactFlow params
+    ;(log/info "flow-star (local-params)" local-params)
+
+    [:> ReactFlow local-params
      [:> MiniMap (if minimap-styles minimap-styles {})]
      [:> Background]
      [:> Controls]]))
@@ -273,7 +271,10 @@
                                 node-types edge-types
                                 minimap-styles on-drop on-drag-over
                                 zoom-on-scroll preventScrolling connectFn
-                                force-layout?]}]
+                                force-layout?] :as params}]
+
+  ;(log/info "editable-flow (params)" params)
+
   (let [{n :nodes e :edges} (if force-layout?
                               (dagre/build-layout nodes edges)
                               {:nodes nodes :edges edges})
@@ -283,6 +284,7 @@
 
 
     ;(log/info "editable-flow"
+    ;  "//" (js->clj node-types))
     ;  "//" ns
     ;  "//" nodes)
     ;  "//" set-nodes
@@ -319,10 +321,10 @@
         n-types       (->> node-types
                         (map (fn [[k v]]
                                {k (partial v open-details?)}))
-                        (into {})
-                        (clj->js))]
+                        (into {}))]
+                        ;(clj->js))]
 
-    (log/info "component (DIGRAPH)" "//" data "//" @d "//" node-types "//" n-types)
+    (log/info "component (DIGRAPH)" "//" data "//" @d "// node-types" node-types "// n-types" (js->clj n-types))
 
     (fn []
       [rc/h-box :src (rc/at)

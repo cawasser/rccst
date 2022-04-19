@@ -1,24 +1,29 @@
 (ns bh.rccst.ui-component.utils.locals
-  (:require [re-frame.core :as re-frame]
+  (:require [bh.rccst.ui-component.utils.helpers :as h]
             [day8.re-frame.tracing :refer-macros [fn-traced]]
-            [bh.rccst.ui-component.utils.helpers :as h]
+            [re-frame.core :as re-frame]
             [taoensso.timbre :as log]))
 
 
 (log/info "bh.rccst.ui-component.utils.locals")
 
 
+(declare process-locals)
+(declare create-widget-local-sub)
+(declare create-widget-local-event)
+
+
 (re-frame/reg-event-db
   :events/init-widget-locals
-  (fn-traced [db [_ container init-vals]]
+  (fn-traced [db [_ container values]]
     ;(log/info "::init-widget-locals" container init-vals)
-    (if (get-in db [:widgets container])
+    (if (= (get-in db [:widgets container]) values)
       (do
         ;(log/info "::init-widget-locals // already exists")
         db)
       (do
         ;(log/info "::init-widget-locals // adding")
-        (assoc-in db [:widgets container] init-vals)))))
+        (assoc-in db [:widgets container] values)))))
 
 
 (defn init-local-values
@@ -32,18 +37,47 @@
 
   ---
 
-  - `widget-id` : (string) id of the widget, passed as a string so we can use generated values (like guids)
+  - `component-id` : (string) id of the component, passed as a string so we can use generated values (like guids)
   - `values` : (hash-map) hash-map (tree) of values specific to _this_ widget.
 
   "
-  [widget-id values]
-  (let [target (keyword widget-id)
+  [component-id values]
+  (let [target (keyword component-id)
         path   [:events/init-widget-locals target values]]
     ;(log/info "init-local-values" path)
     (re-frame/dispatch-sync path)))
 
 
-(declare process-locals)
+(defn update-local-values [component-id values]
+  (let [target   (keyword component-id)
+        old (get-in @re-frame.db/app-db [:widgets target])
+        old-vals (->> old
+                   (process-locals [] nil)
+                   (filter #(= 1 (count %)))
+                   (into #{}))
+        new-vals-paths (process-locals [] nil values)
+        new-vals (->> new-vals-paths
+                   (filter #(= 1 (count %)))
+                   (into #{}))
+        diff     (clojure.set/difference new-vals old-vals)
+        merged-values (merge old
+                        (->> diff
+                          (map (fn [[path]]
+                                 {path (get values path)}))
+                          (into {})))]
+
+    ;(log/info "update-local-values" diff "//" old "//" merged-values)
+
+    (when (not (empty? diff))
+      (re-frame/dispatch-sync
+        [:events/init-widget-locals target merged-values])
+
+      (doall
+        ; TODO: consider using locals-and-defaults to put the actual default into the subscription rather than 'nil'
+        (map #(create-widget-local-sub component-id % nil) new-vals-paths))
+
+      (doall
+        (map #(create-widget-local-event component-id %) new-vals-paths)))))
 
 
 (defn process-branch [accum root k v]
@@ -288,9 +322,9 @@
   [widget-id locals-and-defaults]
   (let [paths (process-locals [] nil locals-and-defaults)]
 
-    ;(log/info "init-widget" widget-id
-    ;  "//" paths
-    ;  "//" locals-and-defaults)
+    (log/info "init-widget" widget-id
+      "//" paths
+      "//" locals-and-defaults)
 
     ; load the app-db with the default values
     (init-local-values widget-id locals-and-defaults)
@@ -409,9 +443,9 @@
   "
   [widget-id [a & more :as value-path] fn-to-apply]
 
-  (let [p (h/path->keyword widget-id a more)
+  (let [p          (h/path->keyword widget-id a more)
         orig-value @(re-frame/subscribe [p])
-        new-value (fn-to-apply orig-value)]
+        new-value  (fn-to-apply orig-value)]
     ;(log/info "apply-local"
     ;  "//" p
     ;  "//" orig-value
@@ -428,14 +462,81 @@
   3. put the result into a hash-map
   "
   [component-id local-config]
-  (->> (process-locals [] nil local-config)
-    (map (fn [path]
-           {path (subscribe-local component-id path)}))
-    (into {})))
+
+  (log/info "build-subs" component-id "//" local-config)
+
+  (let [ret (->> (process-locals [] nil local-config)
+              (map (fn [path]
+                     {path (subscribe-local component-id path)}))
+              (into {}))]
+
+    (log/info "build-subs" component-id "//" ret)
+    ret))
 
 
 (defn resolve-sub [subs path]
   (deref (get subs (->> path
                      (map h/path->keyword)
                      (into [])))))
+
+
+(comment
+  (re-frame/subscribe [:chart-remote-data-demo.widget])
+  (re-frame/subscribe [:chart-remote-data-demo.widget.ui.bar-chart])
+  (re-frame/subscribe [:chart-remote-data-demo.widget.ui.bar-chart.x-axis])
+  (re-frame/subscribe [:chart-remote-data-demo.widget.ui.bar-chart.x-axis.include])
+
+  ())
+
+
+
+(comment
+  (def db @re-frame.db/app-db)
+  (def container :bar-chart-2-demo.bar-chart-2)
+  (def init-vals {:y-axis {:include true, :dataKey "", :orientation :left, :scale "auto"},
+                  :grid   {:include true, :strokeDasharray {:dash "3", :space "3"}, :stroke "#a9a9a9"}})
+  (def init-vals {:amt    {:include true :fill "#ffffff" :stackId ""}
+                  :tv    {:include true :fill "#ffffff" :stackId ""}
+                  :y-axis {:include true, :dataKey "", :orientation :left, :scale "auto"},
+                  :grid   {:include true, :strokeDasharray {:dash "3", :space "3"}, :stroke "#a9a9a9"},})
+  (def init-vals {:y-axis {:include false, :dataKey "", :orientation :left, :scale "auto"},
+                  :grid   {:include true, :strokeDasharray {:dash "3", :space "3"}, :stroke "#a9a9a9"},})
+
+  (def old-vals (get-in db [:widgets container]))
+  (def old-vals-flat (->> old-vals
+                       (process-locals [] nil)
+                       (filter #(= 1 (count %)))
+                       (into #{})))
+  (def init-vals-flat (->> init-vals
+                        (process-locals [] nil)
+                        (filter #(= 1 (count %)))
+                        (into #{})))
+  (def diff (clojure.set/difference init-vals-flat old-vals-flat))
+
+
+  (let [db @re-frame.db/app-db
+        container :bar-chart-2-demo.bar-chart-2
+        init-vals {:amt    {:include true :fill "#ffffff" :stackId ""}
+                   :tv     {:include true :fill "#ff00ff" :stackId ""}
+                   :y-axis {:include true :dataKey "" :orientation :left :scale "auto"}
+                   :grid   {:include true :strokeDasharray {:dash "3" :space "3"}
+                            :stroke "#a9a9a9"}}
+        old-vals (get-in db [:widgets container])
+        old-vals-flat (->> old-vals
+                        (process-locals [] nil)
+                        (filter #(= 1 (count %)))
+                        (into #{}))
+        init-vals-flat (->> init-vals
+                         (process-locals [] nil)
+                         (filter #(= 1 (count %)))
+                         (into #{}))
+        diff (clojure.set/difference init-vals-flat old-vals-flat)]
+
+    (merge old-vals
+      (->> diff
+        (map (fn [[path]]
+               {path (get init-vals path)}))
+        (into {}))))
+
+  ())
 
