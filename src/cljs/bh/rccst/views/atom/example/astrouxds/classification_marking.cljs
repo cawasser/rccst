@@ -11,6 +11,6 @@
      :gap "5px"
      :children [[cm/classification-marking]
                 [:p "Some text to be wrapped in classification banner."]
-                [cm/classification-marking :level "unclassified" :footer? true]]]))
+                [cm/classification-marking :level "unclassified"]]]))
 
 
