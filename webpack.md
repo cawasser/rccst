@@ -1,0 +1,76 @@
+#Webpack
+
+This page details our use of webpack to package javascript files.
+Jira issue 239 is the basis of this, however other issues may be
+resolved by this.
+
+##Instructions for Use
+###First Time
+Step 1: Clone or pull latest from repo.
+
+Step 2: Open a command window and navigate to your project root.
+
+Step 3: Execute the following commands to install packages you will need:
+            npm install --save-dev webpack webpack-cli copy-webpack-plugin imports-loader
+            npm install @astrouxds/react
+
+Step 4: Execute the following command to have shadow-cljs create a file we need:
+            npx shadow-cljs compile app
+
+Step 5: Execute the following command to have webpack create a file we need:
+            npx webpack -c webpack-dev-config.js
+
+Step 6: Perform work normally (launch server, launch shadow watch, launch browser, etc)
+
+###Subsequent Use
+There are only two cases in which you will need to run steps 4 and 5 above after the initial setup:
+
+- To switch between dev and production modes, perform step 5 above using the correct webpack config file.
+- When you've installed a new package via npm for use in your code you'll need to rerun steps 4 and 5.
+
+Once you start using webpack, you must ALWAYS use it, even if the package you download would work perfectly well with Clojurescript.
+
+NOTE: The package you download may require updates to the webpack config files.
+      That is beyond the scope of this guide.
+      If you need to install additional webpack packages, please update step 3 above.
+
+##Background
+
+A problem occurred when we attempted to add AstroUXD components to rccst.
+We ran a spike project to isolate things to just react and Astro.
+Still had problems.
+
+Doing some research, we found that shadow-cljs doesn't work with some 
+javascript modules. The recommended solution was to use a bundler to 
+handle the javascript modules while shadow handled the cljs files.  Webpack
+was chosen to handle the bundling.  using that, I was able to get Astro
+running in the spike project.
+
+When I attempted to use webpack in rccst, we ran into a problem with the
+cesium project. Trial and error and a lot of google-fu helped us resolve that.
+
+##Basic Solution
+
+Modify shadow-cljs.edn to let Shadow know that an external javascript bundler will be used.
+Shadow will generate a js file (we call it requires.js) containing a require statement for the 
+node-modules we are using.
+
+Run the webpack bundler from the command line.  This will ingest the shadow-created requires.js and
+produce a file we call bundle.js.
+
+Make sure to include the bundle.js as a script file in index.html BEFORE our app.js file.
+
+##Required Packages
+
+###Webpack
+webpack, webpack-cli, copy-webpack-plugin, imports-loader
+
+##Additional work
+Some additional cleanup work and error resolution was performed along with implementing webpack:
+
+- Removed the hand-copied cesium assets since webpack handles that now.
+- Removed the assignment of Ion defaultaccesskey from index.html since its handled in code now.
+- Removed the assignment of CESIUM_BASE_URL from index.html since its handled in webpack config files.
+- Changed location of widgets.css in link tag in index.html.
+
+
