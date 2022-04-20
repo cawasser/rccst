@@ -34,7 +34,7 @@
 
 (defn- wrap-component [[id component]]
 
-  (log/info "wrap-component" id)
+  ;(log/info "wrap-component" id "//" component)
 
   [:div.widget-parent {:key id}
    [:div.grid-toolbar.title-wrapper.move-cursor (name id)]

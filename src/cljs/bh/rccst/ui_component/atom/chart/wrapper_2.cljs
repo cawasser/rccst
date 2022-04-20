@@ -2,7 +2,6 @@
   (:require [bh.rccst.ui-component.utils :as ui-utils]
             [bh.rccst.ui-component.atom.chart.utils :as utils]
             [bh.rccst.ui-component.utils.helpers :as h]
-            [bh.rccst.ui-component.utils.helpers :as h]
             [bh.rccst.ui-component.utils.locals :as l]
             [bh.rccst.ui-component.atom.re-com.configure-toggle :as ct]
             [reagent.core :as r]
@@ -12,13 +11,13 @@
 
 
 (defn- component-panel [& {:keys [data component-id container-id component* local-config] :as params}]
-  (log/info "component-panel" params)
+  ;(log/info "component-panel" params)
 
   (let [d                  (h/resolve-value data)
         isAnimationActive? (ui-utils/subscribe-local component-id [:isAnimationActive])]
     ;override-subs      @(ui-utils/subscribe-local component-id [:sub])]
 
-    (log/info "component-panel" data "//" @d)
+    ;(log/info "component-panel" data "//" @d)
 
     (fn []
 
@@ -105,7 +104,7 @@
                             config local-config
                             data-panel config-panel] :as params}]
 
-  (log/info "base-chart" params)
+  ;(log/info "base-chart" params)
 
   (let [id                (r/atom nil)
         not-configurable? (nil? config-panel)

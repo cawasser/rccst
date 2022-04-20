@@ -6,8 +6,8 @@
             [bh.rccst.ui-component.utils :as ui-utils]
             [bh.rccst.ui-component.utils.color :as color]
             [re-com.core :as rc]
-            [reagent.core :as r]
             [re-frame.core :as re-frame]
+            [reagent.core :as r]
             [taoensso.timbre :as log]
             [woolybear.ad.containers :as containers]))
 
@@ -18,10 +18,15 @@
 (def sample-data line-chart/sample-data)
 
 
-(declare config-panel)
+(declare config-panel-2)
 
 
 (defn fn-make-config [{:keys [data config] :as params}]
+  ; needs to implement something along the lines of:
+  ;
+  ; (l/update-local-values component-id (local-config d))
+  ; (ui-utils/build-subs component-id l-c)
+
   (re-frame/reg-sub
     (first config)
     :<- data
@@ -40,27 +45,27 @@
   {; the ui components (looked up in a registry), mapped to local names
    :components  {:ui/line        {:type :ui/component :name :rechart/bar-2}
                  :ui/bar         {:type :ui/component :name :rechart/bar-2}
-                 ;:ui/data-table {:type :ui/component :name :rc/table}
-                 ;:ui/config     {:type :ui/component :name config-panel}
+                 :ui/config      {:type :ui/component :name :stunt/config-panel}
                  :topic/data     {:type :source/local :name :topic/data :default @sample-data}
                  :topic/config   {:type :source/local :name :topic/config :default {}}
                  :fn/make-config {:type  :source/fn :name fn-make-config
                                   :ports {:data :port/sink :config :port/source-sink}}}
 
-
    ; links - how the different components get their data and if they publish or
    ; subscribe to the composite
-   :links       {;:ui/config    {:data {:topic/config :data}}
-                 :topic/data   {:data {:ui/line        :data :ui/bar :data
-                                       :fn/make-config :data}}
-                 :topic/config {:data {:ui/line :config-data :ui/bar :config-data
-                                       :fn/make-config :config}}
+   :links       {:ui/config      {:config-data {:topic/config :data}}
+                 :topic/data     {:data {:ui/line        :data
+                                         :ui/bar         :data
+                                         :fn/make-config :data}}
+                 :topic/config   {:data {:ui/line   :config-data
+                                         :ui/bar    :config-data
+                                         :ui/config :config}}
                  :fn/make-config {:config {:topic/config :data}}}
 
    ; the physical layout of the components on the display
    :grid-layout [{:i :ui/line :x 0 :y 0 :w 5 :h 11 :static true}
-                 ;{:i :ui/config :x 4 :y 0 :w 4 :h 7 :static true}
-                 {:i :ui/bar :x 5 :y 0 :w 5 :h 11 :static true}]})
+                 {:i :ui/config :x 5 :y 0 :w 2 :h 11 :static true}
+                 {:i :ui/bar :x 7 :y 0 :w 5 :h 11 :static true}]})
 
 
 (def source-code '[:div])

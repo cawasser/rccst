@@ -61,21 +61,7 @@ distinction, so we can quickly build all the Nodes and Handles used for the diag
     bar-chart-2/meta-data
 
     ; "stunt" components to use as stand-ins
-    ;
-    {:stunt/selectable-table {:component e/selectable-table
-                              :ports     {:data      :port/source-sink ; out this be {:data-in :port/sink} & {:data-out :port/source}?
-                                          :selection :port/source}}
-
-     :stunt/globe            {:component e/three-d-globe
-                              :ports     {:layers       :port/sink
-                                          :current-time :port/sink}}
-
-     :stunt/label            {:component e/label
-                              :ports     {:value :port/sink}}
-
-     :stunt/slider           {:component e/slider
-                              :ports     {:value :port/source-sink
-                                          :range :port/sink}}}))
+    e/meta-data))
 
 
 (def component-needs {:ui/component  {:name :id}

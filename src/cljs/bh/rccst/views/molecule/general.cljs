@@ -16,10 +16,10 @@
 
   [:div
    [multi-chart-widget/example]
-   [chart-remote-data/example]
-   [coverage-plan/ww-example]
-   [coverage-plan/r-example]
-   [header-bar/example]
-   [login/example]
-   [two-d-three-d-globe/example]
+   ;[chart-remote-data/example]
+   ;[coverage-plan/ww-example]
+   ;[coverage-plan/r-example]
+   ;[header-bar/example]
+   ;[login/example]
+   ;[two-d-three-d-globe/example]
    [multi-chart/example]])
