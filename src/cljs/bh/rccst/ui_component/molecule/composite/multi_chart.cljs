@@ -7,6 +7,7 @@
             [bh.rccst.ui-component.utils.color :as color]
             [re-com.core :as rc]
             [reagent.core :as r]
+            [re-frame.core :as re-frame]
             [taoensso.timbre :as log]
             [woolybear.ad.containers :as containers]))
 
@@ -20,6 +21,14 @@
 (declare config-panel)
 
 
+(defn fn-make-config [{:keys [data config] :as params}]
+  (re-frame/reg-sub
+    (first config)
+    :<- data
+    (fn [d _]
+      {:brush true})))
+
+
 (def ui-definition
   "this data structure defines the composite in terms of the:
 
@@ -29,20 +38,24 @@
   - :grid-layout  - vector of layout data for the react-grid-layout component that positions the children
   "
   {; the ui components (looked up in a registry), mapped to local names
-   :components {:ui/line       {:type :ui/component :name :rechart/bar-2}
-                :ui/bar        {:type :ui/component :name :rechart/bar-2}
-                ;:ui/data-table {:type :ui/component :name :rc/table}
-                ;:ui/config     {:type :ui/component :name config-panel}
-                :topic/data    {:type :source/local :name :topic/data :default @sample-data}}
-                ;:topic/config  {:type :source/local :name :topic/config :default {}}}
+   :components  {:ui/line        {:type :ui/component :name :rechart/bar-2}
+                 :ui/bar         {:type :ui/component :name :rechart/bar-2}
+                 ;:ui/data-table {:type :ui/component :name :rc/table}
+                 ;:ui/config     {:type :ui/component :name config-panel}
+                 :topic/data     {:type :source/local :name :topic/data :default @sample-data}
+                 :topic/config   {:type :source/local :name :topic/config :default {}}
+                 :fn/make-config {:type  :source/fn :name fn-make-config
+                                  :ports {:data :port/sink :config :port/source-sink}}}
 
 
    ; links - how the different components get their data and if they publish or
    ; subscribe to the composite
-   :links      {;:ui/config    {:data {:topic/config :data}}
-                :topic/data   {:data {:ui/line   :data :ui/bar :data}}}
-                                      ;:ui/config :data :ui/data-table :data}}}
-                ;:topic/config {:data {:ui/line :config-data :ui/bar :config-data}}}
+   :links       {;:ui/config    {:data {:topic/config :data}}
+                 :topic/data   {:data {:ui/line        :data :ui/bar :data
+                                       :fn/make-config :data}}
+                 :topic/config {:data {:ui/line :config-data :ui/bar :config-data
+                                       :fn/make-config :config}}
+                 :fn/make-config {:config {:topic/config :data}}}
 
    ; the physical layout of the components on the display
    :grid-layout [{:i :ui/line :x 0 :y 0 :w 5 :h 11 :static true}
