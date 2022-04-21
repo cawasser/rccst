@@ -34,7 +34,7 @@
 
 (defn- wrap-component [[id component]]
 
-  (log/info "wrap-component" id)
+  ;(log/info "wrap-component" id "//" component)
 
   [:div.widget-parent {:key id}
    [:div.grid-toolbar.title-wrapper.move-cursor (name id)]
@@ -129,7 +129,7 @@
 
 (defn component [& {:keys [data component-id container-id]}]
 
-  (log/info "component" data "//" component-id "//" container-id)
+  ;(log/info "component" data "//" component-id "//" container-id)
 
   (let [id            (r/atom nil)
         configuration @data

@@ -24,7 +24,7 @@
 
 (defn local-config [data]
 
-  (log/info "local-config" @data)
+  ;(log/info "local-config" @data)
 
   (let [ret (merge
               {:brush false}
@@ -36,7 +36,7 @@
                                    :fill    (color/get-color idx)
                                    :stackId ""}}))
                 (into {})))]
-    (log/info "local-config" ret)
+    ;(log/info "local-config" ret)
     ret))
 
 
@@ -129,13 +129,14 @@
       (make-bar-display data subscriptions isAnimationActive?)]]))
 
 
-(defn component [& {:keys [data component-id container-id
+(defn component [& {:keys [data config-data component-id container-id
                            data-panel config-panel] :as params}]
 
-  (log/info "component-2" params)
+  ;(log/info "component-2" params)
 
   [wrapper/base-chart
    :data data
+   :config-data config-data
    :component-id component-id
    :container-id container-id
    :component* component*

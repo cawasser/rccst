@@ -3,11 +3,27 @@
   "some components that act as stand-ins for 'real' ui-components"
 
   (:require [bh.rccst.ui-component.labeled-field :as lf]
+            [bh.rccst.ui-component.utils.helpers :as h]
+            [re-com.core :as rc]
             [re-frame.core :as re-frame]
             [reagent.core :as r]
-            [re-com.core :as rc]
-            [taoensso.timbre :as log]
-            [bh.rccst.ui-component.utils :as ui-utils]))
+            [taoensso.timbre :as log]))
+
+
+(log/info "bh.rccst.ui-component.atom.experimental.ui-element")
+
+
+(defn config-panel [& {:keys [config-data] :as params}]
+  ;(log/info "config-panel" params)
+
+  (let [c (h/resolve-value config-data)]
+
+    ;(log/info "config-panel (resolve-value)" @c)
+
+    [:div.card {:style {:width "100%" :height "100%"}}
+     (map (fn [[k v]]
+            ^{:key k} [lf/labeled-field (str k) v])
+       @c)]))
 
 
 (defn selectable-table [& {:keys [data selection]}]
@@ -86,6 +102,26 @@
        [:div {:style {:width "200px" :margin :auto}}
         [lf/labeled-field "Value" @v]]])))
 
+
+
+(def meta-data
+  {
+   :stunt/config-panel     {:component config-panel
+                            :ports     {:config-data :port/source-sink}}
+   :stunt/selectable-table {:component selectable-table
+                            :ports     {:data      :port/source-sink ; out this be {:data-in :port/sink} & {:data-out :port/source}?
+                                        :selection :port/source}}
+
+   :stunt/globe            {:component three-d-globe
+                            :ports     {:layers       :port/sink
+                                        :current-time :port/sink}}
+
+   :stunt/label            {:component label
+                            :ports     {:value :port/sink}}
+
+   :stunt/slider           {:component slider
+                            :ports     {:value :port/source-sink
+                                        :range :port/sink}}})
 
 
 (comment
