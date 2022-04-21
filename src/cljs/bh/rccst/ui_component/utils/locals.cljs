@@ -322,9 +322,9 @@
   [widget-id locals-and-defaults]
   (let [paths (process-locals [] nil locals-and-defaults)]
 
-    (log/info "init-widget" widget-id
-      "//" paths
-      "//" locals-and-defaults)
+    ;(log/info "init-widget" widget-id
+    ;  "//" paths
+    ;  "//" locals-and-defaults)
 
     ; load the app-db with the default values
     (init-local-values widget-id locals-and-defaults)

@@ -129,13 +129,14 @@
       (make-bar-display data subscriptions isAnimationActive?)]]))
 
 
-(defn component [& {:keys [data component-id container-id
+(defn component [& {:keys [data config-data component-id container-id
                            data-panel config-panel] :as params}]
 
   (log/info "component-2" params)
 
   [wrapper/base-chart
    :data data
+   :config-data config-data
    :component-id component-id
    :container-id container-id
    :component* component*

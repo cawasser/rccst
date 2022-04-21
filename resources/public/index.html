@@ -6,12 +6,12 @@
     <title>bh/rccst</title>
 
     <link rel="stylesheet" href="assets/css/bootstrap.css">
-    <link rel="stylesheet" href="assets/css/widgets.css">
+    <link rel="stylesheet" href="js/compiled/Widgets/widgets.css">
     <link rel="stylesheet" href="assets/css/material-design-iconic-font.min.css">
     <link rel="stylesheet" href="assets/css/re-com.css">
     <link rel="stylesheet" href="assets/css/react-grid-layout.css">
     <link rel="stylesheet" href="assets/css/flippable-card.css">
-
+    <link rel="stylesheet" href="js/compiled/Assets/astro-web-components.css">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.1/css/all.css" integrity="sha384-5sAR7xN1Nv6T6+dT2mhtzEpVJvfS3NScPQTrOxhwjIuvcA67KV2R5Jz6kr4abQsz" crossorigin="anonymous">
     <link rel="stylesheet" href="/css/wb.css">
     <link rel="stylesheet" href="/css/rccst.css">
@@ -19,7 +19,7 @@
     <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,400italic" rel="stylesheet" type="text/css">
     <link href='https://fonts.googleapis.com/css?family=Roboto+Condensed:400,300' rel='stylesheet' type='text/css'>
   </head>
-  <body>
+  <body class="light-theme">
     <noscript>
       bh/rccst is a JavaScript app. Please enable JavaScript to continue.
     </noscript>
@@ -31,12 +31,9 @@
         var csrfToken = "{{csrf-token}}";
     </script>
     <script>
-      window.CESIUM_BASE_URL = '/assets/Cesium/';
-      Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJkYWNiMDFiNy1iYzFiLTQ2NDMtYmJlNC0zMjRiNTIzMjM5ODQiLCJpZCI6ODQ1MDAsImlhdCI6MTY0NjMyODY1Mn0.Nax1YEWqQzM_eOqHPhblhU9TO9U42VJn4wCcolAkuhM';
-    </script>
-    <script>
          window.prstr  = function (obj) { return cljs.core.pr_str(obj) };
     </script>
+    <script src="/js/compiled/bundle.js"></script>
     <script src="/js/compiled/app.js"></script>
   </body>
 </html>

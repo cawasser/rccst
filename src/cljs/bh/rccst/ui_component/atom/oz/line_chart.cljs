@@ -106,7 +106,7 @@
   [data chart-id]
 
   [:div {:style {:width "400px" :height "500px"}}
-   [oz/vega @data]])
+   [oz/vega-lite @data]])
 
 
 
