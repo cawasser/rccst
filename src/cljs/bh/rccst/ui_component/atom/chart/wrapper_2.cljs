@@ -117,7 +117,7 @@
 
     (fn []
       (when (nil? @id)
-        (log/info "initializing" component-id)
+        ;(log/info "initializing" component-id)
         (reset! id component-id)
         (ui-utils/init-widget @id c)
         (ui-utils/dispatch-local @id [:container] container-id))

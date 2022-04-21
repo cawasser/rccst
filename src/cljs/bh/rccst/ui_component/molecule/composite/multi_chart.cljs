@@ -5,6 +5,7 @@
             [bh.rccst.ui-component.molecule.composite :as c]
             [bh.rccst.ui-component.utils :as ui-utils]
             [bh.rccst.ui-component.utils.color :as color]
+            [bh.rccst.ui-component.utils.locals :as l]
             [re-com.core :as rc]
             [re-frame.core :as re-frame]
             [reagent.core :as r]
@@ -21,17 +22,40 @@
 (declare config-panel-2)
 
 
-(defn fn-make-config [{:keys [data config] :as params}]
+(defn- compute-data-config [data]
+  ;(log/info "compute-data-config" data)
+
+  (let [ret (merge {:brush false}
+              (->> (get-in data [:metadata :fields])
+                (filter (fn [[k v]] (= :number v)))
+                keys
+                (map-indexed (fn [idx a]
+                               {a {:include true
+                                   :stroke  (color/get-color idx)
+                                   :fill    (color/get-color idx)
+                                   :stackId ""}}))
+                (into {})))]
+    ;(log/info "compute-data-config (ret)" ret)
+    ret))
+
+
+(defn fn-make-config [{:keys [data config-data container-id] :as params}]
   ; needs to implement something along the lines of:
   ;
   ; (l/update-local-values component-id (local-config d))
+  ;
+  ; and maybe...
+  ;
   ; (ui-utils/build-subs component-id l-c)
 
+  ;(log/info "fn-make-config" params)
+
   (re-frame/reg-sub
-    (first config)
+    (first config-data)
     :<- data
     (fn [d _]
-      {:brush true})))
+      (doall
+        (l/update-local-path-values container-id [:blackboard :topic.config] (compute-data-config d))))))
 
 
 (def ui-definition
@@ -49,7 +73,7 @@
                  :topic/data     {:type :source/local :name :topic/data :default @sample-data}
                  :topic/config   {:type :source/local :name :topic/config :default {}}
                  :fn/make-config {:type  :source/fn :name fn-make-config
-                                  :ports {:data :port/sink :config :port/source-sink}}}
+                                  :ports {:data :port/sink :config-data :port/source-sink}}}
 
    ; links - how the different components get their data and if they publish or
    ; subscribe to the composite
@@ -59,8 +83,8 @@
                                          :fn/make-config :data}}
                  :topic/config   {:data {:ui/line   :config-data
                                          :ui/bar    :config-data
-                                         :ui/config :config}}
-                 :fn/make-config {:config {:topic/config :data}}}
+                                         :ui/config :config-data}}
+                 :fn/make-config {:config-data {:topic/config :data}}}
 
    ; the physical layout of the components on the display
    :grid-layout [{:i :ui/line :x 0 :y 0 :w 5 :h 11 :static true}
@@ -129,6 +153,8 @@
 
 
 (defn- config [component-id data]
+  ;(log/info "config" component-id "//" data)
+
   (merge ui-utils/default-pub-sub
     (local-config data component-id)))
 
@@ -161,6 +187,47 @@
 
        [component-panel data @id container-id ui]))))
 
+
+
+; testing for setting up subc/events to support wdigets
+(comment
+  @(re-frame/subscribe [:multi-chart-widget.widget.blackboard])
+  @(re-frame/subscribe [:multi-chart-widget.widget.blackboard.topic.data])
+  @(re-frame/subscribe [:multi-chart-widget.widget.blackboard.topic.config])
+
+
+  @(re-frame/subscribe [:multi-chart-widget.widget.blackboard.topic.config.uv])
+  @(re-frame/subscribe [:multi-chart-widget.widget.blackboard.topic.config.uv.include])
+  @(re-frame/subscribe [:multi-chart-widget.widget.blackboard.topic.config.uv.fill])
+  @(re-frame/subscribe [:multi-chart-widget.widget.blackboard.topic.config.uv.stroke])
+  @(re-frame/subscribe [:multi-chart-widget.widget.blackboard.topic.config.uv.stackId])
+
+
+  (re-frame/dispatch [:multi-chart-widget.widget.blackboard.topic.config.uv.include false])
+  (re-frame/dispatch [:multi-chart-widget.widget.blackboard.topic.config.uv.include true])
+
+
+  (get-in @re-frame.db/app-db [:widgets :multi-chart-widget.widget])
+  (get-in @re-frame.db/app-db [:widgets :multi-chart-widget.widget :blackboard])
+  (get-in @re-frame.db/app-db [:widgets :multi-chart-widget.widget
+                               :blackboard (ui-utils/path->keyword :topic/config)])
+  (get-in @re-frame.db/app-db [:widgets :multi-chart-widget.widget.blackboard])
+
+
+  (reduce conj [:widget :dummy] [:blackboard :topic.config])
+
+  (reduce conj [:widgets] [:dummy])
+  (reduce conj [:widgets] [[:blackboard :topic.config]])
+
+  (def container :multi-chart-widget.widget)
+  (def container [:multi-chart-widget.widget :blackboard :topic.config])
+  (let [data-path (cond
+                    (coll? container) (reduce conj [:widgets] container)
+                    :else [:widget container])]
+    (get-in @re-frame/app-db data-path values))
+
+
+  ())
 
 
 ; play with the app-db configuration and subscriptions

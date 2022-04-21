@@ -10,7 +10,9 @@
 
 (declare process-locals)
 (declare create-widget-local-sub)
+(declare create-local-path-sub)
 (declare create-widget-local-event)
+(declare create-local-path-event)
 
 
 (re-frame/reg-event-db
@@ -24,6 +26,19 @@
       (do
         ;(log/info "::init-widget-locals // adding")
         (assoc-in db [:widgets container] values)))))
+
+
+(re-frame/reg-event-db
+  :events/init-local-path
+  (fn-traced [db [_ local-path values]]
+    ;(log/info "::init-widget-locals" container init-vals)
+    (if (= (get-in db local-path) values)
+      (do
+        ;(log/info "::init-local-path // already exists")
+        db)
+      (do
+        ;(log/info "::init-local-path // adding")
+        (assoc-in db local-path values)))))
 
 
 (defn init-local-values
@@ -49,22 +64,22 @@
 
 
 (defn update-local-values [component-id values]
-  (let [target   (keyword component-id)
-        old (get-in @re-frame.db/app-db [:widgets target])
-        old-vals (->> old
-                   (process-locals [] nil)
-                   (filter #(= 1 (count %)))
-                   (into #{}))
+  (let [target         (keyword component-id)
+        old            (get-in @re-frame.db/app-db [:widgets target])
+        old-vals       (->> old
+                         (process-locals [] nil)
+                         (filter #(= 1 (count %)))
+                         (into #{}))
         new-vals-paths (process-locals [] nil values)
-        new-vals (->> new-vals-paths
-                   (filter #(= 1 (count %)))
-                   (into #{}))
-        diff     (clojure.set/difference new-vals old-vals)
-        merged-values (merge old
-                        (->> diff
-                          (map (fn [[path]]
-                                 {path (get values path)}))
-                          (into {})))]
+        new-vals       (->> new-vals-paths
+                         (filter #(= 1 (count %)))
+                         (into #{}))
+        diff           (clojure.set/difference new-vals old-vals)
+        merged-values  (merge old
+                         (->> diff
+                           (map (fn [[path]]
+                                  {path (get values path)}))
+                           (into {})))]
 
     ;(log/info "update-local-values" diff "//" old "//" merged-values)
 
@@ -78,6 +93,46 @@
 
       (doall
         (map #(create-widget-local-event component-id %) new-vals-paths)))))
+
+
+(defn update-local-path-values [component-id target-path values]
+
+  ;(log/info "update-local-path-values" component-id "//" values)
+
+  (let [data-path      (reduce conj [(h/path->keyword component-id)] target-path)
+        widget-path    (reduce conj [:widgets (h/path->keyword component-id)] target-path)
+        old            (get-in @re-frame.db/app-db widget-path)
+        old-vals       (->> old
+                         (process-locals [] nil)
+                         (filter #(= 1 (count %)))
+                         (into #{}))
+        new-vals-paths (process-locals [] nil values)
+        new-vals       (->> new-vals-paths
+                         (filter #(= 1 (count %)))
+                         (into #{}))
+        diff           (clojure.set/difference new-vals old-vals)
+        merged-values  (merge old
+                         (->> diff
+                           (map (fn [[path]]
+                                  {path (get values path)}))
+                           (into {})))]
+
+    ;(log/info "update-local-path-values (merged)" component-id "//" diff "//" old "//" merged-values)
+
+    (when (not (empty? diff))
+      ;(log/info "update-local-path-values (target)" widget-path "//" data-path "//" new-vals-paths)
+
+      (re-frame/dispatch-sync
+        [:events/init-local-path widget-path merged-values])
+
+      (doall
+        ; TODO: consider using locals-and-defaults to put the actual default into the subscription rather than 'nil'
+        (map #(create-local-path-sub (reduce conj data-path %) nil) new-vals-paths))
+
+      (doall
+        (map #(create-local-path-event (reduce conj data-path %)) new-vals-paths)))
+
+    merged-values))
 
 
 (defn process-branch [accum root k v]
@@ -159,10 +214,16 @@
   (h/path->keyword widget-id "blackboard" a more))
 
 
-(defn compute-deps [widget-id a more]
+(defn compute-widget-deps [widget-id a more]
   (if more
     (h/path->keyword widget-id a (drop-last more))
     (h/path->keyword widget-id)))
+
+
+(defn compute-deps [a more]
+  (if more
+    (h/path->keyword a (drop-last more))
+    (h/path->keyword a)))
 
 
 (defn create-widget-sub
@@ -218,12 +279,31 @@
   "
   [widget-id [a & more :as value-path] default]
   (let [p    (h/path->keyword widget-id a more)
-        dep  (compute-deps widget-id a more)
+        dep  (compute-widget-deps widget-id a more)
         item (h/path->keyword (if more (last more) a))]
 
     ;(log/info "create-widget-local-sub" p
     ;  ":<-" dep
     ;  "item" item)
+
+    (re-frame/reg-sub
+      p
+      :<- [dep]
+      (fn [widget _]
+        ;(log/info "sub" p dep widget (last more))
+        (or (get widget item) default)))))
+
+
+(defn create-local-path-sub [[a & more :as value-path] default]
+  (let [p    (h/path->keyword a more)
+        dep  (compute-deps a more)
+        item (h/path->keyword (if more (last more) a))]
+
+    ;(log/info "create-local-path-sub"
+    ;  value-path
+    ;  "//" p
+    ;  ":<-" dep
+    ;  "//" item)
 
     (re-frame/reg-sub
       p
@@ -287,7 +367,7 @@
   (let [p (h/path->keyword widget-id a more)]
 
     ;(log/info "create-widget-local-event" p
-    ;  "apply conj" (apply conj [:widgets (path->keyword widget-id)] (map path->keyword value-path)))
+    ;  "apply conj" (apply conj [:widgets (h/path->keyword widget-id)] (map h/path->keyword value-path)))
 
     (re-frame/reg-event-db
       p
@@ -299,6 +379,27 @@
         ;
         (assoc-in db
           (apply conj [:widgets (h/path->keyword widget-id)] (map h/path->keyword value-path))
+          new-val)))))
+
+
+(defn create-local-path-event [value-path]
+  (let [p (h/path->keyword value-path)] ;a more)]
+
+    ;(log/info "create-local-path-event"
+    ;  value-path
+    ;  "//" p
+    ;  "//" (reduce conj [:widgets] (map h/path->keyword value-path)))
+
+    (re-frame/reg-event-db
+      p
+      (fn [db [_ new-val]]
+        ;(log/info "event" p new-val)
+
+        ; NOTE: this "default" processing could be overridden (using an optional keyword)
+        ; to perform more custom functions (like incremental updates to a collection)
+        ;
+        (assoc-in db
+          (reduce conj [:widgets] (map h/path->keyword value-path))
           new-val)))))
 
 
@@ -463,14 +564,14 @@
   "
   [component-id local-config]
 
-  (log/info "build-subs" component-id "//" local-config)
+  ;(log/info "build-subs" component-id "//" local-config)
 
   (let [ret (->> (process-locals [] nil local-config)
               (map (fn [path]
                      {path (subscribe-local component-id path)}))
               (into {}))]
 
-    (log/info "build-subs" component-id "//" ret)
+    ;(log/info "build-subs" component-id "//" ret)
     ret))
 
 
@@ -496,7 +597,7 @@
   (def init-vals {:y-axis {:include true, :dataKey "", :orientation :left, :scale "auto"},
                   :grid   {:include true, :strokeDasharray {:dash "3", :space "3"}, :stroke "#a9a9a9"}})
   (def init-vals {:amt    {:include true :fill "#ffffff" :stackId ""}
-                  :tv    {:include true :fill "#ffffff" :stackId ""}
+                  :tv     {:include true :fill "#ffffff" :stackId ""}
                   :y-axis {:include true, :dataKey "", :orientation :left, :scale "auto"},
                   :grid   {:include true, :strokeDasharray {:dash "3", :space "3"}, :stroke "#a9a9a9"},})
   (def init-vals {:y-axis {:include false, :dataKey "", :orientation :left, :scale "auto"},
@@ -514,23 +615,23 @@
   (def diff (clojure.set/difference init-vals-flat old-vals-flat))
 
 
-  (let [db @re-frame.db/app-db
-        container :bar-chart-2-demo.bar-chart-2
-        init-vals {:amt    {:include true :fill "#ffffff" :stackId ""}
-                   :tv     {:include true :fill "#ff00ff" :stackId ""}
-                   :y-axis {:include true :dataKey "" :orientation :left :scale "auto"}
-                   :grid   {:include true :strokeDasharray {:dash "3" :space "3"}
-                            :stroke "#a9a9a9"}}
-        old-vals (get-in db [:widgets container])
-        old-vals-flat (->> old-vals
-                        (process-locals [] nil)
-                        (filter #(= 1 (count %)))
-                        (into #{}))
+  (let [db             @re-frame.db/app-db
+        container      :bar-chart-2-demo.bar-chart-2
+        init-vals      {:amt    {:include true :fill "#ffffff" :stackId ""}
+                        :tv     {:include true :fill "#ff00ff" :stackId ""}
+                        :y-axis {:include true :dataKey "" :orientation :left :scale "auto"}
+                        :grid   {:include true :strokeDasharray {:dash "3" :space "3"}
+                                 :stroke  "#a9a9a9"}}
+        old-vals       (get-in db [:widgets container])
+        old-vals-flat  (->> old-vals
+                         (process-locals [] nil)
+                         (filter #(= 1 (count %)))
+                         (into #{}))
         init-vals-flat (->> init-vals
                          (process-locals [] nil)
                          (filter #(= 1 (count %)))
                          (into #{}))
-        diff (clojure.set/difference init-vals-flat old-vals-flat)]
+        diff           (clojure.set/difference init-vals-flat old-vals-flat)]
 
     (merge old-vals
       (->> diff

@@ -70,7 +70,7 @@
 
 
 (defn fn-current-time [{:keys [value current-time]}]
-  (log/info "fn-current-time" value "//" current-time)
+  ;(log/info "fn-current-time" value "//" current-time)
 
   (re-frame/reg-sub
     (first current-time)

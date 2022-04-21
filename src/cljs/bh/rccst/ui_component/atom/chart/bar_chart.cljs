@@ -180,11 +180,11 @@
         local-subs         (ui-utils/build-subs component-id l-c)
         subscriptions      (ui-utils/override-subs container-id local-subs override-subs)]
 
-    (log/info "component-panel" component-id "//" data
-      "// resolved" @d
-      "// l-c" l-c
-      "// local-subs" local-subs
-      "// subs" subscriptions)
+    ;(log/info "component-panel" component-id "//" data
+    ;  "// resolved" @d
+    ;  "// l-c" l-c
+    ;  "// local-subs" local-subs
+    ;  "// subs" subscriptions)
 
     (fn []
       (if (empty? @d)
@@ -260,7 +260,7 @@
 
   (let [d (h/resolve-value data)]
 
-    (log/info "component" data "//" d "//" @d)
+    ;(log/info "component" data "//" d "//" @d)
 
     [c/base-chart
      :data data
