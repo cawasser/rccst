@@ -24,6 +24,15 @@
    :host     "localhost"
    :port     "5432"})
 
+(def docker-postgres
+  "postgres connection spec for dockerized db"
+  {:dbtype   "postgresql"
+   :dbname   "rccst"
+   :user     "docker"
+   :password "docker"
+   :host     "localhost" ;"rccst-postgres"
+   :port     "5432"})
+
 
 (def rccst-sqlite
   "sqlite database connection spec."
@@ -188,7 +197,7 @@
   (log/info "................. RCCST Starting up...")
   (if (seq args)
     (doseq [arg args]
-      (start! rccst-postgres arg))
+      (start! docker-postgres arg))
     (start! rccst-postgres "true"))
   (log/info ">>>>>>>>>>>>>>>>> RCCST Server READY!"))
 
