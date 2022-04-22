@@ -15,10 +15,10 @@
 (defonce data (r/atom chart/sample-data))
 
 (def default-config-data {:brush false
-                          :uv {:include true, :fill "#8884d8", :stackId ""}
-                          :pv {:include true, :fill "#ffc107", :stackId ""}
-                          :tv {:include true, :fill "#82ca9d", :stackId ""}
-                          :amt {:include true, :fill "#ff00ff", :stackId ""}})
+                          :uv    {:include true, :fill "#8884d8", :stackId ""}
+                          :pv    {:include true, :fill "#ffc107", :stackId ""}
+                          :tv    {:include true, :fill "#82ca9d", :stackId ""}
+                          :amt   {:include true, :fill "#ff00ff", :stackId ""}})
 (defonce config-data (r/atom default-config-data))
 
 
@@ -84,7 +84,8 @@
            :margin     "5px" :padding "5px"}
    :children [[rc/button :on-click #(reset! config-data default-config-data) :label "Default"]
               [rc/button :on-click #(swap! config-data update-in [:brush] not) :label "!Brush"]
-              [rc/button :on-click #(swap! config-data update-in [:uv :include] not) :label "! uv data"]]])
+              [rc/button :on-click #(swap! config-data update-in [:uv :include] not) :label "! uv data"]
+              [chart-utils/color-config config-data ":fill" [:uv :fill] :above-center]]])
 
 
 (defn- config-update-example [& {:keys [data config-data container-id component-id] :as params}]
@@ -109,31 +110,31 @@
 
 
 (defn example []
-    [:<>
-     (let [container-id "bar-chart-2-data-demo"
-           component-id (utils/path->keyword container-id "bar-chart-2")]
-       [example/component-example
-        :title "Bar Chart 2 (Live Data)"
-        :description "A Bar Chart (2) built using [Recharts](https://recharts.org/en-US/api/BarChart). This example shows how
-     charts can take [ratoms](http://reagent-project.github.io/docs/master/reagent.ratom.html) as input and re-render as the data changes."
-        :data data
-        :component data-update-example
-        :container-id container-id
-        :component-id component-id
-        :source-code chart/source-code])
+  [:<>
+   (let [container-id "bar-chart-2-data-demo"
+         component-id (utils/path->keyword container-id "bar-chart-2")]
+     [example/component-example
+      :title "Bar Chart 2 (Live Data)"
+      :description "A Bar Chart (2) built using [Recharts](https://recharts.org/en-US/api/BarChart). This example shows how
+   charts can take [ratoms](http://reagent-project.github.io/docs/master/reagent.ratom.html) as input and re-render as the data changes."
+      :data data
+      :component data-update-example
+      :container-id container-id
+      :component-id component-id
+      :source-code chart/source-code])
 
-     (let [container-id "bar-chart-2-config-demo"
-           component-id (utils/path->keyword container-id "bar-chart-2")]
-       [example/component-example
-        :title "Bar Chart 2 (Live Configuration)"
-        :description "A Bar Chart (2) built using [Recharts](https://recharts.org/en-US/api/BarChart). This example shows how
+   (let [container-id "bar-chart-2-config-demo"
+         component-id (utils/path->keyword container-id "bar-chart-2")]
+     [example/component-example
+      :title "Bar Chart 2 (Live Configuration)"
+      :description "A Bar Chart (2) built using [Recharts](https://recharts.org/en-US/api/BarChart). This example shows how
      charts can take [ratoms](http://reagent-project.github.io/docs/master/reagent.ratom.html) as input and re-render as the configuration changes."
-        :data data
-        :extra-params {:config-data config-data}
-        :component config-update-example
-        :container-id container-id
-        :component-id component-id
-        :source-code chart/source-code])])
+      :data data
+      :extra-params {:config-data config-data}
+      :component config-update-example
+      :container-id container-id
+      :component-id component-id
+      :source-code chart/source-code])])
 
 
 (comment
@@ -172,3 +173,23 @@
 
 
   ())
+
+
+(comment
+
+  (def p {:name "James" :age 26})
+  (update-in p [:age] inc)
+
+
+  (def data config-data)
+  (def path [:uv :fill])
+
+  (assoc-in @data path "#000000")
+  (assoc-in @data [:uv :fill] "#000000")
+
+  (swap! data assoc-in [:uv :fill] "#000000")
+
+
+  ())
+
+

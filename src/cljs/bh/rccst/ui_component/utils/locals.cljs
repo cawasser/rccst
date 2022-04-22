@@ -641,3 +641,22 @@
 
   ())
 
+
+; play with dispatch-local and related things
+(comment
+  (def widget-id nil)
+  (def path [:uv :fill])
+  (def path [:blackboard :topic/config :uv :fill])
+  (def path [:container-widget :blackboard :topic/config :uv :fill])
+
+
+  (let [[a & more] path]
+    (h/path->keyword widget-id a more))
+
+
+
+
+
+  ())
+
+
