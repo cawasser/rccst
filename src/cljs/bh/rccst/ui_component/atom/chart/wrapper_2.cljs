@@ -1,23 +1,25 @@
 (ns bh.rccst.ui-component.atom.chart.wrapper-2
-  (:require [bh.rccst.ui-component.utils :as ui-utils]
-            [bh.rccst.ui-component.atom.chart.utils :as utils]
+  (:require [bh.rccst.ui-component.atom.re-com.configure-toggle :as ct]
+            [bh.rccst.ui-component.utils :as ui-utils]
             [bh.rccst.ui-component.utils.helpers :as h]
             [bh.rccst.ui-component.utils.locals :as l]
-            [bh.rccst.ui-component.atom.re-com.configure-toggle :as ct]
-            [reagent.core :as r]
             [re-com.core :as rc]
-            [taoensso.timbre :as log]
-            [woolybear.ad.layout :as layout]))
+            [reagent.core :as r]
+            [taoensso.timbre :as log]))
 
 
-(defn- component-panel [& {:keys [data component-id container-id component* local-config] :as params}]
+(log/info "bh.rccst.ui-component.atom.chart.wrapper-2")
+
+
+(defn- component-panel [& {:keys [data config-data component-id container-id component* local-config] :as params}]
   ;(log/info "component-panel" params)
 
   (let [d                  (h/resolve-value data)
+        c                  (h/resolve-value config-data)
         isAnimationActive? (ui-utils/subscribe-local component-id [:isAnimationActive])]
     ;override-subs      @(ui-utils/subscribe-local component-id [:sub])]
 
-    ;(log/info "component-panel" data "//" @d)
+    (log/info "component-panel" component-id "//" data "//" @d "//" config-data "//" @c)
 
     (fn []
 
@@ -78,10 +80,10 @@
                    :height "90%"
                    :children (if @open?
                                [[:div.chart-config-panel {:style {:width "40%" :height "100%"}}
-                                  [ui-utils/chart-config
-                                   chart-events
-                                   [data-panel @d]
-                                   [config-panel d component-id]]]
+                                 [ui-utils/chart-config
+                                  chart-events
+                                  [data-panel @d]
+                                  [config-panel d component-id]]]
                                 [:div.chart-content {:style {:width "60%" :height "100%"}}
                                  [component-panel
                                   :component* component*
@@ -98,7 +100,7 @@
                                  :container-id container-id]])]]])))
 
 
-(defn base-chart [& {:keys [data
+(defn base-chart [& {:keys [data config-data
                             component-id container-id
                             component*
                             config local-config
@@ -126,6 +128,7 @@
        (if not-configurable?
          [component-panel
           :data data
+          :config-data config-data
           :config config
           :local-config local-config
           :component-id @id
