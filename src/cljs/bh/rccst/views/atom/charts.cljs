@@ -1,8 +1,8 @@
 (ns bh.rccst.views.atom.charts
   (:require [bh.rccst.views.atom.example.chart.area-chart :as area-chart]
             [bh.rccst.views.atom.example.chart.bar-chart :as bar-chart]
-            [bh.rccst.views.atom.example.chart.bar-chart.data-example :as bar-chart-data]
-            [bh.rccst.views.atom.example.chart.bar-chart.config-example :as bar-chart-config]
+            [bh.rccst.views.atom.example.chart.bar-chart.data-ratom-example :as bar-chart-data-ratom]
+            [bh.rccst.views.atom.example.chart.bar-chart.config-ratom-example :as bar-chart-config-ratom]
             [bh.rccst.views.atom.example.chart.colored-pie-chart :as colored-pie-chart]
             [bh.rccst.views.atom.example.chart.line-chart :as line-chart]
             [bh.rccst.views.atom.example.chart.pie-chart :as pie-chart]
@@ -18,8 +18,8 @@
   [:div
    [area-chart/example]
    [bar-chart/example]
-   [bar-chart-data/example]
-   [bar-chart-config/example]
+   [bar-chart-data-ratom/example]
+   [bar-chart-config-ratom/example]
    [colored-pie-chart/example]
    [funnel-chart/example]
    [line-chart/simple-example]

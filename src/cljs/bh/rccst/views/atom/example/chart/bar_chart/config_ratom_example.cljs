@@ -1,4 +1,4 @@
-(ns bh.rccst.views.atom.example.chart.bar-chart.config-example
+(ns bh.rccst.views.atom.example.chart.bar-chart.config-ratom-example
   (:require [bh.rccst.ui-component.atom.chart.bar-chart-2 :as chart]
             [bh.rccst.ui-component.atom.chart.utils :as chart-utils]
             [bh.rccst.ui-component.molecule.example :as example]
