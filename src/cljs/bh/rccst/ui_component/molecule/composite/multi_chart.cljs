@@ -59,13 +59,6 @@
 
 
 (def ui-definition
-  "this data structure defines the composite in terms of the:
-
-  - :components   - the subcomponents, like tables, charts, and such used for the actual UI as well as
-  remote data sources (mapped to a local name) and internal pub/sub \"topics\"
-  - :links        - linkages between the components
-  - :grid-layout  - vector of layout data for the react-grid-layout component that positions the children
-  "
   {:components  {:ui/line        {:type :ui/component :name :rechart/bar-2}
                  :ui/bar         {:type :ui/component :name :rechart/bar-2}
                  :ui/config      {:type :ui/component :name :stunt/config-panel}
