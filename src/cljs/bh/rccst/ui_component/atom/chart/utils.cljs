@@ -375,7 +375,7 @@
 
 
 (defn verticalAlign-config
-  "lets the user change the vetical alignment of a 'legend'.
+  "lets the user change the vertical alignment of a 'legend'.
   Supports:
 
     `top`  `middle`  `bottom`

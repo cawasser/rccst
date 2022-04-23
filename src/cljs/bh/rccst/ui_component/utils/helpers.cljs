@@ -79,7 +79,9 @@
 (defn handle-change [value new-value]
   ;(log/info "handle-change" value "//" new-value)
   (cond
-    (coll? value) (re-frame/dispatch (conj value new-value))
+    (or (coll? value)
+      (keyword? value)
+      (string? value)) (re-frame/dispatch (conj value new-value))
     (instance? reagent.ratom.RAtom value) (reset! value new-value)
     (instance? Atom value) (reset! value new-value)
     :else ()))
@@ -90,9 +92,10 @@
 
   (cond
     (or (coll? value)
-      (keyword? value)) (let [update-event (conj [(path->keyword value path)] new-value)]
-                          (log/info "handle-change-path (update event)" update-event)
-                          (re-frame/dispatch update-event))
+      (keyword? value)
+      (string? value)) (let [update-event (conj [(path->keyword value path)] new-value)]
+                         (log/info "handle-change-path (update event)" update-event)
+                         (re-frame/dispatch update-event))
     (instance? reagent.ratom.RAtom value) (swap! value assoc-in path new-value)
     (instance? Atom value) (swap! value assoc-in path new-value)
     :else ()))

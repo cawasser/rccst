@@ -16,22 +16,28 @@
 
   (let [d                  (h/resolve-value data)
         c                  (h/resolve-value config-data)
-        isAnimationActive? (ui-utils/subscribe-local component-id [:isAnimationActive])]
-    ;override-subs      @(ui-utils/subscribe-local component-id [:sub])]
+        isAnimationActive? (ui-utils/subscribe-local component-id [:isAnimationActive])
+        override-subs      (when config-data (l/process-locals [] nil @c))]
 
-    (log/info "component-panel" component-id "//" data "//" @d "//" config-data "//" @c)
+    ;(log/info "component-panel" component-id "// (data)" data "// (d)" @d "// (config-data)" config-data "// (c)" @c)
+
+    ;(log/info "component-panel (override)" override-subs )
 
     (fn []
 
       (l/update-local-values component-id (local-config d))
 
-      (let [l-c        (local-config d)
-            local-subs (ui-utils/build-subs component-id l-c)]
-        ;subscriptions (ui-utils/override-subs container-id local-subs override-subs)]
+      (let [l-c           (local-config d)
+            local-subs    (ui-utils/build-subs component-id l-c)
+            subscriptions (if config-data
+                            (ui-utils/override-subs @c local-subs override-subs)
+                            local-subs)]
 
-        ;(log/info "component-panel (render)" component-id "//" @d "//" local-subs)
+        ;(log/info "component-panel" @c
+        ;  "// (override)" override-subs
+        ;  "// (subscriptions)" subscriptions
+        ;  "// (local-subs)" local-subs)
 
-        ;[layout/centered {:extra-classes :is-one-third}
         (if (empty? @d)
           [rc/alert-box :src (rc/at)
            :alert-type :info
@@ -42,7 +48,7 @@
            :data @d
            :component-id component-id
            :container-id container-id
-           :subscriptions local-subs
+           :subscriptions subscriptions
            :isAnimationActive? isAnimationActive?])))))
 
 

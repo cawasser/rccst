@@ -576,9 +576,15 @@
 
 
 (defn resolve-sub [subs path]
-  (deref (get subs (->> path
-                     (map h/path->keyword)
-                     (into [])))))
+  (let [ret (get subs (->> path
+                        (map h/path->keyword)
+                        (into [])))]
+    ;(log/info "resolve-sub" subs "// (path)" path "// (ret)" ret)
+    (if (or (instance? reagent.ratom.RAtom ret)
+          (instance? Atom ret)
+          (instance? reagent.ratom.Reaction ret))
+      @ret
+      ret)))
 
 
 (comment

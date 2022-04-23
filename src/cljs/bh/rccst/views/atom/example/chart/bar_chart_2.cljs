@@ -12,13 +12,14 @@
 
 
 
-(defonce data (r/atom chart/sample-data))
+(defonce data-data (r/atom chart/sample-data))
+(defonce data-config (r/atom chart/sample-data))
 
 (def default-config-data {:brush false
-                          :uv    {:include true, :fill "#8884d8", :stackId ""}
-                          :pv    {:include true, :fill "#ffc107", :stackId ""}
-                          :tv    {:include true, :fill "#82ca9d", :stackId ""}
-                          :amt   {:include true, :fill "#ff00ff", :stackId ""}})
+                          :uv    {:include true, :fill "#ff0000", :stackId ""}
+                          :pv    {:include true, :fill "#00ff00", :stackId ""}
+                          :tv    {:include true, :fill "#0000ff", :stackId ""}
+                          :amt   {:include true, :fill "#745ea5", :stackId ""}})
 (defonce config-data (r/atom default-config-data))
 
 
@@ -28,22 +29,22 @@
    :style {:border     "1px solid" :border-radius "3px"
            :box-shadow "5px 5px 5px 2px"
            :margin     "5px" :padding "5px"}
-   :children [[rc/button :on-click #(reset! data []) :label "Empty"]
-              [rc/button :on-click #(reset! data chart/sample-data) :label "Default"]
-              [rc/button :on-click #(swap! data assoc-in [:data 0 :uv] 10000) :label "A -> 10,000"]
-              [rc/button :on-click #(swap! data assoc :data
-                                      (conj (-> @data :data)
+   :children [[rc/button :on-click #(reset! data-data []) :label "Empty"]
+              [rc/button :on-click #(reset! data-data chart/sample-data) :label "Default"]
+              [rc/button :on-click #(swap! data-data assoc-in [:data 0 :uv] 10000) :label "A -> 10,000"]
+              [rc/button :on-click #(swap! data-data assoc :data
+                                      (conj (-> @data-data :data)
                                         {:name "Page Q" :uv 1100
                                          :pv   1100 :tv 1100 :amt 1100}))
                :label "Add 'Q'"]
-              [rc/button :on-click #(swap! data assoc :data (into [] (drop-last 2 (:data @data))))
+              [rc/button :on-click #(swap! data-data assoc :data (into [] (drop-last 2 (:data @data-data))))
                :label "Drop Last 2"]
-              [rc/button :on-click #(reset! data (-> @data
-                                                   (assoc-in [:metadata :fields :new-item] :number)
-                                                   (assoc :data (into []
-                                                                  (map (fn [x]
-                                                                         (assoc x :new-item 1750))
-                                                                    (:data @data))))))
+              [rc/button :on-click #(reset! data-data (-> @data-data
+                                                        (assoc-in [:metadata :fields :new-item] :number)
+                                                        (assoc :data (into []
+                                                                       (map (fn [x]
+                                                                              (assoc x :new-item 1750))
+                                                                         (:data @data-data))))))
                :label "Add :new-item"]]])
 
 
@@ -85,7 +86,16 @@
    :children [[rc/button :on-click #(reset! config-data default-config-data) :label "Default"]
               [rc/button :on-click #(swap! config-data update-in [:brush] not) :label "!Brush"]
               [rc/button :on-click #(swap! config-data update-in [:uv :include] not) :label "! uv data"]
-              [chart-utils/color-config config-data ":fill" [:uv :fill] :above-center]]])
+              [rc/button :on-click #(swap! config-data update-in [:tv :include] not) :label "! tv data"]
+              [chart-utils/color-config config-data ":amt :fill" [:amt :fill] :above-center]
+              [rc/button :on-click #(reset! config-data (-> @config-data
+                                                          (assoc-in [:uv :stackId] "a")
+                                                          (assoc-in [:tv :stackId] "a")))
+               :label "stack"]
+              [rc/button :on-click #(reset! config-data (-> @config-data
+                                                          (assoc-in [:uv :stackId] "")
+                                                          (assoc-in [:tv :stackId] "")))
+               :label "un-stack"]]])
 
 
 (defn- config-update-example [& {:keys [data config-data container-id component-id] :as params}]
@@ -117,7 +127,7 @@
       :title "Bar Chart 2 (Live Data)"
       :description "A Bar Chart (2) built using [Recharts](https://recharts.org/en-US/api/BarChart). This example shows how
    charts can take [ratoms](http://reagent-project.github.io/docs/master/reagent.ratom.html) as input and re-render as the data changes."
-      :data data
+      :data data-data
       :component data-update-example
       :container-id container-id
       :component-id component-id
@@ -129,7 +139,7 @@
       :title "Bar Chart 2 (Live Configuration)"
       :description "A Bar Chart (2) built using [Recharts](https://recharts.org/en-US/api/BarChart). This example shows how
      charts can take [ratoms](http://reagent-project.github.io/docs/master/reagent.ratom.html) as input and re-render as the configuration changes."
-      :data data
+      :data data-config
       :extra-params {:config-data config-data}
       :component config-update-example
       :container-id container-id

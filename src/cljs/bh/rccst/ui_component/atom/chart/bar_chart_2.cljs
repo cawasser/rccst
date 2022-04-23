@@ -48,10 +48,6 @@
                    :data-path [:widgets (keyword chart-id) :tab-panel]}}
       (local-config data))
     (assoc-in [:x-axis :dataKey] :name)))
-    ;; TODO: this should be produced by a function that processes the data
-    ;(assoc-in [:sub] [[:brush]
-    ;                  [:uv :include] [:uv :stroke] [:uv :fill]
-    ;                  [:pv :include] [:pv :stroke] [:pv :fill]])))
 
 
 (defn- bar-config [component-id label path position]
