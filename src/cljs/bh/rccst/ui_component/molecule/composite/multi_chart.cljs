@@ -66,8 +66,7 @@
   - :links        - linkages between the components
   - :grid-layout  - vector of layout data for the react-grid-layout component that positions the children
   "
-  {; the ui components (looked up in a registry), mapped to local names
-   :components  {:ui/line        {:type :ui/component :name :rechart/bar-2}
+  {:components  {:ui/line        {:type :ui/component :name :rechart/bar-2}
                  :ui/bar         {:type :ui/component :name :rechart/bar-2}
                  :ui/config      {:type :ui/component :name :stunt/config-panel}
                  :topic/data     {:type :source/local :name :topic/data :default @sample-data}
@@ -75,8 +74,6 @@
                  :fn/make-config {:type  :source/fn :name fn-make-config
                                   :ports {:data :port/sink :config-data :port/source-sink}}}
 
-   ; links - how the different components get their data and if they publish or
-   ; subscribe to the composite
    :links       {:ui/config      {:config-data {:topic/config :data}}
                  :topic/data     {:data {:ui/line        :data
                                          :ui/bar         :data
@@ -86,7 +83,6 @@
                                          :ui/config :config-data}}
                  :fn/make-config {:config-data {:topic/config :data}}}
 
-   ; the physical layout of the components on the display
    :grid-layout [{:i :ui/line :x 0 :y 0 :w 5 :h 11 :static true}
                  {:i :ui/config :x 5 :y 0 :w 2 :h 11 :static true}
                  {:i :ui/bar :x 7 :y 0 :w 5 :h 11 :static true}]})
@@ -221,6 +217,7 @@
 
   (def container :multi-chart-widget.widget)
   (def container [:multi-chart-widget.widget :blackboard :topic.config])
+  (def values "")
   (let [data-path (cond
                     (coll? container) (reduce conj [:widgets] container)
                     :else [:widget container])]
