@@ -39,7 +39,7 @@
 
 
 (defn- data-update-example [& {:keys [data config-data container-id component-id] :as params}]
-  (log/info "data-update-example (params)" params)
+  ;(log/info "data-update-example (params)" params)
 
   [rc/v-box :src (rc/at)
    :gap "10px"

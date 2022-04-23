@@ -32,7 +32,7 @@
 
 
 (defn- config-example [& {:keys [data config-data container-id component-id] :as params}]
-  (log/info "config-example (params)" params)
+  ;(log/info "config-example (params)" params)
 
   (let [c (h/resolve-value config-data)]
     [rc/v-box :src (rc/at)

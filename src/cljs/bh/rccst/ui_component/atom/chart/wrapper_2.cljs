@@ -16,8 +16,8 @@
 
   (let [d                  (h/resolve-value data)
         c                  (h/resolve-value config-data)
-        isAnimationActive? (ui-utils/subscribe-local component-id [:isAnimationActive])
-        override-subs      (when config-data (l/process-locals [] nil @c))]
+        isAnimationActive? (ui-utils/subscribe-local component-id [:isAnimationActive])]
+        ;override-subs      (when config-data (l/process-locals [] nil @c))]
 
     ;(log/info "component-panel" component-id
     ;  "// (data)" data "// (d)" @d
@@ -31,6 +31,7 @@
 
       (let [l-c           (local-config d)
             local-subs    (ui-utils/build-subs component-id l-c)
+            override-subs      (when config-data (l/process-locals [] nil @c))
             subscriptions (if config-data
                             (ui-utils/override-subs @c local-subs override-subs)
                             local-subs)]

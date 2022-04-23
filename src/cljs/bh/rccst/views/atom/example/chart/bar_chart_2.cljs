@@ -99,7 +99,7 @@
 
 
 (defn- config-update-example [& {:keys [data config-data container-id component-id] :as params}]
-  (log/info "config-update-example (params)" params)
+  ;(log/info "config-update-example (params)" params)
 
   [rc/v-box :src (rc/at)
    :gap "10px"
@@ -148,7 +148,7 @@
 
 
 (comment
-
+  (def data (r/atom []))
   (reset! data [])
   (reset! data chart/sample-data)
 
