@@ -397,7 +397,7 @@
         showing?         (r/atom false)
         p                (or position :right-center)]
 
-    (log/info "color-config" label "//" config-data "//" @d "//" path)
+    ;(log/info "color-config" label "//" config-data "//" @d "//" path)
 
     (fn []
       [rc/popover-anchor-wrapper :src (rc/at)

@@ -60,8 +60,8 @@
         :cell-style-fn (or cell-style-fn #())]])))
 
 
-(defn- meta-table [& {:keys [data max-rows width height cell-style-fn
-                             on-click-row-fn row-line-color]}]
+(defn meta-table [& {:keys [data max-rows width height cell-style-fn
+                            on-click-row-fn row-line-color]}]
 
   (let [d (h/resolve-value data)]
     (fn []

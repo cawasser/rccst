@@ -68,7 +68,7 @@
   (let [d (h/resolve-value data)]
     (fn []
 
-      (log/info "meta-table" data "//" @d "//" (:data @d))
+      ;(log/info "meta-table" data "//" @d "//" (:data @d))
 
       (let [coc? (r/atom false)]
         [:div.card {:style {:width  (or width "90%") :height (or height "100%")
@@ -106,7 +106,7 @@
                        on-click-row-fn row-line-color]}]
 
   (let [d (h/resolve-value data)]
-    (log/info "table" data "//" @d "//" (:data @d) "//" (:metadata @d))
+    ;(log/info "table" data "//" @d "//" (:data @d) "//" (:metadata @d))
     (if (:metadata @d)
       [meta-table
        :data data
