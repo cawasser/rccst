@@ -7,7 +7,7 @@
             [reagent.core :as r]
             [taoensso.timbre :as log]))
 
-(log/info "bh.rccst.views.atom.example.chart.bar-chart.data-example")
+(log/info "bh.rccst.views.atom.example.chart.bar-chart.data-ratom-example")
 
 
 (defonce data (r/atom chart/sample-data))
@@ -59,14 +59,16 @@
 
 
 (defn example []
-  (let [container-id "bar-chart-2-data-demo"
+  (let [container-id "bar-chart-2-data-ratom-demo"
         component-id (utils/path->keyword container-id "bar-chart-2")]
     [example/component-example
      :title "Bar Chart 2 (Live Data - ratom)"
      :description "A Bar Chart (2) built using [Recharts](https://recharts.org/en-US/api/BarChart). This example shows how
    charts can take [ratoms](http://reagent-project.github.io/docs/master/reagent.ratom.html) as input and re-render as the data changes.
 
-   In _this_ case, we are using a ratom for the data."
+   > In _this_ case, we are using a ratom for the data.
+   >
+   > You can use the buttons below to change some of the data and see how the chart responds."
      :data data
      :component data-update-example
      :container-id container-id

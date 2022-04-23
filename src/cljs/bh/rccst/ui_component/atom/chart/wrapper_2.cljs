@@ -19,7 +19,9 @@
         isAnimationActive? (ui-utils/subscribe-local component-id [:isAnimationActive])
         override-subs      (when config-data (l/process-locals [] nil @c))]
 
-    ;(log/info "component-panel" component-id "// (data)" data "// (d)" @d "// (config-data)" config-data "// (c)" @c)
+    ;(log/info "component-panel" component-id
+    ;  "// (data)" data "// (d)" @d
+    ;  "// (config-data)" config-data "// (c)" @c)
 
     ;(log/info "component-panel (override)" override-subs )
 

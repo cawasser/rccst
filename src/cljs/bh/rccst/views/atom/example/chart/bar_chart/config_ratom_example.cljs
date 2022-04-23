@@ -8,7 +8,7 @@
             [taoensso.timbre :as log]))
 
 
-(log/info "bh.rccst.views.atom.example.chart.bar-chart.config-example")
+(log/info "bh.rccst.views.atom.example.chart.bar-chart.config-ratom-example")
 
 
 (defonce data (r/atom chart/sample-data))
@@ -26,9 +26,11 @@
   [rc/h-box :src (rc/at)
    :gap "10px"
    :style {:border     "1px solid" :border-radius "3px"
+           :background "#808080"
            :box-shadow "5px 5px 5px 2px"
            :margin     "5px" :padding "5px"}
-   :children [[:p (str @config-data)]]])
+   :children [[:p {:style {:color "white"}}
+               (str @config-data)]]])
 
 
 (defn- config-tools []
@@ -74,14 +76,17 @@
 
 
 (defn example []
-  (let [container-id "bar-chart-2-config-demo"
+  (let [container-id "bar-chart-2-config-ratom-demo"
         component-id (utils/path->keyword container-id "bar-chart-2")]
     [example/component-example
      :title "Bar Chart 2 (Live Configuration - ratom)"
      :description "A Bar Chart (2) built using [Recharts](https://recharts.org/en-US/api/BarChart). This example shows how
      charts can take [ratoms](http://reagent-project.github.io/docs/master/reagent.ratom.html) as input and re-render as the configuration changes.
 
-In _this_ case, we are using a ratom to hold the configuration for the chart."
+> In _this_ case, we are using a ratom to hold the configuration for the chart.
+>
+> You can use the buttons in the bottom-most panel to change some of the chart configuration options and see
+> how that affects the data (shown in the gray panel) and how the chart responds."
      :data data
      :extra-params {:config-data config-data}
      :component config-update-example
