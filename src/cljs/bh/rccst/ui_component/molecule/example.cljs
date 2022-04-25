@@ -14,9 +14,9 @@
                                    component-id
                                    source-code
                                    extra-classes
-                                   extra-params] :as params}]
+                                   extra-params] :as input-params}]
 
-  ;(log/info "component-example" params)
+  ;(log/info "component-example" input-params)
 
   (ui-utils/init-container component-id)
 

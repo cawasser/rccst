@@ -129,7 +129,7 @@
 
 (defn component [& {:keys [data component-id container-id]}]
 
-  (log/info "component" data "//" component-id "//" container-id)
+  ;(log/info "component" data "//" component-id "//" container-id)
 
   (let [id            (r/atom nil)
         configuration @data

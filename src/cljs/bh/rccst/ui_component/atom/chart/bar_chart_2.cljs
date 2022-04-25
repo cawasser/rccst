@@ -24,7 +24,7 @@
 
 (defn local-config [data]
 
-  (log/info "local-config" @data)
+  ;(log/info "local-config" @data)
 
   (let [ret (merge
               {:brush false}
@@ -36,7 +36,7 @@
                                    :fill    (color/get-color idx)
                                    :stackId ""}}))
                 (into {})))]
-    (log/info "local-config" ret)
+    ;(log/info "local-config" ret)
     ret))
 
 
@@ -48,10 +48,6 @@
                    :data-path [:widgets (keyword chart-id) :tab-panel]}}
       (local-config data))
     (assoc-in [:x-axis :dataKey] :name)))
-    ;; TODO: this should be produced by a function that processes the data
-    ;(assoc-in [:sub] [[:brush]
-    ;                  [:uv :include] [:uv :stroke] [:uv :fill]
-    ;                  [:pv :include] [:pv :stroke] [:pv :fill]])))
 
 
 (defn- bar-config [component-id label path position]
@@ -132,7 +128,7 @@
 (defn component [& {:keys [data config-data component-id container-id
                            data-panel config-panel] :as params}]
 
-  (log/info "component-2" params)
+  ;(log/info "component-2" params)
 
   [wrapper/base-chart
    :data data

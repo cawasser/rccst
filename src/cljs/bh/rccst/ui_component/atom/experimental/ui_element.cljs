@@ -13,12 +13,17 @@
 (log/info "bh.rccst.ui-component.atom.experimental.ui-element")
 
 
-(defn config-panel [& {:keys [config] :as params}]
-  (log/info "config-panel" params)
+(defn config-panel [& {:keys [config-data] :as params}]
+  ;(log/info "config-panel" params)
 
-  (let [c (h/resolve-value config)]
+  (let [c (h/resolve-value config-data)]
+
+    ;(log/info "config-panel (resolve-value)" @c)
+
     [:div.card {:style {:width "100%" :height "100%"}}
-     [lf/labeled-field "config" @c]]))
+     (map (fn [[k v]]
+            ^{:key k} [lf/labeled-field (str k) v])
+       @c)]))
 
 
 (defn selectable-table [& {:keys [data selection]}]
@@ -102,7 +107,7 @@
 (def meta-data
   {
    :stunt/config-panel     {:component config-panel
-                            :ports     {:config :port/source-sink}}
+                            :ports     {:config-data :port/source-sink}}
    :stunt/selectable-table {:component selectable-table
                             :ports     {:data      :port/source-sink ; out this be {:data-in :port/sink} & {:data-out :port/source}?
                                         :selection :port/source}}

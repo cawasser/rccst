@@ -3,6 +3,7 @@
             [bh.rccst.ui-component.atom.re-com.table :as table]
             [bh.rccst.ui-component.utils :as u]
             [bh.rccst.ui-component.utils.color :as color]
+            [bh.rccst.ui-component.utils.helpers :as h]
             [re-com.core :as rc]
             [re-frame.core :as re-frame]
             [reagent.core :as r]
@@ -330,11 +331,11 @@
   - path : (vector) path into `config` where the scale for the correct axis is stored
   "
   [widget-id label path]
-  (let [btns  [{:id "auto" :label "auto"}
-               {:id "linear" :label "linear"}
-               {:id "pow" :label "pow"}
-               {:id "sqrt" :label "sqrt"}
-               {:id "log" :label "log"}]]
+  (let [btns [{:id "auto" :label "auto"}
+              {:id "linear" :label "linear"}
+              {:id "pow" :label "pow"}
+              {:id "sqrt" :label "sqrt"}
+              {:id "log" :label "log"}]]
     (enumerated-config widget-id btns label path)))
 
 
@@ -350,8 +351,8 @@
   - path : (vector) path into `config` where the scale for the layout is stored
   "
   [widget-id path]
-  (let [btns  [{:id "horizontal" :label "horizontal"}
-               {:id "vertical" :label "vertical"}]]
+  (let [btns [{:id "horizontal" :label "horizontal"}
+              {:id "vertical" :label "vertical"}]]
     (enumerated-config widget-id btns ":layout" path)))
 
 
@@ -367,14 +368,14 @@
   - path : (vector) path into `config` where the scale for the layout is stored
   "
   [widget-id path]
-  (let [btns  [{:id "left" :label "left"}
-               {:id "center" :label "center"}
-               {:id "right" :label "right"}]]
+  (let [btns [{:id "left" :label "left"}
+              {:id "center" :label "center"}
+              {:id "right" :label "right"}]]
     (enumerated-config widget-id btns ":align" path)))
 
 
 (defn verticalAlign-config
-  "lets the user change the vetical alignment of a 'legend'.
+  "lets the user change the vertical alignment of a 'legend'.
   Supports:
 
     `top`  `middle`  `bottom`
@@ -385,31 +386,34 @@
   - path : (vector) path into `config` where the scale for the layout is stored
   "
   [widget-id path]
-  (let [btns  [{:id "top" :label "top"}
-               {:id "middle" :label "middle"}
-               {:id "bottom" :label "bottom"}]]
+  (let [btns [{:id "top" :label "top"}
+              {:id "middle" :label "middle"}
+              {:id "bottom" :label "bottom"}]]
     (enumerated-config widget-id btns ":verticalAlign" path)))
 
 
-(defn color-config [widget-id label path & [position]]
-  (let [showing?         (r/atom false)
-        p                (or position :right-center)
-        background-color (u/subscribe-local widget-id path)]
-    (fn [widget-id label path & [position]]
+(defn color-config [config-data label path & [position]]
+  (let [d                (h/resolve-value config-data)
+        showing?         (r/atom false)
+        p                (or position :right-center)]
+
+    ;(log/info "color-config" label "//" config-data "//" @d "//" path)
+
+    (fn []
       [rc/popover-anchor-wrapper :src (rc/at)
        :showing? @showing?
        :position p
        :anchor [rc/button :src (rc/at)
                 :label label
-                :style {:background-color @background-color
+                :style {:background-color (get-in @d path)
                         :color            (color/best-text-color
-                                            (color/hex->rgba @background-color))}
+                                            (color/hex->rgba (get-in @d path)))}
                 :on-click #(swap! showing? not)]
        :popover [rc/popover-content-wrapper :src (rc/at)
                  :close-button? true
                  :no-clip? true
-                 :body [:> HexColorPicker {:color     @background-color
-                                           :on-change #(u/dispatch-local widget-id path %)}]]])))
+                 :body [:> HexColorPicker {:color (get-in @d path)
+                                           :on-change #(h/handle-change-path config-data path %)}]]])))
 
 
 (defn color-config-text [widget-id label path & [position]]

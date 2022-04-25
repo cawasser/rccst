@@ -1,8 +1,8 @@
 (ns bh.rccst.ui-component.atom.diagram.editable-digraph
   (:require [bh.rccst.ui-component.atom.diagram.diagram.dagre-support :as dagre]
             [bh.rccst.ui-component.molecule.composite.util.node-config-ui :as config]
+            [bh.rccst.ui-component.molecule.composite.util.ui]
             [bh.rccst.ui-component.utils.helpers :as h]
-            [bh.rccst.ui-component.molecule.composite.util.ui :as ui]
             [clojure.set :as set]
             [re-com.core :as rc]
             [reagent.core :as r]
@@ -187,7 +187,7 @@
 
 
 (defn- make-draggable-node [[k {:keys [label type color text-color]} :as node]]
-  (log/info "make-draggable-node" label type "//" node)
+  ;(log/info "make-draggable-node" label type "//" node)
   ^{:key label} [:div.draggable
                  {:style       {:width           "150px" :height "50px"
                                 :margin-bottom   "5px"
@@ -254,8 +254,8 @@
                              :attributionPosition "bottom-left"
                              :onDrop              (or on-drop #())
                              :onDragOver          (or on-drag-over #())}
-                (when node-types {:node-types node-types})
-                (when edge-types {:edge-types edge-types}))]
+                 (when node-types {:node-types node-types})
+                 (when edge-types {:edge-types edge-types}))]
 
     ;(log/info "flow-star (local-params)" local-params)
 
@@ -369,15 +369,3 @@
 
   ())
 
-
-(comment
-  (let {nodes :nodes edges :edges} (dagre/build-layout
-                                     (:nodes @sample-data-2)
-                                     (:edges @sample-data-2)))
-
-  (->> (dagre/build-layout (:nodes @sample-data-2)
-         (:edges @sample-data-2))
-    :nodes
-    (map #(dissoc % :targetPosition :sourcePosition)))
-
-  ())

@@ -5,8 +5,8 @@
             [re-com.core :as rc]
             [re-frame.core :as re-frame]
             [reagent.core :as r]
-            [woolybear.packs.tab-panel :as tab-panel]
-            [taoensso.timbre :as log]))
+            [taoensso.timbre :as log]
+            [woolybear.packs.tab-panel :as tab-panel]))
 
 
 (defn config-tab-panel [chart-id]
@@ -64,6 +64,7 @@
 
 (defn resolve-value [value & opts]
   (let [ret (cond
+              (keyword? value) (re-frame/subscribe (reduce conj [value] opts))
               (and (coll? value)
                 (not (empty? value))
                 (every? keyword? value)) (re-frame/subscribe (reduce conj value opts))
@@ -78,13 +79,35 @@
 (defn handle-change [value new-value]
   ;(log/info "handle-change" value "//" new-value)
   (cond
-    (coll? value) (re-frame/dispatch (conj value new-value))
+    (or (coll? value)
+      (keyword? value)
+      (string? value)) (re-frame/dispatch (conj value new-value))
     (instance? reagent.ratom.RAtom value) (reset! value new-value)
     (instance? Atom value) (reset! value new-value)
     :else ()))
 
 
+(defn handle-change-path [value path new-value]
+  (log/info "handle-change-path" value "//" path "//" new-value)
+
+  (cond
+    (or (coll? value)
+      (keyword? value)
+      (string? value)) (let [update-event (conj [(path->keyword value path)] new-value)]
+                         (log/info "handle-change-path (update event)" update-event)
+                         (re-frame/dispatch update-event))
+    (instance? reagent.ratom.RAtom value) (swap! value assoc-in path new-value)
+    (instance? Atom value) (swap! value assoc-in path new-value)
+    :else ()))
+
+
 (comment
+  (def path [:uv :fill])
+  (def value [:dummy])
+
+  (path->keyword value path)
+  (conj [(path->keyword value path)] "#000000")
+
   (->>
     (re-frame/subscribe [:coverage-plan-demo.component.blackboard.topic.current-time])
     deref

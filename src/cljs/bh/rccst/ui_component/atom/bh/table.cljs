@@ -52,7 +52,7 @@
 (defn- non-meta-table [& {:keys [data max-rows width height cell-style-fn
                                  on-click-row-fn row-line-color]}]
   (let [d (h/resolve-value data)]
-    (log/info "non-meta-table" data "//" @d)
+    ;(log/info "non-meta-table" data "//" @d)
     [table*
      :data @d
      :max-rows max-rows
@@ -68,7 +68,7 @@
   (let [d (h/resolve-value data)]
     (fn []
 
-      (log/info "meta-table" data "//" @d "//" (:data @d))
+      ;(log/info "meta-table" data "//" @d "//" (:data @d))
 
       (let [coc? (r/atom false)]
         [:div.card {:style {:width  (or width "90%") :height (or height "100%")
@@ -106,7 +106,7 @@
                        on-click-row-fn row-line-color]}]
 
   (let [d (h/resolve-value data)]
-    (log/info "table" data "//" @d "//" (:data @d) "//" (:metadata @d))
+    ;(log/info "table" data "//" @d "//" (:data @d) "//" (:metadata @d))
     (if (:metadata @d)
       [meta-table
        :data data
@@ -138,15 +138,15 @@
 
   (def value [])
 
-  (let [ret (cond
-              (and (coll? value)
-                (not (empty? value))
-                (every? keyword? value)) (re-frame/subscribe value)
-              (instance? reagent.ratom.RAtom value) value
-              (instance? Atom value) value
-              :else (r/atom value))]
-    ;(log/info "resolve-value" value "//" ret "//" (str @ret))
-    ret)
+  ;(let [ret (cond
+  ;            (and (coll? value)
+  ;              (not (empty? value))
+  ;              (every? keyword? value)) (re-frame/subscribe value)
+  ;            (instance? reagent.ratom.RAtom value) value
+  ;            (instance? Atom value) value
+  ;            :else (r/atom value))]
+  ;  ;(log/info "resolve-value" value "//" ret "//" (str @ret))
+  ;  ret)
 
   (empty? @(h/resolve-value []))
 

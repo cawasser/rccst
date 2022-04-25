@@ -84,6 +84,7 @@
 (defmethod component->ui :source/fn [{:keys [node configuration container-id]}]
   (let [actual-fn (->> configuration :components node :name)
         params    (merge
+                    {:container-id container-id}
                     (make-params configuration node :inputs container-id)
                     (make-params configuration node :outputs container-id))]
 
