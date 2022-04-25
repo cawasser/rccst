@@ -62,12 +62,32 @@
     keyword))
 
 
+(defn- resolve-subscription
+  "resolve a subscription.
+
+  there are 2 types if subscriptions: REMOTE and LOCAL
+
+  REMOTE subscriptions are designed to reach across the network and query data from the Server, while
+  LOCAL subscriptions are designed to reach into the Re-frame 'APP-DB' at a certain path
+  "
+  [subs opts]
+  (let [[target & _] subs]
+    ;(log/info "resolve-subscription" subs "//" target)
+    (if (= target :bh.rccst.subs/source)
+      (re-frame/subscribe (reduce conj subs opts))
+      (re-frame/subscribe (reduce conj [(path->keyword subs)] opts)))))
+
+
 (defn resolve-value [value & opts]
+  ;(log/info "resolve-value" value "//" opts
+  ;  "// (path-kw)" (reduce conj [(path->keyword value)] opts)
+  ;  "// (path-sub)" (reduce conj [(path->keyword value)] opts))
+
   (let [ret (cond
-              (keyword? value) (re-frame/subscribe (reduce conj [value] opts))
+              (keyword? value) (re-frame/subscribe (reduce conj [(path->keyword value)] opts))
               (and (coll? value)
                 (not (empty? value))
-                (every? keyword? value)) (re-frame/subscribe (reduce conj value opts))
+                (every? keyword? value)) (resolve-subscription value opts)
               (instance? reagent.ratom.RAtom value) value
               (instance? Atom value) value
               :else (r/atom value))]

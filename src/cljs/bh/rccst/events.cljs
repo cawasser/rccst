@@ -145,8 +145,8 @@
   ::good-subscribe-result
   (fn-traced [db [_ source result]]
     (let [current (:subscribed db)]
-      (log/info ":good-subscribe-result" source result
-        "////" current)
+      ;(log/info ":good-subscribe-result" source result
+      ;  "////" current)
       (assoc db
         :subscribed (set (apply conj current source))
         :subscribe-error ""))))
@@ -164,9 +164,9 @@
   ::subscribe-to
   (fn-traced [{:keys [db]} [_ source]]
     (let [user-id (:user-id db)]
-      (log/info "::subscribe-to" source
-        "////" {:user-id user-id :data-sources source}
-        "////" ?csrf-token)
+      ;;(log/info "::subscribe-to" source
+      ;  "////" {:user-id user-id :data-sources source}
+      ;  "////" ?csrf-token
       {:http-xhrio (merge default-header
                      {:method     :post
                       :uri        "/subscribe/data-source"

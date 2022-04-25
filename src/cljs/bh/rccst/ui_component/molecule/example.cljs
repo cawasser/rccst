@@ -20,10 +20,11 @@
 
   (ui-utils/init-container component-id)
 
-  (let [params (flatten (seq
-                          (apply merge
-                            {:data data :component-id component-id :container-id container-id}
-                            extra-params)))]
+  (let [params (reduce (fn [accum [k v]] (conj accum k v))
+                (seq
+                  (apply merge
+                    {:data data :component-id component-id :container-id container-id}
+                    extra-params)))]
 
     ;(log/info "component-example" component-id "//" params)
 
@@ -41,7 +42,7 @@
                          data-panel config-panel component-panel
                          source-code] :as params}]
 
-  (log/info "example" params)
+  ;(log/info "example" params)
 
   (ui-utils/init-widget container-id config)
 
@@ -74,13 +75,12 @@
     extra-params)
 
   (let [{:keys [extra-params]} params]
-    (reduce conj
+    (reduce (fn [accum [k v]] (conj accum k v))
       ["container"]
-      (flatten
-        (seq
-          (apply merge
-            {:data "data" :component-id "component-id" :container-id "container-id"}
-            extra-params)))))
+      (seq
+        (apply merge
+          {:data ["data" :blackboard] :component-id "component-id" :container-id "container-id"}
+          extra-params))))
 
   (reduce conj ["container"] (flatten (seq {:one "one" :two "two"})))
 

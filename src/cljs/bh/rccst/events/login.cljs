@@ -26,7 +26,7 @@
 (re-frame/reg-event-db
   :bh.rccst.events/register-success
   (fn-traced [db [_ {:keys [registered uuid]}]]
-    (log/info "::register-success" registered uuid)
+    ;(log/info "::register-success" registered uuid)
     (assoc db
       :registered registered
       :uuid uuid)))

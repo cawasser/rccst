@@ -11,13 +11,12 @@
 (log/info "bh.rccst.ui-component.atom.chart.wrapper-2")
 
 
-(defn- component-panel [& {:keys [data config-data component-id container-id component* local-config] :as params}]
+(defn component-panel [& {:keys [data config-data component-id container-id component* local-config] :as params}]
   ;(log/info "component-panel" params)
 
   (let [d                  (h/resolve-value data)
         c                  (h/resolve-value config-data)
         isAnimationActive? (ui-utils/subscribe-local component-id [:isAnimationActive])]
-        ;override-subs      (when config-data (l/process-locals [] nil @c))]
 
     ;(log/info "component-panel" component-id
     ;  "// (data)" data "// (d)" @d
@@ -31,7 +30,7 @@
 
       (let [l-c           (local-config d)
             local-subs    (ui-utils/build-subs component-id l-c)
-            override-subs      (when config-data (l/process-locals [] nil @c))
+            override-subs (when config-data (l/process-locals [] nil @c))
             subscriptions (if config-data
                             (ui-utils/override-subs @c local-subs override-subs)
                             local-subs)]
@@ -58,7 +57,7 @@
 (defn configurable-component-panel [& {:keys [data component-id container-id
                                               component*
                                               config local-config
-                                              config-panel data-panel component*]}]
+                                              config-panel data-panel]}]
 
   (let [open?        (r/atom false)
         config-key   (keyword component-id "config")
@@ -124,7 +123,8 @@
 
     ;(log/info "base-chart"
     ;  component-id container-id
-    ;  "//" data "//" @d)
+    ;  "//" data "//" @d
+    ;  "//" not-configurable?)
 
     (fn []
       (when (nil? @id)
@@ -145,7 +145,7 @@
           :component* component*]
 
          [configurable-component-panel
-          :data d
+          :data data
           :config config
           :local-config local-config
           :component-id @id
