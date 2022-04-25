@@ -13,8 +13,8 @@
      :title "Composite with Multiple Charts"
      :widget-id container-id
      :description "Working out how to place multiple components into a single composite so they can exchange information."
-     :data multi-chart/sample-data
-     :component multi-chart/component
+     :data [] ;multi-chart/sample-data
+     :component [:div "OBE"] ;multi-chart/component
      :component-id (ui-utils/path->keyword container-id "multi-chart")
      :source-code multi-chart/source-code]))
 

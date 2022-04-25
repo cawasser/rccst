@@ -397,7 +397,7 @@
         showing?         (r/atom false)
         p                (or position :right-center)]
 
-    ;(log/info "color-config" label "//" config-data "//" @d "//" path)
+    ;(log/info "color-config" label "//" config-data "//" @d "//" path "//" @showing?)
 
     (fn []
       [rc/popover-anchor-wrapper :src (rc/at)
@@ -410,8 +410,8 @@
                                             (color/hex->rgba (get-in @d path)))}
                 :on-click #(swap! showing? not)]
        :popover [rc/popover-content-wrapper :src (rc/at)
-                 :close-button? true
-                 :no-clip? true
+                 :close-button? false
+                 :no-clip? false
                  :body [:> HexColorPicker {:color (get-in @d path)
                                            :on-change #(h/handle-change-path config-data path %)}]]])))
 
