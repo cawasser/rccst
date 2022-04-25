@@ -5,8 +5,8 @@
             [re-com.core :as rc]
             [re-frame.core :as re-frame]
             [reagent.core :as r]
-            [woolybear.packs.tab-panel :as tab-panel]
-            [taoensso.timbre :as log]))
+            [taoensso.timbre :as log]
+            [woolybear.packs.tab-panel :as tab-panel]))
 
 
 (defn config-tab-panel [chart-id]
@@ -62,11 +62,32 @@
     keyword))
 
 
+(defn- resolve-subscription
+  "resolve a subscription.
+
+  there are 2 types if subscriptions: REMOTE and LOCAL
+
+  REMOTE subscriptions are designed to reach across the network and query data from the Server, while
+  LOCAL subscriptions are designed to reach into the Re-frame 'APP-DB' at a certain path
+  "
+  [subs opts]
+  (let [[target & _] subs]
+    ;(log/info "resolve-subscription" subs "//" target)
+    (if (= target :bh.rccst.subs/source)
+      (re-frame/subscribe (reduce conj subs opts))
+      (re-frame/subscribe (reduce conj [(path->keyword subs)] opts)))))
+
+
 (defn resolve-value [value & opts]
+  ;(log/info "resolve-value" value "//" opts
+  ;  "// (path-kw)" (reduce conj [(path->keyword value)] opts)
+  ;  "// (path-sub)" (reduce conj [(path->keyword value)] opts))
+
   (let [ret (cond
+              (keyword? value) (re-frame/subscribe (reduce conj [(path->keyword value)] opts))
               (and (coll? value)
                 (not (empty? value))
-                (every? keyword? value)) (re-frame/subscribe (reduce conj value opts))
+                (every? keyword? value)) (resolve-subscription value opts)
               (instance? reagent.ratom.RAtom value) value
               (instance? Atom value) value
               :else (r/atom value))]
@@ -78,13 +99,35 @@
 (defn handle-change [value new-value]
   ;(log/info "handle-change" value "//" new-value)
   (cond
-    (coll? value) (re-frame/dispatch (conj value new-value))
+    (or (coll? value)
+      (keyword? value)
+      (string? value)) (re-frame/dispatch (conj value new-value))
     (instance? reagent.ratom.RAtom value) (reset! value new-value)
     (instance? Atom value) (reset! value new-value)
     :else ()))
 
 
+(defn handle-change-path [value path new-value]
+  ;(log/info "handle-change-path" value "//" path "//" new-value)
+
+  (cond
+    (or (coll? value)
+      (keyword? value)
+      (string? value)) (let [update-event (conj [(path->keyword value path)] new-value)]
+                         ;(log/info "handle-change-path (update event)" update-event)
+                         (re-frame/dispatch update-event))
+    (instance? reagent.ratom.RAtom value) (swap! value assoc-in path new-value)
+    (instance? Atom value) (swap! value assoc-in path new-value)
+    :else ()))
+
+
 (comment
+  (def path [:uv :fill])
+  (def value [:dummy])
+
+  (path->keyword value path)
+  (conj [(path->keyword value path)] "#000000")
+
   (->>
     (re-frame/subscribe [:coverage-plan-demo.component.blackboard.topic.current-time])
     deref

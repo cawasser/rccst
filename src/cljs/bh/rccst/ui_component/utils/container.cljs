@@ -1,8 +1,8 @@
 (ns bh.rccst.ui-component.utils.container
-  (:require [re-frame.core :as re-frame]
-            [day8.re-frame.tracing :refer-macros [fn-traced]]
-            [bh.rccst.ui-component.utils.helpers :as h]
+  (:require [bh.rccst.ui-component.utils.helpers :as h]
             [bh.rccst.ui-component.utils.locals :as l]
+            [day8.re-frame.tracing :refer-macros [fn-traced]]
+            [re-frame.core :as re-frame]
             [taoensso.timbre :as log]))
 
 
@@ -113,13 +113,57 @@
     (into {})))
 
 
-(defn override-subs [container-id local-subs subs]
-  ;(log/info "override-subs" subs)
-  (->> subs
+(defn override-subs [override-source local-subs subs]
+  ;(log/info "override-subs" override-source "//" local-subs "//" subs)
+  (let [overrides (->> subs
+                    (map (fn [path]
+                           (let [s (get-in override-source path)]
+                             ;(log/info "override-subs map" path "//" s)
+                             (when (not (nil? s)) {path s})))))]
+
+    ;(log/info "override-subs" override-source
+    ;  "// (local-subs)" local-subs
+    ;  "// (subs)" subs
+    ;  "// (overrides)" overrides)
+
+    (apply merge local-subs overrides)))
+
+
+
+; revise override-subs
+(comment
+  (do
+    (def data-source {:brush false
+                      :uv    {:include true, :fill "#ff0000", :stackId ""}
+                      :pv    {:include true, :fill "#00ff00", :stackId ""}
+                      :tv    {:include true, :fill "#0000ff", :stackId ""}
+                      :amt   {:include true, :fill "#f0f0f0", :stackId ""}})
+    (def local-subs {[:tv :fill]     {:val "#82ca9d"},
+                     [:uv :fill]     {:val "#8884d8"},
+                     [:pv]           {:val {:include true, :fill "#ffc107", :stackId ""}},
+                     [:pv :stackId]  {:val ""},
+                     [:tv]           {:val {:include true, :fill "#82ca9d", :stackId ""}},
+                     [:amt :stackId] {:val ""},
+                     [:pv :include]  {:val true},
+                     [:amt :fill]    {:val "#ff00ff"},
+                     [:uv :include]  {:val true},
+                     [:brush]        {:val nil},
+                     [:tv :include]  {:val true}
+                     [:amt]          {:val {:include true, :fill "#ff00ff", :stackId ""}}
+                     [:pv :fill]     {:val "#ffc107"}
+                     [:uv :stackId]  {:val ""}
+                     [:tv :stackId]  {:val ""}
+                     [:uv]           {:val {:include true, :fill "#8884d8", :stackId ""}}
+                     [:amt :include] {:val true}})
+    (def my-subs (l/process-locals [] nil data-source)))
+
+
+  (->> my-subs
     (map (fn [path]
            ;(log/info "override-subs map" container-id path)
-           (let [s (subscribe-to-container container-id path)]
+           (let [s (get-in data-source path)]
              (when s {path s}))))
-    (apply merge local-subs)))
+    (apply merge local-subs))
 
 
+  ())

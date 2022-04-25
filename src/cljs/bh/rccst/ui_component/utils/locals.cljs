@@ -576,9 +576,15 @@
 
 
 (defn resolve-sub [subs path]
-  (deref (get subs (->> path
-                     (map h/path->keyword)
-                     (into [])))))
+  (let [ret (get subs (->> path
+                        (map h/path->keyword)
+                        (into [])))]
+    ;(log/info "resolve-sub" subs "// (path)" path "// (ret)" ret)
+    (if (or (instance? reagent.ratom.RAtom ret)
+          (instance? Atom ret)
+          (instance? reagent.ratom.Reaction ret))
+      @ret
+      ret)))
 
 
 (comment
@@ -640,4 +646,23 @@
         (into {}))))
 
   ())
+
+
+; play with dispatch-local and related things
+(comment
+  (def widget-id nil)
+  (def path [:uv :fill])
+  (def path [:blackboard :topic/config :uv :fill])
+  (def path [:container-widget :blackboard :topic/config :uv :fill])
+
+
+  (let [[a & more] path]
+    (h/path->keyword widget-id a more))
+
+
+
+
+
+  ())
+
 

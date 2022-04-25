@@ -44,27 +44,27 @@
 
 
 (defmethod make-config-panel* :ui/component [type {:strs [id] :as node}]
-  (log/info "make-config-panel* :ui/component" type id)
+  ;(log/info "make-config-panel* :ui/component" type id)
   [:div.ui-component (str type " - " id)])
 
 
 (defmethod make-config-panel* :source/remote [type {:strs [id] :as node}]
-  (log/info "make-config-panel* :source/remote" type id)
+  ;(log/info "make-config-panel* :source/remote" type id)
   [:div.source-remote (str type " - " id)])
 
 
 (defmethod make-config-panel* :source/local [type {:strs [id] :as node}]
-  (log/info "make-config-panel* :source/local" type id)
+  ;(log/info "make-config-panel* :source/local" type id)
   [:div.source-local (str type " - " id)])
 
 
 (defmethod make-config-panel* :source/fn [type {:strs [id] :as node}]
-  (log/info "make-config-panel* :source/fn" type id)
+  ;(log/info "make-config-panel* :source/fn" type id)
   [:div.source-fn (str type " - " id)])
 
 
 (defmethod make-config-panel* :default [type {:strs [id] :as node}]
-  (log/info "make-config-panel* :default" type "//" id "//" node)
+  ;(log/info "make-config-panel* :default" type "//" id "//" node)
   [:div])
 
 
@@ -76,7 +76,7 @@
                            ":source/fn" :source/fn}
                        node-type)]
 
-    (log/info "make-config-panel" node "//" node-type "//" kw-node-type)
+    ;(log/info "make-config-panel" node "//" node-type "//" kw-node-type)
 
     (make-config-panel* kw-node-type node)))
 

@@ -110,7 +110,7 @@
 
 
 (defn subscribe-data-source [data-source-id]
-  (log/info "subscribe-data-source" data-source-id)
+  ;(log/info "subscribe-data-source" data-source-id)
   (re-frame/subscribe [:data-sources (path->keyword data-source-id)]))
 
 

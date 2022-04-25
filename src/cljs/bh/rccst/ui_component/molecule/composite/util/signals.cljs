@@ -36,10 +36,14 @@
 
 
 (defmethod component->ui :ui/component [{:keys [node registry configuration component-id container-id]}]
-  ;(log/info "component->ui :ui/component" node)
 
   (let [ui-type      (->> configuration :components node :name)
-        ui-component (->> registry ui-type :component)]
+        ui-component (if (keyword? ui-type)
+                       (->> registry ui-type :component)
+                       ui-type)]
+
+    ;(log/info "component->ui :ui/component" node "//" ui-type)
+
     {node
      (reduce into [ui-component :component-id component-id]
        (seq

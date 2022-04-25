@@ -67,7 +67,7 @@
         outputs (get-in data ["data" "outputs"])
         style   (merge default-node-style (node-type node-style))]
 
-    (log/info "custom-node" label data "///" inputs "///" outputs "//" extras?)
+    ;(log/info "custom-node" label data "///" inputs "///" outputs "//" extras?)
 
     (r/as-element
       [:div {:style style :on-click #(open-details open-details? d)}

@@ -157,11 +157,6 @@
                                                                       :fn/coverage     :current-time}}
                                    :topic/time-range          {:data {:ui/time-slider :range}}}
 
-                    :layout       [:v-box
-                                   [[:h-box
-                                     [[:v-box [:ui/targets :ui/satellites :ui/time-slider]]
-                                      [:v-box [:ui/globe :ui/current-time]]]]]]
-
                     :grid-layout  [{:i :ui/targets :x 0 :y 0 :w 4 :h 7 :static true}
                                    {:i :ui/satellites :x 0 :y 7 :w 4 :h 8 :static true}
                                    {:i :ui/time-slider :x 0 :y 15 :w 4 :h 2 :static true}
