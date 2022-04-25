@@ -1,4 +1,4 @@
-GRANT ALL PRIVILEGES ON DATABASE rccst TO docker;
+GRANT ALL PRIVILEGES ON DATABASE rccst TO postgres;
 
 -- Remove if exists
 DROP TABLE IF EXISTS users;

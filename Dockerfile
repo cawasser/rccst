@@ -5,6 +5,7 @@ WORKDIR /rccst/
 COPY target/rccst-standalone.jar app.jar
 
 ENV JAVA_OPTS="-Djava.net.preferIPv4Stack=true -Djava.net.preferIPv4Addresses=true"
+ENV RCCST_DATABASE_HOST="rccst-postgres"
 
 EXPOSE 8280
 EXPOSE 5432
