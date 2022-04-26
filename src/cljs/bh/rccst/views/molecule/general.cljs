@@ -15,9 +15,9 @@
 
   [:div
    [chart-remote-data/example]
-   ;[coverage-plan/ww-example]
-   ;[coverage-plan/r-example]
-   ;[header-bar/example]
-   ;[login/example]
-   ;[two-d-three-d-globe/example]
-   [multi-chart-widget/example]])
+   [multi-chart-widget/example]
+   [coverage-plan/ww-example]
+   [coverage-plan/r-example]
+   [header-bar/example]
+   [login/example]
+   [two-d-three-d-globe/example]])
