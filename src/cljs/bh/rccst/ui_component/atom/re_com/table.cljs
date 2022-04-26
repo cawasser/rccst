@@ -136,6 +136,7 @@
     (every? keyword? value))
   (instance? reagent.ratom.RAtom value)
   (cond
+    ; TODO: can this be converted to (apply concat...)? (see https://clojuredesign.club/episode/080-apply-as-needed/)
     (and (coll? value)
       (not (empty? value))
       (every? keyword? value)) (re-frame/subscribe (reduce conj value opts))

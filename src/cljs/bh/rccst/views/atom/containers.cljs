@@ -8,7 +8,6 @@
 
 ; TODO: do we need this in an RCCST namespace, or can we just grab it from woolybear/catalog?
 ; TODO: should this be a 'utils' function instead?
-;
 
 (defn examples
   []

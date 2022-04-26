@@ -99,7 +99,7 @@ distinction, so we can quickly build all the Nodes and Handles used for the diag
 ;                   ":source/local"  "#0000ff"
 ;                   ":source/fn"     "#FFC0CB"})
 
-(defn- definition-panel
+(defn definition-panel
   "show the text definition of the composed UI
   "
   [& {:keys [configuration]}]
@@ -130,7 +130,7 @@ distinction, so we can quickly build all the Nodes and Handles used for the diag
                    [layout/text-block (str layout)]]]])))
 
 
-(defn- dag-panel
+(defn dag-panel
   "show the DAG, built form the configuration passed into the component, in a panel
   (beside the actual UI)
   "
@@ -154,7 +154,7 @@ distinction, so we can quickly build all the Nodes and Handles used for the diag
      :minimap-styles minimap-styles]))
 
 
-(defn- component-panel
+(defn component-panel
   "show the UI, built from the configuration data passed to the component
   "
   [& {:keys [configuration component-id container-id]}]
@@ -227,8 +227,6 @@ distinction, so we can quickly build all the Nodes and Handles used for the diag
                       :default [rc/alert-box :src (rc/at)
                                 :alert-type :warning
                                 :body "There is a problem with this component."])]]))))
-
-
 
 
 (defn composite
@@ -932,6 +930,7 @@ distinction, so we can quickly build all the Nodes and Handles used for the diag
   (let [ui-type      (->> configuration :components node :name)
         ui-component (->> registry ui-type :component)]
     {node
+     ; TODO: can this be converted to (apply concat...)? (see https://clojuredesign.club/episode/080-apply-as-needed/)
      (reduce into [ui-component]
        (seq
          (merge

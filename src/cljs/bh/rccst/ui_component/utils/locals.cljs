@@ -99,6 +99,7 @@
 
   ;(log/info "update-local-path-values" component-id "//" values)
 
+  ; TODO: can this be converted to (apply concat...)? (see https://clojuredesign.club/episode/080-apply-as-needed/)
   (let [data-path      (reduce conj [(h/path->keyword component-id)] target-path)
         widget-path    (reduce conj [:widgets (h/path->keyword component-id)] target-path)
         old            (get-in @re-frame.db/app-db widget-path)
@@ -127,9 +128,11 @@
 
       (doall
         ; TODO: consider using locals-and-defaults to put the actual default into the subscription rather than 'nil'
+        ; TODO: can this be converted to (apply concat...)? (see https://clojuredesign.club/episode/080-apply-as-needed/)
         (map #(create-local-path-sub (reduce conj data-path %) nil) new-vals-paths))
 
       (doall
+        ; TODO: can this be converted to (apply concat...)? (see https://clojuredesign.club/episode/080-apply-as-needed/)
         (map #(create-local-path-event (reduce conj data-path %)) new-vals-paths)))
 
     merged-values))
@@ -399,6 +402,7 @@
         ; to perform more custom functions (like incremental updates to a collection)
         ;
         (assoc-in db
+          ; TODO: can this be converted to (apply concat...)? (see https://clojuredesign.club/episode/080-apply-as-needed/)
           (reduce conj [:widgets] (map h/path->keyword value-path))
           new-val)))))
 

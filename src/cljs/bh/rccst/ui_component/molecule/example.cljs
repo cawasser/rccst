@@ -20,6 +20,7 @@
 
   (ui-utils/init-container component-id)
 
+  ; TODO: can this be converted to (apply concat...)? (see https://clojuredesign.club/episode/080-apply-as-needed/)
   (let [params (reduce (fn [accum [k v]] (conj accum k v))
                 (seq
                   (apply merge
@@ -33,6 +34,7 @@
       description
       [layout/centered (or extra-classes {})
        [:div {:style {:width "1000px" :height "700px"}}
+        ; TODO: can this be converted to (apply concat...)? (see https://clojuredesign.club/episode/080-apply-as-needed/)
         (reduce conj [component] params)]]
       source-code)))
 

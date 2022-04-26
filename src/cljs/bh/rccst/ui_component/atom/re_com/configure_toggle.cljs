@@ -17,6 +17,7 @@
                               :tooltip      "Configure this chart"}
          save-editable-style {:md-icon-name "zmdi-floppy"
                               :tooltip      "Save the configuration"}]
+     ; TODO: can this be converted to (apply concat...)? (see https://clojuredesign.club/episode/080-apply-as-needed/)
      (reduce conj [rc/md-icon-button]
        (flatten
          (seq

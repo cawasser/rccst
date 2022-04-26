@@ -45,6 +45,7 @@
     ;(log/info "component->ui :ui/component" node "//" ui-type)
 
     {node
+     ; TODO: can this be converted to (apply concat...)? (see https://clojuredesign.club/episode/080-apply-as-needed/)
      (reduce into [ui-component :component-id component-id]
        (seq
          (merge
