@@ -108,13 +108,13 @@
 
 
 (defn handle-change-path [value path new-value]
-  (log/info "handle-change-path" value "//" path "//" new-value)
+  ;(log/info "handle-change-path" value "//" path "//" new-value)
 
   (cond
     (or (coll? value)
       (keyword? value)
       (string? value)) (let [update-event (conj [(path->keyword value path)] new-value)]
-                         (log/info "handle-change-path (update event)" update-event)
+                         ;(log/info "handle-change-path (update event)" update-event)
                          (re-frame/dispatch update-event))
     (instance? reagent.ratom.RAtom value) (swap! value assoc-in path new-value)
     (instance? Atom value) (swap! value assoc-in path new-value)

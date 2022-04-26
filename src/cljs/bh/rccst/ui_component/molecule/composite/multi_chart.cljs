@@ -6,6 +6,7 @@
             [bh.rccst.ui-component.utils :as ui-utils]
             [bh.rccst.ui-component.utils.color :as color]
             [bh.rccst.ui-component.utils.locals :as l]
+            [bh.rccst.ui-component.utils.helpers :as h]
             [re-com.core :as rc]
             [re-frame.core :as re-frame]
             [reagent.core :as r]
@@ -19,13 +20,13 @@
 (def sample-data line-chart/sample-data)
 
 
-(declare config-panel-2)
+(declare config-panel)
 
 
 (defn- compute-data-config [data]
   ;(log/info "compute-data-config" data)
 
-  (let [ret (merge {:brush false}
+  (let [ret (merge {:brush true}
               (->> (get-in data [:metadata :fields])
                 (filter (fn [[k v]] (= :number v)))
                 keys
@@ -58,10 +59,46 @@
         (l/update-local-path-values container-id [:blackboard :topic.config] (compute-data-config d))))))
 
 
+(defn- data-config [config-data-path item position]
+  [rc/v-box :src (rc/at)
+   :gap "5px"
+   :children [[rc/line :size "2px"]
+              [rc/h-box :src (rc/at)
+               :gap "5px"
+               :children [[utils/boolean-config config-data-path item [item :include]]
+                          [utils/color-config config-data-path ":stroke" [item :stroke] position]
+                          [utils/color-config config-data-path ":fill" [item :fill] position]]]
+              [utils/text-config config-data-path ":stackId" [item :stackId]]]])
+
+
+(defn- config-panel [& {:keys [config-data component-id container-id] :as params}]
+  (let [c (h/resolve-value config-data)
+        data-only (dissoc @c :brush)
+        item-controls (map-indexed (fn [idx [item _]]
+                                     (data-config config-data item (if (= 0 idx)
+                                                                     :below-right
+                                                                     :right-center)))
+                        data-only)]
+
+    ;(log/info "config-panel" params
+    ;  "//" config-data "//" @c)
+
+    [rc/scroller
+     :v-scroll :auto
+     :height   "90%"
+     :child [rc/v-box :src (rc/at)
+             :width "100%"
+             :height "100%"
+             :gap "2px"
+             :children (apply merge
+                         [[utils/boolean-config config-data ":brush?" [:brush]]]
+                         item-controls)]]))
+
+
 (def ui-definition
   {:components  {:ui/line        {:type :ui/component :name :rechart/bar-2}
                  :ui/bar         {:type :ui/component :name :rechart/bar-2}
-                 :ui/config      {:type :ui/component :name :stunt/config-panel}
+                 :ui/config      {:type :ui/component :name config-panel} ;:stunt/config-panel}
                  :topic/data     {:type :source/local :name :topic/data :default @sample-data}
                  :topic/config   {:type :source/local :name :topic/config :default {}}
                  :fn/make-config {:type  :source/fn :name fn-make-config
@@ -76,109 +113,39 @@
                                          :ui/config :config-data}}
                  :fn/make-config {:config-data {:topic/config :data}}}
 
-   :grid-layout [{:i :ui/line :x 0 :y 0 :w 5 :h 11 :static true}
-                 {:i :ui/config :x 5 :y 0 :w 2 :h 11 :static true}
-                 {:i :ui/bar :x 7 :y 0 :w 5 :h 11 :static true}]})
+   :grid-layout [{:i :ui/line :x 0 :y 0 :w 4 :h 11 :static true}
+                 {:i :ui/config :x 4 :y 0 :w 3 :h 11 :static true}
+                 {:i :ui/bar :x 7 :y 0 :w 4 :h 11 :static true}]})
 
 
-(def source-code '[:div])
+(def source-code '(let [def {:components  {:ui/line        {:type :ui/component :name :rechart/bar-2}
+                                           :ui/bar         {:type :ui/component :name :rechart/bar-2}
+                                           :ui/config      {:type :ui/component :name config-panel} ;:stunt/config-panel}
+                                           :topic/data     {:type :source/local :name :topic/data :default @sample-data}
+                                           :topic/config   {:type :source/local :name :topic/config :default {}}
+                                           :fn/make-config {:type  :source/fn :name fn-make-config
+                                                            :ports {:data :port/sink :config-data :port/source-sink}}}
 
+                             :links       {:ui/config      {:config-data {:topic/config :data}}
+                                           :topic/data     {:data {:ui/line        :data
+                                                                   :ui/bar         :data
+                                                                   :fn/make-config :data}}
+                                           :topic/config   {:data {:ui/line   :config-data
+                                                                   :ui/bar    :config-data
+                                                                   :ui/config :config-data}}
+                                           :fn/make-config {:config-data {:topic/config :data}}}
 
-(defn- data-config [component-id label path position]
-  ;(log/info "data-config" component-id label path position)
-  [rc/v-box :src (rc/at)
-   :gap "5px"
-   :children [[utils/boolean-config component-id label (conj path :include)]
-              [utils/color-config component-id ":stroke" (conj path :stroke) position]
-              [utils/color-config component-id ":fill" (conj path :fill) position]
-              [utils/text-config component-id ":stackId" (conj path :stackId)]]])
-
-
-(defn- make-config [component-id data]
-  (->> (get-in @data [:metadata :fields])
-    (filter (fn [[k v]] (= :number v)))
-    keys
-    (map-indexed (fn [idx a]
-                   [data-config component-id a [:blackboard a] :above-right]))
-    (into [])))
-
-
-(defn- config-panel [data component-id]
-  [containers/v-scroll-pane
-   {:width  "200px"
-    :height "400px"}
-   [rc/v-box :src (rc/at)
-    ;:width "200px"
-    ;:height "100%"
-    :gap "2px"
-    :children (apply merge
-                [[utils/boolean-config component-id ":brush?" [:blackboard :brush]]]
-                (make-config component-id data))]])
-
-
-(defn local-config [data component-id]
-  {:components [[[:div {:style {:width "400px"}}
-                  [line-chart/component
-                   :data data
-                   :component-id (ui-utils/path->keyword component-id "line-chart")
-                   :container-id component-id]]
-                 [:div {:style {:width "150px"}}
-                  [config-panel data component-id]]
-                 [:div {:style {:width "400px"}}
-                  [bar-chart/component
-                   :data data
-                   :component-id (ui-utils/path->keyword component-id "bar-chart")
-                   :container-id component-id]]]]
-   :blackboard (merge {:brush false}
-                 (->> (get-in @data [:metadata :fields])
-                   (filter (fn [[k v]] (= :number v)))
-                   keys
-                   (map-indexed (fn [idx a]
-                                  {a {:include true
-                                      :stroke  (color/get-color idx)
-                                      :fill    (color/get-color idx)
-                                      :stackId ""}}))
-                   (into {})))})
-
-
-(defn- config [component-id data]
-  ;(log/info "config" component-id "//" data)
-
-  (merge ui-utils/default-pub-sub
-    (local-config data component-id)))
-
-
-(defn- component-panel [data component-id container-id]
-
-  (let [subscriptions (ui-utils/build-subs component-id (local-config data component-id))]
-
-    (fn [data component-id container-id]
-      [c/composite
-       :id component-id
-       :components (ui-utils/resolve-sub subscriptions [:components])
-       :ui {}])))
-
-
-(defn component
-  ([& {:keys [data component-id container-id ui]}]
-
-   ;(log/info "multi-chart" @data)
-
-   (let [id (r/atom nil)]
-
-     (fn []
-       (when (nil? @id)
-         (reset! id component-id)
-         (ui-utils/init-widget @id (config @id data))
-         (ui-utils/dispatch-local @id [:container] container-id))
-
-       ;(log/info "multi-chart" @id (config @id data))
-
-       [component-panel data @id container-id ui]))))
+                             :grid-layout [{:i :ui/line :x 0 :y 0 :w 4 :h 11 :static true}
+                                           {:i :ui/config :x 4 :y 0 :w 3 :h 11 :static true}
+                                           {:i :ui/bar :x 7 :y 0 :w 4 :h 11 :static true}]}]
+                    [grid-widget/component
+                     :data def
+                     :component-id (h/path->keyword container-id "widget")]))
 
 
 
-; testing for setting up subc/events to support wdigets
+
+; testing for setting up subs/events to support widgets
 (comment
   @(re-frame/subscribe [:multi-chart-widget.widget.blackboard])
   @(re-frame/subscribe [:multi-chart-widget.widget.blackboard.topic.data])
@@ -218,34 +185,5 @@
 
 
   ())
-
-
-; play with the app-db configuration and subscriptions
-(comment
-  (do
-    (def data sample-data)
-    (def component-id "multi-chart-demo/multi-chart")
-    (def container-id "")
-    (def id (r/atom component-id))
-    (def locals-and-defaults (config @id data)))
-
-  (ui-utils/init-widget @id (config @id data))
-  (ui-utils/dispatch-local @id [:container] container-id)
-
-  (def subscriptions (ui-utils/build-subs component-id
-                       (local-config data component-id)))
-  (keys (get @re-frame.db/app-db :widgets))
-  (get-in @re-frame.db/app-db [:widgets :multi-chart-demo/multi-chart])
-
-  subscriptions
-
-  (ui-utils/process-locals [] nil locals-and-defaults)
-
-  (ui-utils/resolve-sub subscriptions [:components])
-  (ui-utils/resolve-sub subscriptions [:blackboard :tv :include])
-
-  ())
-
-
 
 

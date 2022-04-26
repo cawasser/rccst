@@ -11,8 +11,6 @@
 (log/info "bh.rccst.views.atom.example.chart.bar-chart.config-ratom-example")
 
 
-(defonce data (r/atom chart/sample-data))
-
 (def default-config-data {:brush false
                           :uv    {:include true, :fill "#ff0000", :stackId ""}
                           :pv    {:include true, :fill "#00ff00", :stackId ""}
@@ -87,7 +85,7 @@
 >
 > You can use the buttons in the bottom-most panel to change some of the chart configuration options and see
 > how that affects the data (shown in the gray panel) and how the chart responds."
-     :data data
+     :data (r/atom chart/sample-data)
      :extra-params {:config-data config-data}
      :component config-update-example
      :container-id container-id
