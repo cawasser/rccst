@@ -5,7 +5,7 @@
             [bh.rccst.views.atom.astrouxds :as astro-demo]
             [bh.rccst.views.atom.buttons :as buttons-demo]
             [bh.rccst.views.atom.cards :as cards-demo]
-            [bh.rccst.views.atom.charts :as charts-demo]
+            [bh.rccst.views.atom.charts-2 :as charts-demo]
 
             [bh.rccst.views.atom.containers :as containers-demo]
             [bh.rccst.views.atom.diagrams :as diagrams-demo]
@@ -23,7 +23,7 @@
 (def atom-navbar [[:atoms/layouts "Layout" [layout-demo/examples]]
                   [:atoms/containers "Containers" [containers-demo/examples]]
                   [:atoms/cards "Cards" [cards-demo/examples]]
-                  [:atoms/charts "Charts" [charts-demo/examples]]
+                  [:atoms/charts "Charts" [charts-demo/page]]
                   [:atoms/diagrams "Diagrams" [diagrams-demo/examples]]
                   [:atoms/icons "Icons / Images" [icons-demo/examples]]
                   [:atoms/buttons "Buttons" [buttons-demo/examples]]
@@ -40,7 +40,7 @@
   []
 
   [tabbed-panel/tabbed-panel
-   :title "'Atom' atom (refactor)"
+   :title "'Atoms'"
    :short-name "atoms"
    :description "Based upon [_Atomic Design_](https://bradfrost.com/blog/post/atomic-web-design/) by Brad Frost"
    :children atom-navbar

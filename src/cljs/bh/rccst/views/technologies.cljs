@@ -47,27 +47,28 @@
   []
   (re-frame/dispatch-sync [::events/init-locals :tech init-db])
 
-  [layout/page {:extra-classes :rccst}
-   [flex/flex-panel {:height "calc(100vh - 2rem)"}
+  [layout/page {:extra-classes :is-fluid}
+   [flex/flex-panel {:extra-classes :is-fluid
+                     :height "calc(100vh - 2rem)"}
     [flex/flex-top
-     [layout/page-header {:extra-classes :rccst}
+     [layout/page-header {:extra-classes :is-fluid}
       [layout/page-title "Technology Overview"]]
 
      [navbar/navbar tech-navbar [:tech/tab-panel]]]
 
-    [layout/page-body {:extra-classes :rccst}
-     [tab-panel/tab-panel {:extra-classes             :rccst
+    [layout/page-body {:extra-classes :is-fluid}
+     [tab-panel/tab-panel {:extra-classes             :is-fluid
                            :subscribe-to-selected-tab [:tech/value]}
 
-      [tab-panel/sub-panel {:panel-id :tech/server}
+      [tab-panel/sub-panel {:extra-classes :is-fluid :panel-id :tech/server}
        [tech-clj/page]]
 
-      [tab-panel/sub-panel {:panel-id :tech/client}
+      [tab-panel/sub-panel {:extra-classes :is-fluid :panel-id :tech/client}
        [tech-cljs/page]]
 
-      [tab-panel/sub-panel {:panel-id :tech/system}
+      [tab-panel/sub-panel {:extra-classes :is-fluid :panel-id :tech/system}
        [s-s/page]]
 
-      [tab-panel/sub-panel {:panel-id :tech/all}
+      [tab-panel/sub-panel {:extra-classes :is-fluid :panel-id :tech/all}
        [all/page]]]]]])
 

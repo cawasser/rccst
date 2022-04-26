@@ -1,18 +1,19 @@
 (ns bh.rccst.views.atom.example.chart.bar-chart
-  (:require [bh.rccst.ui-component.atom.chart.bar-chart :as chart]
-            [bh.rccst.ui-component.molecule.example :as example]
-            [bh.rccst.ui-component.utils :as utils]
-            [taoensso.timbre :as log]))
+  (:require [bh.rccst.views.atom.example.chart.bar-chart.bar-chart :as bar-chart]
+            [bh.rccst.views.atom.example.chart.bar-chart.config-ratom-example :as bar-chart-config-ratom]
+            [bh.rccst.views.atom.example.chart.bar-chart.config-structure-example :as bar-chart-config-structure]
+            [bh.rccst.views.atom.example.chart.bar-chart.config-sub-example :as bar-chart-config-sub]
+            [bh.rccst.views.atom.example.chart.bar-chart.data-ratom-example :as bar-chart-data-ratom]
+            [bh.rccst.views.atom.example.chart.bar-chart.data-structure-example :as bar-chart-data-structure]
+            [bh.rccst.views.atom.example.chart.bar-chart.data-sub-example :as bar-chart-data-sub]))
 
 
-(defn example []
-  (let [container-id "bar-chart-demo"]
-    [example/component-example
-     :title "Bar Chart"
-     :container-id container-id
-     :description "A simple Bar Chart built using [Recharts](https://recharts.org/en-US/api/BarChart)"
-     :data chart/sample-data
-     :component chart/configurable-component
-     :component-id (utils/path->keyword container-id "bar-chart")
-     :source-code chart/source-code]))
-
+(defn examples []
+  [:div
+   [bar-chart/example]
+   [bar-chart-data-ratom/example]
+   [bar-chart-data-structure/example]
+   [bar-chart-data-sub/example]
+   [bar-chart-config-ratom/example]
+   [bar-chart-config-structure/example]
+   [bar-chart-config-sub/example]])

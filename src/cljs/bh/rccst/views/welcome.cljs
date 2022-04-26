@@ -6,11 +6,11 @@
 
 (defn page []
 
-  [layout/page
-   [flex/flex-panel
-    {:height "80vh"}
-    [flex/flex-top
-     [:div
+  [layout/page {:extra-classes :is-fluid :width "95%"}
+   [flex/flex-panel {:extra-classes :is-fluid
+                     :height "80vh"}
+    [flex/flex-top {:extra-classes :is-fluid}
+     [:div.is-fluid
       [:h2.has-text-info "Welcome!"]
       [layout/markdown-block
        "This application documents the design and implementation of a UI Design System using the principles of
@@ -32,20 +32,20 @@
 >
 >"]
 
-      [layout/frame
+      [layout/frame {:extra-classes :is-fluid}
        [o/overview "How to use this application"]]
 
-      [layout/frame
+      [layout/frame {:extra-classes :is-fluid}
        [o/overview "Rationale"
         "There are several reasons to provide a rationale for any decision made:"]]
 
-      [layout/frame
+      [layout/frame {:extra-classes :is-fluid}
        [o/overview "Examples"]]
 
-      [layout/frame
+      [layout/frame {:extra-classes :is-fluid}
        [o/overview "Installing the Library"]]
 
-      [layout/frame
+      [layout/frame {:extra-classes :is-fluid}
        [o/overview "Adding to the Catalog"]]]]]])
 
 

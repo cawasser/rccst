@@ -36,7 +36,7 @@
             [bh.rccst.views.atom.example.forms.checkbox :as checkbox]
             [bh.rccst.views.atom.example.forms.disabled-checkbox :as disabled-checkbox]
 
-            [bh.rccst.views.atom.example.chart.bar-chart :as bar-chart]
+            ;[bh.rccst.views.atom.example.chart.bar-chart :as bar-chart]
             [bh.rccst.views.atom.example.chart.line-chart :as line-chart]
             [bh.rccst.views.atom.example.chart.pie-chart :as pie-chart]
             [bh.rccst.views.atom.example.chart.colored-pie-chart :as colored-piechart]
@@ -62,7 +62,7 @@
 
    [rc/line :size "5px" :color "orange"]
 
-   [bar-chart/example]
+   ;[bar-chart/example]
    [line-chart/simple-example]
    [pie-chart/example]
    [colored-piechart/example]

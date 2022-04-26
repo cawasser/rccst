@@ -24,6 +24,6 @@
   (->> children
     (map (fn [[id label]]
            [buttons/tab-button {:panel-id id} label]))
-    (into [tab-panel/tab-bar {:extra-classes               :rccst
+    (into [tab-panel/tab-bar {:extra-classes               :is-fluid
                               :subscribe-to-component-data subcription}])))
 

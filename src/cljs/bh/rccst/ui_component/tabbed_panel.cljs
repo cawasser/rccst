@@ -18,18 +18,18 @@
 
   (tab-utils/init-tabbed-panel short-name start-panel)
 
-  [layout/page {:extra-classes :rccst}
+  [layout/page {:extra-classes :is-fluid}
    [flex/flex-panel {:height "calc(100vh - 2rem)"}
     [flex/flex-top
-     [layout/page-header {:extra-classes :rccst}
+     [layout/page-header {:extra-classes :is-fluid}
       [layout/page-title title]
       [layout/markdown-block description]
       [layout/text-block ""]]
      [navbar/navbar children [(keyword short-name "tab-panel")]]]
 
-    [layout/page-body {:extra-classes :rccst}
+    [layout/page-body {:extra-classes :is-fluid}
      (into
-       [tab-panel/tab-panel {:extra-classes             :rccst
+       [tab-panel/tab-panel {:extra-classes             :is-fluid
                              :subscribe-to-selected-tab [(keyword short-name "value")]}]
 
        (doall

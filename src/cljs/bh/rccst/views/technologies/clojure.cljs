@@ -12,11 +12,11 @@
 
 (defn page []
 
-  [layout/page
-   [flex/flex-panel
-    {:height "80vh"}
-    [flex/flex-top
-     [:div
+  [layout/page {:extra-classes :is-fluid}
+   [flex/flex-panel {:extra-classes :is-fluid
+                     :height "80vh"}
+    [flex/flex-top {:extra-classes :is-fluid}
+     [:div.is-fluid
       [:h2.has-text-info "Clojure"]
       [layout/markdown-block
        "[Clojure](https://clojure.org) is a dynamic, general-purpose programming language, combining the approachability and

@@ -28,7 +28,7 @@
      [rc/scroller :src (rc/at)
       :v-scroll :auto
       :height "95%"
-      :child [tab-panel/tab-panel {:extra-classes             :rccst
+      :child [tab-panel/tab-panel {:extra-classes             :is-fluid
                                    :subscribe-to-selected-tab [tab]}
 
               [tab-panel/sub-panel {:panel-id config}

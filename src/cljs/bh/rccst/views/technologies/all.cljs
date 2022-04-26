@@ -21,11 +21,11 @@
 
 
 (defn page []
-  [layout/page
-   [flex/flex-panel
-    {:height "80vh"}
-    [flex/flex-top
-     [:div
+  [layout/page {:extra-classes :is-fluid}
+   [flex/flex-panel {:extra-classes :is-fluid
+                     :height "80vh"}
+    [flex/flex-top  {:extra-classes :is-fluid}
+     [:div.is-fluid
       [:h2.has-text-info "All"]
       [layout/text-block "An overview of many of the technologies we use in RCCST"]
       [layout/section]]]

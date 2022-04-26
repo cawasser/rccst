@@ -11,11 +11,11 @@
 
 (defn page []
 
-  [layout/page
-   [flex/flex-panel
-    {:height "80vh"}
-    [flex/flex-top
-     [:div
+  [layout/page {:extra-classes :is-fluid}
+   [flex/flex-panel {:extra-classes :is-fluid
+                     :height "80vh"}
+    [flex/flex-top {:extra-classes :is-fluid}
+     [:div.is-fluid
       [:h2.has-text-info "Clojurescript"]
       [layout/markdown-block "[ClojureScript](https://github.com/clojure/clojurescript) is a compiler for Clojure that
       targets JavaScript. It emits JavaScript code which is compatible with the advanced compilation mode of the Google Closure
@@ -27,15 +27,15 @@
 >
 >[Clojurescript](https://clojurescript.org/)"]
       [layout/section "We use a number of libraries to provide critical client-side functionality:"]]]
-    [layout/frame
+    [layout/frame {:extra-classes :is-fluid}
      [reagent/overview]]
-    [layout/frame
+    [layout/frame {:extra-classes :is-fluid}
      [hiccup/overview]]
-    [layout/frame
+    [layout/frame {:extra-classes :is-fluid}
      [re-frame/overview]]
-    [layout/frame
+    [layout/frame {:extra-classes :is-fluid}
      [re-com/overview]]
-    [layout/frame
+    [layout/frame {:extra-classes :is-fluid}
      [woolybear/overview]]
-    [layout/frame
+    [layout/frame {:extra-classes :is-fluid}
      [recharts/overview]]]])
