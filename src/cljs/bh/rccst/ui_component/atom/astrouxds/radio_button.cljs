@@ -2,7 +2,7 @@
   (:require ["@astrouxds/react" :refer (RuxRadioGroup RuxRadio)]))
 
 
-(defn radio-button [& {:keys [name value]}]
+(defn radio-button []
   [:> RuxRadioGroup
-   [:> RuxRadio
-    {:name name :value value}]])
+   (doall (for [v ["One" "Two" "Three"]]
+            [:> RuxRadio {:value v} v]))])
