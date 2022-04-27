@@ -49,7 +49,7 @@
 
   [layout/page {:extra-classes :is-fluid}
    [flex/flex-panel {:extra-classes :is-fluid
-                     :height "calc(100vh - 2rem)"}
+                     :height "90vh"}
     [flex/flex-top
      [layout/page-header {:extra-classes :is-fluid}
       [layout/page-title "Technology Overview"]]

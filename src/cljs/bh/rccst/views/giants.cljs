@@ -216,7 +216,7 @@
 
 (defn view []
   [layout/page {:extra-classes :is-fluid}
-   [flex/flex-panel {:height "calc(100vh - 2rem)"}
+   [flex/flex-panel {:height "90vh"}
     [flex/flex-top
      [layout/page-header {:extra-classes :is-fluid}
       [layout/page-title "'Giants'"]

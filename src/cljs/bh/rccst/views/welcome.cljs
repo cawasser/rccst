@@ -6,11 +6,10 @@
 
 (defn page []
 
-  [layout/page {:extra-classes :is-fluid :width "95%"}
-   [flex/flex-panel {:extra-classes :is-fluid
-                     :height "80vh"}
+  [layout/page {:extra-classes :is-fluid}
+   [flex/flex-panel {:extra-classes :is-fluid}
     [flex/flex-top {:extra-classes :is-fluid}
-     [:div.is-fluid
+     [:div.is-fluid.welcome
       [:h2.has-text-info "Welcome!"]
       [layout/markdown-block
        "This application documents the design and implementation of a UI Design System using the principles of

@@ -17,6 +17,9 @@
   []
 
   [tabbed-panel/tabbed-panel
+   :extra-classes {:extra-classes :is-fluid
+                   :height "90vh"}
+
    :title "'Molecule' Catalog"
    :description "Based upon [_Atomic Design_](https://bradfrost.com/blog/post/atomic-web-design/) by Brad Frost"
    :short-name "molecules"

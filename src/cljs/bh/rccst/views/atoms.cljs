@@ -40,6 +40,8 @@
   []
 
   [tabbed-panel/tabbed-panel
+   :extra-classes {:extra-classes :is-fluid
+                   :height "90vh"}
    :title "'Atoms'"
    :short-name "atoms"
    :description "Based upon [_Atomic Design_](https://bradfrost.com/blog/post/atomic-web-design/) by Brad Frost"

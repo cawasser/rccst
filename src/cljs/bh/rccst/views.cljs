@@ -38,32 +38,33 @@
       ;(log/info "view" @logged-in?)
 
       [layout/page {:extra-classes :is-fluid}
-       [flex/flex-panel {;:extra-classes :is-fluid
-                         :width "calc(100vw - 2rem)"
-                         :height "calc(100vh - 2rem)"}
+
+       [flex/flex-panel {:width "100%"
+                         :height "97vh"}
         [flex/flex-top {:extra-classes :is-fluid}
          [navbar/navbar main-navbar [:app-bar/tab-panel]]]
+        [flex/flex-bottom "UI Component Catalog"]
 
-        [layout/page-body {:extra-classes :is-fluid}
-         [tab-panel/tab-panel {:extra-classes             :is-fluid
-                               :subscribe-to-selected-tab [:app-bar/value]}
+        ;[layout/page-body {:extra-classes :is-fluid}]
+        [tab-panel/tab-panel {:extra-classes             :is-fluid
+                              :subscribe-to-selected-tab [:app-bar/value]}
 
-          [tab-panel/sub-panel {:extra-classes :is-fluid :panel-id :app-bar/welcome}
-           [welcome/page]]
+         [tab-panel/sub-panel {:extra-classes :is-fluid :panel-id :app-bar/welcome}
+          [welcome/page]]
 
-          [tab-panel/sub-panel {:extra-classes :is-fluid :panel-id :app-bar/atoms}
-           [atoms/page]]
+         [tab-panel/sub-panel {:extra-classes :is-fluid :panel-id :app-bar/atoms}
+          [atoms/page]]
 
-          [tab-panel/sub-panel {:extra-classes :is-fluid :panel-id :app-bar/molecules}
-           [molecules/page]]
+         [tab-panel/sub-panel {:extra-classes :is-fluid :panel-id :app-bar/molecules}
+          [molecules/page]]
 
-          [tab-panel/sub-panel {:extra-classes :is-fluid :panel-id :app-bar/templates}
-           [templates/page]]
+         [tab-panel/sub-panel {:extra-classes :is-fluid :panel-id :app-bar/templates}
+          [templates/page]]
 
-          [tab-panel/sub-panel {:extra-classes :is-fluid :panel-id :app-bar/tech}
-           [tech/page]]
+         [tab-panel/sub-panel {:extra-classes :is-fluid :panel-id :app-bar/tech}
+          [tech/page]]
 
-          [tab-panel/sub-panel {:extra-classes :is-fluid :panel-id :app-bar/giants}
-           [#'giants/view]]]]]])))
+         [tab-panel/sub-panel {:extra-classes :is-fluid :panel-id :app-bar/giants}
+          [#'giants/view]]]]])))
 
 
