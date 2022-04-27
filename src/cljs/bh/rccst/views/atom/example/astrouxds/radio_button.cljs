@@ -8,5 +8,5 @@
     "Radio Button"
     [rc/h-box :src (rc/at)
      :gap "50px"
-     :children [[rb/radio-button]]]))
+     :children [[rb/radio-button ["One" "Two" "Three"]]]]))
 
