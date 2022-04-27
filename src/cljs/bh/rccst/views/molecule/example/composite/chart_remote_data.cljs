@@ -27,7 +27,12 @@
         (acu/demo "Bar chart of remote data"
           "This example shows a Bar Chart displaying data via a subscription to the Server"
           [layout/frame
-           [:div {:style {:width "1000px" :height "800px"}}
+           ;;
+           ;; NOTE: the :height MUST be specified here since the ResponsiveContainer down in bowels of the chart needs a height
+           ;; in order to actually draw the Recharts components. just saying "100%" doesn't work, since the
+           ;; that really means "be as big as you need" and ResponsiveContainer then doesn't know what to do.
+           ;;
+           [:div {:style {:width "100%" :height "800px"}}
             [grid/component
              :data (r/atom chart-remote-data/ui-definition)
              :component-id (h/path->keyword container-id "widget")]]]

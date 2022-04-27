@@ -40,7 +40,7 @@
    [:div.grid-toolbar.title-wrapper.move-cursor (name id)]
    [:div.widget.widget-content
     {:style         {;:width       "100%"
-                     ;:height      "100%"
+                     :height      "90%"
                      :cursor      :default
                      :align-items :stretch
                      :display     :flex}
@@ -48,7 +48,7 @@
     component]])
 
 
-(defn- on-width-update [width margin cols padding]
+(defn- on-width-update
   "
   ---
 
@@ -57,8 +57,10 @@
   - cols : (number) number of columns
   - padding : (vector) padding [left? right?]
   "
+  [width margin cols padding]
 
   (log/info "on-width-update" width "//" margin "//" cols "//" padding)
+
   ())
 
 
@@ -115,13 +117,14 @@
        :children [[ct/configure-toggle open? #(locals/apply-local component-id
                                                 [:layout] toggle-editable)]
                   [:div.grid-container {:style {:width "100%" :height "100%"}}
+                   ; TODO: convert to responsive-grid
                    [grid/grid
                     :id component-id
                     :class "layout"
                     :children composed-ui
                     :layout @layout
-                    :cols (r/atom 12)
-                    :width 900
+                    :cols (r/atom 20)
+                    :width 1200
                     :rowHeight 25
                     :layoutFn #(on-layout-change component-id %1 %2)
                     :widthFn #(on-width-update %1 %2 %3 %4)]]]])))

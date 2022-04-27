@@ -34,7 +34,7 @@
                                   :layout          @layout
                                   :breakpoints     {:lg 850 :md 600 :sm 400}
                                   :cols            {:lg 20 :md 15 :sm 10} ;(or @cols 12)
-                                  :width           (or width 600)
+                                  :width           (or width 1200)
                                   :rowHeight       (or rowHeight 25)
                                   :onLayoutChange  (or layoutFn #())
                                   :onWidthChange   (or widthFn #())
