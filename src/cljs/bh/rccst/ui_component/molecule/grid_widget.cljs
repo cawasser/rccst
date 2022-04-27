@@ -1,5 +1,5 @@
 (ns bh.rccst.ui-component.molecule.grid-widget
-  (:require [bh.rccst.ui-component.atom.layout.grid :as grid]
+  (:require [bh.rccst.ui-component.atom.layout.responsive-grid :as grid]
             [bh.rccst.ui-component.molecule.composite :as composite]
             [bh.rccst.ui-component.molecule.composite.util.digraph :as dig]
             [bh.rccst.ui-component.molecule.composite.util.signals :as sig]
@@ -69,9 +69,9 @@
         all-layouts* (js->clj all-layouts :keywordize-keys true)
         fst          (first new-layout*)]
 
-    ;(log/info "on-layout-change" new-layout*
-    ;  "//" all-layouts*
-    ;  "//" (keys all-layouts*))
+    (log/info "on-layout-change" new-layout*
+      "//" all-layouts*
+      "//" (keys all-layouts*))
 
     (when (and
             (not (empty? new-layout*))
@@ -79,6 +79,7 @@
             (not= (:i fst) "null"))
       (let [cooked (map #(zipmap '(:i :x :y :w :h :static) %)
                      (map (juxt :i :x :y :w :h :static) new-layout*))]
+        (log/info "on-layout-change (cooked)" cooked)
         (locals/dispatch-local component-id [:layout] cooked)))))
 
 
@@ -123,7 +124,7 @@
                     :class "layout"
                     :children composed-ui
                     :layout @layout
-                    :cols (r/atom 20)
+                    :cols 20
                     :width 1200
                     :rowHeight 25
                     :layoutFn #(on-layout-change component-id %1 %2)

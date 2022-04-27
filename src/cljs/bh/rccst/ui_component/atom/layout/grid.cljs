@@ -38,7 +38,7 @@
 
   (into [:> GridLayout {:id              id
                         :layout          layout
-                        :cols            (or @cols 12)
+                        :cols            (or cols 12)
                         :width           (or width 600)
                         :rowHeight       (or rowHeight 25)
                         :onLayoutChange  (or layoutFn #())

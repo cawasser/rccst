@@ -9,8 +9,8 @@
   [layout/page {:extra-classes :is-fluid}
    [flex/flex-panel {:extra-classes :is-fluid}
     [flex/flex-top {:extra-classes :is-fluid}
-     [:div.is-fluid.welcome
-      [:h2.has-text-info "Welcome!"]
+     [:div.is-fluid
+      [layout/page-title "Welcome"]
       [layout/markdown-block
        "This application documents the design and implementation of a UI Design System using the principles of
        [Atomic Design](https://bradfrost.com/blog/post/atomic-web-design/) by Brad Frost.

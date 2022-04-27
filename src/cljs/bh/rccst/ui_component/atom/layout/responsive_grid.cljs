@@ -1,5 +1,12 @@
 (ns bh.rccst.ui-component.atom.layout.responsive-grid
-  (:require ["react-grid-layout" :rename {Responsive ResponsiveGridLayout}]))
+  (:require [taoensso.timbre :as log]
+            ["react-grid-layout" :refer (Responsive WidthProvider)]))
+
+
+(log/info "bh.rccst.ui-component.atom.layout.responsive-grid")
+
+
+(def ResponsiveGridLayout (WidthProvider. Responsive))
 
 
 (defn grid
@@ -26,21 +33,23 @@
   [& {:keys [id children layout layoutFn widthFn
              cols width rowHeight compactType
              draggableHandle draggableCancel
-             isDraggable isResizable]
+             isDraggable isResizable] :as args}]
 
-      :as   args}]
   ;(log/info "grid" id children layout layoutFn)
-  (into [:> ResponsiveGridLayout {:id              id
-                                  :layout          @layout
-                                  :breakpoints     {:lg 850 :md 600 :sm 400}
-                                  :cols            {:lg 20 :md 15 :sm 10} ;(or @cols 12)
-                                  :width           (or width 1200)
-                                  :rowHeight       (or rowHeight 25)
-                                  :onLayoutChange  (or layoutFn #())
-                                  :onWidthChange   (or widthFn #())
-                                  :isDraggable     (or isDraggable true)
-                                  :isResizable     (or isResizable true)
-                                  :draggableHandle (or draggableHandle ".grid-toolbar")
-                                  :draggableCancel (or draggableCancel ".grid-content")
-                                  :compactType     (or compactType :vertical)}]
-    children))
+
+  (let [l {:lg layout :md layout :sm layout}]
+    (into [:> ResponsiveGridLayout {:className       "layout"
+                                    :id              id
+                                    :layouts         l
+                                    :breakpoints     {:lg 1000 :md 800 :sm 500 :xs 480 :xxs 0}
+                                    :cols            {:lg 20 :md 20 :sm 20 :xs 20 :xxs 20}
+                                    :width           (or width 1200)
+                                    :rowHeight       (or rowHeight 25)
+                                    :onLayoutChange  (or layoutFn #())
+                                    :onWidthChange   (or widthFn #())
+                                    :isDraggable     (or isDraggable true)
+                                    :isResizable     (or isResizable true)
+                                    :draggableHandle (or draggableHandle ".grid-toolbar")
+                                    :draggableCancel (or draggableCancel ".grid-content")
+                                    :compactType     (or compactType :vertical)}]
+      children)))
