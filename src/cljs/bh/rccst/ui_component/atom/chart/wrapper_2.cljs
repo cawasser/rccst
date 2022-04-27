@@ -100,12 +100,13 @@
                                   :component-id component-id
                                   :container-id container-id]]]
 
-                               [[component-panel
-                                 :component* component*
-                                 :local-config local-config
-                                 :data data
-                                 :component-id component-id
-                                 :container-id container-id]])]]])))
+                               [[:div.chart-content {:style {:width "100%" :height "100%"}}
+                                 [component-panel
+                                  :component* component*
+                                  :local-config local-config
+                                  :data data
+                                  :component-id component-id
+                                  :container-id container-id]]])]]])))
 
 
 (defn base-chart [& {:keys [data config-data

@@ -42,6 +42,7 @@
   ;(log/info "data-update-example (params)" params)
 
   [rc/v-box :src (rc/at)
+   :class "data-update-example"
    :gap "10px"
    :width "100%"
    :height "100%"

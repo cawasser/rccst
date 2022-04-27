@@ -33,7 +33,12 @@
       title
       description
       [layout/centered (or extra-classes {})
-       [:div {:style {:width "1000px" :height "700px"}}
+       ;;
+       ;; NOTE: the :height MUST be specified here since the ResponsiveContainer down in bowels of the chart needs a height
+       ;; in order to actually draw the Recharts components. just saying "100%" doesn't work, since the
+       ;; that really means "be as big as you need" and ResponsiveContainer then doesn't know what to do.
+       ;;
+       [:div.component-example {:style {:width "100%" :height "700px"}} ;{:width "1000px" :height "700px"}}
         ; TODO: can this be converted to (apply concat...)? (see https://clojuredesign.club/episode/080-apply-as-needed/)
         (reduce conj [component] params)]]
       source-code)))
@@ -59,8 +64,8 @@
       [config-key data-key tab-panel selected-tab]
       [data-panel data]
       [config-panel data container-id]
-      [:div {:style {:width "1500px" :height "700px"}}
-       [component-panel data container-id]]
+      ;[:div.configurable-demo-component {:style {:width "100%" :height "100%"}} ;{:width "1500px" :height "700px"}}
+      [component-panel data container-id]
       source-code)))
 
 

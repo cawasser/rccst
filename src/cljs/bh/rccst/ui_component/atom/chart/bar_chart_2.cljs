@@ -75,6 +75,7 @@
   [rc/v-box :src (rc/at)
    :gap "10px"
    :width "100%"
+   :height "100%"
    :style {:padding          "5px"
            :border-top       "1px solid #DDD"
            :background-color "#f7f7f7"}
@@ -82,6 +83,7 @@
               [rc/line :src (rc/at) :size "2px"]
               [rc/h-box :src (rc/at)
                :width "100%"
+               :height "100%"
                :style ui-utils/h-wrap
                :gap "10px"
                :children (make-bar-config component-id data)]

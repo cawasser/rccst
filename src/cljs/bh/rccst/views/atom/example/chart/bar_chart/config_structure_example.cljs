@@ -36,6 +36,7 @@
 
   (let [c (h/resolve-value config-data)]
     [rc/v-box :src (rc/at)
+     :class "config-example"
      :gap "10px"
      :width "100%"
      :height "100%"

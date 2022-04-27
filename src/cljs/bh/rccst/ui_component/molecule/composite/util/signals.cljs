@@ -10,7 +10,6 @@
             ["react-flow-renderer" :refer (ReactFlowProvider Controls Handle Background) :default ReactFlow]))
 
 
-
 (defn- make-params [configuration node direction container-id]
   (->> configuration
     :denorm
@@ -123,26 +122,4 @@
                                :registry      registry
                                :component-id  (ui-utils/path->keyword container-id node)
                                :container-id  container-id})))))))
-
-
-(defn parse-token [lookup token]
-  (condp = token
-    :v-box [rc/v-box :src (rc/at) :gap "10px" :max-width "1000px" :max-height "700px"]
-    :h-box [rc/h-box :src (rc/at) :gap "10px" :max-width "1000px" :max-height "700px"]
-    (or (get lookup token)
-      [rc/alert-box :src (rc/at)
-       :alert-type :warning
-       :body "There is a problem with this component."])))
-
-
-(defn process-ui [lookup acc tree]
-  (let [[node children] tree
-        siblings? (and (vector? node))
-        branch?   (and (vector? children)
-                    (or (= :v-box node) (= :h-box node)))]
-    (cond
-      branch? (apply conj acc (into (parse-token lookup node) [:children (process-ui lookup [] children)]))
-      siblings? (apply conj acc (mapv #(process-ui lookup [] %) tree))
-      :else (apply conj acc (mapv #(parse-token lookup %) tree)))))
-
 
