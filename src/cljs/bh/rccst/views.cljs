@@ -37,9 +37,9 @@
     (fn []
       ;(log/info "view" @logged-in?)
 
-      [layout/page {:extra-classes :is-fluid
-                    :width "95%"}
-       [flex/flex-panel {:extra-classes :is-fluid
+      [layout/page {:extra-classes :is-fluid}
+       [flex/flex-panel {;:extra-classes :is-fluid
+                         :width "calc(100vw - 2rem)"
                          :height "calc(100vh - 2rem)"}
         [flex/flex-top {:extra-classes :is-fluid}
          [navbar/navbar main-navbar [:app-bar/tab-panel]]]

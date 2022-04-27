@@ -56,7 +56,9 @@
   ;(log/info "config-display" data)
   [:div.demo-display
    [rc/h-box :src (rc/at)
-    :size "auto"
+    :width "100%"
+    :height "100%"
+    ;:size "auto"
     :align :center
     :children [[layout/centered {:extra-classes :is-one-third}
                 [chart-config chart-events data-panel config-panel]]
