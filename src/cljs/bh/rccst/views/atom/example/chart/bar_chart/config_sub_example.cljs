@@ -47,7 +47,8 @@
        :style {:border     "1px solid" :border-radius "3px"
                :box-shadow "5px 5px 5px 2px"
                :margin     "5px" :padding "5px"}
-       :children [[rc/button :on-click #() :label "Default"]
+       :children [[:label.h5 "Config:"]
+                  [rc/button :on-click #(h/handle-change-path config-data [] default-config-data) :label "Default"]
                   [rc/button :on-click #(h/handle-change-path config-data [:brush] (not @brush?))
                    :label "!Brush"]
                   [rc/button :on-click #(h/handle-change-path config-data [:uv :include] (not @uv?))
@@ -88,6 +89,7 @@
 
               [:div.config-tools-part {:style {:width "100%"}}
                [config-tools config-data]]]])
+
 
 (defn- component [& {:keys [data config-data component-id container-id] :as params}]
   (let [id (r/atom nil)]
