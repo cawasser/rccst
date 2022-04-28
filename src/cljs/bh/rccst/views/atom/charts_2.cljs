@@ -2,12 +2,13 @@
   (:require [bh.rccst.events :as events]
             [bh.rccst.ui-component.tabbed-panel :as tabbed-panel]
             [bh.rccst.views.atom.charts :as charts]
+            [bh.rccst.views.atom.example.chart.area-chart :as area-chart]
             [bh.rccst.views.atom.example.chart.bar-chart :as bar-chart]))
 
 
 
 
-(def navbar [;[:charts/area-chart "Area" [area-chart/examples]]
+(def navbar [[:charts/area-chart "Area" [area-chart/examples]]
              [:charts/other "Other" [charts/examples]]
              [:charts/bar-chart "Bar" [bar-chart/examples]]])
                   ;[:charts/colored-pie-chart "Colored Pie" [colored-pie-chart/examples]]

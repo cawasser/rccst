@@ -1,5 +1,5 @@
 (ns bh.rccst.views.atom.example.chart.area-chart
-  (:require [bh.rccst.ui-component.atom.chart.area-chart.area-chart :as area-chart]))
+  (:require [bh.rccst.views.atom.example.chart.area-chart.area-chart :as area-chart]))
 
 (defn examples []
   [:div
