@@ -16,28 +16,12 @@
 
    [layout/page-header {:extra-classes :is-fluid}
     [:h1.has-text-info "Welcome"]
-    [layout/markdown-block
-     "This application documents the design and implementation of a UI Design System using the principles of
-      [Atomic Design](https://bradfrost.com/blog/post/atomic-web-design/) by Brad Frost.
+    [layout/markdown-block]
 
-> See also:
->
-> [Atomic Design](https://bradfrost.com/blog/post/atomic-web-design/)
-> [Clojure](https://clojure.org)
-> [Lisp](https://en.wikipedia.org/wiki/Lisp_(programming_language))
-> [Functional Programming ](https://en.wikipedia.org/wiki/Functional_programming)
->
-> [Woolybear](https://github.com/manutter51/woolybear)
-> [Re-com](https://re-com.day8.com.au)
-> [Astro UXDS](https://www.astrouxds.com)
-> [Storybook](https://storybook.js.org)
-> [Devcards](https://github.com/bhauman/devcards)
-> [Carbon Design System](https://www.carbondesignsystem.com)
-"]
     [rc/gap :size "10px"]]
 
    [flex/flex-panel {:extra-classes :is-fluid
-                     :height "70vh"}
+                     :height "80vh"}
 
     [layout/page-body {:extra-classes :is-fluid}
      [layout/frame {:extra-classes :is-fluid}
@@ -50,7 +34,7 @@
       [examples/overview]]
 
      [layout/frame {:extra-classes :is-fluid}
-      [installing/overview "Installing the Library"]]
+      [installing/overview]]
 
      [layout/frame {:extra-classes :is-fluid}
       [adding-catalog/overview]]]]])
