@@ -18,7 +18,7 @@
                     :flex-direction  :column
                     :justify-content :center
                     :align-items     :center})
-(def default-size {:width 280 :height 400})
+(def default-size {:width "100%" :height 400})
 
 (defn card
   "returns a 'flippable card' react component (via [react-ui-cards](https://github.com/nukeop/react-ui-cards)).

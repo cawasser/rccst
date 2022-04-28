@@ -5,7 +5,7 @@
 
 (def default-background "#9CA8B3")
 (def default-color "#FF")
-(def node-style {:width           "300px" :height "150px"
+(def node-style {:width           "100%" :height "150px"
                  :background      default-background
                  :color           default-color})
 
