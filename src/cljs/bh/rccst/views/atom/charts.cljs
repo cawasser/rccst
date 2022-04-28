@@ -1,5 +1,5 @@
 (ns bh.rccst.views.atom.charts
-  (:require [bh.rccst.views.atom.example.chart.area-chart.area-chart :as area-chart]
+  (:require [bh.rccst.views.atom.example.chart.area-chart :as area-chart]
             [bh.rccst.views.atom.example.chart.bar-chart :as bar-chart]
             ;[bh.rccst.views.atom.example.chart.bar-chart.data-ratom-example :as bar-chart-data-ratom]
             ;[bh.rccst.views.atom.example.chart.bar-chart.data-structure-example :as bar-chart-data-structure]
@@ -20,7 +20,7 @@
 
 (defn examples []
   [:div
-   [area-chart/example]
+   ;[area-chart/example]
    ;[bar-chart/example]
    ;[bar-chart-data-ratom/example]
    ;[bar-chart-data-structure/example]

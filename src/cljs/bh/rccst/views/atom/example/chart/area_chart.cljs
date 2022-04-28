@@ -1,9 +1,11 @@
 (ns bh.rccst.views.atom.example.chart.area-chart
-  (:require [bh.rccst.views.atom.example.chart.area-chart.area-chart :as area-chart]))
+  (:require [bh.rccst.views.atom.example.chart.area-chart.area-chart :as area-chart]
+            [bh.rccst.views.atom.example.chart.area-chart.data-ratom-example :as data-ratom]))
 
 (defn examples []
   [:div
-   [area-chart/example]])
+   [area-chart/example]
+   [data-ratom/example]])
 
 ;
 ; this code was moved to an area-chart folder.
