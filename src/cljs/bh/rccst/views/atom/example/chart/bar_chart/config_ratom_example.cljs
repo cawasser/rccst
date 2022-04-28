@@ -37,7 +37,8 @@
    :style {:border     "1px solid" :border-radius "3px"
            :box-shadow "5px 5px 5px 2px"
            :margin     "5px" :padding "5px"}
-   :children [[rc/button :on-click #(reset! config-data default-config-data) :label "Default"]
+   :children [[:label.h5 "Config:"]
+              [rc/button :on-click #(reset! config-data default-config-data) :label "Default"]
               [rc/button :on-click #(swap! config-data update-in [:brush] not) :label "!Brush"]
               [rc/button :on-click #(swap! config-data update-in [:uv :include] not) :label "! uv data"]
               [rc/button :on-click #(swap! config-data update-in [:tv :include] not) :label "! tv data"]

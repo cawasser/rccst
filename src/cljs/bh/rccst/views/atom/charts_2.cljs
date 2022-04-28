@@ -27,8 +27,8 @@
   []
 
   [tabbed-panel/tabbed-panel
-   :title "Charts"
+   :title ""
    :short-name "charts"
-   :description "These charts are all drawn from [Recharts](https://recharts.org/en-US/)."
+   :description ""
    :children navbar
    :start-panel :charts/other])

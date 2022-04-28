@@ -19,7 +19,8 @@
    :style {:border     "1px solid" :border-radius "3px"
            :box-shadow "5px 5px 5px 2px"
            :margin     "5px" :padding "5px"}
-   :children [[rc/button :on-click #(reset! data []) :label "Empty"]
+   :children [[:label.h5 "Input Data:"]
+              [rc/button :on-click #(reset! data []) :label "Empty"]
               [rc/button :on-click #(reset! data chart/sample-data) :label "Default"]
               [rc/button :on-click #(swap! data assoc-in [:data 0 :uv] 10000) :label "A -> 10,000"]
               [rc/button :on-click #(swap! data assoc :data
