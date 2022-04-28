@@ -10,11 +10,12 @@
 
 (def default-background "#9CA8B3")
 (def default-color "#FF")
-(def default-card-style {:width           "200px"
-                         :height          "100px"
-                         :overflow        "hidden"
-                         :background      default-background
-                         :color           default-color})
+(def default-card-style {:width      "100%"
+                         :height     "100%"
+                         :margin     :auto
+                         :overflow   "hidden"
+                         :background default-background
+                         :color      default-color})
 
 
 (defn card [& {:keys [style header-style title content]}]

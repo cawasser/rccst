@@ -20,7 +20,7 @@
 
 (defn examples []
   [:div
-   [area-chart/example]
+   ;[area-chart/example]
    ;[bar-chart/example]
    ;[bar-chart-data-ratom/example]
    ;[bar-chart-data-structure/example]

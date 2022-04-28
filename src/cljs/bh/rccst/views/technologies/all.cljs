@@ -30,20 +30,34 @@
       [layout/text-block "An overview of many of the technologies we use in RCCST"]
       [layout/section]]]
 
-    [ring-overview/overview]
-    [compojure-overview/overview]
-    [component-overview/overview]
-    [sente-overview/overview]
-    [transit-overview/overview]
-    [next-jdbc-overview/overview]
-    [jackdaw-overview/overview]
+    [layout/frame {:extra-classes :is-fluid}
+     [ring-overview/overview]]
+    [layout/frame {:extra-classes :is-fluid}
+     [compojure-overview/overview]]
+    [layout/frame {:extra-classes :is-fluid}
+     [component-overview/overview]]
+    [layout/frame {:extra-classes :is-fluid}
+     [sente-overview/overview]]
+    [layout/frame {:extra-classes :is-fluid}
+     [transit-overview/overview]]
+    [layout/frame {:extra-classes :is-fluid}
+     [next-jdbc-overview/overview]]
+    [layout/frame {:extra-classes :is-fluid}
+     [jackdaw-overview/overview]]
 
-    [reagent/overview]
-    [re-frame/overview]
-    [re-com/overview]
-    [woolybear/overview]
-    [recharts/overview]
+    [layout/frame {:extra-classes :is-fluid}
+     [reagent/overview]]
+    [layout/frame {:extra-classes :is-fluid}
+     [re-frame/overview]]
+    [layout/frame {:extra-classes :is-fluid}
+     [re-com/overview]]
+    [layout/frame {:extra-classes :is-fluid}
+     [woolybear/overview]]
+    [layout/frame {:extra-classes :is-fluid}
+     [recharts/overview]]
 
-    [kafka/overview]
-    [swagger/overview]]])
+    [layout/frame {:extra-classes :is-fluid}
+     [kafka/overview]]
+    [layout/frame {:extra-classes :is-fluid}
+     [swagger/overview]]]])
 

@@ -1,10 +1,9 @@
 (ns bh.rccst.views.atom.example.layout.layout-grid
   (:require [bh.rccst.ui-component.atom.layout.grid :as grid]
             [re-com.core :as rc]
-            [reagent.core :as r]
+            [taoensso.timbre :as log]
             [woolybear.ad.catalog.utils :as acu]
             [woolybear.ad.icons :as icons]
-            [taoensso.timbre :as log]
             [woolybear.ad.layout :as layout]))
 
 
@@ -27,10 +26,10 @@
   (let [widgets [["one" "anchor" :green :white]
                  ["two" "globe-americas" :blue :white]
                  ["three" "helicopter" :yellow :black]]
-        layout [{:i "one" :x 0 :y 0 :w 2 :h 3 :static true}
-                {:i "two" :x 1 :y 0 :w 3 :h 2}
-                {:i "three" :x 4 :y 0 :w 4 :h 2}]
-        cols (r/atom 12)]
+        layout  [{:i "one" :x 0 :y 0 :w 2 :h 3 :static true}
+                 {:i "two" :x 1 :y 0 :w 3 :h 2}
+                 {:i "three" :x 4 :y 0 :w 4 :h 2}]
+        cols    12]
     (acu/demo "Layout Grid"
       "Provides a grid-based layout manager, using [react-grid-layout](https://github.com/react-grid-layout/react-grid-layout)
 for other content (something like a `:div`).
@@ -52,10 +51,10 @@ into the `grid`.
         (let [widgets [["one" "anchor" :green :white]
                        ["two" "globe-americas" :blue :white]
                        ["three" "helicopter" :yellow :black]]
-              layout [{:i "one" :x 0 :y 0 :w 2 :h 3 :static true}
-                      {:i "two" :x 1 :y 0 :w 3 :h 2}
-                      {:i "three" :x 4 :y 0 :w 4 :h 2}]
-              cols (r/atom 12)]
+              layout  [{:i "one" :x 0 :y 0 :w 2 :h 3 :static true}
+                       {:i "two" :x 1 :y 0 :w 3 :h 2}
+                       {:i "three" :x 4 :y 0 :w 4 :h 2}]
+              cols    12]
           [grid/grid :id "layout-grid-example"
            :children (doall (map make-widget widgets))
            :cols cols

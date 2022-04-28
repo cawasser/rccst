@@ -186,9 +186,10 @@
             :gap "10px"
             :align :center
             :justify :center
-            :children [[:figure.image
+            :children [[:figure.image {:style {:width "200px" :height "200px"}}
                         [:img.is-rounded {:src (or (if (empty? image) nil image) "imgs/hammer-icon-16x16.png")}]]
-                       [:p.title.is-4.has-text-centered name]]]]
+                       [rc/gap :size "15px"]
+                       [:p.title.is-1.has-text-centered name]]]]
    :back [:div {:style flippable/default-style}
           [layout/section
            [layout/markdown-block description]]]])
@@ -216,14 +217,14 @@
 
 (defn view []
   [layout/page {:extra-classes :is-fluid}
-   [flex/flex-panel {:height "calc(100vh - 2rem)"}
+   [flex/flex-panel {:height "85vh"}
     [flex/flex-top
      [layout/page-header {:extra-classes :is-fluid}
-      [layout/page-title "'Giants'"]
+      [:h1.has-text-info "'Giants'"]
       [layout/markdown-block "It has been said that [\"we stand on the shoulders of giants\"](https://www.phrases.org.uk/meanings/268025.html).
       The following people may not all qualify as 'giants', but we certainly have
-      looked to them for insight, inspiration, guidance, and general thoughtfulness."]
-      [layout/section]]]
+      looked to them for insight, inspiration, guidance, and general thoughtfulness."]]]
+
 
     [columns people 5]]])
 

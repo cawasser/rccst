@@ -14,7 +14,7 @@
 
   [layout/page {:extra-classes :is-fluid}
    [flex/flex-panel {:extra-classes :is-fluid
-                     :height "80vh"}
+                     :height "70vh"}
     [flex/flex-top {:extra-classes :is-fluid}
      [:div.is-fluid
       [:h2.has-text-info "Clojure"]
@@ -38,10 +38,23 @@ Agent system that ensure clean, correct, multithreaded designs.
 >[Functional Programming ](https://en.wikipedia.org/wiki/Functional_programming)"]
       [layout/section "We use a number of libraries to provide critical server-side functionality:"]]]
 
-    [ring-overview/overview]
-    [compojure-overview/overview]
-    [component-overview/overview]
-    [sente-overview/overview]
-    [transit-overview/overview]
-    [next-jdbc-overview/overview]
-    [jackdaw-overview/overview]]])
+    [layout/frame {:extra-classes :is-fluid}
+     [ring-overview/overview]]
+
+    [layout/frame {:extra-classes :is-fluid}
+     [compojure-overview/overview]]
+
+    [layout/frame {:extra-classes :is-fluid}
+     [component-overview/overview]]
+
+    [layout/frame {:extra-classes :is-fluid}
+     [sente-overview/overview]]
+
+    [layout/frame {:extra-classes :is-fluid}
+     [transit-overview/overview]]
+
+    [layout/frame {:extra-classes :is-fluid}
+     [next-jdbc-overview/overview]]
+
+    [layout/frame {:extra-classes :is-fluid}
+     [jackdaw-overview/overview]]]])
