@@ -30,6 +30,7 @@ distinction, so we can quickly build all the Nodes and Handles used for the diag
             [bh.rccst.ui-component.utils :as ui-utils]
             [bh.rccst.ui-component.atom.chart.bar-chart :as bar-chart]
             [bh.rccst.ui-component.atom.chart.bar-chart-2 :as bar-chart-2]
+            [bh.rccst.ui-component.atom.chart.line-chart-2 :as line-chart-2]
             [day8.re-frame.tracing :refer-macros [fn-traced]]
             [loom.graph :as lg]
             [re-com.core :as rc]
@@ -60,6 +61,7 @@ distinction, so we can quickly build all the Nodes and Handles used for the diag
 
     bar-chart/meta-data
     bar-chart-2/meta-data
+    line-chart-2/meta-data
 
     ; "stunt" components to use as stand-ins
     e/meta-data))

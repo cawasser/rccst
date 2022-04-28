@@ -96,7 +96,7 @@
 
 
 (def ui-definition
-  {:components  {:ui/line        {:type :ui/component :name :rechart/bar-2}
+  {:components  {:ui/line        {:type :ui/component :name :rechart/line-2}
                  :ui/bar         {:type :ui/component :name :rechart/bar-2}
                  :ui/area        {:type :ui/component :name :rechart/bar-2}
                  :ui/config      {:type :ui/component :name config-panel}
