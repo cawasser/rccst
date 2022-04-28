@@ -13,8 +13,10 @@
             [woolybear.ad.layout :as layout]
             ["recharts" :refer [ResponsiveContainer LineChart Line Brush]]))
 
+
 (def source-code '[])
 (def sample-data example-data/meta-tabular-data)
+
 
 (defn local-config [data]
   (merge
@@ -29,6 +31,7 @@
                             :fill    (color/get-color idx)}}))
          (into {}))))
 
+
 (defn- config [chart-id data]
   (-> ui-utils/default-pub-sub
       (merge
@@ -37,7 +40,8 @@
          :tab-panel {:value     (keyword chart-id "config")
                      :data-path [:widgets (keyword chart-id) :tab-panel]}}
         (local-config data))
-      (assoc-in [:x-axis :dataKey] (get-in data [:metadata :id]))))
+      (assoc-in [:x-axis :dataKey] (get-in @data [:metadata :id]))))
+
 
 (defn- line-config [widget-id label path position]
   [rc/v-box :src (rc/at)
@@ -48,6 +52,7 @@
                :children [[utils/color-config widget-id ":stroke" (conj path :stroke) position]
                           [utils/color-config widget-id ":fill" (conj path :fill) position]]]]])
 
+
 (defn- make-line-config [chart-id data]
   (->> (get-in @data [:metadata :fields])
        (filter (fn [[k v]] (= :number v)))
@@ -55,6 +60,7 @@
        (map-indexed (fn [idx a]
                       [line-config chart-id a [a] :above-right]))
        (into [])))
+
 
 (defn config-panel [data chart-id]
 
@@ -74,6 +80,7 @@
               [rc/line :src (rc/at) :size "2px"]
               [utils/boolean-config chart-id ":brush?" [:brush]]]])
 
+
 (defn- make-line-display [chart-id data subscriptions isAnimationActive?]
 
   (log/info "make-line-display" data)
@@ -89,6 +96,7 @@
                 [])))
        (remove empty?)
        (into [:<>])))
+
 
 (defn- component* [& {:keys [data component-id container-id
                              subscriptions isAnimationActive?]
@@ -106,6 +114,7 @@
 
       (make-line-display component-id data subscriptions isAnimationActive?)]]))
 
+
 (defn component [& {:keys [data config-data component-id container-id
                            data-panel config-panel] :as params}]
 
@@ -122,6 +131,7 @@
    :config-panel config-panel
    :config config
    :local-config local-config])
+
 
 (def meta-data {:rechart/line-2 {:component component
                                  ;:configurable-component configurable-component
