@@ -14,7 +14,7 @@
 
   [layout/page {:extra-classes :is-fluid}
    [flex/flex-panel {:extra-classes :is-fluid
-                     :height "80vh"}
+                     :height "70vh"}
     [flex/flex-top {:extra-classes :is-fluid}
      [:div.is-fluid
       [:h2.has-text-info "Clojure"]
