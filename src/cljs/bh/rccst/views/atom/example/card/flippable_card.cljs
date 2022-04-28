@@ -9,6 +9,7 @@
 (def default-color "#FF")
 (def node-style-square {:width           "300px" :height "500px"
                         :overflow        "hidden"
+                        :margin          :auto
                         ;:background      default-background
                         ;:color           default-color
                         :display         :flex
@@ -32,8 +33,10 @@
       :style (assoc node-style-square :width "300px" :height "500px" :margin :auto)
       :front [rc/v-box
               :gap "10px"
-              :children [[:img {:style image-style
-                                :src   "/imgs/giants/rich-hickey.jpeg"}]
+              :children [[rc/gap :size "20px"]
+                         [:figure.image
+                          [:img.is-rounded {:style image-style
+                                            :src   "/imgs/giants/rich-hickey.jpeg"}]]
                          [:p.title.is-4 "Rich Hickey"]]]
       :back [layout/markdown-block
              "Rich created the [Clojure](https://clojure.org/) programming language, and the [Datomic](https://www.datomic.com/) database."]]]
