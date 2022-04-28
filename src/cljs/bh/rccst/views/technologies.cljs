@@ -52,7 +52,7 @@
                      :height "90vh"}
     [flex/flex-top
      [layout/page-header {:extra-classes :is-fluid}
-      [layout/page-title "Technology Overview"]]
+      [:h2.has-text-info "Technology Overview"]]
 
      [navbar/navbar tech-navbar [:tech/tab-panel]]]
 

@@ -219,7 +219,7 @@
    [flex/flex-panel {:height "90vh"}
     [flex/flex-top
      [layout/page-header {:extra-classes :is-fluid}
-      [layout/page-title "'Giants'"]
+      [:h2.has-text-info "'Giants'"]
       [layout/markdown-block "It has been said that [\"we stand on the shoulders of giants\"](https://www.phrases.org.uk/meanings/268025.html).
       The following people may not all qualify as 'giants', but we certainly have
       looked to them for insight, inspiration, guidance, and general thoughtfulness."]

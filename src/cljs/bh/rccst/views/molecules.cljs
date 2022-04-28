@@ -3,8 +3,8 @@
             [bh.rccst.ui-component.navbar :as navbar]
             [bh.rccst.views.molecule.general :as general]
             [bh.rccst.views.molecule.all :as all]
-
-            [bh.rccst.ui-component.tabbed-panel :as tabbed-panel]))
+            [bh.rccst.ui-component.tabbed-panel :as tabbed-panel]
+            [woolybear.ad.layout :as layout]))
 
 
 
@@ -16,15 +16,20 @@
   "Page to explore the various 'molecules' (more complex UI elements)"
   []
 
-  [tabbed-panel/tabbed-panel
-   :extra-classes {:extra-classes :is-fluid
-                   :height "90vh"}
+  [layout/page {:extra-classes :is-fluid}
 
-   :title "'Molecule' Catalog"
-   :description "Based upon [_Atomic Design_](https://bradfrost.com/blog/post/atomic-web-design/) by Brad Frost"
-   :short-name "molecules"
-   :children navbar
-   :start-page :molecules/general])
+   [layout/page-header {:extra-classes :is-fluid}
+    [:h1.has-text-info "'Molecules'"]]
+
+   [tabbed-panel/tabbed-panel
+    :extra-classes {:extra-classes :is-fluid
+                    :height "80vh"}
+
+    :title ""
+    :description ""
+    :short-name "molecules"
+    :children navbar
+    :start-page :molecules/general]])
 
 
 
