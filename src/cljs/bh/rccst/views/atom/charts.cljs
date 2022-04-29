@@ -28,7 +28,7 @@
    ;[bar-chart-config-ratom/example]
    ;[bar-chart-config-structure/example]
    ;[bar-chart-config-sub/example]
-   [colored-pie-chart/example]
+   ;[colored-pie-chart/example]
    [funnel-chart/example]
    ;[line-chart/simple-example]
    [pie-chart/example]
