@@ -8,7 +8,7 @@
 (log/info "bh.rccst.views.atom.example.re-com.editable-table")
 
 
-(def data table/sample-data)
+(defonce data table/sample-data)
 
 
 (defn cell-styling-fn [{:keys [amt uv pv] :as row}
@@ -54,3 +54,15 @@
        :table-row-line-color "#0fff00"
        :on-click-row #(log/info "on-click-row")
        :cell-style cell-styling-fn]]))
+
+
+; can we change the data and have the table re-render correctly?
+(comment
+  (assoc-in @data [0 :uv] 10000)
+
+
+  (swap! data assoc-in [0 :uv] 10000)
+  (swap! data assoc-in [0 :uv] 4000)
+
+
+  ())

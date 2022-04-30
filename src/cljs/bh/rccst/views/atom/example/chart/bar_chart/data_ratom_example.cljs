@@ -34,7 +34,7 @@
                                                    (assoc-in [:metadata :fields :new-item] :number)
                                                    (assoc :data (into []
                                                                   (map (fn [x]
-                                                                         (assoc x :new-item 1750))
+                                                                         (assoc x :new-item (rand-int 7000)))
                                                                     (:data @data))))))
                :label "Add :new-item"]]])
 

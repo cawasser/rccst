@@ -24,18 +24,18 @@
 (defn- table* [& {:keys [data max-rows width height cell-style-fn
                          on-click-row-fn row-line-color]}]
 
-  ;(log/info "table*" data "//" width)
+  (log/info "table-star" @data)
 
-  (if (empty? data)
+  (if (empty? @data)
 
     [rc/alert-box :src (rc/at)
      :alert-type :info
      :heading "Waiting for data"]
 
     [rc/simple-v-table :src (rc/at)
-     :model (r/atom data)
-     :columns (table-column-headers data 5 (or width 200) (or height))
-     :max-rows (or max-rows (count data))
+     :model data
+     :columns (table-column-headers @data 5 (or width 200) (or height))
+     :max-rows (or max-rows (count @data))
      :table-row-line-color (or row-line-color "#00fff0")
      :on-click-row (or on-click-row-fn #())
      :cell-style (or cell-style-fn #())
@@ -45,13 +45,13 @@
 (defn- non-meta-table [& {:keys [data max-rows width height cell-style-fn
                                  on-click-row-fn row-line-color]}]
 
-  (let [remote (h/resolve-value data)]
+  (let [d (h/resolve-value data)]
     (fn []
       ;(log/info "non-meta-table" data "//" @remote)
       [:div {:style {:width  (or width "300px") :height (or height "250px")
                      :margin :auto}}
        [table*
-        :data @remote
+        :data d
         :max-rows max-rows
         :width width
         :height height
@@ -62,45 +62,46 @@
 
 (defn meta-table [& {:keys [data max-rows width height cell-style-fn
                             on-click-row-fn row-line-color]}]
+  (let [d    (h/resolve-value data)
+        coc? (r/atom false)]
 
-  (let [d (h/resolve-value data)]
     (fn []
-      ;(log/info "meta-table" data "//" @d "//" (:data @d) "//" (count (:data @d)))
-      (let [coc? (r/atom false)]
-        [:div.card {:style {:width  (or width "90%") :height (or height "100%")
-                            :margin :auto}}
-         [rc/h-box :src (rc/at)
-          :gap "2px"
-          :children [[table*
-                      :data (if (:data @d) (:data @d) [])
-                      :max-rows (or max-rows (count (:data @d)))
-                      :width width
-                      :height height
-                      :row-line-color (or row-line-color "#00fff0")
-                      :on-click-row (or on-click-row-fn #())
-                      :cell-style-fn (or cell-style-fn #())]
-                     (when (seq (:c-o-c @d))
-                       [:div
-                        [rc/popover-anchor-wrapper :src (rc/at)
-                         :showing? coc?
-                         :position :below-center
-                         :anchor [rc/md-icon-button
-                                  :md-icon-name "zmdi zmdi-badge-check"
-                                  :tooltip "view chain-of-custody"
-                                  :on-click #(swap! coc? not)]
-                         :popover [rc/popover-content-wrapper :src (rc/at)
-                                   :title "Chain-of-Custody"
-                                   ;:no-clip? true
-                                   :body [table*
-                                          :data (:c-o-c @d)
-                                          :max-rows 3]]]])]]]))))
+      (log/info "meta-table (inner)" data "//" @d)
+
+      [:div.card {:style {:width  (or width "90%") :height (or height "100%")
+                          :margin :auto}}
+       [rc/h-box :src (rc/at)
+        :gap "2px"
+        :children [[table*
+                    :data (h/resolve-value (if (:data @d) (:data @d) []))
+                    :max-rows (or max-rows (count (:data @d)))
+                    :width width
+                    :height height
+                    :row-line-color (or row-line-color "#00fff0")
+                    :on-click-row (or on-click-row-fn #())
+                    :cell-style-fn (or cell-style-fn #())]
+                   (when (seq (:c-o-c @d))
+                     [:div
+                      [rc/popover-anchor-wrapper :src (rc/at)
+                       :showing? coc?
+                       :position :below-center
+                       :anchor [rc/md-icon-button
+                                :md-icon-name "zmdi zmdi-badge-check"
+                                :tooltip "view chain-of-custody"
+                                :on-click #(swap! coc? not)]
+                       :popover [rc/popover-content-wrapper :src (rc/at)
+                                 :title "Chain-of-Custody"
+                                 ;:no-clip? true
+                                 :body [table*
+                                        :data (:c-o-c @d)
+                                        :max-rows 3]]]])]]])))
 
 
 (defn table [& {:keys [data max-rows width height cell-style-fn
                        on-click-row-fn row-line-color]}]
 
   (let [d (h/resolve-value data)]
-    ;(log/info "table" data "//" @d "//" (:data @d))
+    (log/info "table" data "//" @d "//" (:data @d))
     (if (:metadata @d)
       [meta-table
        :data data

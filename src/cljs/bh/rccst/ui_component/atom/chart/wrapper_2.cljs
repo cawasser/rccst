@@ -64,49 +64,52 @@
         data-key     (keyword component-id "data")
         tab-panel    (ui-utils/path->keyword component-id "tab-panel")
         selected-tab (ui-utils/path->keyword component-id "tab-panel.value")
-        chart-events [config-key data-key tab-panel selected-tab]
-        d            (h/resolve-value data)]
+        chart-events [config-key data-key tab-panel selected-tab]]
 
     ;(log/info "configurable-component" component-id "//" data "//" @d)
 
-    (ui-utils/init-widget component-id (config component-id d))
+    (ui-utils/init-widget component-id (config component-id (h/resolve-value data)))
 
     (fn []
-      [rc/v-box :src (rc/at)
-       :class "configurable-component-panel"
-       :gap "2px"
-       :width "100%"
-       :height "100%"
-       :children [[rc/h-box :src (rc/at)
-                   :class "chart-config-tools"
-                   :justify :end
-                   :children [[ct/configure-toggle open?]]]
-                  [rc/h-box :src (rc/at)
-                   :class "chart-itself"
-                   :gap "5px"
-                   :width "100%"
-                   :height "90%"
-                   :children (if @open?
-                               [[:div.chart-config-panel {:style {:width "40%" :height "100%"}}
-                                 [ui-utils/chart-config
-                                  chart-events
-                                  [data-panel @d]
-                                  [config-panel d component-id]]]
-                                [:div.chart-content {:style {:width "60%" :height "100%"}}
-                                 [component-panel
-                                  :component* component*
-                                  :local-config local-config
-                                  :data data
-                                  :component-id component-id
-                                  :container-id container-id]]]
+      (let [d (h/resolve-value data)]
 
-                               [[:div.chart-content {:style {:width "100%" :height "100%"}}
-                                 [component-panel
-                                  :component* component*
-                                  :local-config local-config
-                                  :data data
-                                  :component-id component-id
-                                  :container-id container-id]]])]]])))
+        (log/info "configurable-component (INNER)" data "//" @d)
+
+        [rc/v-box :src (rc/at)
+         :class "configurable-component-panel"
+         :gap "2px"
+         :width "100%"
+         :height "100%"
+         :children [[rc/h-box :src (rc/at)
+                     :class "chart-config-tools"
+                     :justify :end
+                     :children [[ct/configure-toggle open?]]]
+                    [rc/h-box :src (rc/at)
+                     :class "chart-itself"
+                     :gap "5px"
+                     :width "100%"
+                     :height "90%"
+                     :children (if @open?
+                                 [[:div.chart-config-panel {:style {:width "40%" :height "100%"}}
+                                   [ui-utils/chart-config
+                                    chart-events
+                                    [data-panel d]
+                                    [config-panel d component-id]]]
+                                  [:div.chart-content {:style {:width "60%" :height "100%"}}
+                                   [component-panel
+                                    :component* component*
+                                    :local-config local-config
+                                    :data data
+                                    :component-id component-id
+                                    :container-id container-id]]]
+
+                                 [[:div.chart-content {:style {:width "100%" :height "100%"}}
+                                   [component-panel
+                                    :component* component*
+                                    :local-config local-config
+                                    :data data
+                                    :component-id component-id
+                                    :container-id container-id]]])]]]))))
 
 
 (defn base-chart [& {:keys [data config-data
