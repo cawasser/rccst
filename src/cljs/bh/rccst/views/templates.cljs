@@ -17,12 +17,12 @@
 
   [layout/page {:extra-classes :is-fluid}
 
-   [layout/page-header {:extra-classes :is-fluid}
-    [:h1.has-text-info "'Templates'"]]
+   ;[layout/page-header {:extra-classes :is-fluid}
+   ; [:h1.has-text-info "'Templates'"]]
 
    [tabbed-panel/tabbed-panel
     :extra-classes {:extra-classes :is-fluid
-                    :height "80vh"}
+                    :height "85vh"}
     :title ""
     :short-name "templates"
     :description ""

@@ -39,12 +39,12 @@
 
   [layout/page {:extra-classes :is-fluid}
 
-   [layout/page-header {:extra-classes :is-fluid}
-    [:h1.has-text-info "'Atoms'"]]
+   ;[layout/page-header {:extra-classes :is-fluid}
+   ; [:h1.has-text-info "'Atoms'"]]
 
    [tabbed-panel/tabbed-panel
     :extra-classes {:extra-classes :is-fluid
-                    :height        "80vh"}
+                    :height        "85vh"}
     :title ""
     :short-name "atoms"
     :description ""

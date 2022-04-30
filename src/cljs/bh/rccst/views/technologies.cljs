@@ -48,11 +48,11 @@
   (re-frame/dispatch-sync [::events/init-locals :tech init-db])
 
   [layout/page {:extra-classes :is-fluid}
-   [layout/page-header {:extra-classes :is-fluid}
-    [:h1.has-text-info "Technology Overview"]]
+   ;[layout/page-header {:extra-classes :is-fluid}
+   ; [:h1.has-text-info "Technology Overview"]]
 
    [flex/flex-panel {:extra-classes :is-fluid
-                     :height "80vh"}
+                     :height "85vh"}
     [flex/flex-top
      [navbar/navbar tech-navbar [:tech/tab-panel]]]
 
