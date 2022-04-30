@@ -1,7 +1,7 @@
 (ns bh.rccst.views.technologies.all
   (:require [woolybear.ad.layout :as layout]
             [woolybear.packs.flex-panel :as flex]
-
+            [re-com.core :as rc]
             [bh.rccst.views.technologies.overview.ring :as ring-overview]
             [bh.rccst.views.technologies.overview.compojure :as compojure-overview]
             [bh.rccst.views.technologies.overview.component :as component-overview]
@@ -18,17 +18,15 @@
             [bh.rccst.views.technologies.overview.swagger :as swagger]))
 
 
-
-
 (defn page []
   [layout/page {:extra-classes :is-fluid}
    [flex/flex-panel {:extra-classes :is-fluid
-                     :height "80vh"}
+                     :height "76vh"}
     [flex/flex-top  {:extra-classes :is-fluid}
      [:div.is-fluid
       [:h2.has-text-info "All"]
       [layout/text-block "An overview of many of the technologies we use in RCCST"]
-      [layout/section]]]
+      [rc/gap :size "8px"]]]
 
     [layout/frame {:extra-classes :is-fluid}
      [ring-overview/overview]]

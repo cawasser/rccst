@@ -1,6 +1,7 @@
 (ns bh.rccst.views.technologies.clojure
   (:require [woolybear.ad.layout :as layout]
             [woolybear.packs.flex-panel :as flex]
+            [re-com.core :as rc]
 
             [bh.rccst.views.technologies.overview.ring :as ring-overview]
             [bh.rccst.views.technologies.overview.compojure :as compojure-overview]
@@ -14,7 +15,7 @@
 
   [layout/page {:extra-classes :is-fluid}
    [flex/flex-panel {:extra-classes :is-fluid
-                     :height "70vh"}
+                     :height "76vh"}
     [flex/flex-top {:extra-classes :is-fluid}
      [:div.is-fluid
       [:h2.has-text-info "Clojure"]
@@ -36,7 +37,7 @@ Agent system that ensure clean, correct, multithreaded designs.
 >[Clojure](https://clojure.org)
 >[Lisp](https://en.wikipedia.org/wiki/Lisp_(programming_language))
 >[Functional Programming ](https://en.wikipedia.org/wiki/Functional_programming)"]
-      [layout/section "We use a number of libraries to provide critical server-side functionality:"]]]
+      [rc/gap :size "8px"]]]
 
     [layout/frame {:extra-classes :is-fluid}
      [ring-overview/overview]]
