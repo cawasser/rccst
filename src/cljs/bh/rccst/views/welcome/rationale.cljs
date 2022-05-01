@@ -16,11 +16,12 @@ As stated by Bruce Hauman in [the Devcards readme](https://github.com/bhauman/de
 > This is extremely limiting.\"
 
 We agree. Therefore, we developed this Catalog both as a means to show off the breadth of UI Components available to
-us as Professional Software Developers, but also to allow us to work more quickly and more easily, by isolating the development
-of the components from the develop of the User-facing solutions that will be built _from_ those components.
+us as Professional Software Developers, but also to allow us to work more quickly and more easily by isolating the development
+of the components from the development of the User-facing solutions that will be built _from_ those components.
 
 
-We are confident in this approach, as it has been adopted by a number of other Coompanies and Communities:
+We are confident in this approach, as it has been adopted by a number of other Companies and Communities across many
+different markets, approaches, and technologies:
 
 - [Astro UXDS](https://www.astrouxds.com)
 - [Devcards](https://github.com/bhauman/devcards)
