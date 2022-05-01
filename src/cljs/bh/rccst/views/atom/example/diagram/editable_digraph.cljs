@@ -32,7 +32,7 @@
       :source-code digraph/source-code]
 
      [example/component-example
-      :title "Editable Digraph (example data)"
+      :title "Editable Digraph (example data with initial auto-layout)"
       :description "An Editable Digraph, built using [react-flow](https://reactflow.dev)"
       :data (r/atom digraph/sample-data-3)
       :extra-params {:node-types support/default-node-types
