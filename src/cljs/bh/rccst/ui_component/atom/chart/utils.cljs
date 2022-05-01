@@ -76,7 +76,7 @@
   - data : (atom) vector of content hash-maps."
 
   [data]
-  (log/info "tabular-data-panel" @data)
+  ;(log/info "tabular-data-panel" @data)
   [table/table
    :width 500
    :data @data
@@ -94,7 +94,7 @@
   - data : (atom) atom wrapping data with metadata included"
 
   [data]
-  (log/info "meta-tabular-data-panel" @data)
+  ;(log/info "meta-tabular-data-panel" @data)
   [table/meta-table
    :width 500
    :data data

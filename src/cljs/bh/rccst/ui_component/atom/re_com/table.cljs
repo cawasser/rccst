@@ -24,7 +24,7 @@
 (defn- table* [& {:keys [data max-rows width height cell-style-fn
                          on-click-row-fn row-line-color]}]
 
-  (log/info "table-star" @data)
+  ;(log/info "table-star" @data)
 
   (if (empty? @data)
 
@@ -66,7 +66,7 @@
         coc? (r/atom false)]
 
     (fn []
-      (log/info "meta-table (inner)" data "//" @d)
+      ;(log/info "meta-table (inner)" data "//" @d)
 
       [:div.card {:style {:width  (or width "90%") :height (or height "100%")
                           :margin :auto}}
@@ -101,7 +101,7 @@
                        on-click-row-fn row-line-color]}]
 
   (let [d (h/resolve-value data)]
-    (log/info "table" data "//" @d "//" (:data @d))
+    ;(log/info "table" data "//" @d "//" (:data @d))
     (if (:metadata @d)
       [meta-table
        :data data

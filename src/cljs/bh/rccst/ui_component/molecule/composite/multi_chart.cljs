@@ -1,5 +1,5 @@
 (ns bh.rccst.ui-component.molecule.composite.multi-chart
-  (:require [bh.rccst.ui-component.atom.chart.line-chart :as line-chart]
+  (:require [bh.rccst.ui-component.atom.chart.bar-chart-2 :as chart]
             [bh.rccst.ui-component.atom.chart.utils :as utils]
             [bh.rccst.ui-component.utils :as ui-utils]
             [bh.rccst.ui-component.utils.color :as color]
@@ -13,7 +13,7 @@
 (log/info "bh.rccst.ui-component.molecule.composite.multi-chart")
 
 
-(def sample-data line-chart/sample-data)
+(def sample-data chart/sample-data)
 
 
 (declare config-panel)
@@ -101,7 +101,7 @@
                  :ui/bar         {:type :ui/component :name :rechart/bar-2}
                  :ui/area        {:type :ui/component :name :rechart/bar-2}
                  :ui/config      {:type :ui/component :name config-panel}
-                 :topic/data     {:type :source/local :name :topic/data :default @sample-data}
+                 :topic/data     {:type :source/local :name :topic/data :default sample-data}
                  :topic/config   {:type :source/local :name :topic/config :default {}}
                  :fn/make-config {:type  :source/fn :name fn-make-config
                                   :ports {:data :port/sink :config-data :port/source-sink}}}
