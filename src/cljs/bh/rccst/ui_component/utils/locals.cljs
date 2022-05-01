@@ -1,4 +1,6 @@
 (ns bh.rccst.ui-component.utils.locals
+  (:require-macros
+    [reagent.ratom :refer [reaction]])
   (:require [bh.rccst.ui-component.utils.helpers :as h]
             [day8.re-frame.tracing :refer-macros [fn-traced]]
             [re-frame.core :as re-frame]
@@ -386,7 +388,7 @@
 
 
 (defn create-local-path-event [value-path]
-  (let [p (h/path->keyword value-path)] ;a more)]
+  (let [p (h/path->keyword value-path)]                     ;a more)]
 
     ;(log/info "create-local-path-event"
     ;  value-path
@@ -497,6 +499,24 @@
     (re-frame/subscribe [p])))
 
 
+(defn resolve-subscribe-local [widget-id [a & more :as value-path]]
+  (let [p         (h/path->keyword widget-id a more)
+        sub-ok    (re-frame/subscribe [p])
+        get-ok    (let [x (re-frame/subscribe [(h/path->keyword widget-id a)])]
+                    (if x (get @x more) nil))
+        get-in-ok (let [x (re-frame/subscribe [(h/path->keyword widget-id)])]
+                    (if x (get-in @x value-path)))]
+
+    (log/info "resolve-subscribe-local (ret)" widget-id "," value-path "//" sub-ok "//" get-ok "//" get-in-ok)
+
+    (if sub-ok
+      sub-ok
+      (if get-ok
+        (reaction get-ok)
+        (if get-in-ok
+          (reaction get-in-ok)
+          nil)))))
+
 (defn dispatch-local
   "constructs a Re-frame event dispatch call to a local value stored in the given
   widget's 'locals' in the `app-db`. This way the developer isn't concerned about the
@@ -596,6 +616,20 @@
   (re-frame/subscribe [:chart-remote-data-demo.widget.ui.bar-chart])
   (re-frame/subscribe [:chart-remote-data-demo.widget.ui.bar-chart.x-axis])
   (re-frame/subscribe [:chart-remote-data-demo.widget.ui.bar-chart.x-axis.include])
+
+
+  (do
+    (def widget-id [:simple-multi-chart.widget :blackboard :topic.data])
+    (def a :data)
+    (def more nil)
+    (def value-path [:data]))
+
+  (def sub-ok (re-frame/subscribe (h/path->keyword widget-id [:data])))
+  (def get-ok (let [x (re-frame/subscribe [(h/path->keyword widget-id a)])]
+                (if x (get @x more) nil)))
+  (def get-in-ok (let [x (re-frame/subscribe [(h/path->keyword widget-id)])]
+                   (if x (get-in @x value-path))))
+
 
   ())
 

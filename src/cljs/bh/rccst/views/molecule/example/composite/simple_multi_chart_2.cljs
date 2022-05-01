@@ -1,4 +1,4 @@
-(ns bh.rccst.views.molecule.example.composite.simple-multi-chart
+(ns bh.rccst.views.molecule.example.composite.simple-multi-chart-2
   (:require [bh.rccst.ui-component.atom.chart.utils :as chart-utils]
             [bh.rccst.ui-component.molecule.composite.simple-multi-chart :as widget]
             [bh.rccst.ui-component.molecule.grid-widget :as grid]
@@ -12,13 +12,14 @@
             [woolybear.ad.layout :as layout]))
 
 
-(log/info "bh.rccst.views.molecule.example.composite.simple-multi-chart")
+(log/info "bh.rccst.views.molecule.example.composite.simple-multi-chart-2")
 
 
 (defn- data-tools [data]
-  (let [old-data (ui-utils/subscribe-local data [])]
+  (let [old-data (ui-utils/subscribe-local data [:data])
+        old-meta (ui-utils/subscribe-local data [])]
 
-    ;(log/info "data-tools" data "//" @old-data)
+    (log/info "data-tools" data "//" @old-data "//" @old-meta)
 
     (fn []
       [rc/h-box :src (rc/at)
@@ -33,29 +34,27 @@
                   [rc/button :on-click #(h/handle-change-path data [] widget/sample-data)
                    :label "Default"]
 
-                  [rc/button :on-click #(h/handle-change-path data []
-                                          (assoc-in @old-data [:data 0 :uv] 10000))
+                  [rc/button :on-click #(h/handle-change-path data [:data]
+                                          (assoc-in @old-data [0 :uv] 10000))
                    :label "A -> 10000"]
 
-                  [rc/button :on-click #(h/handle-change-path data []
-                                          (assoc @old-data :data
-                                            (conj (:data @old-data)
-                                              {:name "Page Q" :uv 1100
-                                               :pv   1100 :tv 1100 :amt 1100})))
+                  [rc/button :on-click #(h/handle-change-path data [:data]
+                                          (conj @old-data
+                                            {:name "Page Q" :uv 1100
+                                             :pv   1100 :tv 1100 :amt 1100}))
                    :label "Add 'Q'"]
 
-                  [rc/button :on-click #(h/handle-change-path data []
-                                          (assoc @old-data :data
-                                            (into [] (drop-last 2 (:data @old-data)))))
+                  [rc/button :on-click #(h/handle-change-path data [:data]
+                                          (into [] (drop-last 2 @old-data)))
                    :label "Drop Last 2"]
 
                   [rc/button :on-click #(h/handle-change-path data []
-                                          (-> @old-data
+                                          (-> @old-meta
                                             (assoc-in [:metadata :fields :new-item] :number)
                                             (assoc :data (into []
                                                            (map (fn [x]
                                                                   (assoc x :new-item (rand-int 7000)))
-                                                             (:data @old-data))))))
+                                                             @old-data)))))
                    :label "Add :new-item"]]])))
 
 
@@ -80,9 +79,7 @@
                    :label "! uv data"]
                   [rc/button :on-click #(h/handle-change-path config-data [:tv :include] (not @tv?))
                    :label "! tv data"]
-
                   [chart-utils/color-config config-data ":amt :fill" [:amt :fill] :above-center]
-
                   [rc/button :on-click #((h/handle-change-path config-data [:uv :stackId] "b")
                                          (h/handle-change-path config-data [:pv :stackId] "b"))
                    :label "stack uv/pv"]
@@ -114,17 +111,14 @@
 
 
 (defn example []
-  (let [container-id "simple-multi-chart"
+  (let [container-id "simple-multi-chart-2"
         component-id (h/path->keyword container-id "widget")]
     (fn []
-      (acu/demo "(A simple) Multiple Charts in a Widget"
+      (acu/demo "(A simpler) Multiple Charts in a Widget (WIP)"
         "This example provides a 'widget' (collection of UI Components) organized into a digraph (Event Model) that
           describes the flow of data from sources (remote or local) into and out-of the UI.
 
-> This example works on the entire 'data' item, rather than _reaching inside_ like
-> `atom/example/chart/bar-chart/data-sub-example`
->
-> See also `molecule/example/simple-multi-chart-2`
+> Current the data tools *DON'T WORK*, but this is written as is *should* be written (subscribe-local ...)
 "
         [layout/frame
          ;;
@@ -145,7 +139,7 @@
 
 (comment
   (do
-    (def container-id "simple-multi-chart")
+    (def container-id "simple-multi-chart-2")
     (def component-id (h/path->keyword container-id "widget"))
     (def data [component-id :blackboard :topic.data])
     (def path [:data])
@@ -178,13 +172,12 @@
     (assoc-in @old-data [0 :uv] 10000))
 
 
-  :simple-multi-chart.widget.blackboard.topic.data.data
+  :simple-multi-chart-2.widget.blackboard.topic.data.data
 
   (:event @re-frame.registrar/kind->id->handler)
 
-  (get-in @re-frame.registrar/kind->id->handler [:event :simple-multi-chart.widget.blackboard.topic.data])
-  (get-in @re-frame.registrar/kind->id->handler [:event :simple-multi-chart.widget.blackboard.topic.data.data])
+  (get-in @re-frame.registrar/kind->id->handler [:event :simple-multi-chart-2.widget.blackboard.topic.data])
+  (get-in @re-frame.registrar/kind->id->handler [:event :simple-multi-chart-2.widget.blackboard.topic.data.data])
 
 
   ())
-

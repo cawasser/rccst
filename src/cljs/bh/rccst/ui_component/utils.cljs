@@ -61,6 +61,10 @@
   (l/subscribe-local widget-id value-path))
 
 
+(defn resolve-subscribe-local [widget-id value-path]
+  (l/resolve-subscribe-local widget-id value-path))
+
+
 (defn dispatch-local [widget-id value-path new-val]
   (l/dispatch-local widget-id value-path new-val))
 

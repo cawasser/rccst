@@ -83,7 +83,7 @@
 
 (defn- make-line-display [chart-id data subscriptions isAnimationActive?]
 
-  (log/info "make-line-display" data)
+  ;(log/info "make-line-display" data)
   (->> (get-in data [:metadata :fields])
        (filter (fn [[_ v]] (= :number v)))
        keys
@@ -104,7 +104,7 @@
 
   (let [d (if (empty? data) [] (get data :data))]
 
-    (log/info "component*" data "//" d)
+    ;(log/info "component*" data "//" d)
     [:> ResponsiveContainer
      [:> LineChart {:data d}
 

@@ -21,7 +21,7 @@
 
 
 (defn- compute-data-config [data]
-  (merge {:brush true}
+  (merge {:brush false}
     (->> (get-in data [:metadata :fields])
       (filter (fn [[k v]] (= :number v)))
       keys
@@ -34,7 +34,7 @@
 
 
 (defn fn-make-config [{:keys [data config-data container-id] :as params}]
-  (log/info "fn-make-config" config-data)
+  ;(log/info "fn-make-config" config-data)
   (re-frame/reg-sub
     (first config-data)
     :<- data

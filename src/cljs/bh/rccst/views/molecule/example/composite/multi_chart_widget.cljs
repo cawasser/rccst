@@ -17,7 +17,10 @@
     (fn []
       (acu/demo "Multiple Charts in a Widget"
         "This example provides a 'widget' (collection of UI Components) organized into a digraph (Event Model) that
-          describes the flow of data from sources (remote or local) into and out-of the UI."
+          describes the flow of data from sources (remote or local) into and out-of the UI.
+
+> In this example the configuration is presented as part of the widget, rather than separately as in
+> the example above"
         [layout/frame
          ;;
          ;; NOTE: the :height MUST be specified here since the ResponsiveContainer down in bowels of the chart needs a height

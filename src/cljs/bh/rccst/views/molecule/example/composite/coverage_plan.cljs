@@ -55,7 +55,12 @@
     (fn []
       (if (and @logged-in? @pub-sub-started?)
         (acu/demo "Coverage Plan using a Grid for layout (Resium globe)"
-          "This experiment uses a GRID to layout the various UI components that make up the 'composite'.  Constructs 'coverage-plan', drawing the layout from `:grid-layout` which provides X/Y/W/H for each component on the widget's internal grid."
+          "This experiment uses a GRID to layout the various UI components that make up the 'composite'.  Constructs
+          'coverage-plan', drawing the layout from `:grid-layout` which provides X/Y/W/H for each component
+          on the widget's internal grid.
+
+> This example different from the Worldwind version only by replacing the `:ww/globe` reference with `:r/globe`
+"
           [layout/frame
            ;;
            ;; NOTE: the :height MUST be specified here since the ResponsiveContainer down in bowels of the chart needs a height
