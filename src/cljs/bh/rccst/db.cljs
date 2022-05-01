@@ -16,14 +16,17 @@
    ;    :source/entity-contents - description of the contents of the collection that is returned
    ;
    :avail-sources {:source/coverages {:source/type :source/remote
-                                      :source/returns :source/vector-of-entity
+                                      :source/returns :source/vector-of-entity-meta-coc
                                       :source/entity-contents []}
                    :source/satellites {:source/type :source/remote
-                                       :source/returns :source/vector-of-entity
+                                       :source/returns :source/vector-of-entity-meta-coc
                                        :source/entity-contents []}
                    :source/targets {:source/type :source/remote
-                                    :source/returns :source/vector-of-entity
-                                    :source/entity-contents []}}
+                                    :source/returns :source/vector-of-entity-meta-coc
+                                    :source/entity-contents []}
+                   :source/measurements {:source/type :source/remote
+                                         :source/returns :source/vector-of-entity-meta-coc
+                                         :source/entity-contents []}}
    :sources          {:number 0
                       :string "empty"}})
 
