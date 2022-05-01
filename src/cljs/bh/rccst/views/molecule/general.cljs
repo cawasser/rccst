@@ -6,6 +6,7 @@
             [bh.rccst.views.molecule.example.two-d-three-d-globe :as two-d-three-d-globe]
             [bh.rccst.views.molecule.example.composite.coverage-plan :as coverage-plan]
             [bh.rccst.views.molecule.example.composite.chart-remote-data :as chart-remote-data]
+            [bh.rccst.views.molecule.example.composite.simple-multi-chart :as simple-multi-chart]
             [bh.rccst.views.molecule.example.composite.multi-chart-widget :as multi-chart-widget]))
 
 
@@ -15,6 +16,7 @@
 
   [:div
    [chart-remote-data/example]
+   [simple-multi-chart/example]
    [multi-chart-widget/example]
    [coverage-plan/ww-example]
    [coverage-plan/r-example]

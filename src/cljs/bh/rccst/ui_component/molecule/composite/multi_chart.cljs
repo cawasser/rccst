@@ -44,6 +44,7 @@
     :<- data
     (fn [d _]
       (doall
+        ; TODO: need a way to have :topic.config passed in somehow...
         (l/update-local-path-values container-id [:blackboard :topic.config] (compute-data-config d))))))
 
 

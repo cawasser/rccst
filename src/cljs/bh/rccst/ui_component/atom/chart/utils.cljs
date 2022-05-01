@@ -533,7 +533,7 @@
    [legend widget-id]])
 
 
-(defn non-gridded-chart-config [widget-id]
+(defn non-gridded-chart-config [data widget-id]
   [:<>
    [isAnimationActive widget-id]
    [rc/line :src (rc/at) :size "2px"]

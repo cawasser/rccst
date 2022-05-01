@@ -73,7 +73,7 @@
     (fn []
       (let [d (h/resolve-value data)]
 
-        (log/info "configurable-component (INNER)" data "//" @d)
+        ;(log/info "configurable-component (INNER)" data "//" @d)
 
         [rc/v-box :src (rc/at)
          :class "configurable-component-panel"

@@ -31,10 +31,12 @@
                :label "Add 'Q'"]
               [rc/button :on-click #(swap! data assoc :data (into [] (drop-last 2 (:data @data))))
                :label "Drop Last 2"]
-              [rc/button :on-click #(swap! data assoc :data (into []
-                                                              (map (fn [x]
-                                                                     (assoc x :new-item 1750))
-                                                                (:data @data))))
+              [rc/button :on-click #(reset! data (-> @data
+                                                   (assoc-in [:metadata :fields :new-item] :number)
+                                                   (assoc :data (into []
+                                                                  (map (fn [x]
+                                                                         (assoc x :new-item (rand-int 7000)))
+                                                                    (:data @data))))))
                :label "Add :new-item"]]])
 
 

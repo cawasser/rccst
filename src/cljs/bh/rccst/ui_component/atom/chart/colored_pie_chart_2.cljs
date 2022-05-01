@@ -77,7 +77,7 @@
    :style {:padding          "15px"
            :border-top       "1px solid #DDD"
            :background-color "#f7f7f7"}
-   :children [[utils/non-gridded-chart-config data component-id]
+   :children [[utils/non-gridded-chart-config @data component-id]
               [rc/line :src (rc/at) :size "2px"]
               [utils/option component-id ":name" [:name]]
               [rc/line :src (rc/at) :size "2px"]
@@ -95,7 +95,7 @@
 
   (let [d (if (empty? data) [] (get data :data))]
 
-    ;(log/info "colored-pie-chart" component-id "//" data "//" @d)
+    ;(log/info "colored-pie-chart" component-id "//" data "//" d)
 
     [:> ResponsiveContainer
      [:> PieChart {:label true} (utils/override true {} :label)

@@ -65,14 +65,16 @@
   (let [container-id "colored-pie-chart-2-data-ratom-demo"
         component-id (utils/path->keyword container-id "bar-chart-2")]
     [example/component-example
-     :title "Colored Pie Chart 2 (Live Data - ratom)"
+     :title "Colored Pie Chart 2 (Live Data - ratom) (WIP)"
      :description "A Pie Chart with colored segments built using [Recharts](https://recharts.org/en-US/api/BarChart). This example shows how
    charts can take [ratoms](http://reagent-project.github.io/docs/master/reagent.ratom.html) as input and re-render as the data changes.
 
-   > In _this_ case, we are using a ratom for the data. Specifically, this chart is only presenting the data
-   > specified by the `:value` property on the Configuration Panel (defaults to `:uv`)
-   >
-   > You can use the buttons below to change some of the data and see how the chart responds."
+> In _this_ case, we are using a ratom for the data. Specifically, this chart is only presenting the data
+> specified by the `:value` property on the Configuration Panel (defaults to `:uv`)
+
+> You can use the buttons below to change some of the data and see how the chart responds.
+
+> Unresolved issues with the config & data panels not updating properly."
      :data data
      :component data-update-example
      :container-id container-id
