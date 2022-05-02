@@ -99,12 +99,12 @@
                  keys
                  (map (fn [a]
                         (if (ui-utils/resolve-sub subscriptions [a :include])
-                          [:> Area (merge {:type "monotone" :dataKey a
-                                          :isAnimationActive @isAnimationActive?
+                          [:> Area (merge {:type              "monotone" :dataKey a
+                                           :isAnimationActive @isAnimationActive?
                                            :stroke            (ui-utils/resolve-sub subscriptions [a :stroke])
-                                           :fill (ui-utils/resolve-sub subscriptions [a :fill])}
-                                            (when (seq (ui-utils/resolve-sub subscriptions [a :stackId])))
-                                              {:stackId (ui-utils/resolve-sub subscriptions [a :stackId])})]
+                                           :fill              (ui-utils/resolve-sub subscriptions [a :fill])}
+                                          (when (seq (ui-utils/resolve-sub subscriptions [a :stackId])))
+                                          {:stackId (ui-utils/resolve-sub subscriptions [a :stackId])})]
                           [])))
                  (remove empty?)
                  (into [:<>]))]
@@ -115,7 +115,7 @@
 
 (defn- component* [& {:keys [data component-id container-id
                              subscriptions isAnimationActive?]
-                      :as params}]
+                      :as   params}]
   (let [d (if (empty? data) [] (get data :data))]
 
     [:> ResponsiveContainer
@@ -147,8 +147,8 @@
 
 
 (def meta-data {:rechart/area-2 {:component component
-                                ;:configurable-component configurable-component
-                                :ports     {:data   :port/sink
-                                            :config :port/sink}}})
+                                 ;:configurable-component configurable-component
+                                 :ports     {:data   :port/sink
+                                             :config :port/sink}}})
 
 
