@@ -11,10 +11,9 @@
             [reagent.core :as r]
             [taoensso.timbre :as log]
             [woolybear.ad.layout :as layout]
-            ["recharts" :refer [ResponsiveContainer BarChart Bar Brush
-                                XAxis YAxis CartesianGrid Tooltip Legend]]))
+            ["recharts" :refer [ResponsiveContainer AreaChart Area Brush]]))
 
-(log/info "bh.rccst.views.atom.example.chart.bar-chart-2")
+(log/info "bh.rccst.views.atom.example.chart.area-chart-2")
 
 
 (def source-code '[])
@@ -33,6 +32,7 @@
                    (map-indexed (fn [idx a]
                                   {a {:include true
                                       :fill    (color/get-color idx)
+                                      :stroke  (color/get-color idx)
                                       :stackId ""}}))
                    (into {})))]
     ;(log/info "local-config" ret)
@@ -49,22 +49,23 @@
       (assoc-in [:x-axis :dataKey] :name)))
 
 
-(defn- bar-config [component-id label path position]
+(defn- area-config [component-id label path position]
   [rc/v-box :src (rc/at)
    :gap "5px"
    :children [[utils/boolean-config component-id label (conj path :include)]
               [utils/color-config component-id ":fill" (conj path :fill) position]
+              [utils/color-config component-id ":stroke" (conj path :stroke) :right-above]
               [utils/text-config component-id ":stackId" (conj path :stackId)]]])
 
 
-(defn- make-bar-config [component-id data]
-  ;(log/info "make-bar-config" component-id "//" @data)
+(defn- make-area-config [component-id data]
+  ;(log/info "make-area-config" component-id "//" @data)
 
   (->> (get-in @data [:metadata :fields])
        (filter (fn [[k v]] (= :number v)))
        keys
        (map-indexed (fn [idx a]
-                      [bar-config component-id a [a] :above-right]))
+                      [area-config component-id a [a] :above-right]))
        (into [])))
 
 
@@ -85,22 +86,23 @@
                :height "100%"
                :style ui-utils/h-wrap
                :gap "10px"
-               :children (make-bar-config component-id data)]
+               :children (make-area-config component-id data)]
               [rc/line :src (rc/at) :size "2px"]
               [utils/boolean-config component-id ":brush?" [:brush]]]])
 
 
-(defn- make-bar-display [data subscriptions isAnimationActive?]
-  ;(log/info "make-bar-display" data "//" subscriptions)
+(defn- make-area-display [data subscriptions isAnimationActive?]
+  ;(log/info "make-area-display" data "//" subscriptions)
 
   (let [ret (->> (get-in data [:metadata :fields])
                  (filter (fn [[_ v]] (= :number v)))
                  keys
                  (map (fn [a]
                         (if (ui-utils/resolve-sub subscriptions [a :include])
-                          [:> Bar (merge {:type "monotone" :dataKey a
+                          [:> Area (merge {:type "monotone" :dataKey a
                                           :isAnimationActive @isAnimationActive?
-                                          :fill (ui-utils/resolve-sub subscriptions [a :fill])}
+                                           :stroke            (ui-utils/resolve-sub subscriptions [a :stroke])
+                                           :fill (ui-utils/resolve-sub subscriptions [a :fill])}
                                             (when (seq (ui-utils/resolve-sub subscriptions [a :stackId])))
                                               {:stackId (ui-utils/resolve-sub subscriptions [a :stackId])})]
                           [])))
@@ -117,13 +119,13 @@
   (let [d (if (empty? data) [] (get data :data))]
 
     [:> ResponsiveContainer
-     [:> BarChart {:data d}
+     [:> AreaChart {:data d}
 
       (utils/standard-chart-components component-id {})
 
       (when (ui-utils/resolve-sub subscriptions [:brush]) [:> Brush])
 
-      (make-bar-display data subscriptions isAnimationActive?)]]))
+      (make-area-display data subscriptions isAnimationActive?)]]))
 
 
 (defn component [& {:keys [data config-data component-id container-id
@@ -144,7 +146,7 @@
    :local-config local-config])
 
 
-(def meta-data {:rechart/bar-2 {:component component
+(def meta-data {:rechart/area-2 {:component component
                                 ;:configurable-component configurable-component
                                 :ports     {:data   :port/sink
                                             :config :port/sink}}})

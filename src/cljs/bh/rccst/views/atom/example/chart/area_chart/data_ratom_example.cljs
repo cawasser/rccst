@@ -64,14 +64,13 @@
   (let [container-id "area-chart-2-data-ratom-demo"
         component-id (utils/path->keyword container-id "area-chart-2")]
     [example/component-example
-     :title "Area Chart 2 (Live Data - ratom) (WORK IN PROGRESS)"
-     :description "A Bar Chart (2) built using [Recharts](https://recharts.org/en-US/api/BarChart). This example shows how
+     :title "Area Chart 2 (Live Data - ratom)"
+     :description "An Area Chart (2) built using [Recharts](https://recharts.org/en-US/api/AreaChart). This example shows how
    charts can take [ratoms](http://reagent-project.github.io/docs/master/reagent.ratom.html) as input and re-render as the data changes.
 
    > In _this_ case, we are using a ratom for the data.
    >
-   > You can use the buttons below to change some of the data and see how the chart responds.
-   > NOTE: I am using existing bar chart code as a place-holder."
+   > You can use the buttons below to change some of the data and see how the chart responds."
      :data data
      :component data-update-example
      :container-id container-id
