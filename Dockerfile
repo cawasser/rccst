@@ -1,4 +1,4 @@
-FROM registry.access.redhat.com/ubi8/openjdk-11:1.11-2.1648459569
+FROM registry.access.redhat.com/ubi8/openjdk-11:latest
 
 WORKDIR /rccst/
 
@@ -9,6 +9,5 @@ ENV RCCST_DATABASE_HOST="rccst-postgres"
 
 EXPOSE 8280
 EXPOSE 5432
-EXPOSE 7777
 
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-jar", "app.jar", "false"]
