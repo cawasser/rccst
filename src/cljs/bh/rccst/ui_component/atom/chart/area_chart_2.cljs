@@ -103,8 +103,8 @@
                                            :isAnimationActive @isAnimationActive?
                                            :stroke            (ui-utils/resolve-sub subscriptions [a :stroke])
                                            :fill              (ui-utils/resolve-sub subscriptions [a :fill])}
-                                          (when (seq (ui-utils/resolve-sub subscriptions [a :stackId])))
-                                          {:stackId (ui-utils/resolve-sub subscriptions [a :stackId])})]
+                                          (when (seq (ui-utils/resolve-sub subscriptions [a :stackId]))
+                                            {:stackId (ui-utils/resolve-sub subscriptions [a :stackId])}))]
                           [])))
                  (remove empty?)
                  (into [:<>]))]
