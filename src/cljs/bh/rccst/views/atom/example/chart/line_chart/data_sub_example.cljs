@@ -73,10 +73,10 @@
                   [rc/button :on-click #(h/handle-change-path data []
                                                               (-> @old-meta
                                                                   (assoc-in [:metadata :fields :new-item] :number)
-                                                                  (assoc :data (into [])
-                                                                         (map (fn [x]
-                                                                                (assoc x :new-item (rand-int 7000)))
-                                                                           @old-data))))
+                                                                  (assoc :data (into []
+                                                                                 (map (fn [x]
+                                                                                        (assoc x :new-item (rand-int 7000)))
+                                                                                   @old-data)))))
 
                    :label "Add :new-item"]]])))
 

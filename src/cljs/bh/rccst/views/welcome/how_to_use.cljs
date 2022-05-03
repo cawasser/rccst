@@ -30,7 +30,7 @@ and other external concerns.
 Much like Developers, Designers can use the Catalog to see the whole range of UI Components available for them to use
 in their own solutions. In many cases, there are multiple options for a given Component. Sometimes they vary by the
 source library they are drawn from (we re-package such components to make them interchangeable with minimal software code
-changes). Sometimes they vary in how they work, with the different options suited to some different situation. Having options
+changes). Sometimes they vary in how they work, with the different options suited to different situations. Having options
 gives you the freedom to choose what works best for you and your clients.
 
 #### Product Owners
