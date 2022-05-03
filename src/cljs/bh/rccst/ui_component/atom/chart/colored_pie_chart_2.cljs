@@ -34,7 +34,7 @@
       ; process :name to map up the :colors
       (->> d
         (map-indexed (fn [idx entry]
-                       ;(log/info "local-config (loop)" entry)
+                       ;(log/info "local-config (:color loop)" entry)
                        {(ui-utils/path->keyword (:name entry))
                         {:name  (:name entry)
                          :include true
@@ -125,7 +125,7 @@
               [rc/line :src (rc/at) :size "2px"]
               [utils/option component-id ":name" [:name]]
               [rc/line :src (rc/at) :size "2px"]
-              [utils/option component-id ":value" [:value]]
+              [utils/column-picker data component-id ":value" [:value :chosen]]
               [rc/v-box :src (rc/at)
                :gap "5px"
                :children [[rc/label :src (rc/at) :label "Pie Colors"]
