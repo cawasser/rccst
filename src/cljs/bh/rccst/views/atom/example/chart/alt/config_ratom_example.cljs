@@ -44,12 +44,21 @@
               [chart-utils/color-config config-data ":amt :fill" [:amt :fill] :above-center]
               [rc/button :on-click #(reset! config-data (-> @config-data
                                                           (assoc-in [:uv :stackId] "a")
-                                                          (assoc-in [:tv :stackId] "a")))
-               :label "stack"]
+                                                          (assoc-in [:pv :stackId] "a")))
+               :label "stack uv/pv"]
               [rc/button :on-click #(reset! config-data (-> @config-data
                                                           (assoc-in [:uv :stackId] "")
-                                                          (assoc-in [:tv :stackId] "")))
-               :label "un-stack"]]])
+                                                          (assoc-in [:pv :stackId] "")))
+               :label "!stack uv/pv"]
+              [rc/button :on-click #(reset! config-data (-> @config-data
+                                                         (assoc-in [:tv :stackId] "b")
+                                                         (assoc-in [:amt :stackId] "b")))
+               :label "stack tv/amt"]
+              [rc/button :on-click #(reset! config-data (-> @config-data
+                                                          (assoc-in [:tv :stackId] "")
+                                                          (assoc-in [:amt :stackId] "")))
+               :label "!stack tv/amt"]]])
+
 
 
 (defn- config-update-example [component default-config-data
