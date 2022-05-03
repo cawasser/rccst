@@ -35,10 +35,11 @@
                             (ui-utils/override-subs @c local-subs override-subs)
                             local-subs)]
 
-        ;(log/info "component-panel" @c
-        ;  "// (override)" override-subs
-        ;  "// (subscriptions)" subscriptions
-        ;  "// (local-subs)" local-subs)
+        ;(log/info "component-panel (render)" @c
+          ;"// (local-config)" l-c
+          ;"// (override)" override-subs
+          ;"// (subscriptions)" subscriptions
+          ;"// (local-subs)" local-subs
 
         (if (empty? @d)
           [rc/alert-box :src (rc/at)
