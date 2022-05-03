@@ -25,7 +25,7 @@
   (let [d (h/resolve-value data)]
     (fn []
 
-      (log/info "show-data" data "//" d "//" @d)
+      ;(log/info "show-data" data "//" d "//" @d)
 
       [rc/h-box :src (rc/at)
        :gap "10px"
@@ -82,7 +82,7 @@
                                       config-data data-panel
                                       config-panel default-data
                                       container-id component-id] :as params}]
-  (log/info "data-update-example (params)" params)
+  ;(log/info "data-update-example (params)" params)
   ;(log/info "data-update-example (component)" component "//" data-panel "//" config-panel "//" default-data)
 
   [rc/v-box :src (rc/at)
@@ -108,7 +108,7 @@
                         & {:keys [data component-id container-id] :as params}]
   (let [id (r/atom nil)]
 
-    (log/info "component" params)
+    ;(log/info "component" params)
 
     (fn []
       (when (nil? @id)

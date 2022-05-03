@@ -74,7 +74,7 @@
 
 
 (defn config-panel [data component-id]
-  (log/info "config-panel" component-id "//" @data)
+  ;(log/info "config-panel" component-id "//" @data)
 
   [rc/v-box :src (rc/at)
    :gap "10px"

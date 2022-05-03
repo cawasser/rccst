@@ -27,7 +27,7 @@
   (let [d (h/resolve-value data)]
     (fn []
 
-      (log/info "show-data" data "//" d "//" @d)
+      ;(log/info "show-data" data "//" d "//" @d)
 
       [rc/h-box :src (rc/at)
        :gap "10px"

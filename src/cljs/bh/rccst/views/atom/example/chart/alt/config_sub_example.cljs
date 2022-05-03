@@ -22,9 +22,6 @@
 (defn- config [config-data]
   ; TODO: notice how we need to use '.' instead of '/' for this :topic? how can we fix this
   ; which causes an issue with subscriptions and resolve-value
-
-  (log/info "config" config-data)
-
   {:blackboard {:config-data config-data}
    :container  ""})
 
@@ -74,7 +71,7 @@
                    :label "!stack tv/amt"]]])))
 
 
-(defn- config-update-example [& {:keys [data config-data default-config-data
+(defn- config-update-example [& {:keys [data component config-data default-config-data
                                         container-id component-id] :as params}]
   ;(log/info "config-update-example (params)" params)
 
@@ -83,12 +80,11 @@
    :width "100%"
    :height "100%"
    :children [[:div.chart-part {:style {:width "100%" :height "90%"}}
-               [chart/component
+               [component
                 :data data
                 :config-data config-data
                 :component-id component-id
-                :container-id container-id
-                :component-panel chart/component]]
+                :container-id container-id]]
 
               [show-config (h/resolve-value config-data)]
 
@@ -96,10 +92,10 @@
                [config-tools config-data default-config-data]]]])
 
 
-(defn- component [default-config-data
-                  & {:keys [data config-data component-id container-id] :as params}]
+(defn- component-wedge [component default-config-data
+                        & {:keys [data config-data component-id container-id] :as params}]
 
-  (log/info "component" default-config-data "//" params)
+  ;(log/info "component" default-config-data "//" params)
 
   (let [id (r/atom nil)]
 
@@ -111,6 +107,7 @@
 
       [config-update-example
        :data data
+       :component component
        :config-data config-data
        :default-config-data default-config-data
        :component-id (h/path->keyword component-id "chart")
@@ -124,14 +121,14 @@
                          source-code
                          component] :as params}]
 
-  (log/info "example" params)
+  ;(log/info "example" params)
 
   [e/component-example
    :title title
    :description description
    :data (r/atom sample-data)
    :extra-params {:config-data config-data}
-   :component (partial component default-config-data)
+   :component (partial component-wedge component default-config-data)
    :container-id ""
    :component-id container-id
    :source-code source-code])
