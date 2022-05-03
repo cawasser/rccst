@@ -94,7 +94,9 @@
                 :config-data config-data
                 :component-id component-id
                 :container-id container-id
-                :component-panel chart/component]]
+                :component-panel chart/component
+                :data-panel chart-utils/meta-tabular-data-panel
+                :config-panel chart/config-panel]]
 
               [show-data data]
 
