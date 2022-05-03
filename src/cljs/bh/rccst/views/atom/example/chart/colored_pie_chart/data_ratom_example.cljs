@@ -74,7 +74,7 @@
 
 > You can use the buttons below to change some of the data and see how the chart responds.
 
-> Unresolved issues with the config & data panels not updating properly."
+> Unresolved issues with the data panel not updating properly."
      :data data
      :component data-update-example
      :container-id container-id

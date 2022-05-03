@@ -57,21 +57,6 @@
     (local-config data)))
 
 
-(defn- color-anchors
-  "build the config ui-components needed for each of the pie slices
-  "
-  [chart-id data colors]
-
-  ;(log/info "color-anchors" chart-id "//" data "//" @colors)
-
-  [:<>
-   (doall
-     (map (fn [[id color-data]]
-            (let [text  (:name color-data)]
-              ^{:key id} [utils/color-config-text chart-id text [:colors id :color] :right-above]))
-       @colors))])
-
-
 (defn- cell-config [component-id label path position]
   (let [p (ui-utils/path->keyword path)]
     (log/info "cell-config" component-id "//" label "//" p)
@@ -86,30 +71,6 @@
                    (log/info "make-cell-config (loop)" idx item)
                    [cell-config component-id name [name] :above-right]))
     (into [:<>])))
-
-
-
-(comment
-  (def data (atom {:metadata {:type :tabular, :id :name, :title "Tabular Data with Metadata",
-                              :fields {:name :string, :uv :number, :pv :number, :tv :number, :amt :number}},
-                   :data [{:name "Page A", :uv 4000, :pv 2400, :tv 1500, :amt 2400}
-                          {:name "Page B", :uv 3000, :pv 1398, :tv 1500, :amt 2210}
-                          {:name "Page C", :uv 2000, :pv 9800, :tv 1500, :amt 2290}
-                          {:name "Page D", :uv 2780, :pv 3908, :tv 1500, :amt 2000}
-                          {:name "Page E", :uv 1890, :pv 4800, :tv 1500, :amt 2181}
-                          {:name "Page F", :uv 2390, :pv 3800, :tv 1500, :amt 2500}
-                          {:name "Page G", :uv 3490, :pv 4300, :tv 1500, :amt 2100}]}))
-
-
-  (->> @data
-    :data
-    (map-indexed (fn [idx {:keys [name] :as item}]
-                   [idx name item])))
-                   ;[cell-config component-id item [item] :above-right]))
-    ;(into []))
-
-
-  ())
 
 
 (defn config-panel [data component-id]
