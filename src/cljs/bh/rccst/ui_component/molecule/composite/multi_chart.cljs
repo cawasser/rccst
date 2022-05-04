@@ -24,7 +24,7 @@
 (defn- compute-data-config [data]
   ;(log/info "compute-data-config" data)
 
-  (let [ret (merge {:brush true}
+  (let [ret (merge {:brush false}
               (->> (get-in data [:metadata :fields])
                 (filter (fn [[k v]] (= :number v)))
                 keys
