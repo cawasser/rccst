@@ -24,7 +24,7 @@
 (defn- table* [& {:keys [data max-rows width height cell-style-fn
                          on-click-row-fn row-line-color]}]
 
-  ;(log/info "table-star" @data)
+  (log/info "table-star" @data)
 
   (if (empty? @data)
 
@@ -93,7 +93,7 @@
                                  :title "Chain-of-Custody"
                                  ;:no-clip? true
                                  :body [table*
-                                        :data (:c-o-c @d)
+                                        :data (h/resolve-value (if (:c-o-c @d) (:c-o-c @d) []))
                                         :max-rows 3]]]])]]])))
 
 
