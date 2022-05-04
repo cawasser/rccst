@@ -146,7 +146,6 @@
 
 
 (def meta-data {:rechart/bar-2 {:component component
-                                ;:configurable-component configurable-component
                                 :ports     {:data   :port/sink
                                             :config :port/sink}}})
 
