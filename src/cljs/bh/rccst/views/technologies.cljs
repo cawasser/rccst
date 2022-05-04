@@ -16,7 +16,7 @@
 (def data-path [:tech :tab-panel])
 
 (def init-db
-  {:tab-panel (tab-panel/mk-tab-panel-data data-path :tech/server)})
+  {:tab-panel (tab-panel/mk-tab-panel-data data-path :tech/system)})
 
 (re-frame/reg-sub
   :db/tech
@@ -36,9 +36,9 @@
     (:value tab-panel)))
 
 
-(def tech-navbar [[:tech/server "Server-side"]
+(def tech-navbar [[:tech/system "System / Services"]
+                  [:tech/server "Server-side"]
                   [:tech/client "Client-side"]
-                  [:tech/system "System / Services"]
                   [:tech/all "All"]])
 
 
@@ -60,14 +60,14 @@
      [tab-panel/tab-panel {:extra-classes             :is-fluid
                            :subscribe-to-selected-tab [:tech/value]}
 
+      [tab-panel/sub-panel {:extra-classes :is-fluid :panel-id :tech/system}
+       [s-s/page]]
+
       [tab-panel/sub-panel {:extra-classes :is-fluid :panel-id :tech/server}
        [tech-clj/page]]
 
       [tab-panel/sub-panel {:extra-classes :is-fluid :panel-id :tech/client}
        [tech-cljs/page]]
-
-      [tab-panel/sub-panel {:extra-classes :is-fluid :panel-id :tech/system}
-       [s-s/page]]
 
       [tab-panel/sub-panel {:extra-classes :is-fluid :panel-id :tech/all}
        [all/page]]]]]])

@@ -18,10 +18,10 @@
 
 
 (def main-navbar [[:app-bar/welcome "Welcome!"]
+                  [:app-bar/tech "Technologies"]
                   [:app-bar/atoms "'Atoms'"]
                   [:app-bar/molecules "'Molecules'"]
                   [:app-bar/templates "'Templates'"]
-                  [:app-bar/tech "Technologies"]
                   [:app-bar/giants "'Giants'"]])
 
 
@@ -52,6 +52,9 @@
          [tab-panel/sub-panel {:extra-classes :is-fluid :panel-id :app-bar/welcome}
           [welcome/page]]
 
+         [tab-panel/sub-panel {:extra-classes :is-fluid :panel-id :app-bar/tech}
+          [tech/page]]
+
          [tab-panel/sub-panel {:extra-classes :is-fluid :panel-id :app-bar/atoms}
           [atoms/page]]
 
@@ -60,9 +63,6 @@
 
          [tab-panel/sub-panel {:extra-classes :is-fluid :panel-id :app-bar/templates}
           [templates/page]]
-
-         [tab-panel/sub-panel {:extra-classes :is-fluid :panel-id :app-bar/tech}
-          [tech/page]]
 
          [tab-panel/sub-panel {:extra-classes :is-fluid :panel-id :app-bar/giants}
           [#'giants/view]]]]])))

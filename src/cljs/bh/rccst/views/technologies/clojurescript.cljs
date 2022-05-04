@@ -7,7 +7,8 @@
             [bh.rccst.views.technologies.overview.re-frame :as re-frame]
             [bh.rccst.views.technologies.overview.re-com :as re-com]
             [bh.rccst.views.technologies.overview.woolybear :as woolybear]
-            [bh.rccst.views.technologies.overview.recharts :as recharts]))
+            [bh.rccst.views.technologies.overview.recharts :as recharts]
+            [bh.rccst.views.technologies.overview.atom-design :as atomic-design]))
 
 
 (defn page []
@@ -28,6 +29,10 @@
 >
 >[Clojurescript](https://clojurescript.org/)"]
       [rc/gap :size "8px"]]]
+
+    [layout/frame {:extra-classes :is-fluid}
+     [atomic-design/overview]]
+
     [layout/frame {:extra-classes :is-fluid}
      [reagent/overview]]
 
