@@ -1,21 +1,23 @@
 (ns bh.rccst.views.technologies.clojurescript
   (:require [woolybear.ad.layout :as layout]
             [woolybear.packs.flex-panel :as flex]
+            [re-com.core :as rc]
             [bh.rccst.views.technologies.overview.hiccup :as hiccup]
             [bh.rccst.views.technologies.overview.reagent :as reagent]
             [bh.rccst.views.technologies.overview.re-frame :as re-frame]
             [bh.rccst.views.technologies.overview.re-com :as re-com]
             [bh.rccst.views.technologies.overview.woolybear :as woolybear]
-            [bh.rccst.views.technologies.overview.recharts :as recharts]))
+            [bh.rccst.views.technologies.overview.recharts :as recharts]
+            [bh.rccst.views.technologies.overview.atom-design :as atomic-design]))
 
 
 (defn page []
 
-  [layout/page
-   [flex/flex-panel
-    {:height "80vh"}
-    [flex/flex-top
-     [:div
+  [layout/page {:extra-classes :is-fluid}
+   [flex/flex-panel {:extra-classes :is-fluid
+                     :height "76vh"}
+    [flex/flex-top {:extra-classes :is-fluid}
+     [:div.is-fluid
       [:h2.has-text-info "Clojurescript"]
       [layout/markdown-block "[ClojureScript](https://github.com/clojure/clojurescript) is a compiler for Clojure that
       targets JavaScript. It emits JavaScript code which is compatible with the advanced compilation mode of the Google Closure
@@ -26,16 +28,25 @@
 > See also:
 >
 >[Clojurescript](https://clojurescript.org/)"]
-      [layout/section "We use a number of libraries to provide critical client-side functionality:"]]]
-    [layout/frame
+      [rc/gap :size "8px"]]]
+
+    [layout/frame {:extra-classes :is-fluid}
+     [atomic-design/overview]]
+
+    [layout/frame {:extra-classes :is-fluid}
      [reagent/overview]]
-    [layout/frame
+
+    [layout/frame {:extra-classes :is-fluid}
      [hiccup/overview]]
-    [layout/frame
+
+    [layout/frame {:extra-classes :is-fluid}
      [re-frame/overview]]
-    [layout/frame
+
+    [layout/frame {:extra-classes :is-fluid}
      [re-com/overview]]
-    [layout/frame
+
+    [layout/frame {:extra-classes :is-fluid}
      [woolybear/overview]]
-    [layout/frame
+
+    [layout/frame {:extra-classes :is-fluid}
      [recharts/overview]]]])

@@ -54,7 +54,7 @@
                      [:demo-navbar/four "Four"]]
       [:navbar-example/tab-panel]]
 
-     [tab-panel/tab-panel {:extra-classes             :rccst
+     [tab-panel/tab-panel {:extra-classes             :is-fluid
                            :subscribe-to-selected-tab [:navbar-example/value]}
 
       [tab-panel/sub-panel {:panel-id :demo-navbar/one}
@@ -72,7 +72,7 @@
                       [:demo-navbar/three "Three"]
                       [:demo-navbar/four "Four"]]
        [:navbar-example/tab-panel]]
-      [tab-panel/tab-panel {:extra-classes             :rccst
+      [tab-panel/tab-panel {:extra-classes             :is-fluid
                             :subscribe-to-selected-tab [:navbar-example/value]}
 
        [tab-panel/sub-panel {:panel-id :demo-navbar/one}

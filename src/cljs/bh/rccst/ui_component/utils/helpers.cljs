@@ -28,7 +28,7 @@
      [rc/scroller :src (rc/at)
       :v-scroll :auto
       :height "95%"
-      :child [tab-panel/tab-panel {:extra-classes             :rccst
+      :child [tab-panel/tab-panel {:extra-classes             :is-fluid
                                    :subscribe-to-selected-tab [tab]}
 
               [tab-panel/sub-panel {:panel-id config}
@@ -119,6 +119,48 @@
     (instance? reagent.ratom.RAtom value) (swap! value assoc-in path new-value)
     (instance? Atom value) (swap! value assoc-in path new-value)
     :else ()))
+
+
+
+(comment
+  (do
+    (def container-id "simple-multi-chart")
+    (def component-id (path->keyword container-id "widget"))
+    (def data [component-id :blackboard :topic.data])
+    (def path [:data])
+    (def old-data (atom {:metadata {:type :tabular,
+                                    :id :name,
+                                    :title "Tabular Data with Metadata",
+                                    :fields {:name :string, :uv :number, :pv :number, :tv :number, :amt :number}},
+                         :data [{:name "Page A", :uv 4000, :pv 2400, :tv 1500, :amt 2400}
+                                {:name "Page B", :uv 3000, :pv 1398, :tv 1500, :amt 2210}
+                                {:name "Page C", :uv 2000, :pv 9800, :tv 1500, :amt 2290}
+                                {:name "Page D", :uv 2780, :pv 3908, :tv 1500, :amt 2000}
+                                {:name "Page E", :uv 1890, :pv 4800, :tv 1500, :amt 2181}
+                                {:name "Page F", :uv 2390, :pv 3800, :tv 1500, :amt 2500}
+                                {:name "Page G", :uv 3490, :pv 4300, :tv 1500, :amt 2100}]}))
+    (def value data)
+    (def new-value (assoc-in (:data @old-data) [0 :uv] 10000)))
+
+
+
+  (cond
+    (or (coll? value)
+      (keyword? value)
+      (string? value)) (let [update-event (conj [(path->keyword value path)] new-value)]
+                         ;(log/info "handle-change-path (update event)" update-event)
+                         (re-frame/dispatch update-event))
+    (instance? reagent.ratom.RAtom value) (swap! value assoc-in path new-value)
+    (instance? Atom value) (swap! value assoc-in path new-value)
+    :else ())
+
+  (handle-change-path data [:data]
+    (assoc-in (:data @old-data) [0 :uv] 10000))
+
+
+
+  ())
+
 
 
 (comment

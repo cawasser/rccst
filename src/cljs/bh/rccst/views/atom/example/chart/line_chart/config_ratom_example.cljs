@@ -1,5 +1,5 @@
-(ns bh.rccst.views.atom.example.chart.bar-chart.config-ratom-example
-  (:require [bh.rccst.ui-component.atom.chart.bar-chart-2 :as chart]
+(ns bh.rccst.views.atom.example.chart.line-chart.config-ratom-example
+  (:require [bh.rccst.ui-component.atom.chart.line-chart-2 :as chart]
             [bh.rccst.ui-component.atom.chart.utils :as chart-utils]
             [bh.rccst.ui-component.molecule.example :as example]
             [bh.rccst.ui-component.utils :as utils]
@@ -8,7 +8,7 @@
             [taoensso.timbre :as log]))
 
 
-(log/info "bh.rccst.views.atom.example.chart.bar-chart.config-ratom-example")
+(log/info "bh.rccst.views.atom.example.chart.line-chart.config-ratom-example")
 
 
 (def default-config-data {:brush false
@@ -37,18 +37,19 @@
    :style {:border     "1px solid" :border-radius "3px"
            :box-shadow "5px 5px 5px 2px"
            :margin     "5px" :padding "5px"}
-   :children [[rc/button :on-click #(reset! config-data default-config-data) :label "Default"]
+   :children [[:label.h5 "Config:"]
+              [rc/button :on-click #(reset! config-data default-config-data) :label "Default"]
               [rc/button :on-click #(swap! config-data update-in [:brush] not) :label "!Brush"]
               [rc/button :on-click #(swap! config-data update-in [:uv :include] not) :label "! uv data"]
               [rc/button :on-click #(swap! config-data update-in [:tv :include] not) :label "! tv data"]
               [chart-utils/color-config config-data ":amt :fill" [:amt :fill] :above-center]
               [rc/button :on-click #(reset! config-data (-> @config-data
-                                                          (assoc-in [:uv :stackId] "a")
-                                                          (assoc-in [:tv :stackId] "a")))
+                                                            (assoc-in [:uv :stackId] "a")
+                                                            (assoc-in [:tv :stackId] "a")))
                :label "stack"]
               [rc/button :on-click #(reset! config-data (-> @config-data
-                                                          (assoc-in [:uv :stackId] "")
-                                                          (assoc-in [:tv :stackId] "")))
+                                                            (assoc-in [:uv :stackId] "")
+                                                            (assoc-in [:tv :stackId] "")))
                :label "un-stack"]]])
 
 
@@ -74,11 +75,11 @@
 
 
 (defn example []
-  (let [container-id "bar-chart-2-config-ratom-demo"
-        component-id (utils/path->keyword container-id "bar-chart-2")]
+  (let [container-id "line-chart-2-config-ratom-demo"
+        component-id (utils/path->keyword container-id "line-chart-2")]
     [example/component-example
-     :title "Bar Chart 2 (Live Configuration - ratom)"
-     :description "A Bar Chart (2) built using [Recharts](https://recharts.org/en-US/api/BarChart). This example shows how
+     :title "line Chart 2 (Live Configuration - ratom)"
+     :description "A line Chart (2) built using [Recharts](https://recharts.org/en-US/api/lineChart). This example shows how
      charts can take [ratoms](http://reagent-project.github.io/docs/master/reagent.ratom.html) as input and re-render as the configuration changes.
 
 > In _this_ case, we are using a ratom to hold the configuration for the chart.
@@ -91,5 +92,4 @@
      :container-id container-id
      :component-id component-id
      :source-code chart/source-code]))
-
 

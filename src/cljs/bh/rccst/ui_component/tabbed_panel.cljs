@@ -14,25 +14,25 @@
   page show (and hide all the others)
 
   "
-  [& {:keys [title short-name description children start-panel]}]
+  [& {:keys [title extra-classes short-name description children start-panel]}]
 
   (tab-utils/init-tabbed-panel short-name start-panel)
 
-  [layout/page {:extra-classes :rccst}
-   [flex/flex-panel {:height "calc(100vh - 2rem)"}
-    [flex/flex-top
-     [layout/page-header {:extra-classes :rccst}
-      [layout/page-title title]
-      [layout/markdown-block description]
-      [layout/text-block ""]]
-     [navbar/navbar children [(keyword short-name "tab-panel")]]]
+  ;[layout/page {:extra-classes :is-fluid}
+  [flex/flex-panel (or extra-classes {})
+   [flex/flex-top
+    [layout/page-header {:extra-classes :is-fluid}
+     [layout/page-title title]
+     [layout/markdown-block description]
+     [layout/text-block ""]]
+    [navbar/navbar children [(keyword short-name "tab-panel")]]]
 
-    [layout/page-body {:extra-classes :rccst}
-     (into
-       [tab-panel/tab-panel {:extra-classes             :rccst
-                             :subscribe-to-selected-tab [(keyword short-name "value")]}]
+   [layout/page-body {:extra-classes :is-fluid}
+    (into
+      [tab-panel/tab-panel {:extra-classes             :is-fluid
+                            :subscribe-to-selected-tab [(keyword short-name "value")]}]
 
-       (doall
-         (map (fn [[tag _ page]]
-                [tab-panel/sub-panel {:panel-id tag} page])
-           children)))]]])
+      (doall
+        (map (fn [[tag _ page]]
+               [tab-panel/sub-panel {:panel-id tag} page])
+          children)))]])

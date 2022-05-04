@@ -1,7 +1,7 @@
 (ns bh.rccst.views.technologies.all
   (:require [woolybear.ad.layout :as layout]
             [woolybear.packs.flex-panel :as flex]
-
+            [re-com.core :as rc]
             [bh.rccst.views.technologies.overview.ring :as ring-overview]
             [bh.rccst.views.technologies.overview.compojure :as compojure-overview]
             [bh.rccst.views.technologies.overview.component :as component-overview]
@@ -18,32 +18,44 @@
             [bh.rccst.views.technologies.overview.swagger :as swagger]))
 
 
-
-
 (defn page []
-  [layout/page
-   [flex/flex-panel
-    {:height "80vh"}
-    [flex/flex-top
-     [:div
+  [layout/page {:extra-classes :is-fluid}
+   [flex/flex-panel {:extra-classes :is-fluid
+                     :height "76vh"}
+    [flex/flex-top  {:extra-classes :is-fluid}
+     [:div.is-fluid
       [:h2.has-text-info "All"]
       [layout/text-block "An overview of many of the technologies we use in RCCST"]
-      [layout/section]]]
+      [rc/gap :size "8px"]]]
 
-    [ring-overview/overview]
-    [compojure-overview/overview]
-    [component-overview/overview]
-    [sente-overview/overview]
-    [transit-overview/overview]
-    [next-jdbc-overview/overview]
-    [jackdaw-overview/overview]
+    [layout/frame {:extra-classes :is-fluid}
+     [ring-overview/overview]]
+    [layout/frame {:extra-classes :is-fluid}
+     [compojure-overview/overview]]
+    [layout/frame {:extra-classes :is-fluid}
+     [component-overview/overview]]
+    [layout/frame {:extra-classes :is-fluid}
+     [sente-overview/overview]]
+    [layout/frame {:extra-classes :is-fluid}
+     [transit-overview/overview]]
+    [layout/frame {:extra-classes :is-fluid}
+     [next-jdbc-overview/overview]]
+    [layout/frame {:extra-classes :is-fluid}
+     [jackdaw-overview/overview]]
 
-    [reagent/overview]
-    [re-frame/overview]
-    [re-com/overview]
-    [woolybear/overview]
-    [recharts/overview]
+    [layout/frame {:extra-classes :is-fluid}
+     [reagent/overview]]
+    [layout/frame {:extra-classes :is-fluid}
+     [re-frame/overview]]
+    [layout/frame {:extra-classes :is-fluid}
+     [re-com/overview]]
+    [layout/frame {:extra-classes :is-fluid}
+     [woolybear/overview]]
+    [layout/frame {:extra-classes :is-fluid}
+     [recharts/overview]]
 
-    [kafka/overview]
-    [swagger/overview]]])
+    [layout/frame {:extra-classes :is-fluid}
+     [kafka/overview]]
+    [layout/frame {:extra-classes :is-fluid}
+     [swagger/overview]]]])
 

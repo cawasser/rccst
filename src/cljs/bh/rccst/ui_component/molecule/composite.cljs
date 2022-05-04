@@ -1,4 +1,5 @@
 (ns bh.rccst.ui-component.molecule.composite
+  ; TODO: we can refactor all function into grid-widget
   "provides a 'container' to hold and organize other atoms and molecules
 components have 'ports' which define their inputs and outputs:
 
@@ -28,7 +29,10 @@ distinction, so we can quickly build all the Nodes and Handles used for the diag
             [bh.rccst.ui-component.molecule.composite.util.ui :as ui]
             [bh.rccst.ui-component.utils :as ui-utils]
             [bh.rccst.ui-component.atom.chart.bar-chart :as bar-chart]
+            [bh.rccst.ui-component.atom.chart.area-chart-2 :as area-chart-2]
             [bh.rccst.ui-component.atom.chart.bar-chart-2 :as bar-chart-2]
+            [bh.rccst.ui-component.atom.chart.colored-pie-chart-2 :as colored-pie-chart-2]
+            [bh.rccst.ui-component.atom.chart.line-chart-2 :as line-chart-2]
             [day8.re-frame.tracing :refer-macros [fn-traced]]
             [loom.graph :as lg]
             [re-com.core :as rc]
@@ -58,7 +62,10 @@ distinction, so we can quickly build all the Nodes and Handles used for the diag
     r-globe/meta-data
 
     bar-chart/meta-data
+    area-chart-2/meta-data
     bar-chart-2/meta-data
+    colored-pie-chart-2/meta-data
+    line-chart-2/meta-data
 
     ; "stunt" components to use as stand-ins
     e/meta-data))
@@ -84,22 +91,8 @@ distinction, so we can quickly build all the Nodes and Handles used for the diag
    :container  ""})
 
 
-;;;;;;;;;;
-;;;;;;;;;;
-;
-;  UI Support Functions
-;
-;;;;;;;;;;
-;;;;;;;;;;
-;; region
 
-
-;(def color-pallet {":ui/component"  "#00ff00"
-;                   ":source/remote" "#FFA500"
-;                   ":source/local"  "#0000ff"
-;                   ":source/fn"     "#FFC0CB"})
-
-(defn- definition-panel
+(defn definition-panel
   "show the text definition of the composed UI
   "
   [& {:keys [configuration]}]
@@ -130,7 +123,7 @@ distinction, so we can quickly build all the Nodes and Handles used for the diag
                    [layout/text-block (str layout)]]]])))
 
 
-(defn- dag-panel
+(defn dag-panel
   "show the DAG, built form the configuration passed into the component, in a panel
   (beside the actual UI)
   "
@@ -153,101 +146,6 @@ distinction, so we can quickly build all the Nodes and Handles used for the diag
      :tool-types dag-support/default-tool-types
      :minimap-styles minimap-styles]))
 
-
-(defn- component-panel
-  "show the UI, built from the configuration data passed to the component
-  "
-  [& {:keys [configuration component-id container-id]}]
-  (let [layout           (:layout configuration)
-        components       (:components configuration)
-        component-lookup (into {}
-                           (sig/process-components
-                             configuration :ui/component
-                             meta-data-registry component-id))
-
-        ; 1. build UI components (with subscription/event signals against the blackboard or remotes)
-        composed-ui      (sig/process-ui component-lookup [] layout)]
-
-    ;(log/info "component-panel" component-id "//" composed-ui)
-
-    (fn [& {:keys [configuration component-id container-id]}]
-
-      ; 5. return the composed component layout!
-      composed-ui)))
-
-
-(defn component
-  "build a UI from a data structure (data), which provides the :components, :links between them,
-  and the :layout of the physical UI-components on the display
-  "
-  [& {:keys [data component-id container-id]}]
-  (let [id            (r/atom nil)
-        configuration @data
-        graph         (apply lg/digraph (ui/compute-edges configuration))
-        comp-or-dag?  (r/atom :component)
-        full-config   (assoc configuration
-                        :graph graph
-                        :denorm (dig/denorm-components graph (:links configuration) (lg/nodes graph))
-                        :nodes (lg/nodes graph)
-                        :edges (lg/edges graph))]
-
-    (fn []
-      (when (nil? @id)
-        (reset! id component-id)
-        (ui-utils/init-widget @id (config full-config))
-        (ui-utils/dispatch-local @id [:container] container-id)
-
-        (ui/prep-environment full-config @id meta-data-registry))
-
-      (let [buttons [{:id :component :label [:i {:class "zmdi zmdi-view-compact"}]}
-                     {:id :dag :label [:i {:class "zmdi zmdi-share"}]}
-                     {:id :definition :label [:i {:class "zmdi zmdi-format-subject"}]}]]
-
-        [rc/v-box :src (rc/at)
-         :width "1000px"
-         :height "800px"
-         :gap "5px"
-         :children [[rc/h-box :src (rc/at)
-                     :justify :end
-                     :children [[rc/horizontal-bar-tabs
-                                 :model comp-or-dag?
-                                 :tabs buttons
-                                 :on-change #(reset! comp-or-dag? %)]]]
-                    (condp = @comp-or-dag?
-                      :dag [dag-panel
-                            :configuration full-config
-                            :component-id @id
-                            :container-id container-id]
-                      :component [component-panel
-                                  :configuration full-config
-                                  :component-id @id
-                                  :container-id container-id]
-                      :definition [definition-panel
-                                   :configuration configuration]
-                      :default [rc/alert-box :src (rc/at)
-                                :alert-type :warning
-                                :body "There is a problem with this component."])]]))))
-
-
-
-
-(defn composite
-  "make the composite:
-
-  1. sets up the app-db to hold the local state, specifically the `:components`
-  2. stores the children as `:components` in local state
-  2. organizes the children onto the display
-
-  ---
-
-  - id : (string) unique id for this composite
-  - components : (vector) vector of hiccup components (atoms or molecules) to manage and display
-
-  Returns - (hiccup) a single reagent component (equivalent to a `:div`)
-  "
-  [& {:keys [id components]}]
-
-  [cl/layout components])
 
 
 
@@ -717,119 +615,6 @@ distinction, so we can quickly build all the Nodes and Handles used for the diag
   ())
 
 
-; work out the "new" logic for building the :layout
-(comment
-  (do
-    (def config @bh.rccst.ui-component.molecule.composite.coverage-plan/ui-definition)
-    (def container-id "dummy")
-    (def links (:links config))
-    (def layout (:layout config))
-    (def components (:components config))
-    (def graph (apply lg/digraph (compute-edges config)))
-    (def nodes (lg/nodes graph))
-    (def edges (lg/edges graph))
-    (def registry meta-data-registry)
-
-    (def configuration (assoc @bh.rccst.ui-component.molecule.composite.coverage-plan/ui-definition
-                         :graph graph
-                         :denorm (denorm-components graph (:links config) (lg/nodes graph))
-                         :nodes (lg/nodes graph)
-                         :edges (lg/edges graph)
-                         :ui-lookup (into {}
-                                      (process-components
-                                        configuration :ui/component
-                                        meta-data-registry :coverage-plan))))
-    (def component-lookup (into {}
-                            (process-components
-                              configuration :ui/component
-                              meta-data-registry :coverage-plan))))
-
-  ; in a more 'tree format, the layout looks like this:
-  ;
-  ; |-v-box ---------------------------------------------|
-  ; | |--------------------------------------------------|
-  ; | | h-box                                            |
-  ; | | |-v-box ---------------| |-v-box ----------------|
-  ; | | |    [:ui/targets]     | |   [:ui/globe]         |
-  ; | | |    [:ui/satellites]  | |   [:ui/current-time]  |
-  ; | | |    [:ui/time-slider] | |                       |
-  ; |-|-|----------------------|-|-----------------------|
-
-  (:ui-lookup configuration)
-  (:layout configuration)
-
-
-  ;(def layout [:v-box
-  ;             [[:h-box
-  ;               [[:v-box [:ui/targets :ui/satellites :ui/time-slider]]
-  ;                [:v-box [:ui/globe :ui/current-time]]]]]])
-
-  (def should-be [:v-box
-                  :children
-                  [[:h-box
-                    :children
-                    [[:v-box :children [:ui/targets :ui/satellites :ui/time-slider]]
-                     [:v-box :children [:ui/globe :ui/current-time]]]]]])
-
-  ;(defn process-ui [lookup a tree]
-  ;  (let [[node children] tree
-  ;        siblings? (and (vector? node))
-  ;        ;(or (= :v-box (first node)) (= :h-box (first node))))
-  ;        branch?   (and (vector? children)
-  ;                    (or (= :v-box node) (= :h-box node)))]
-  ;    (cond
-  ;      branch? (do
-  ;                (println "branch" node "///" children)
-  ;                (apply conj a [node :children (process-ui lookup [] children)]))
-  ;      siblings? (do
-  ;                  (println "siblings" tree)
-  ;                  ; this mapv adds an extra '[]' which we don't need,
-  ;                  ; but how to get rid of it?
-  ;                  (apply conj a (mapv #(process-ui lookup [] %) tree)))
-  ;      :else (do
-  ;              (println "leaf" tree)
-  ;              tree))))
-
-  (= (process-ui component-lookup [] layout)
-    should-be)
-
-
-
-
-  (def tree [:v-box [[:h-box [:c :d]]]])
-  (process-ui component-lookup [] tree)
-  (def produces [:v-box
-                 :children [[:h-box
-                             :children [:c :d]]]])
-
-
-  (def tree2 [:v-box
-              [[:h-box
-                [[:v-box [:c :d :e]]
-                 [:v-box [:f :g]]]]]])
-  (process-ui component-lookup [] tree2)
-
-  (def produces2 [:v-box
-                  :children
-                  [[:h-box
-                    :children [[:v-box
-                                :children [:c :d :e]]
-                               [:v-box
-                                :children [:f :g]]]]]])
-
-
-
-  (def produces-layout [:v-box
-                        :children [[:h-box
-                                    :children [[:v-box
-                                                :children [:ui/targets :ui/satellites :ui/time-slider]]
-                                               [:v-box
-                                                :children [:ui/globe :ui/current-time]]]]]])
-
-
-  ())
-
-
 ; token substitution
 (comment
   (do
@@ -860,9 +645,9 @@ distinction, so we can quickly build all the Nodes and Handles used for the diag
 
   (:ui-lookup configuration)
 
-  (parse-token component-lookup node)
+  ;(parse-token component-lookup node)
 
-  (into (parse-token lookup node) [:children [:a :b :c]])
+  ;(into (parse-token lookup node) [:children [:a :b :c]])
 
 
   ())
@@ -932,6 +717,7 @@ distinction, so we can quickly build all the Nodes and Handles used for the diag
   (let [ui-type      (->> configuration :components node :name)
         ui-component (->> registry ui-type :component)]
     {node
+     ; TODO: can this be converted to (apply concat...)? (see https://clojuredesign.club/episode/080-apply-as-needed/)
      (reduce into [ui-component]
        (seq
          (merge
@@ -1137,46 +923,6 @@ distinction, so we can quickly build all the Nodes and Handles used for the diag
 
   ())
 
-
-; building the UI components "for real"
-(comment
-  (do
-    (def data @bh.rccst.ui-component.molecule.composite.coverage-plan/ui-definition)
-    (def container-id "coverage-plan-demo")
-    (def component-id :coverage-plan-demo.component)
-    (def links (:links data))
-    (def layout (:layout data))
-    (def components (:components data))
-    (def graph (apply lg/digraph (compute-edges data)))
-    (def nodes (lg/nodes graph))
-    (def edges (lg/edges graph))
-    (def registry meta-data-registry)
-    (def configuration (assoc @bh.rccst.ui-component.molecule.composite.coverage-plan/ui-definition
-                         :graph graph
-                         :denorm (denorm-components graph (:links data) (lg/nodes graph))
-                         :nodes (lg/nodes graph)
-                         :edges (lg/edges graph)))
-    (def source-type :source/local)
-    (def node-type :source/local))
-
-  (def component-lookup (into {}
-                          (process-components
-                            configuration :ui/component
-                            meta-data-registry component-id)))
-
-  (def component-ui (process-ui component-lookup [] layout))
-
-
-  (process-ui component-lookup [] [:ui/globe])
-
-  (process-ui component-lookup [] [:v-box [:ui/time-slider]])
-
-  (re-frame/subscribe [:coverage-plan-demo.component.blackboard.topic.time-range])
-  (re-frame/subscribe [:coverage-plan-demo.component.blackboard.topic.current-time])
-
-  (re-frame/dispatch [:coverage-plan-demo.component.blackboard.topic.current-time 22])
-
-  ())
 
 
 ; have to actually CALL the fn/subcription we built!

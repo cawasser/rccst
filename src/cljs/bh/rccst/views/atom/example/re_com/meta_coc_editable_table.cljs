@@ -8,7 +8,7 @@
 (log/info "bh.rccst.views.atom.example.re-com.meta-coc-editable-table")
 
 
-(def data table/meta-coc-sample-data)
+(defonce data table/meta-coc-sample-data)
 
 
 (defn cell-styling-fn [{:keys [amt uv pv] :as row}
@@ -55,3 +55,15 @@
        :width 2000
        :on-click-row #(log/info "on-click-row")
        :cell-style cell-styling-fn]]))
+
+
+; can we change the data and have the table re-render correctly?
+(comment
+  (assoc-in @data [:data 0 :uv] 10000)
+
+
+  (swap! data assoc-in [:data 0 :uv] 10000)
+  (swap! data assoc-in [:data 0 :uv] 4000)
+
+
+  ())

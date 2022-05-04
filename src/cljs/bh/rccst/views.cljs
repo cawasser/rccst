@@ -1,28 +1,27 @@
 (ns bh.rccst.views
-  (:require [re-frame.core :as re-frame]
-            [taoensso.timbre :as log]
-
-            [woolybear.ad.layout :as layout]
-            [woolybear.packs.flex-panel :as flex]
-            [woolybear.packs.tab-panel :as tab-panel]
-
-            [bh.rccst.subs :as subs]
+  (:require [bh.rccst.subs :as subs]
             [bh.rccst.ui-component.navbar :as navbar]
-            [bh.rccst.views.welcome :as welcome]
+
+            [bh.rccst.ui-component.tabbed-pane.utils :as tab-utils]
             [bh.rccst.views.atoms :as atoms]
-            [bh.rccst.views.molecules :as molecules]
-            [bh.rccst.views.templates :as templates]
-            [bh.rccst.views.technologies :as tech]
             [bh.rccst.views.giants :as giants]
 
-            [bh.rccst.ui-component.tabbed-pane.utils :as tab-utils]))
+            [bh.rccst.views.molecules :as molecules]
+            [bh.rccst.views.technologies :as tech]
+            [bh.rccst.views.templates :as templates]
+            [bh.rccst.views.welcome :as welcome]
+            [re-frame.core :as re-frame]
+            [woolybear.ad.layout :as layout]
+            [woolybear.packs.flex-panel :as flex]
+
+            [woolybear.packs.tab-panel :as tab-panel]))
 
 
 (def main-navbar [[:app-bar/welcome "Welcome!"]
+                  [:app-bar/tech "Technologies"]
                   [:app-bar/atoms "'Atoms'"]
                   [:app-bar/molecules "'Molecules'"]
                   [:app-bar/templates "'Templates'"]
-                  [:app-bar/tech "Technologies"]
                   [:app-bar/giants "'Giants'"]])
 
 
@@ -38,31 +37,34 @@
     (fn []
       ;(log/info "view" @logged-in?)
 
-      [layout/page {:extra-classes :rccst}
-       [flex/flex-panel {:height "calc(100vh - 2rem)"}
-        [flex/flex-top
+      [layout/page {:extra-classes :is-fluid}
+
+       [flex/flex-panel {:width "100%"
+                         :height "97vh"}
+        [flex/flex-top {:extra-classes :is-fluid}
          [navbar/navbar main-navbar [:app-bar/tab-panel]]]
+        [flex/flex-bottom "UI Component Catalog"]
 
-        [layout/page-body {:extra-classes :rccst}
-         [tab-panel/tab-panel {:extra-classes             :rccst
-                               :subscribe-to-selected-tab [:app-bar/value]}
+        ;[layout/page-body {:extra-classes :is-fluid}]
+        [tab-panel/tab-panel {:extra-classes             :is-fluid
+                              :subscribe-to-selected-tab [:app-bar/value]}
 
-          [tab-panel/sub-panel {:panel-id :app-bar/welcome}
-           [welcome/page]]
+         [tab-panel/sub-panel {:extra-classes :is-fluid :panel-id :app-bar/welcome}
+          [welcome/page]]
 
-          [tab-panel/sub-panel {:panel-id :app-bar/atoms}
-           [atoms/page]]
+         [tab-panel/sub-panel {:extra-classes :is-fluid :panel-id :app-bar/tech}
+          [tech/page]]
 
-          [tab-panel/sub-panel {:panel-id :app-bar/molecules}
-           [molecules/page]]
+         [tab-panel/sub-panel {:extra-classes :is-fluid :panel-id :app-bar/atoms}
+          [atoms/page]]
 
-          [tab-panel/sub-panel {:panel-id :app-bar/templates}
-           [templates/page]]
+         [tab-panel/sub-panel {:extra-classes :is-fluid :panel-id :app-bar/molecules}
+          [molecules/page]]
 
-          [tab-panel/sub-panel {:panel-id :app-bar/tech}
-           [tech/page]]
+         [tab-panel/sub-panel {:extra-classes :is-fluid :panel-id :app-bar/templates}
+          [templates/page]]
 
-          [tab-panel/sub-panel {:panel-id :app-bar/giants}
-           [#'giants/view]]]]]])))
+         [tab-panel/sub-panel {:extra-classes :is-fluid :panel-id :app-bar/giants}
+          [#'giants/view]]]]])))
 
 

@@ -6,7 +6,8 @@
                 [bh.rccst.views.atom.example.astrouxds.status :as status]
                 [bh.rccst.views.atom.example.astrouxds.progress-bar :as progress-bar]
                 [bh.rccst.views.atom.example.astrouxds.slider :as slider]
-                [bh.rccst.views.atom.example.astrouxds.radio-button :as rb]))
+                [bh.rccst.views.atom.example.astrouxds.radio-button :as rb]
+                [bh.rccst.views.atom.example.astrouxds.table :as table]))
 
 
 (defn examples
@@ -19,4 +20,5 @@
        [status/example]
        [progress-bar/example]
        [slider/example]
-       [rb/example]])
+       [rb/example]
+       [table/example]])

@@ -8,13 +8,5 @@
     "Radio Button"
     [rc/h-box :src (rc/at)
      :gap "50px"
-     :children [[rc/h-box :src (rc/at)
-                 :align :center
-                 :children [[:p "One"] [rb/radio-button :name "radios" :value "one"]]]
-                [rc/h-box :src (rc/at)
-                 :align :center
-                 :children [[:p "Two"] [rb/radio-button :name "radios" :value "two"]]]
-                [rc/h-box :src (rc/at)
-                 :align :center
-                 :children [[:p "Three"] [rb/radio-button :name "radios" :value "three"]]]]]))
+     :children [[rb/radio-button ["One" "Two" "Three"]]]]))
 

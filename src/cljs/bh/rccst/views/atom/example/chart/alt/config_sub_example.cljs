@@ -1,4 +1,4 @@
-(ns bh.rccst.views.atom.example.chart.bar-chart.config-sub-example
+(ns bh.rccst.views.atom.example.chart.alt.config-sub-example
   (:require [bh.rccst.ui-component.atom.chart.bar-chart-2 :as chart]
             [bh.rccst.ui-component.atom.chart.utils :as chart-utils]
             [bh.rccst.ui-component.molecule.example :as e]
@@ -12,12 +12,13 @@
 (log/info "bh.rccst.views.atom.example.chart.bar-chart.data-sub-example")
 
 
-(def default-config-data {:brush true
-                          :uv    {:include true, :fill "#ff0000", :stackId "b"}
-                          :pv    {:include true, :fill "#228B22", :stackId "b"}
-                          :tv    {:include true, :fill "#ADD8E6", :stackId "a"}
-                          :amt   {:include true, :fill "#800000", :stackId "a"}})
-
+;(def default-config-data {:brush true
+;                          :uv    {:include true, :fill "#ff0000", :stackId "b"}
+;                          :pv    {:include true, :fill "#228B22", :stackId "b"}
+;                          :tv    {:include true, :fill "#ADD8E6", :stackId "a"}
+;                          :amt   {:include true, :fill "#800000", :stackId "a"}})
+;
+;
 (defn- config [config-data]
   ; TODO: notice how we need to use '.' instead of '/' for this :topic? how can we fix this
   ; which causes an issue with subscriptions and resolve-value
@@ -36,7 +37,7 @@
                (str @config-data)]]])
 
 
-(defn- config-tools [config-data]
+(defn- config-tools [config-data default-config-data]
   (let [brush? (ui-utils/subscribe-local config-data [:brush])
         uv? (ui-utils/subscribe-local config-data [:uv :include])
         tv? (ui-utils/subscribe-local config-data [:tv :include])]
@@ -47,7 +48,8 @@
        :style {:border     "1px solid" :border-radius "3px"
                :box-shadow "5px 5px 5px 2px"
                :margin     "5px" :padding "5px"}
-       :children [[rc/button :on-click #() :label "Default"]
+       :children [[:label.h5 "Config:"]
+                  [rc/button :on-click #(h/handle-change-path config-data [] default-config-data) :label "Default"]
                   [rc/button :on-click #(h/handle-change-path config-data [:brush] (not @brush?))
                    :label "!Brush"]
                   [rc/button :on-click #(h/handle-change-path config-data [:uv :include] (not @uv?))
@@ -69,7 +71,8 @@
                    :label "!stack tv/amt"]]])))
 
 
-(defn- config-update-example [& {:keys [data config-data container-id component-id] :as params}]
+(defn- config-update-example [& {:keys [data component config-data default-config-data
+                                        container-id component-id] :as params}]
   ;(log/info "config-update-example (params)" params)
 
   [rc/v-box :src (rc/at)
@@ -77,19 +80,23 @@
    :width "100%"
    :height "100%"
    :children [[:div.chart-part {:style {:width "100%" :height "90%"}}
-               [chart/component
+               [component
                 :data data
                 :config-data config-data
                 :component-id component-id
-                :container-id container-id
-                :component-panel chart/component]]
+                :container-id container-id]]
 
               [show-config (h/resolve-value config-data)]
 
               [:div.config-tools-part {:style {:width "100%"}}
-               [config-tools config-data]]]])
+               [config-tools config-data default-config-data]]]])
 
-(defn- component [& {:keys [data config-data component-id container-id] :as params}]
+
+(defn- component-wedge [component default-config-data
+                        & {:keys [data config-data component-id container-id] :as params}]
+
+  ;(log/info "component" default-config-data "//" params)
+
   (let [id (r/atom nil)]
 
     (fn []
@@ -100,27 +107,30 @@
 
       [config-update-example
        :data data
+       :component component
        :config-data config-data
-       :component-id (h/path->keyword component-id "bar-chart-2")
+       :default-config-data default-config-data
+       :component-id (h/path->keyword component-id "chart")
        :container-id component-id])))
 
 
-(defn example []
-  (let [container-id :bar-chart-2-config-sub-demo
-        component-id (h/path->keyword container-id "bar-chart-2")]
+(defn example [& {:keys [container-id
+                         title description
+                         sample-data
+                         config-data default-config-data
+                         source-code
+                         component] :as params}]
 
-    [e/component-example
-     :title "Bar Chart 2 (Live Configuration - subscription)"
-     :description "A Bar Chart (2) built using [Recharts](https://recharts.org/en-US/api/BarChart). This example shows how
-     charts can take [subscriptions](https://day8.github.io/re-frame/subscriptions/) as input and re-render as the configuration changes.
+  ;(log/info "example" params)
 
-> In _this_ case, we are using a subscription to handle the configuration for the chart.
-"
-     :data (r/atom chart/sample-data)
-     :extra-params {:config-data [container-id :blackboard :config-data]}
-     :component component
-     :container-id ""
-     :component-id container-id
-     :source-code chart/source-code]))
+  [e/component-example
+   :title title
+   :description description
+   :data (r/atom sample-data)
+   :extra-params {:config-data config-data}
+   :component (partial component-wedge component default-config-data)
+   :container-id ""
+   :component-id container-id
+   :source-code source-code])
 
 

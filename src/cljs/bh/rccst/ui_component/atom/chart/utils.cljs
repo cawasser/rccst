@@ -76,9 +76,10 @@
   - data : (atom) vector of content hash-maps."
 
   [data]
+  ;(log/info "tabular-data-panel" @data)
   [table/table
    :width 500
-   :data data
+   :data @data
    :max-rows 5])
 
 
@@ -93,6 +94,7 @@
   - data : (atom) atom wrapping data with metadata included"
 
   [data]
+  ;(log/info "meta-tabular-data-panel" @data)
   [table/meta-table
    :width 500
    :data data
@@ -161,19 +163,20 @@
 
 
 (defn column-picker [data widget-id label path]
-  (let [model    (u/subscribe-local widget-id path)
-        headings (apply set (map keys (get @data :data)))
-        btns     (mapv (fn [h] {:id h :label h}) headings)]
-    (fn [data widget-id label path]
-      [rc/h-box :src (rc/at)
-       :gap "5px"
-       :children [[rc/box :src (rc/at) :align :start :child [:code label]]
-                  [rc/horizontal-bar-tabs
-                   :src (rc/at)
-                   :model @model
-                   :tabs btns
-                   :style btns-style
-                   :on-change #(u/dispatch-local widget-id path %)]]])))
+  (let [model    (u/subscribe-local widget-id path)]
+    (fn []
+      (let [headings (apply set (map keys (get @data :data)))
+            btns     (mapv (fn [h] {:id h :label h}) headings)]
+        ;(log/info "column-picker" data "//" widget-id "//" label "//" path)
+        [rc/h-box :src (rc/at)
+         :gap "5px"
+         :children [[rc/box :src (rc/at) :align :start :child [:code label]]
+                    [rc/horizontal-bar-tabs
+                     :src (rc/at)
+                     :model @model
+                     :tabs btns
+                     :style btns-style
+                     :on-change #(u/dispatch-local widget-id path %)]]]))))
 
 
 (defn boolean-config
@@ -188,7 +191,7 @@
   [config label path]
 
   (let [checked? (u/subscribe-local config path)]
-    (fn [config label path]
+    (fn []
       [rc/checkbox :src (rc/at)
        :label [rc/box :src (rc/at) :align :start :child [:code label]]
        :model @checked?
@@ -198,7 +201,7 @@
 (defn slider-config
   ([widget-id min max step path]
    (let [model (u/subscribe-local widget-id path)]
-     (fn [widget-id min max step path]
+     (fn []
        [rc/slider :src (rc/at)
         :model @model
         :width "100px"
@@ -211,7 +214,7 @@
 
 (defn text-config [widget-id label path]
   (let [model (u/subscribe-local widget-id path)]
-    (fn [widget-id label path])
+    (fn [])
     [rc/h-box :src (rc/at)
      :gap "5px"
      :children [[rc/label :src (rc/at) :label label]
@@ -420,7 +423,7 @@
   ;(log/info "color-config-text" widget-id "//" label "//" path)
 
   (let [model (u/subscribe-local widget-id path)]
-    (fn [widget-id label path & [position]]
+    (fn []
       [rc/h-box :src (rc/at)
        :gap "5px"
        :children [[color-config widget-id label path position]
@@ -493,7 +496,7 @@
 
     ;(log/info "option" @keys @chosen btns)
 
-    (fn [chart-id label path-root]
+    (fn []
       [rc/h-box :src (rc/at)
        :children [[rc/box :src (rc/at) :align :start :child [:code label]]
                   [rc/horizontal-bar-tabs
@@ -530,7 +533,7 @@
    [legend widget-id]])
 
 
-(defn non-gridded-chart-config [widget-id]
+(defn non-gridded-chart-config [data widget-id]
   [:<>
    [isAnimationActive widget-id]
    [rc/line :src (rc/at) :size "2px"]

@@ -151,7 +151,7 @@
   ; the apply/merge/map below is to stringify all the values so sorting still works once a value is edited
   ; this will need more modification/thought once we move beyond strings/ints in the table cells
   (let [dataset                   (r/atom
-                                    (->> data
+                                    (->> @data
                                       (map #(apply merge (map (fn [[k v]]
                                                                 {k (str v)}) %)))
                                       (into [])))
@@ -206,7 +206,7 @@
        :column-header-renderer (fn [] [build-header
                                        [dataset editing-cell editing-cell-content]
                                        (+ row-height 10)
-                                       (into (keys (get data 0)))])
+                                       (into (keys (get @data 0)))])
        :column-header-height 40])))
 
 
@@ -214,14 +214,15 @@
                                  on-click-row-fn row-line-color]}]
   (let [d (h/resolve-value data)]
     ;(log/info "non-meta-table" data "//" @d)
-    [table*
-     :data @d
-     :max-rows max-rows
-     :width width
-     :height height
-     :row-line-color row-line-color
-     :on-click-row on-click-row-fn
-     :cell-style-fn cell-style-fn]))
+    (fn []
+      [table*
+        :data d
+        :max-rows max-rows
+        :width width
+        :height height
+        :row-line-color row-line-color
+        :on-click-row on-click-row-fn
+        :cell-style-fn cell-style-fn])))
 
 
 (defn- meta-table [& {:keys [data max-rows width height cell-style-fn
@@ -229,16 +230,16 @@
   (let [d (h/resolve-value data)]
     (fn []
 
-      ;(log/info "meta-table" data "//" @d "//" (:data @d))
-
       (let [coc? (r/atom false)]
+        ;(log/info "meta-table" data "//" @d "//" (:data @d))
+
         [:div.card {:style {:width  (or width "100%") :height (or height "100%")
                             :margin :auto}}
          [:h3 (-> @d :metadata :title)]
          [rc/h-box :src (rc/at)
           :gap "2px"
           :children [[table*
-                      :data (if (:data @d) (:data @d) [])
+                      :data (h/resolve-value (if (:data @d) (:data @d) []))
                       :max-rows max-rows
                       :width width
                       :height height

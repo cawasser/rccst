@@ -1,5 +1,5 @@
-(ns bh.rccst.views.atom.example.chart.bar-chart.config-structure-example
-  (:require [bh.rccst.ui-component.atom.chart.bar-chart-2 :as chart]
+(ns bh.rccst.views.atom.example.chart.line-chart.config-structure-example
+  (:require [bh.rccst.ui-component.atom.chart.line-chart-2 :as chart]
             [bh.rccst.ui-component.atom.chart.utils :as chart-utils]
             [bh.rccst.ui-component.molecule.example :as example]
             [bh.rccst.ui-component.utils.helpers :as h]
@@ -9,7 +9,7 @@
             [taoensso.timbre :as log]))
 
 
-(log/info "bh.rccst.views.atom.example.chart.bar-chart.config-structure-example")
+(log/info "bh.rccst.views.atom.example.chart.line-chart.config-structure-example")
 
 
 (def config-data {:brush false
@@ -36,6 +36,7 @@
 
   (let [c (h/resolve-value config-data)]
     [rc/v-box :src (rc/at)
+     :class "config-example"
      :gap "10px"
      :width "100%"
      :height "100%"
@@ -51,11 +52,11 @@
 
 
 (defn example []
-  (let [container-id "bar-chart-2-config-ratom-demo"
-        component-id (utils/path->keyword container-id "bar-chart-2")]
+  (let [container-id "line-chart-2-config-ratom-demo"
+        component-id (utils/path->keyword container-id "line-chart-2")]
     [example/component-example
-     :title "Bar Chart 2 (Live Configuration - structure)"
-     :description "A Bar Chart (2) built using [Recharts](https://recharts.org/en-US/api/BarChart). This example shows how
+     :title "line Chart 2 (Live Configuration - structure)"
+     :description "A line Chart (2) built using [Recharts](https://recharts.org/en-US/api/lineChart). This example shows how
      charts can take [ratoms](http://reagent-project.github.io/docs/master/reagent.ratom.html) as input and re-render as the configuration changes.
 
 > In _this_ case, we are using a plain data structure to hold the configuration for the chart.
@@ -67,5 +68,4 @@
      :container-id container-id
      :component-id component-id
      :source-code chart/source-code]))
-
 

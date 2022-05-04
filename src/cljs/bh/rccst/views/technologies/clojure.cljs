@@ -1,6 +1,7 @@
 (ns bh.rccst.views.technologies.clojure
   (:require [woolybear.ad.layout :as layout]
             [woolybear.packs.flex-panel :as flex]
+            [re-com.core :as rc]
 
             [bh.rccst.views.technologies.overview.ring :as ring-overview]
             [bh.rccst.views.technologies.overview.compojure :as compojure-overview]
@@ -12,11 +13,11 @@
 
 (defn page []
 
-  [layout/page
-   [flex/flex-panel
-    {:height "80vh"}
-    [flex/flex-top
-     [:div
+  [layout/page {:extra-classes :is-fluid}
+   [flex/flex-panel {:extra-classes :is-fluid
+                     :height "76vh"}
+    [flex/flex-top {:extra-classes :is-fluid}
+     [:div.is-fluid
       [:h2.has-text-info "Clojure"]
       [layout/markdown-block
        "[Clojure](https://clojure.org) is a dynamic, general-purpose programming language, combining the approachability and
@@ -36,12 +37,25 @@ Agent system that ensure clean, correct, multithreaded designs.
 >[Clojure](https://clojure.org)
 >[Lisp](https://en.wikipedia.org/wiki/Lisp_(programming_language))
 >[Functional Programming ](https://en.wikipedia.org/wiki/Functional_programming)"]
-      [layout/section "We use a number of libraries to provide critical server-side functionality:"]]]
+      [rc/gap :size "8px"]]]
 
-    [ring-overview/overview]
-    [compojure-overview/overview]
-    [component-overview/overview]
-    [sente-overview/overview]
-    [transit-overview/overview]
-    [next-jdbc-overview/overview]
-    [jackdaw-overview/overview]]])
+    [layout/frame {:extra-classes :is-fluid}
+     [ring-overview/overview]]
+
+    [layout/frame {:extra-classes :is-fluid}
+     [compojure-overview/overview]]
+
+    [layout/frame {:extra-classes :is-fluid}
+     [component-overview/overview]]
+
+    [layout/frame {:extra-classes :is-fluid}
+     [sente-overview/overview]]
+
+    [layout/frame {:extra-classes :is-fluid}
+     [transit-overview/overview]]
+
+    [layout/frame {:extra-classes :is-fluid}
+     [next-jdbc-overview/overview]]
+
+    [layout/frame {:extra-classes :is-fluid}
+     [jackdaw-overview/overview]]]])
