@@ -97,8 +97,8 @@
 (def ui-definition {:title        "Coverage Plan"
                     :component-id :coverage-plan
                     :components   {; ui components
-                                   :ui/targets                {:type :ui/component :name :rc/table}
-                                   :ui/satellites             {:type :ui/component :name :rc/table}
+                                   :ui/targets                {:type :ui/component :name :bh/table}
+                                   :ui/satellites             {:type :ui/component :name :bh/table}
                                    :ui/globe                  {:type :ui/component :name :ww/globe}
                                    :ui/time-slider            {:type :ui/component :name :rc/slider}
                                    :ui/current-time           {:type :ui/component :name :rc/label-md}
@@ -157,10 +157,10 @@
                                                                       :fn/coverage     :current-time}}
                                    :topic/time-range          {:data {:ui/time-slider :range}}}
 
-                    :grid-layout  [{:i :ui/targets :x 0 :y 0 :w 6 :h 7 :static true}
-                                   {:i :ui/satellites :x 0 :y 7 :w 6 :h 8 :static true}
-                                   {:i :ui/time-slider :x 0 :y 15 :w 6 :h 2 :static true}
-                                   {:i :ui/globe :x 6 :y 0 :w 14 :h 15 :static true}
+                    :grid-layout  [{:i :ui/targets :x 0 :y 0 :w 9 :h 7 :static true}
+                                   {:i :ui/satellites :x 0 :y 7 :w 9 :h 8 :static true}
+                                   {:i :ui/time-slider :x 2 :y 15 :w 6 :h 2 :static true}
+                                   {:i :ui/globe :x 9 :y 0 :w 11 :h 15 :static true}
                                    {:i :ui/current-time :x 9 :y 15 :w 8 :h 2 :static true}]})
 
 

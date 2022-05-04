@@ -38,7 +38,7 @@
 (defn- format-aois []
   (->> (get-targets)
     (map (fn [[target cells]]
-           {:name target :cells (str cells)}))
+           {:name target :cells cells}))
     (into [])))
 
 
@@ -54,7 +54,8 @@
             :version version/version
             :at (str (java.util.Date.))
             :signature (str (java.util.UUID/randomUUID))}]
-   :metadata {:type :tabular
+   :metadata {:title "Targets"
+              :type :tabular
               :id :target
               :fields {:target :string :cells :string}}
    :data data})

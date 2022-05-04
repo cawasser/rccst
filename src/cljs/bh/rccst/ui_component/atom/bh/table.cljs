@@ -29,7 +29,9 @@
 
       ;(log/info "table* INSIDE" header "//" body)
 
-      [:div.table-container {:style {:width (or width "100%") :height (or height "100%")}}
+      [:div.table-container {:style {:width (or width "100%")
+                                     :height (or height "100%")
+                                     :overflow  :scroll}}
        [:table.table.is-hoverable {:style {:width "100%" :height "100%"}}
         [:thead {:style {:position :sticky :top 0 :background :darkslategray}}
          [:tr
@@ -68,38 +70,43 @@
   (let [d (h/resolve-value data)]
     (fn []
 
-      (log/info "meta-table" data "//" @d "//" (:data @d))
+      ;(log/info "meta-table" data "//" @d "//" (:data @d))
 
       (let [coc? (r/atom false)]
         [:div.card {:style {:width  (or width "90%") :height (or height "100%")
                             :margin :auto}}
-         [:h3 (-> @d :metadata :title)]
-         [rc/h-box :src (rc/at)
-          :gap "2px"
-          :children [[table*
-                      :data (if (:data @d) (:data @d) [])
-                      :max-rows max-rows
-                      :width width
-                      :height height
-                      :row-line-color row-line-color
-                      :on-click-row on-click-row-fn
-                      :cell-style-fn cell-style-fn]
-                     (when (seq (:c-o-c @d))
-                       [:div
-                        [rc/popover-anchor-wrapper :src (rc/at)
-                         :showing? coc?
-                         :position :below-center
-                         :anchor [rc/md-icon-button
-                                  :md-icon-name "zmdi zmdi-badge-check"
-                                  :tooltip "view chain-of-custody"
-                                  :on-click #(swap! coc? not)]
-                         :popover [rc/popover-content-wrapper :src (rc/at)
-                                   :title "Chain-of-Custody"
-                                   :body [table*
-                                          :data (:c-o-c @d)
-                                          :width "400px"
-                                          :max-width "400px"
-                                          :max-rows 3]]]])]]]))))
+         [:div.card-header
+          [:div.card-header-title
+           [rc/h-box :src (rc/at)
+            :width "100%"
+            :justify :between
+            :children [(-> @d :metadata :title)
+                       (when (seq (:c-o-c @d))
+                         [:div
+                          [rc/popover-anchor-wrapper :src (rc/at)
+                           :showing? coc?
+                           :position :below-center
+                           :anchor [rc/md-icon-button
+                                    :md-icon-name "zmdi zmdi-badge-check"
+                                    :tooltip "view chain-of-custody"
+                                    :on-click #(swap! coc? not)]
+                           :popover [rc/popover-content-wrapper :src (rc/at)
+                                     :title "Chain-of-Custody"
+                                     :body [table*
+                                            :data (:c-o-c @d)
+                                            :width "400px"
+                                            :max-width "400px"
+                                            :max-rows 3]]]])]]]]
+         [:div.card-content
+          [table*
+           :data (if (:data @d) (:data @d) [])
+           :max-rows max-rows
+           :width width
+           :height height
+           :row-line-color row-line-color
+           :on-click-row on-click-row-fn
+           :cell-style-fn cell-style-fn]]]))))
+
 
 
 (defn table [& {:keys [data max-rows width height cell-style-fn
