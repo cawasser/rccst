@@ -32,7 +32,7 @@
            ;; in order to actually draw the Recharts components. just saying "100%" doesn't work, since the
            ;; that really means "be as big as you need" and ResponsiveContainer then doesn't know what to do.
            ;;
-           [:div {:style {:width "100%" :height "800px"}}
+           [:div {:style {:width "100%" :min-height "400px"}}
             [grid/component
              :data (r/atom coverage-plan/ui-definition)
              :component-id (h/path->keyword container-id "grid-widget")
@@ -59,7 +59,7 @@
           'coverage-plan', drawing the layout from `:grid-layout` which provides X/Y/W/H for each component
           on the widget's internal grid.
 
-> This example different from the Worldwind version only by replacing the `:ww/globe` reference with `:r/globe`
+> This example differs from the Worldwind version only by replacing the `:ww/globe` reference with `:r/globe`
 "
           [layout/frame
            ;;
@@ -67,7 +67,7 @@
            ;; in order to actually draw the Recharts components. just saying "100%" doesn't work, since the
            ;; that really means "be as big as you need" and ResponsiveContainer then doesn't know what to do.
            ;;
-           [:div {:style {:width "100%" :height "800px"}}
+           [:div {:style {:width "100%" :min-height "400px"}}
             [grid/component
              :data (r/atom
                      (assoc-in coverage-plan/ui-definition
