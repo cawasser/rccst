@@ -29,6 +29,7 @@ distinction, so we can quickly build all the Nodes and Handles used for the diag
             [bh.rccst.ui-component.molecule.composite.util.ui :as ui]
             [bh.rccst.ui-component.utils :as ui-utils]
             [bh.rccst.ui-component.atom.chart.bar-chart :as bar-chart]
+            [bh.rccst.ui-component.atom.chart.area-chart-2 :as area-chart-2]
             [bh.rccst.ui-component.atom.chart.bar-chart-2 :as bar-chart-2]
             [bh.rccst.ui-component.atom.chart.colored-pie-chart-2 :as colored-pie-chart-2]
             [bh.rccst.ui-component.atom.chart.line-chart-2 :as line-chart-2]
@@ -61,6 +62,7 @@ distinction, so we can quickly build all the Nodes and Handles used for the diag
     r-globe/meta-data
 
     bar-chart/meta-data
+    area-chart-2/meta-data
     bar-chart-2/meta-data
     colored-pie-chart-2/meta-data
     line-chart-2/meta-data

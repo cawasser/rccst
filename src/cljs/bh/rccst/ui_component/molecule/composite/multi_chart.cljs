@@ -99,7 +99,7 @@
 (def ui-definition
   {:components  {:ui/line        {:type :ui/component :name :rechart/line-2}
                  :ui/bar         {:type :ui/component :name :rechart/bar-2}
-                 :ui/area        {:type :ui/component :name :rechart/bar-2}
+                 :ui/area        {:type :ui/component :name :rechart/area-2}
                  :ui/config      {:type :ui/component :name config-panel}
                  :topic/data     {:type :source/local :name :topic/data :default sample-data}
                  :topic/config   {:type :source/local :name :topic/config :default {}}
