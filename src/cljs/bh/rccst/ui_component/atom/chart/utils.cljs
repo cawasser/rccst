@@ -193,7 +193,9 @@
   (let [checked? (u/subscribe-local config path)]
     (fn []
       [rc/checkbox :src (rc/at)
-       :label [rc/box :src (rc/at) :align :start :child [:code label]]
+       :label (if (empty? label)
+                ""
+                [rc/box :src (rc/at) :align :start :child [:code label]])
        :model @checked?
        :on-change #(u/dispatch-local config path %)])))
 

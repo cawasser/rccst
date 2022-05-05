@@ -14,7 +14,7 @@
                             & {:keys [data config-data container-id component-id
                                       data-tools data-panel config-panel] :as params}]
 
-  (log/info "data-update-example (params)" params)
+  ;(log/info "data-update-example (params)" params)
   ;(log/info "data-update-example" default-data)
 
   [rc/v-box :src (rc/at)
