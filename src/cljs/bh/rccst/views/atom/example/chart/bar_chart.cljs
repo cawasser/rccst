@@ -7,7 +7,8 @@
             [bh.rccst.views.atom.example.chart.alt.config-ratom-example :as config-ratom-example]
             [bh.rccst.views.atom.example.chart.alt.config-structure-example :as config-structure-example]
             [bh.rccst.views.atom.example.chart.alt.config-sub-example :as config-sub-example]
-            [bh.rccst.views.atom.example.chart.alt.data-tools :as data-tools]))
+            [bh.rccst.views.atom.example.chart.alt.data-tools :as data-tools]
+            [bh.rccst.views.atom.example.chart.alt.config-tools :as config-tools]))
 
 
 (def default-config-data {:brush false
@@ -82,6 +83,7 @@
 > how that affects the data (shown in the gray panel) and how the chart responds."
    :sample-data chart/sample-data
    :source-code chart/source-code
+   :config-tools config-tools/meta-tabular-config-ratom-tools
    :component chart/component
    :default-config-data default-config-data])
 
@@ -113,6 +115,7 @@
 > In _this_ case, we are using a subscription to handle the configuration for the chart."
      :sample-data chart/sample-data
      :source-code chart/source-code
+     :config-tools config-tools/meta-tabular-config-sub-tools
      :component chart/component
      :config-data [container-id :blackboard :config-data]
      :default-config-data default-config-data]))
@@ -123,9 +126,9 @@
   [:div
    [data-ratom]
    [data-structure]
-   [data-sub]])
-   ;[config-ratom]
-   ;[config-structure]
-   ;[config-sub]])
+   [data-sub]
+   [config-ratom]
+   [config-structure]
+   [config-sub]])
 
 
