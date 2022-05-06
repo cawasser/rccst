@@ -7,11 +7,6 @@
 (def source-id :source/targets)
 
 
-(def sample-data (atom [{:id "one":data "ONE ONE ONE"}
-                        {:id "two":data "TWO TWO TWO"}
-                        {:id "three":data "THREE THREE THREE"}
-                        {:id "four":data "FOUR FOUR FOUR"}]))
-
 (def sample-targets {"alpha-hd"  #{[7 7 "hidef-image" 0]
                                    [7 6 "hidef-image" 1]
                                    [7 6 "hidef-image" 2]

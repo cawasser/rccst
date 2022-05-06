@@ -143,7 +143,7 @@
                         :graph graph
                         :denorm (dig/denorm-components graph (:links configuration) (lg/nodes graph))
                         :nodes (lg/nodes graph)
-                        :edges (lg/edges graph))]
+                        :edges (into [] (lg/edges graph)))]
 
     (fn []
       (when (nil? @id)
@@ -156,7 +156,7 @@
                      {:id :dag :tooltip "Event model view" :label [:i {:class "zmdi zmdi-share"}]}
                      {:id :definition :tooltip "Text view"  :label [:i {:class "zmdi zmdi-format-subject"}]}]]
 
-        [:div.box {:style {:background "#faeee8"}}
+        [:div.box {:style {:width "100%" :height "100%" :background "#faeee8"}}
          [rc/v-box :src (rc/at)
           :justify :end
           :width "100%"

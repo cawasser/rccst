@@ -16,7 +16,7 @@
 (defn- table* [& {:keys [data max-rows width height cell-style-fn
                          on-click-row-fn row-line-color]}]
 
-  (log/info "table*" data)
+  ;(log/info "table*" data)
 
   (if (empty? data)
 
