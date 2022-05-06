@@ -88,7 +88,7 @@
 
 
 (defn- component-panel [& {:keys [configuration component-id resizable] :as params}]
-  (log/info "component-panel (params)" params)
+  ;(log/info "component-panel (params)" params)
 
   ;(log/info "component-panel" component-id
   ;  "//" (keys configuration)
@@ -136,24 +136,24 @@
 (defn component [& {:keys [data component-id container-id resizable tools] :as params}]
 
   ;(log/info "component" data "//" component-id "//" container-id)
-  (log/info "component (params)" params)
+  ;(log/info "component (params)" params)
 
   (let [id            (r/atom nil)
         configuration @data
         graph         (apply lg/digraph (ui/compute-edges configuration))
         comp-or-dag?  (r/atom :component)
-        full-config   (assoc configuration
-                        :graph graph
-                        :denorm (dig/denorm-components graph (:links configuration) (lg/nodes graph))
-                        :nodes (lg/nodes graph)
-                        :edges (into [] (lg/edges graph)))]
+        partial-config   (assoc configuration
+                           :denorm (dig/denorm-components graph (:links configuration) (lg/nodes graph))
+                           :nodes (lg/nodes graph)
+                           :edges (into [] (lg/edges graph)))
+        full-config (assoc partial-config :graph graph)]
 
     (fn []
       (when (nil? @id)
         (reset! id component-id)
-        (ui-utils/init-widget @id (config full-config))
+        (ui-utils/init-widget @id (config partial-config))
         (ui-utils/dispatch-local @id [:container] container-id)
-        (ui/prep-environment full-config @id composite/meta-data-registry))
+        (ui/prep-environment partial-config @id composite/meta-data-registry))
 
       (let [buttons [{:id :component :tooltip "Widget view" :label [:i {:class "zmdi zmdi-view-compact"}]}
                      {:id :dag :tooltip "Event model view" :label [:i {:class "zmdi zmdi-share"}]}
