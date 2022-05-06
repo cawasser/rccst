@@ -36,7 +36,9 @@
             [grid/component
              :data (r/atom coverage-plan/ui-definition)
              :component-id (h/path->keyword container-id "grid-widget")
-             :container-id container-id]]])
+             :container-id container-id
+             :resizable true
+             :tools true]]])
         (acu/demo
           "Coverage Plan"
           [rc/alert-box :src (rc/at)
@@ -73,7 +75,9 @@
                      (assoc-in coverage-plan/ui-definition
                        [:components :ui/globe :name] :r/globe))
              :component-id (h/path->keyword container-id "grid-widget")
-             :container-id container-id]]])
+             :container-id container-id
+             :resizable true
+             :tools true]]])
         (acu/demo
           "Coverage Plan"
           [rc/alert-box :src (rc/at)

@@ -87,7 +87,9 @@
   (map #(assoc % :static (-> % :static not)) orig-value))
 
 
-(defn- component-panel [& {:keys [configuration component-id]}]
+(defn- component-panel [& {:keys [configuration component-id resizable] :as params}]
+  (log/info "component-panel (params)" params)
+
   ;(log/info "component-panel" component-id
   ;  "//" (keys configuration)
   ;  "// dummy-layout" dummy-layout
@@ -115,8 +117,8 @@
       ; 5. return the composed component layout!
       [rc/v-box :src (rc/at)
        :gap "2px"
-       :children [[ct/configure-toggle open? #(locals/apply-local component-id
-                                                [:layout] toggle-editable)]
+       :children [(when resizable [ct/configure-toggle open? #(locals/apply-local component-id
+                                                                [:layout] toggle-editable)])
                   [:div.grid-container {:style {:width "100%" :height "100%"}}
                    ; TODO: convert to responsive-grid
                    [grid/grid
@@ -131,9 +133,10 @@
                     :widthFn #(on-width-update %1 %2 %3 %4)]]]])))
 
 
-(defn component [& {:keys [data component-id container-id]}]
+(defn component [& {:keys [data component-id container-id resizable tools] :as params}]
 
   ;(log/info "component" data "//" component-id "//" container-id)
+  (log/info "component (params)" params)
 
   (let [id            (r/atom nil)
         configuration @data
@@ -162,12 +165,12 @@
           :width "100%"
           :height "100%"
           :gap "5px"
-          :children [[rc/h-box :src (rc/at)
-                      :justify :end
-                      :children [[rc/horizontal-bar-tabs
-                                  :model comp-or-dag?
-                                  :tabs buttons
-                                  :on-change #(reset! comp-or-dag? %)]]]
+          :children [(when tools [rc/h-box :src (rc/at)
+                                  :justify :end
+                                  :children [[rc/horizontal-bar-tabs
+                                              :model comp-or-dag?
+                                              :tabs buttons
+                                              :on-change #(reset! comp-or-dag? %)]]])
                      (condp = @comp-or-dag?
                        :dag [composite/dag-panel
                              :configuration full-config
@@ -176,7 +179,8 @@
                        :component [component-panel
                                    :configuration full-config
                                    :component-id @id
-                                   :container-id container-id]
+                                   :container-id container-id
+                                   :resizable resizable]
                        :definition [composite/definition-panel
                                     :configuration configuration]
                        :default [rc/alert-box :src (rc/at)

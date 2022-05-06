@@ -25,7 +25,9 @@
            [grid/component
             :data plan/ui-definition
             :component-id (h/path->keyword container-id "grid-widget")
-            :container-id container-id]])
+            :container-id container-id
+            :resizable true
+            :tools true]])
         (acu/demo
           "Coverage Plan"
           [rc/alert-box :src (rc/at)

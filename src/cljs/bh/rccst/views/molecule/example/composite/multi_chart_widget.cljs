@@ -94,6 +94,8 @@
           [data-update-example
            :widget [grid/component
                     :data (r/atom widget/ui-definition)
-                    :component-id component-id]
+                    :component-id component-id
+                    :resizable true
+                    :tools true]
            :component-id component-id]]]
         widget/source-code))))

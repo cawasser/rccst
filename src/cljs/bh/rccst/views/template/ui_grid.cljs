@@ -20,17 +20,20 @@
   [[:bar-chart "Bar Chart"
     [widget/component
      :data (r/atom chart-remote-data/ui-definition)
-     :component-id (h/path->keyword container-id "bar-chart")]
+     :component-id (h/path->keyword container-id "bar-chart")
+     :resizable true]
     :green :white]
    [:multi-chart "Multi-Chart"
     [widget/component
      :data (r/atom simple-multi-chart/ui-definition)
-     :component-id (h/path->keyword container-id "multi-chart")]
+     :component-id (h/path->keyword container-id "multi-chart")
+     :resizable true]
     :blue :white]
    [:coverage-plan "Coverage Plan"
     [widget/component
      :data (r/atom coverage-plan/ui-definition)
-     :component-id (h/path->keyword container-id "coverage-plan")]
+     :component-id (h/path->keyword container-id "coverage-plan")
+     :resizable true]
     :yellow :black]])
 
 

@@ -35,7 +35,9 @@
            [:div {:style {:width "100%" :min-height "400px"}}
             [grid/component
              :data (r/atom chart-remote-data/ui-definition)
-             :component-id (h/path->keyword container-id "widget")]]]
+             :component-id (h/path->keyword container-id "widget")
+             :resizable true
+             :tools true]]]
           chart-remote-data/source-code)
         (acu/demo
           "Bar chart of remote data"

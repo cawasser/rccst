@@ -131,7 +131,9 @@
            :widget [grid/component
                     ; TODO: why is this a RATOM????
                     :data (r/atom widget/ui-definition)
-                    :component-id component-id]
+                    :component-id component-id
+                    :resizable true
+                    :tools true]
            :component-id component-id]]]
 
         widget/source-code))))
