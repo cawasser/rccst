@@ -4,7 +4,7 @@
             [bh.rccst.ui-component.molecule.composite.chart-remote-data :as chart-remote-data]
             [bh.rccst.ui-component.molecule.composite.coverage-plan :as coverage-plan]
             [bh.rccst.ui-component.molecule.composite.simple-multi-chart :as simple-multi-chart]
-            [bh.rccst.ui-component.molecule.grid-widget :as widget]
+            [bh.rccst.ui-component.molecule.grid-container :as grid-container]
             [bh.rccst.ui-component.utils.helpers :as h]
             [re-com.core :as rc]
             [re-frame.core :as re-frame]
@@ -18,19 +18,19 @@
 
 (defn example-widgets [container-id]
   [[:bar-chart "Bar Chart"
-    [widget/component
+    [grid-container/component
      :data (r/atom chart-remote-data/ui-definition)
      :component-id (h/path->keyword container-id "bar-chart")
      :resizable true]
     :green :white]
    [:multi-chart "Multi-Chart"
-    [widget/component
+    [grid-container/component
      :data (r/atom simple-multi-chart/ui-definition)
      :component-id (h/path->keyword container-id "multi-chart")
      :resizable true]
     :blue :white]
    [:coverage-plan "Coverage Plan"
-    [widget/component
+    [grid-container/component
      :data (r/atom coverage-plan/ui-definition)
      :component-id (h/path->keyword container-id "coverage-plan")
      :resizable true]
@@ -45,9 +45,12 @@
 (defn- make-widget [[id title content bk-color txt-color]]
   [:div.widget-parent {:key id}
    [:div.grid-toolbar.title-wrapper.move-cursor
-    {:style {:background-color bk-color
-             :color            txt-color}}
-    title]
+    [:div {:style {:background-color bk-color
+                   :color            txt-color
+                   :padding          "5px"
+                   :font-weight      :bold
+                   :font-size        "1.1em"}}
+     title]]
    [:div.widget.widget-content
     {:style         {:width       "100%"
                      :height      "90%"

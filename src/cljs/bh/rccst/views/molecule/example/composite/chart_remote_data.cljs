@@ -1,7 +1,7 @@
 (ns bh.rccst.views.molecule.example.composite.chart-remote-data
   (:require [bh.rccst.subs :as subs]
             [bh.rccst.ui-component.molecule.composite.chart-remote-data :as chart-remote-data]
-            [bh.rccst.ui-component.molecule.grid-widget :as grid]
+            [bh.rccst.ui-component.molecule.grid-container :as grid]
             [bh.rccst.ui-component.utils.helpers :as h]
             [re-com.core :as rc]
             [re-frame.core :as re-frame]

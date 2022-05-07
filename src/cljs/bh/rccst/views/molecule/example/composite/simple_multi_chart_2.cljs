@@ -1,7 +1,7 @@
 (ns bh.rccst.views.molecule.example.composite.simple-multi-chart-2
   (:require [bh.rccst.ui-component.atom.chart.utils :as chart-utils]
             [bh.rccst.ui-component.molecule.composite.simple-multi-chart-2 :as widget]
-            [bh.rccst.ui-component.molecule.grid-widget :as grid]
+            [bh.rccst.ui-component.molecule.grid-container :as grid]
             [bh.rccst.ui-component.utils :as ui-utils]
             [bh.rccst.ui-component.utils.helpers :as h]
             [re-com.core :as rc]

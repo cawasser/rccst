@@ -2,7 +2,7 @@
   (:require [bh.rccst.ui-component.molecule.composite.multi-chart :as widget]
             [bh.rccst.ui-component.atom.chart.utils :as chart-utils]
             [bh.rccst.ui-component.utils :as ui-utils]
-            [bh.rccst.ui-component.molecule.grid-widget :as grid]
+            [bh.rccst.ui-component.molecule.grid-container :as grid]
             [bh.rccst.ui-component.utils.helpers :as h]
             [reagent.core :as r]
             [re-com.core :as rc]

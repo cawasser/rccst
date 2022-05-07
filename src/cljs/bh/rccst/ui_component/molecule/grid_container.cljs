@@ -1,4 +1,4 @@
-(ns bh.rccst.ui-component.molecule.grid-widget
+(ns bh.rccst.ui-component.molecule.grid-container
   (:require [bh.rccst.ui-component.atom.layout.responsive-grid :as grid]
             [bh.rccst.ui-component.molecule.composite :as composite]
             [bh.rccst.ui-component.molecule.composite.util.digraph :as dig]
@@ -14,7 +14,7 @@
             [taoensso.timbre :as log]))
 
 
-(log/info "bh.rccst.ui-component.molecule.grid-widget")
+(log/info "bh.rccst.ui-component.molecule.grid-container")
 
 
 (defn- config
