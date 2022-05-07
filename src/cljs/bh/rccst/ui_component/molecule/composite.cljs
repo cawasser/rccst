@@ -498,7 +498,7 @@ distinction, so we can quickly build all the Nodes and Handles used for the diag
   ;     subscriptions for the "locals"
   ;
   ; [SIDE EFFECT]
-  (ui-utils/create-widget-sub container-id)
+  (ui-utils/create-container-sub container-id)
 
 
   ; 2. add blackboard data to the app-db and build local subscriptions/events against the blackboard
@@ -778,8 +778,8 @@ distinction, so we can quickly build all the Nodes and Handles used for the diag
 
   (ui-utils/init-container-locals component-id {:blackboard {}})
 
-  (ui-utils/create-widget-local-sub component-id [:container] "")
-  (ui-utils/create-widget-local-event component-id [:container])
+  (ui-utils/create-container-local-sub component-id [:container] "")
+  (ui-utils/create-container-local-event component-id [:container])
 
   (ui-utils/subscribe-local component-id [:container])
   (ui-utils/dispatch-local component-id [:container] container-id)
@@ -789,8 +789,8 @@ distinction, so we can quickly build all the Nodes and Handles used for the diag
 
   (ui-utils/dispatch-local component-id [:blackboard] {:dummy "dummy"})
 
-  (ui-utils/create-widget-local-sub component-id [:blackboard :topic/layers] [])
-  (ui-utils/create-widget-local-event component-id [:blackboard :topic/layers])
+  (ui-utils/create-container-local-sub component-id [:blackboard :topic/layers] [])
+  (ui-utils/create-container-local-event component-id [:blackboard :topic/layers])
   (ui-utils/dispatch-local component-id [:blackboard :topic/layers] {:dummy "ui-utils"})
 
   (re-frame/dispatch [:coverage-plan-demo.component.blackboard.topic.layers {:dummy "re-frame"}])
@@ -798,8 +798,8 @@ distinction, so we can quickly build all the Nodes and Handles used for the diag
 
   (ui-utils/subscribe-local component-id [:blackboard :topic/current-time])
 
-  (ui-utils/create-widget-local-sub component-id [:blackboard :topic/current-time] "")
-  (ui-utils/create-widget-local-event component-id [:blackboard :topic/current-time])
+  (ui-utils/create-container-local-sub component-id [:blackboard :topic/current-time] "")
+  (ui-utils/create-container-local-event component-id [:blackboard :topic/current-time])
   (ui-utils/dispatch-local component-id [:blackboard :topic/current-time] {})
 
 

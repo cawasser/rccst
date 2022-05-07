@@ -11,9 +11,9 @@
 
 
 (declare process-locals)
-(declare create-widget-local-sub)
+(declare create-container-local-sub)
 (declare create-local-path-sub)
-(declare create-widget-local-event)
+(declare create-container-local-event)
 (declare create-local-path-event)
 
 
@@ -48,14 +48,14 @@
 
   `component-id` is automatically converted into a `keyword`
 
-  In cases where there are multiple widgets of the same 'type', using 'locals' keeps each
+  In cases where there are multiple containers of the same 'type', using 'locals' keeps each
   instance's local state away from all the others, so changing the state of one does _not_ change
   them all.
 
   ---
 
   - `component-id` : (string) id of the component, passed as a string so we can use generated values (like guids)
-  - `values` : (hash-map) hash-map (tree) of values specific to _this_ widget.
+  - `values` : (hash-map) hash-map (tree) of values specific to _this_ container.
 
   "
   [component-id values]
@@ -91,10 +91,10 @@
 
       (doall
         ; TODO: consider using locals-and-defaults to put the actual default into the subscription rather than 'nil'
-        (map #(create-widget-local-sub component-id % nil) new-vals-paths))
+        (map #(create-container-local-sub component-id % nil) new-vals-paths))
 
       (doall
-        (map #(create-widget-local-event component-id %) new-vals-paths)))))
+        (map #(create-container-local-event component-id %) new-vals-paths)))))
 
 
 (defn update-local-path-values [component-id target-path values]
@@ -103,8 +103,8 @@
 
   ; TODO: can this be converted to (apply concat...)? (see https://clojuredesign.club/episode/080-apply-as-needed/)
   (let [data-path      (reduce conj [(h/path->keyword component-id)] target-path)
-        widget-path    (reduce conj [:containers (h/path->keyword component-id)] target-path)
-        old            (get-in @re-frame.db/app-db widget-path)
+        container-path    (reduce conj [:containers (h/path->keyword component-id)] target-path)
+        old            (get-in @re-frame.db/app-db container-path)
         old-vals       (->> old
                          (process-locals [] nil)
                          (filter #(= 1 (count %)))
@@ -123,10 +123,10 @@
     ;(log/info "update-local-path-values (merged)" component-id "//" diff "//" old "//" merged-values)
 
     (when (not (empty? diff))
-      ;(log/info "update-local-path-values (target)" widget-path "//" data-path "//" new-vals-paths)
+      ;(log/info "update-local-path-values (target)" container-path "//" data-path "//" new-vals-paths)
 
       (re-frame/dispatch-sync
-        [:events/init-local-path widget-path merged-values])
+        [:events/init-local-path container-path merged-values])
 
       (doall
         ; TODO: consider using locals-and-defaults to put the actual default into the subscription rather than 'nil'
@@ -182,7 +182,7 @@
 
   This is a preparation step for creating and registering the re-frame
   [subscription handlers](https://day8.github.io/re-frame/subscriptions/), so we must
-  create a vector for each value in the 'tree' so other code, like a UI 'widget', can subscribe to
+  create a vector for each value in the 'tree' so other code, like a UI 'container', can subscribe to
   the value and automatically 'update and render'.
 
   ---
@@ -195,7 +195,7 @@
   the specific value of interest.
 
 > Note: ^*^ typically we sort out the 'base' for the relative paths separately, using
-> [[create-widget-local-sub]]
+> [[create-container-local-sub]]
 
   "
   [a r t]
@@ -219,7 +219,7 @@
   (h/path->keyword container-id "blackboard" a more))
 
 
-(defn compute-widget-deps [container-id a more]
+(defn compute-container-deps [container-id a more]
   (if more
     (h/path->keyword container-id a (drop-last more))
     (h/path->keyword container-id)))
@@ -231,7 +231,7 @@
     (h/path->keyword a)))
 
 
-(defn create-widget-sub
+(defn create-container-sub
   "create and registers a re-frame [subscription handler](https://day8.github.io/re-frame/subscriptions/)
   for the `container-id` (as a keyword) inside the `:containers` top-level key in the `app-db`.
 
@@ -243,7 +243,7 @@
   [container-id]
   (let [id (h/path->keyword container-id)]
 
-    ;(log/info "create-widget-sub" id)
+    ;(log/info "create-container-sub" id)
 
     (re-frame/reg-sub
       id
@@ -253,14 +253,14 @@
         (get containers id)))))
 
 
-(defn create-widget-local-sub
+(defn create-container-local-sub
   "create and registers a re-frame [subscription handler](https://day8.github.io/re-frame/subscriptions/)
   for the value at the path inside the [`:containers` `container-id as a keyword`] key in the `app-db`.
 
   ---
 
-  - `container-id` : (string) id for the widget, using a string means we can use generated values, like a guid, for the id
-  - `value-path` : (vector of keywords) the path into the widget values to locate the specific one for this subscription
+  - `container-id` : (string) id for the container, using a string means we can use generated values, like a guid, for the id
+  - `value-path` : (vector of keywords) the path into the container's values to locate the specific one for this subscription
 
   `value-path` functions exactly like any other re-frame subscription, but relative to the
   `[:containers <container-id as a keyword>]` in the overall `app-db`
@@ -276,7 +276,7 @@
   to organize things. In order to generate unique ids for each subscription, we concatenate the
   path into a single value:
 
-  assuming: `(def widget-wid \"some-guid\")` then path `[:value-2 :nested-value]` would be converted into the subscription named
+  assuming: `(def container-id \"some-guid\")` then path `[:value-2 :nested-value]` would be converted into the subscription named
   `:some-guid/value-2.nested-value`
 
 > Note: so developer don't need to understand or even remember this encoding scheme, use the [[subscribe-local]] helper function
@@ -284,19 +284,19 @@
   "
   [container-id [a & more :as value-path] default]
   (let [p    (h/path->keyword container-id a more)
-        dep  (compute-widget-deps container-id a more)
+        dep  (compute-container-deps container-id a more)
         item (h/path->keyword (if more (last more) a))]
 
-    ;(log/info "create-widget-local-sub" p
+    ;(log/info "create-container-local-sub" p
     ;  ":<-" dep
     ;  "item" item)
 
     (re-frame/reg-sub
       p
       :<- [dep]
-      (fn [widget _]
-        ;(log/info "sub" p dep widget (last more))
-        (or (get widget item) default)))))
+      (fn [container _]
+        ;(log/info "sub" p dep container (last more))
+        (or (get container item) default)))))
 
 
 (defn create-local-path-sub [[a & more :as value-path] default]
@@ -313,12 +313,12 @@
     (re-frame/reg-sub
       p
       :<- [dep]
-      (fn [widget _]
-        ;(log/info "sub" p dep widget (last more))
-        (or (get widget item) default)))))
+      (fn [container _]
+        ;(log/info "sub" p dep container (last more))
+        (or (get container item) default)))))
 
 
-(defn create-widget-event
+(defn create-container-event
   "create and registers a re-frame [event handler](https://day8.github.io/re-frame/dominoes-30k/#domino-2-event-handling)
   for the `container-id` (as a keyword) inside the `:containers` top-level key in the `app-db`.
 
@@ -330,7 +330,7 @@
   [container-id]
   (let [id (h/path->keyword container-id)]
 
-    ;(log/info "create-widget-event" id)
+    ;(log/info "create-container-event" id)
 
     (re-frame/reg-event-db
       id
@@ -339,7 +339,7 @@
         (assoc-in db [:containers id] new-val)))))
 
 
-(defn create-widget-local-event
+(defn create-container-local-event
   "create and registers a re-frame [event handler](https://day8.github.io/re-frame/dominoes-30k/#domino-2-event-handling)
   for the value at the path inside the [`:containers` `container-id as a keyword`] key in the `app-db`.
 
@@ -371,7 +371,7 @@
   [container-id [a & more :as value-path]]
   (let [p (h/path->keyword container-id a more)]
 
-    ;(log/info "create-widget-local-event" p
+    ;(log/info "create-container-local-event" p
     ;  "apply conj" (apply conj [:containers (h/path->keyword container-id)] (map h/path->keyword value-path)))
 
     (re-frame/reg-event-db
@@ -437,15 +437,15 @@
     (init-local-values container-id locals-and-defaults)
 
     ; create subscriptions
-    (create-widget-sub container-id)
+    (create-container-sub container-id)
     (doall
       ; TODO: consider using locals-and-defaults to put the actual default into the subscription rather than 'nil'
-      (map #(create-widget-local-sub container-id % nil) paths))
+      (map #(create-container-local-sub container-id % nil) paths))
 
     ; create event handlers
-    (create-widget-event container-id)
+    (create-container-event container-id)
     (doall
-      (map #(create-widget-local-event container-id %) paths))))
+      (map #(create-container-local-event container-id %) paths))))
 
 
 (defn subscribe-local
