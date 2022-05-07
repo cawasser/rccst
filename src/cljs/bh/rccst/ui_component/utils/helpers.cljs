@@ -9,9 +9,9 @@
             [woolybear.packs.tab-panel :as tab-panel]))
 
 
-(defn config-tab-panel [chart-id]
-  {:tab-panel {:value     (keyword chart-id "config")
-               :data-path [:widgets (keyword chart-id) :tab-panel]}})
+(defn config-tab-panel [component-id]
+  {:tab-panel {:value     (keyword component-id "config")
+               :data-path [:widgets (keyword component-id) :tab-panel]}})
 
 
 (defn component-id []

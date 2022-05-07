@@ -28,8 +28,8 @@
              :flex-flow         "column wrap"})
 
 
-(defn config-tab-panel [chart-id]
-  (h/config-tab-panel chart-id))
+(defn config-tab-panel [component-id]
+  (h/config-tab-panel component-id))
 
 
 (defn component-id []

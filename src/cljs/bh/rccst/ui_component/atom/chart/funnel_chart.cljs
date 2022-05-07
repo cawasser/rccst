@@ -64,27 +64,27 @@
 
   ---
 
-  - chart-id : (string) unique id of the chart
+  - component-id : (string) unique id of the chart
   "
-  [chart-id data]
+  [component-id data]
 
   (merge
     ui-utils/default-pub-sub
     utils/default-config
-    (ui-utils/config-tab-panel chart-id)
+    (ui-utils/config-tab-panel component-id)
     (local-config data)))
 
 
 (defn- color-anchors
   "build the config ui-components needed for each of the funnel slices
   "
-  [chart-id]
+  [component-id]
   [:<>
    (doall
      (map (fn [[id color-data]]
             (let [text  (:name color-data)]
-              ^{:key id} [utils/color-config-text chart-id text [:colors id :color] :right-above]))
-       @(ui-utils/subscribe-local chart-id [:colors])))])
+              ^{:key id} [utils/color-config-text component-id text [:colors id :color] :right-above]))
+       @(ui-utils/subscribe-local component-id [:colors])))])
 
 
 (defn config-panel
@@ -103,10 +103,10 @@
   ---
 
   - _ : (unused) this is where the container will pass in the data, unused by the funner chart's config
-  - chart-id : (string) unique id of the chart
+  - component-id : (string) unique id of the chart
   "
 
-  [_ chart-id]
+  [_ component-id]
 
   [rc/v-box :src (rc/at)
    :gap "10px"
@@ -114,15 +114,15 @@
    :style {:padding          "15px"
            :border-top       "1px solid #DDD"
            :background-color "#f7f7f7"}
-   :children [[utils/non-gridded-chart-config chart-id]
+   :children [[utils/non-gridded-chart-config component-id]
               [rc/line :src (rc/at) :size "2px"]
-              [utils/option chart-id ":name" [:name]]
+              [utils/option component-id ":name" [:name]]
               [rc/line :src (rc/at) :size "2px"]
-              [utils/option chart-id ":value" [:value]]
+              [utils/option component-id ":value" [:value]]
               [rc/v-box :src (rc/at)
                :gap "5px"
                :children [[rc/label :src (rc/at) :label "Funnel Colors"]
-                          (color-anchors chart-id)]]]])
+                          (color-anchors component-id)]]]])
 
 
 (defn- component-panel
@@ -131,7 +131,7 @@
   ---
 
   - data : (atom) any data shown by the component's ui
-  - chart-id : (string) unique identifier for this chart instance
+  - component-id : (string) unique identifier for this chart instance
   "
   [data component-id container-id ui]
   (let [isAnimationActive? (ui-utils/subscribe-local component-id [:isAnimationActive])

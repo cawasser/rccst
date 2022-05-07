@@ -33,7 +33,7 @@
 
   ---
 
-  - chart-id : (string) unique id of the chart
+  - component-id : (string) unique id of the chart
   "
   [component-id data]
   (merge
@@ -71,7 +71,7 @@
   ---
 
   - data : (atom) data to display (may be used by the standard configuration components for thins like axes, etc.
-  - chart-id : (string) unique identifier for this chart instance
+  - component-id : (string) unique identifier for this chart instance
   "
   [_ component-id]
 

@@ -32,13 +32,13 @@
          (into {}))))
 
 
-(defn- config [chart-id data]
+(defn- config [component-id data]
   (-> ui-utils/default-pub-sub
       (merge
         utils/default-config
         {:type      "line-chart"
-         :tab-panel {:value     (keyword chart-id "config")
-                     :data-path [:widgets (keyword chart-id) :tab-panel]}}
+         :tab-panel {:value     (keyword component-id "config")
+                     :data-path [:widgets (keyword component-id) :tab-panel]}}
         (local-config data))
       (assoc-in [:x-axis :dataKey] (get-in @data [:metadata :id]))))
 
@@ -53,18 +53,18 @@
                           [utils/color-config widget-id ":fill" (conj path :fill) position]]]]])
 
 
-(defn- make-line-config [chart-id data]
+(defn- make-line-config [component-id data]
   (->> (get-in @data [:metadata :fields])
        (filter (fn [[k v]] (= :number v)))
        keys
        (map-indexed (fn [idx a]
-                      [line-config chart-id a [a] :above-right]))
+                      [line-config component-id a [a] :above-right]))
        (into [])))
 
 
-(defn config-panel [data chart-id]
+(defn config-panel [data component-id]
 
-  ;(log/info "config-panel" data chart-id)
+  ;(log/info "config-panel" data component-id)
 
   [rc/v-box :src (rc/at)
    :gap "10px"
@@ -72,16 +72,16 @@
    :style {:padding          "15px"
            :border-top       "1px solid #DDD"
            :background-color "#f7f7f7"}
-   :children [[utils/standard-chart-config data chart-id]
+   :children [[utils/standard-chart-config data component-id]
               [rc/line :src (rc/at) :size "2px"]
               [rc/h-box :src (rc/at)
                :gap "10px"
-               :children (make-line-config chart-id data)]
+               :children (make-line-config component-id data)]
               [rc/line :src (rc/at) :size "2px"]
-              [utils/boolean-config chart-id ":brush?" [:brush]]]])
+              [utils/boolean-config component-id ":brush?" [:brush]]]])
 
 
-(defn- make-line-display [chart-id data subscriptions isAnimationActive?]
+(defn- make-line-display [component-id data subscriptions isAnimationActive?]
 
   ;(log/info "make-line-display" data)
   (->> (get-in data [:metadata :fields])

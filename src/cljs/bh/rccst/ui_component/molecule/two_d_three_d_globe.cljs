@@ -21,11 +21,11 @@
     (local-config data)))
 
 
-(defn- three-d-view [data chart-id container-id]
+(defn- three-d-view [data component-id container-id]
   [:div "3D view"])
 
 
-(defn- two-d-view [data chart-id container-id]
+(defn- two-d-view [data component-id container-id]
   [:div "2D view"])
 
 

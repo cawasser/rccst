@@ -71,15 +71,15 @@
 
   ---
 
-  - chart-id : (string) unique id of the chart
+  - component-id : (string) unique id of the chart
   - data : (atom) metadata wrapped data  to display
   "
-  [chart-id data]
+  [component-id data]
   (-> ui-utils/default-pub-sub
     (merge
       utils/default-config
-      {:tab-panel {:value     (keyword chart-id "config")
-                   :data-path [:widgets (keyword chart-id) :tab-panel]}}
+      {:tab-panel {:value     (keyword component-id "config")
+                   :data-path [:widgets (keyword component-id) :tab-panel]}}
       (local-config data))
     (assoc-in [:x-axis :dataKey] (get-in @data [:metadata :id]))))
 
@@ -93,7 +93,7 @@
 
   ---
 
-  - chart-id : (string) unique identifier for his chart instance
+  - component-id : (string) unique identifier for his chart instance
   - label : (string) label to use for this `area`
   - path : (vector of keywords) path to the data inside the config data structure
   - position : (keyword) position to place the re-com/popover that shows the `color-picker`
@@ -102,21 +102,21 @@
 >
 > [Re-com/popover](https://re-com.day8.com.au/#/popovers)
   "
-  [chart-id label path position]
+  [component-id label path position]
   [rc/v-box :src (rc/at)
    :gap "5px"
-   :children [[utils/boolean-config chart-id label (conj path :include)]
-              [utils/color-config chart-id ":fill" (conj path :fill) :right-above]
-              [utils/color-config chart-id ":stroke" (conj path :stroke) :right-above]
-              [utils/text-config chart-id ":stackId" (conj path :stackId)]]])
+   :children [[utils/boolean-config component-id label (conj path :include)]
+              [utils/color-config component-id ":fill" (conj path :fill) :right-above]
+              [utils/color-config component-id ":stroke" (conj path :stroke) :right-above]
+              [utils/text-config component-id ":stackId" (conj path :stackId)]]])
 
 
-(defn- make-area-config [chart-id data]
+(defn- make-area-config [component-id data]
   (->> (get-in @data [:metadata :fields])
     (filter (fn [[k v]] (= :number v)))
     keys
     (map-indexed (fn [idx a]
-                   [area-config chart-id a [a] :right-center]))
+                   [area-config component-id a [a] :right-center]))
     (into [])))
 
 
@@ -127,7 +127,7 @@
 
   - data : (atom) data to display (may be used by the standard configuration components for thins like axes, etc.\n  - config : (atom) holds all the configuration settings made by the user
   "
-  [data chart-id]
+  [data component-id]
 
   [rc/v-box :src (rc/at)
    :gap "10px"
@@ -135,21 +135,21 @@
    :style {:padding          "15px"
            :border-top       "1px solid #DDD"
            :background-color "#f7f7f7"}
-   :children [[utils/standard-chart-config data chart-id]
+   :children [[utils/standard-chart-config data component-id]
               [rc/line :src (rc/at) :size "2px"]
               [rc/h-box :src (rc/at)
                :gap "10px"
                :width "400px"
                :style ui-utils/h-wrap
-               :children (make-area-config chart-id data)]
+               :children (make-area-config component-id data)]
               [rc/line :src (rc/at) :size "2px"]
-              [utils/boolean-config chart-id ":brush?" [:brush]]]])
+              [utils/boolean-config component-id ":brush?" [:brush]]]])
 
 
 (def source-code "dummy area Chart Code")
 
 
-(defn- make-area-display [chart-id data subscriptions isAnimationActive?]
+(defn- make-area-display [component-id data subscriptions isAnimationActive?]
   (->> (get-in @data [:metadata :fields])
     (filter (fn [[_ v]] (= :number v)))
     keys
@@ -262,12 +262,12 @@
 
 (comment
   (do
-    (def chart-id "area-chart-demo/area-chart")
+    (def component-id "area-chart-demo/area-chart")
     (def data sample-data)
-    (def subscriptions (ui-utils/build-subs chart-id (local-config data)))
+    (def subscriptions (ui-utils/build-subs component-id (local-config data)))
     (def isAnimationActive? (r/atom true)))
 
-  (make-area-display chart-id data subscriptions isAnimationActive?)
+  (make-area-display component-id data subscriptions isAnimationActive?)
 
 
   (->> (get-in @data [:metadata :fields])

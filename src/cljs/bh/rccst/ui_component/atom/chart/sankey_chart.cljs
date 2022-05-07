@@ -126,7 +126,7 @@
   ---
 
   - data : (atom) any data shown by the component's ui
-  - chart-id : (string) unique identifier for this chart instance within this container
+  - component-id : (string) unique identifier for this chart instance within this container
   - container-id : (string) name of the container this chart is inside of
   "
   [data component-id container-ui ui]
@@ -156,7 +156,7 @@
   ---
 
   - data : (atom) any data shown by the component's ui
-  - chart-id : (string) unique identifier of this chart insatnce within this container
+  - component-id : (string) unique identifier of this chart insatnce within this container
   - container-id : (string) name of the container this chart is inside of
   "
   [& {:keys [data component-id container-id ui]}]
@@ -199,6 +199,6 @@
 
 
 (comment
-  (def chart-id "sankey-chart-demo")
+  (def component-id "sankey-chart-demo")
 
   ())

@@ -28,7 +28,7 @@
 
   ---
 
-  - chart-id : (string) unique id of the chart
+  - component-id : (string) unique id of the chart
   "
   [component-id data]
   (->

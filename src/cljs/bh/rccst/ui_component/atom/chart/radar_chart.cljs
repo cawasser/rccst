@@ -113,35 +113,35 @@
 
   ---
 
-  - chart-id : (string) unique id of the chart
+  - component-id : (string) unique id of the chart
   - data : (atom) metadata wrapped data  to display
   "
-  [chart-id data]
+  [component-id data]
   (-> ui-utils/default-pub-sub
     (merge
       utils/default-config
-      {:tab-panel {:value     (keyword chart-id "config")
-                   :data-path [:widgets (keyword chart-id) :tab-panel]}}
+      {:tab-panel {:value     (keyword component-id "config")
+                   :data-path [:widgets (keyword component-id) :tab-panel]}}
 
       (local-config data))
     (assoc-in [:fullMark :include] false)))
 
 
-(defn- radar-config [chart-id label path position]
+(defn- radar-config [component-id label path position]
   [rc/v-box :src (rc/at)
    :gap "5px"
-   :children [[utils/boolean-config chart-id label (conj path :include)]
-              [utils/color-config chart-id ":fill" (conj path :fill) position]
-              [utils/color-config chart-id ":stroke" (conj path :stroke) position]
-              [utils/slider-config chart-id 0 1 0.1 (conj path :fillOpacity)]]])
+   :children [[utils/boolean-config component-id label (conj path :include)]
+              [utils/color-config component-id ":fill" (conj path :fill) position]
+              [utils/color-config component-id ":stroke" (conj path :stroke) position]
+              [utils/slider-config component-id 0 1 0.1 (conj path :fillOpacity)]]])
 
 
-(defn- make-radar-config [chart-id data]
+(defn- make-radar-config [component-id data]
   (->> (get-in @data [:metadata :fields])
     (filter (fn [[k v]] (= :number v)))
     keys
     (map-indexed (fn [idx a]
-                   [radar-config chart-id a [a] :above-right]))
+                   [radar-config component-id a [a] :above-right]))
     (into [])))
 
 
@@ -152,7 +152,7 @@
 
   - data : (atom) data to display (may be used by the standard configuration components for thins like axes, etc.\n  - config : (atom) holds all the configuration settings made by the user
   "
-  [data chart-id]
+  [data component-id]
 
   [rc/v-box :src (rc/at)
    :gap "10px"
@@ -160,16 +160,16 @@
    :style {:padding          "15px"
            :border-top       "1px solid #DDD"
            :background-color "#f7f7f7"}
-   :children [[utils/non-gridded-chart-config chart-id]
+   :children [[utils/non-gridded-chart-config component-id]
               [rc/line :src (rc/at) :size "2px"]
               [rc/h-box :src (rc/at)
                :width "400px"
                :style ui-utils/h-wrap
                :gap "10px"
-               :children (make-radar-config chart-id data)]]])
+               :children (make-radar-config component-id data)]]])
 
 
-(defn- make-radar-display [chart-id data subscriptions]
+(defn- make-radar-display [component-id data subscriptions]
   (->> (get-in @data [:metadata :fields])
     (filter (fn [[_ v]] (= :number v)))
     keys
@@ -317,9 +317,9 @@
 
 ; defs for repl testing
 (comment
-  (def chart-id "radar-chart-demo/radar-chart")
+  (def component-id "radar-chart-demo/radar-chart")
   (def data sample-data)
-  (def subscriptions (ui-utils/build-subs chart-id (local-config data)))
+  (def subscriptions (ui-utils/build-subs component-id (local-config data)))
   ())
 
 

@@ -487,11 +487,11 @@
               [verticalAlign-config widget-id [:legend :verticalAlign]]]])
 
 
-(defn option [chart-id label path-root]
+(defn option [component-id label path-root]
   (let [chosen-path (conj path-root :chosen)
         keys-path   (conj path-root :keys)
-        chosen      (u/subscribe-local chart-id chosen-path)
-        keys        (u/subscribe-local chart-id keys-path)
+        chosen      (u/subscribe-local component-id chosen-path)
+        keys        (u/subscribe-local component-id keys-path)
         btns        (->> @keys
                       (map (fn [k]
                              {:id k :label k})))]
@@ -506,7 +506,7 @@
                    :model @chosen
                    :tabs btns
                    :style btns-style
-                   :on-change #(u/dispatch-local chart-id chosen-path %)]]])))
+                   :on-change #(u/dispatch-local component-id chosen-path %)]]])))
 
 ;; endregion
 

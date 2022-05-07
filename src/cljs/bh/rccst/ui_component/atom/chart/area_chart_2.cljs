@@ -39,12 +39,12 @@
     ret))
 
 
-(defn config [chart-id data]
+(defn config [component-id data]
   (-> ui-utils/default-pub-sub
       (merge
         utils/default-config
-        {:tab-panel {:value     (keyword chart-id "config")
-                     :data-path [:widgets (keyword chart-id) :tab-panel]}}
+        {:tab-panel {:value     (keyword component-id "config")
+                     :data-path [:widgets (keyword component-id) :tab-panel]}}
         (local-config data))
       (assoc-in [:x-axis :dataKey] :name)))
 
