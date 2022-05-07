@@ -162,21 +162,28 @@
                                          :verticalAlign "bottom"}})
 
 
-(defn column-picker [data widget-id label path]
-  (let [model    (u/subscribe-local widget-id path)]
+(defn- subscription-error [label path]
+  (log/info (str label " : " path " - error"))
+  [:div])
+
+
+(defn column-picker [data component-id label path]
+  (let [model    (u/subscribe-local component-id path)]
     (fn []
-      (let [headings (apply set (map keys (get @data :data)))
-            btns     (mapv (fn [h] {:id h :label h}) headings)]
-        ;(log/info "column-picker" data "//" widget-id "//" label "//" path)
-        [rc/h-box :src (rc/at)
-         :gap "5px"
-         :children [[rc/box :src (rc/at) :align :start :child [:code label]]
-                    [rc/horizontal-bar-tabs
-                     :src (rc/at)
-                     :model @model
-                     :tabs btns
-                     :style btns-style
-                     :on-change #(u/dispatch-local widget-id path %)]]]))))
+      (if model
+        (let [headings (apply set (map keys (get @data :data)))
+              btns     (mapv (fn [h] {:id h :label h}) headings)]
+          ;(log/info "column-picker" data "//" widget-id "//" label "//" path)
+          [rc/h-box :src (rc/at)
+           :gap "5px"
+           :children [[rc/box :src (rc/at) :align :start :child [:code label]]
+                      [rc/horizontal-bar-tabs
+                       :src (rc/at)
+                       :model @model
+                       :tabs btns
+                       :style btns-style
+                       :on-change #(u/dispatch-local component-id path %)]]])
+        (subscription-error label path)))))
 
 
 (defn boolean-config
@@ -192,23 +199,27 @@
 
   (let [checked? (u/subscribe-local config path)]
     (fn []
-      [rc/checkbox :src (rc/at)
-       :label (cond
-                (and (string? label) (empty? label)) ""
-                :else [rc/box :src (rc/at) :align :start :child [:code label]])
-       :model @checked?
-       :on-change #(u/dispatch-local config path %)])))
+      (if checked?
+        [rc/checkbox :src (rc/at)
+         :label (cond
+                  (and (string? label) (empty? label)) ""
+                  :else [rc/box :src (rc/at) :align :start :child [:code label]])
+         :model @checked?
+         :on-change #(u/dispatch-local config path %)]
+        (subscription-error label path)))))
 
 
 (defn slider-config
   ([widget-id min max step path]
    (let [model (u/subscribe-local widget-id path)]
      (fn []
-       [rc/slider :src (rc/at)
-        :model @model
-        :width "100px"
-        :min min :max max :step step
-        :on-change #(u/dispatch-local widget-id path %)])))
+       (if model
+         [rc/slider :src (rc/at)
+          :model @model
+          :width "100px"
+          :min min :max max :step step
+          :on-change #(u/dispatch-local widget-id path %)]
+         (subscription-error "slider" path)))))
 
   ([widget-id min max path]
    [slider-config widget-id min max 1 path]))
@@ -216,14 +227,16 @@
 
 (defn text-config [widget-id label path]
   (let [model (u/subscribe-local widget-id path)]
-    (fn [])
-    [rc/h-box :src (rc/at)
-     :gap "5px"
-     :children [[rc/label :src (rc/at) :label label]
-                [rc/input-text :src (rc/at)
-                 :model (str @model)
-                 :width "50px"
-                 :on-change #(u/dispatch-local widget-id path %)]]]))
+    (fn []
+      (if model
+        [rc/h-box :src (rc/at)
+         :gap "5px"
+         :children [[rc/label :src (rc/at) :label label]
+                    [rc/input-text :src (rc/at)
+                     :model (str @model)
+                     :width "50px"
+                     :on-change #(u/dispatch-local widget-id path %)]]]
+        (subscription-error label path)))))
 
 
 (defn strokeDasharray
@@ -283,14 +296,16 @@
 
   (let [model (u/subscribe-local widget-id path)]
     (fn []
-      [rc/h-box :src (rc/at)
-       :children [[rc/box :src (rc/at) :align :start :child [:code label]]
-                  [rc/horizontal-bar-tabs
-                   :src (rc/at)
-                   :model @model
-                   :tabs btns
-                   :style btns-style
-                   :on-change #(u/dispatch-local widget-id path %)]]])))
+      (if model
+        [rc/h-box :src (rc/at)
+         :children [[rc/box :src (rc/at) :align :start :child [:code label]]
+                    [rc/horizontal-bar-tabs
+                     :src (rc/at)
+                     :model @model
+                     :tabs btns
+                     :style btns-style
+                     :on-change #(u/dispatch-local widget-id path %)]]]
+        (subscription-error label path)))))
 
 
 (defn orientation-config
@@ -426,13 +441,15 @@
 
   (let [model (u/subscribe-local widget-id path)]
     (fn []
-      [rc/h-box :src (rc/at)
-       :gap "5px"
-       :children [[color-config widget-id label path position]
-                  [rc/input-text :src (rc/at)
-                   :width "100px"
-                   :model @model
-                   :on-change #(u/dispatch-local widget-id path %)]]])))
+      (if model
+        [rc/h-box :src (rc/at)
+         :gap "5px"
+         :children [[color-config widget-id label path position]
+                    [rc/input-text :src (rc/at)
+                     :width "100px"
+                     :model @model
+                     :on-change #(u/dispatch-local widget-id path %)]]]
+        (subscription-error label path)))))
 
 
 ;; endregion

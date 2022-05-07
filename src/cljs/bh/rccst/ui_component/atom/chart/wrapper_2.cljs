@@ -22,7 +22,7 @@
     ;  "// (data)" data "// (d)" @d
     ;  "// (config-data)" config-data "// (c)" @c)
 
-    ;(log/info "component-panel (override)" override-subs )
+    ;(log/info "component-panel (override)" override-subs)
 
     (fn []
 
@@ -37,9 +37,9 @@
 
         ;(log/info "component-panel (render)" @c
           ;"// (local-config)" l-c
-          ;"// (override)" override-subs
-          ;"// (subscriptions)" subscriptions
-          ;"// (local-subs)" local-subs
+         ;"// (override)" override-subs
+         ;"// (subscriptions)" subscriptions
+         ;"// (local-subs)" local-subs
 
         (if (empty? @d)
           [rc/alert-box :src (rc/at)
@@ -75,6 +75,8 @@
       (let [d (h/resolve-value data)]
 
         ;(log/info "configurable-component (INNER)" data "//" @d)
+
+        (l/update-local-values component-id (local-config d))
 
         [rc/v-box :src (rc/at)
          :class "configurable-component-panel"
