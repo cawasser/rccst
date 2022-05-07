@@ -110,7 +110,7 @@
     (fn []
       (when (nil? @id)
         (reset! id component-id)
-        (ui-utils/init-widget @id (config chart/sample-data))
+        (ui-utils/init-container-locals @id (config chart/sample-data))
         (ui-utils/dispatch-local @id [:container] container-id))
 
       [data-update-example

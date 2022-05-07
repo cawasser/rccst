@@ -53,8 +53,8 @@
 ; container locals
 ;
 
-(defn init-widget [container-id locals-and-defaults]
-  (l/init-widget container-id locals-and-defaults))
+(defn init-container-locals [container-id locals-and-defaults]
+  (l/init-container-locals container-id locals-and-defaults))
 
 
 (defn subscribe-local [container-id value-path]

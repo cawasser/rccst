@@ -776,7 +776,7 @@ distinction, so we can quickly build all the Nodes and Handles used for the diag
   (process-components configuration :source/local meta-data-registry component-id)
 
 
-  (ui-utils/init-widget component-id {:blackboard {}})
+  (ui-utils/init-container-locals component-id {:blackboard {}})
 
   (ui-utils/create-widget-local-sub component-id [:container] "")
   (ui-utils/create-widget-local-event component-id [:container])

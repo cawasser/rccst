@@ -33,7 +33,7 @@
 (re-frame/reg-event-db
   :events/init-local-path
   (fn-traced [db [_ local-path values]]
-    ;(log/info "::init-widget-locals" container init-vals)
+    ;(log/info "::init-local-path" container init-vals)
     (if (= (get-in db local-path) values)
       (do
         ;(log/info "::init-local-path // already exists")
@@ -409,7 +409,7 @@
           new-val)))))
 
 
-(defn init-widget
+(defn init-container-locals
   "1. adds the `locals-and-defaults` into the `app-db` in the correct location
   2. creates and registers a subscription to `:containers/<container-id>`
   3. creates and registers a subscription (cascaded off `:containers/<container-id>`) for each relative path in `locals-and-defaults`
@@ -429,7 +429,7 @@
   [container-id locals-and-defaults]
   (let [paths (process-locals [] nil locals-and-defaults)]
 
-    ;(log/info "init-widget" container-id
+    ;(log/info "init-container-locals" container-id
     ;  "//" paths
     ;  "//" locals-and-defaults)
 
@@ -456,7 +456,7 @@
   The container-id string will be converted into a keyword as appropriate to access the
   registered subscription, so you can freely use generated values as widget identifiers
 
-> NOTE: the re-frame subscriptions ***MUST*** be created beforehand, using [[init-widget]]
+> NOTE: the re-frame subscriptions ***MUST*** be created beforehand, using [[init-container-locals]]
 
   ---
 
@@ -517,6 +517,7 @@
           (reaction get-in-ok)
           nil)))))
 
+
 (defn dispatch-local
   "constructs a Re-frame event dispatch call to a local value stored in the given
   widget's 'locals' in the `app-db`. This way the developer isn't concerned about the
@@ -525,7 +526,7 @@
   The container-id string will be converted into a keyword as appropriate to access the
   registered subscription, so you can freely use generated values as widget identifiers
 
-> NOTE: the re-frame event-handlers ***MUST*** be created beforehand, using [[init-widget]]
+> NOTE: the re-frame event-handlers ***MUST*** be created beforehand, using [[init-container-locals]]
 
   ---
 

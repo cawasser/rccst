@@ -92,7 +92,7 @@
       (when (nil? @id)
         ;(log/info "initializing" component-id)
         (reset! id component-id)
-        (ui-utils/init-widget @id config)
+        (ui-utils/init-container-locals @id config)
         (ui-utils/dispatch-local @id [:container] container-id))
 
       (if not-configurable?
@@ -135,7 +135,7 @@
                  :tooltip {:include true},
                  :isAnimationActive true}))
 
-  (ui-utils/init-widget id config)
+  (ui-utils/init-container-locals id config)
   (ui-utils/dispatch-local id [:container] container-id)
 
   @(ui-utils/subscribe-local id [:container])

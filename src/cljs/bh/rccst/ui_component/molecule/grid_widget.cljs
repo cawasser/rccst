@@ -151,7 +151,7 @@
     (fn []
       (when (nil? @id)
         (reset! id component-id)
-        (ui-utils/init-widget @id (config partial-config))
+        (ui-utils/init-container-locals @id (config partial-config))
         (ui-utils/dispatch-local @id [:container] container-id)
         (ui/prep-environment partial-config @id composite/meta-data-registry))
 

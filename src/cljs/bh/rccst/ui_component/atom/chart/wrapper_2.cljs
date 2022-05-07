@@ -69,7 +69,7 @@
 
     ;(log/info "configurable-component" component-id "//" data "//" @d)
 
-    (ui-utils/init-widget component-id (config component-id (h/resolve-value data)))
+    (ui-utils/init-container-locals component-id (config component-id (h/resolve-value data)))
 
     (fn []
       (let [d (h/resolve-value data)]
@@ -137,7 +137,7 @@
       (when (nil? @id)
         ;(log/info "initializing" component-id)
         (reset! id component-id)
-        (ui-utils/init-widget @id c)
+        (ui-utils/init-container-locals @id c)
         (ui-utils/dispatch-local @id [:container] container-id))
 
       [:div.base-chart {:style {:width "100%" :height "100%"}}
