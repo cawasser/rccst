@@ -9,9 +9,9 @@
 
 
 (re-frame/reg-sub
-  :widgets
+  :containers
   (fn [db]
-    (:widgets db)))
+    (:containers db)))
 
 
 (re-frame/reg-sub

@@ -34,7 +34,7 @@
   (merge
     ui-utils/default-pub-sub
     {:tab-panel {:value     (keyword component-id "config")
-                 :data-path [:widgets (keyword component-id) :tab-panel]}
+                 :data-path [:containers (keyword component-id) :tab-panel]}
      :tooltip   {:include true}
      :node      {:fill "#77c878" :stroke "#000000"}
      :link      {:stroke "#77c878" :curve 0.5}}))

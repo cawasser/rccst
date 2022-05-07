@@ -126,7 +126,7 @@
                  :legend {:include true, :layout "horizontal", :align "center", :verticalAlign "bottom"},
                  :type "line-chart",
                  :amt {:include true, :stroke "#ff00ff", :fill "#ff00ff"},
-                 :tab-panel {:value :line-chart-demo.line-chart.config, :data-path [:widgets :line-chart-demo.line-chart :tab-panel]},
+                 :tab-panel {:value :line-chart-demo.line-chart.config, :data-path [:containers :line-chart-demo.line-chart :tab-panel]},
                  :pv {:include true, :stroke "#ffc107", :fill "#ffc107"},
                  :container "",
                  :x-axis {:include true, :dataKey :name, :orientation :bottom, :scale "auto"},

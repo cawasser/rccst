@@ -46,10 +46,10 @@ distinction, so we can quickly build all the Nodes and Handles used for the diag
 (log/info "bh.rccst.ui-component.molecule.composite")
 
 
-(re-frame/reg-event-db
-  ::add-component
-  (fn-traced [db [_ id component]]
-    (update-in db [:widgets (keyword id) :components] (partial apply conj) component)))
+;(re-frame/reg-event-db
+;  ::add-component
+;  (fn-traced [db [_ id component]]
+;    (update-in db [:containers (keyword id) :components] (partial apply conj) component)))
 
 
 (def meta-data-registry
@@ -1001,7 +1001,7 @@ distinction, so we can quickly build all the Nodes and Handles used for the diag
 ; make sure the event handler preserves the ordering of the components in the DSL
 (comment
   (def id "dummy")
-  (def c {:widgets {id (config id)}})
+  (def c {:containers {id (config id)}})
 
   ((partial apply conj) [] [[:a :b] [:c :d]])
 
@@ -1011,7 +1011,7 @@ distinction, so we can quickly build all the Nodes and Handles used for the diag
   (def components [[[:div "1"] [empty] [:div "2"]]
                    [[:div "3"] [:div "4"]]])
 
-  (update-in c [:widgets id :components] (partial apply conj) components)
+  (update-in c [:containers id :components] (partial apply conj) components)
 
   ())
 

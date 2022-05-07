@@ -18,16 +18,16 @@
 
 
 (re-frame/reg-event-db
-  :events/init-widget-locals
+  :events/init-container-locals
   (fn-traced [db [_ container values]]
-    ;(log/info "::init-widget-locals" container init-vals)
-    (if (= (get-in db [:widgets container]) values)
+    ;(log/info "::init-container-locals" container init-vals)
+    (if (= (get-in db [:containers container]) values)
       (do
-        ;(log/info "::init-widget-locals // already exists")
+        ;(log/info "::init-container-locals // already exists")
         db)
       (do
-        ;(log/info "::init-widget-locals // adding")
-        (assoc-in db [:widgets container] values)))))
+        ;(log/info "::init-container-locals // adding")
+        (assoc-in db [:containers container] values)))))
 
 
 (re-frame/reg-event-db
@@ -44,7 +44,7 @@
 
 
 (defn init-local-values
-  "add the given 'tree' of values into the app-db under the `[:widgets <container-id as a keyword>] path
+  "add the given 'tree' of values into the app-db under the `[:containers <container-id as a keyword>] path
 
   `component-id` is automatically converted into a `keyword`
 
@@ -60,14 +60,14 @@
   "
   [component-id values]
   (let [target (keyword component-id)
-        path   [:events/init-widget-locals target values]]
+        path   [:events/init-container-locals target values]]
     ;(log/info "init-local-values" path)
     (re-frame/dispatch-sync path)))
 
 
 (defn update-local-values [component-id values]
   (let [target         (keyword component-id)
-        old            (get-in @re-frame.db/app-db [:widgets target])
+        old            (get-in @re-frame.db/app-db [:containers target])
         old-vals       (->> old
                          (process-locals [] nil)
                          (filter #(= 1 (count %)))
@@ -87,7 +87,7 @@
 
     (when (not (empty? diff))
       (re-frame/dispatch-sync
-        [:events/init-widget-locals target merged-values])
+        [:events/init-container-locals target merged-values])
 
       (doall
         ; TODO: consider using locals-and-defaults to put the actual default into the subscription rather than 'nil'
@@ -103,7 +103,7 @@
 
   ; TODO: can this be converted to (apply concat...)? (see https://clojuredesign.club/episode/080-apply-as-needed/)
   (let [data-path      (reduce conj [(h/path->keyword component-id)] target-path)
-        widget-path    (reduce conj [:widgets (h/path->keyword component-id)] target-path)
+        widget-path    (reduce conj [:containers (h/path->keyword component-id)] target-path)
         old            (get-in @re-frame.db/app-db widget-path)
         old-vals       (->> old
                          (process-locals [] nil)
@@ -233,7 +233,7 @@
 
 (defn create-widget-sub
   "create and registers a re-frame [subscription handler](https://day8.github.io/re-frame/subscriptions/)
-  for the `container-id` (as a keyword) inside the `:widgets` top-level key in the `app-db`.
+  for the `container-id` (as a keyword) inside the `:containers` top-level key in the `app-db`.
 
   ---
 
@@ -247,15 +247,15 @@
 
     (re-frame/reg-sub
       id
-      :<- [:widgets]
-      (fn [widgets _]
+      :<- [:containers]
+      (fn [containers _]
         ;(log/info "sub" w id)
-        (get widgets id)))))
+        (get containers id)))))
 
 
 (defn create-widget-local-sub
   "create and registers a re-frame [subscription handler](https://day8.github.io/re-frame/subscriptions/)
-  for the value at the path inside the [`:widgets` `container-id as a keyword`] key in the `app-db`.
+  for the value at the path inside the [`:containers` `container-id as a keyword`] key in the `app-db`.
 
   ---
 
@@ -263,7 +263,7 @@
   - `value-path` : (vector of keywords) the path into the widget values to locate the specific one for this subscription
 
   `value-path` functions exactly like any other re-frame subscription, but relative to the
-  `[:widgets <container-id as a keyword>]` in the overall `app-db`
+  `[:containers <container-id as a keyword>]` in the overall `app-db`
 
   It is destructured as follows:
 
@@ -320,7 +320,7 @@
 
 (defn create-widget-event
   "create and registers a re-frame [event handler](https://day8.github.io/re-frame/dominoes-30k/#domino-2-event-handling)
-  for the `container-id` (as a keyword) inside the `:widgets` top-level key in the `app-db`.
+  for the `container-id` (as a keyword) inside the `:containers` top-level key in the `app-db`.
 
   ---
 
@@ -336,12 +336,12 @@
       id
       (fn [db [_ new-val]]
         ;(log/info "event" w id)
-        (assoc-in db [:widgets id] new-val)))))
+        (assoc-in db [:containers id] new-val)))))
 
 
 (defn create-widget-local-event
   "create and registers a re-frame [event handler](https://day8.github.io/re-frame/dominoes-30k/#domino-2-event-handling)
-  for the value at the path inside the [`:widgets` `container-id as a keyword`] key in the `app-db`.
+  for the value at the path inside the [`:containers` `container-id as a keyword`] key in the `app-db`.
 
   ---
 
@@ -349,7 +349,7 @@
   - `value-path` : (vector of keywords) the path into the widget values to locate the specific one for this subscription
 
   `value-path` functions exactly like any other re-frame subscription, but relative to the
-  `[:widgets <container-id as a keyword>]` in the overall `app-db`
+  `[:containers <container-id as a keyword>]` in the overall `app-db`
 
   It is destructured as follows:
 
@@ -372,7 +372,7 @@
   (let [p (h/path->keyword container-id a more)]
 
     ;(log/info "create-widget-local-event" p
-    ;  "apply conj" (apply conj [:widgets (h/path->keyword container-id)] (map h/path->keyword value-path)))
+    ;  "apply conj" (apply conj [:containers (h/path->keyword container-id)] (map h/path->keyword value-path)))
 
     (re-frame/reg-event-db
       p
@@ -383,7 +383,7 @@
         ; to perform more custom functions (like incremental updates to a collection)
         ;
         (assoc-in db
-          (apply conj [:widgets (h/path->keyword container-id)] (map h/path->keyword value-path))
+          (apply conj [:containers (h/path->keyword container-id)] (map h/path->keyword value-path))
           new-val)))))
 
 
@@ -393,7 +393,7 @@
     ;(log/info "create-local-path-event"
     ;  value-path
     ;  "//" p
-    ;  "//" (reduce conj [:widgets] (map h/path->keyword value-path)))
+    ;  "//" (reduce conj [:containers] (map h/path->keyword value-path)))
 
     (re-frame/reg-event-db
       p
@@ -405,15 +405,15 @@
         ;
         (assoc-in db
           ; TODO: can this be converted to (apply concat...)? (see https://clojuredesign.club/episode/080-apply-as-needed/)
-          (reduce conj [:widgets] (map h/path->keyword value-path))
+          (reduce conj [:containers] (map h/path->keyword value-path))
           new-val)))))
 
 
 (defn init-widget
   "1. adds the `locals-and-defaults` into the `app-db` in the correct location
-  2. creates and registers a subscription to `:widgets/<container-id>`
-  3. creates and registers a subscription (cascaded off `:widgets/<container-id>`) for each relative path in `locals-and-defaults`
-  4. creates and registers an event handler for`:widgets/<container-id>`
+  2. creates and registers a subscription to `:containers/<container-id>`
+  3. creates and registers a subscription (cascaded off `:containers/<container-id>`) for each relative path in `locals-and-defaults`
+  4. creates and registers an event handler for`:containers/<container-id>`
   5. creates and registers an event handler for each relative path in `locals-and-defaults`
 
   `locals-and-defaults` provides both the structure used to create the subscriptions and the default values when a new widget is
@@ -464,7 +464,7 @@
   - `value-path : (vector of keywords) the path into the widget values to locate the specific one for this subscription
 
   `value-path` functions exactly like any other re-frame subscription, but relative to the
-  `[:widgets <container-id>]` in the overall `app-db`
+  `[:containers <container-id>]` in the overall `app-db`
 
   It is destructured as follows:
 
@@ -534,7 +534,7 @@
   - `new-val` : (any) the new value to store at the given path
 
   `value-path` functions exactly like any other re-frame subscription, but relative to the
-  `[:widgets <container-id>]` in the overall `app-db`
+  `[:containers <container-id>]` in the overall `app-db`
 
   It is destructured as follows:
 
@@ -647,7 +647,7 @@
   (def init-vals {:y-axis {:include false, :dataKey "", :orientation :left, :scale "auto"},
                   :grid   {:include true, :strokeDasharray {:dash "3", :space "3"}, :stroke "#a9a9a9"},})
 
-  (def old-vals (get-in db [:widgets container]))
+  (def old-vals (get-in db [:containers container]))
   (def old-vals-flat (->> old-vals
                        (process-locals [] nil)
                        (filter #(= 1 (count %)))
@@ -666,7 +666,7 @@
                         :y-axis {:include true :dataKey "" :orientation :left :scale "auto"}
                         :grid   {:include true :strokeDasharray {:dash "3" :space "3"}
                                  :stroke  "#a9a9a9"}}
-        old-vals       (get-in db [:widgets container])
+        old-vals       (get-in db [:containers container])
         old-vals-flat  (->> old-vals
                          (process-locals [] nil)
                          (filter #(= 1 (count %)))

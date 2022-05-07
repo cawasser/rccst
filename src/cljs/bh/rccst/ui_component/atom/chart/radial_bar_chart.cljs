@@ -31,7 +31,7 @@
     (merge
       utils/default-config
       {:tab-panel {:value     (keyword component-id "config")
-                   :data-path [:widgets (keyword component-id) :tab-panel]}
+                   :data-path [:containers (keyword component-id) :tab-panel]}
        :radial-uv {:include    true :minAngle 15
                    :label      {:fill "#666", :position "insideStart"}
                    :background {:clockWise true}

@@ -71,12 +71,12 @@
     (assoc db :name name)))
 
 
-(re-frame/reg-event-db
-  ::update-counter
-  (fn-traced [db [_ content]]
-    ;(log/info "::update-counter" (:i content))
-    (assoc db :counter (:i content)
-      :set (:last-3 content))))
+;(re-frame/reg-event-db
+;  ::update-counter
+;  (fn-traced [db [_ content]]
+;    ;(log/info "::update-counter" (:i content))
+;    (assoc db :counter (:i content)
+;      :set (:last-3 content))))
 
 
 (re-frame/reg-event-db
@@ -86,34 +86,34 @@
     (assoc-in db [:sources id] value)))
 
 
-(re-frame/reg-event-db
-  ::add-to-set
-  (fn-traced [db [_ new-value]]
-    ;(log/info "add-to-set" (:set db) "<-" new-value)
-    (update db :set conj new-value)))
-
-
-(re-frame/reg-event-db
-  ::remove-from-set
-  (fn-traced [db [_ new-value]]
-    ;(log/info "remove-from-set" (:set db) "<-" new-value)
-    (update db :set disj new-value)))
-
-
-(re-frame/reg-event-db
-  ::union-set
-  (fn-traced [db [_ new-values]]
-    ;(log/info "union-set" (:set db) "<-" new-values)
-    (update db :set clojure.set/union new-values)))
-
-
-(re-frame/reg-event-db
-  ::diff-set
-  (fn-traced [db [_ new-values]]
-    ;(log/info "diff-set" (:set db) "<-" new-values)
-    (update db :set clojure.set/difference new-values)))
-
-
+;(re-frame/reg-event-db
+;  ::add-to-set
+;  (fn-traced [db [_ new-value]]
+;    ;(log/info "add-to-set" (:set db) "<-" new-value)
+;    (update db :set conj new-value)))
+;
+;
+;(re-frame/reg-event-db
+;  ::remove-from-set
+;  (fn-traced [db [_ new-value]]
+;    ;(log/info "remove-from-set" (:set db) "<-" new-value)
+;    (update db :set disj new-value)))
+;
+;
+;(re-frame/reg-event-db
+;  ::union-set
+;  (fn-traced [db [_ new-values]]
+;    ;(log/info "union-set" (:set db) "<-" new-values)
+;    (update db :set clojure.set/union new-values)))
+;
+;
+;(re-frame/reg-event-db
+;  ::diff-set
+;  (fn-traced [db [_ new-values]]
+;    ;(log/info "diff-set" (:set db) "<-" new-values)
+;    (update db :set clojure.set/difference new-values)))
+;
+;
 (re-frame/reg-event-db
   ::good-lookup-result
   (fn-traced [db [_ uuid result]]

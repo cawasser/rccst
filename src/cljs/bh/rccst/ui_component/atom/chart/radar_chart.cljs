@@ -121,7 +121,7 @@
     (merge
       utils/default-config
       {:tab-panel {:value     (keyword component-id "config")
-                   :data-path [:widgets (keyword component-id) :tab-panel]}}
+                   :data-path [:containers (keyword component-id) :tab-panel]}}
 
       (local-config data))
     (assoc-in [:fullMark :include] false)))

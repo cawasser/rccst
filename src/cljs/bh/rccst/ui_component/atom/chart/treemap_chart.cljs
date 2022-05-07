@@ -39,7 +39,7 @@
   (merge
     ui-utils/default-pub-sub
     {:tab-panel         {:value     (keyword component-id "config")
-                         :data-path [:widgets (keyword component-id) :tab-panel]}
+                         :data-path [:containers (keyword component-id) :tab-panel]}
      :isAnimationActive true
      :ratio             {:include true
                          :n       4
