@@ -8,7 +8,7 @@
   (let [container-id "line-chart-demo"]
     [example/component-example
      :title "Line Chart"
-     :widget-id container-id
+     :container-id container-id
      :description "A simple Line Chart built using [Recharts](https://recharts.org/en-US/api/LineChart)"
      :data chart/sample-data
      :component chart/configurable-component

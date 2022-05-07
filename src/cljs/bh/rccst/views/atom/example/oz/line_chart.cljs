@@ -9,7 +9,7 @@
   (let [container-id "oz-line-chart-demo"]
     [example/component-example
      :title "Line Chart (oz)"
-     :widget-id container-id
+     :container-id container-id
      :description "A simple Line Chart built using [Oz](https://github.com/metasoarous/oz)"
      :data chart/sample-data
      :component chart/component

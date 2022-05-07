@@ -9,7 +9,7 @@
   (let [container-id "sankey-chart-demo"]
     [example/component-example
      :title "Sankey Chart"
-     :widget-id container-id
+     :container-id container-id
      :description "A simple Sankey Chart built using [Recharts](https://recharts.org/en-US/api/Sankey)
 
 > Note: the API page for Sankey is woefully incomplete, it does NOT explain how to build the

@@ -8,7 +8,7 @@
   (let [container-id "two-d-three-d-globe-demo"]
     [example/component-example
      :title "2D/3D Globe"
-     :widget-id container-id
+     :container-id container-id
      :description "A combination of the 2d and 3d globe components. Both show the same data."
      :data globe/sample-data
      :component globe/component

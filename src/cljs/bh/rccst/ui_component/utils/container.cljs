@@ -64,7 +64,7 @@
 
 (defn publish-to-container
   "
-> NOTE: the re-frame event-handlers ***MUST*** be created beforehand, using [[init-widget]]
+> NOTE: the re-frame event-handlers ***MUST*** be created beforehand, using [[init-container-locals]]
 
   ---
 
@@ -73,7 +73,7 @@
   - `new-val` : (any) the new value to store at the given path
 
   `value-path` functions exactly like any other re-frame subscription, but relative to the
-  `[:widgets <widget-id>]` in the overall `app-db`
+  `[:widgets <component-id>]` in the overall `app-db`
 
   It is destructured as follows:
 

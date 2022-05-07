@@ -24,7 +24,7 @@
 
   ---
 
-  - widget-id : (string) id of the widget, in this specific case
+  - component-id : (string) id of the widget, in this specific case
   "
   [component-id data]
   (-> ui-utils/default-pub-sub
@@ -38,10 +38,10 @@
                    :dataKey    :uv}})))
 
 
-(defn- radial-config [widget-id label path position]
+(defn- radial-config [component-id label path position]
   [rc/v-box :src (rc/at)
    :gap "5px"
-   :children [[utils/boolean-config widget-id label (conj path :include)]]])
+   :children [[utils/boolean-config component-id label (conj path :include)]]])
 
 
 (defn config-panel
@@ -72,7 +72,7 @@
   ---
 
   - data : (atom) any data used by the component's ui
-  - widget-id : (string) unique identifier for this specific widget
+  - component-id : (string) unique identifier for this specific widget
   "
   [data component-id container-id ui]
   (let [container  (ui-utils/subscribe-local component-id [:container])

@@ -173,7 +173,7 @@
       (if model
         (let [headings (apply set (map keys (get @data :data)))
               btns     (mapv (fn [h] {:id h :label h}) headings)]
-          ;(log/info "column-picker" data "//" widget-id "//" label "//" path)
+        ;(log/info "column-picker" data "//" component-id "//" label "//" path)
           [rc/h-box :src (rc/at)
            :gap "5px"
            :children [[rc/box :src (rc/at) :align :start :child [:code label]]
@@ -210,23 +210,23 @@
 
 
 (defn slider-config
-  ([widget-id min max step path]
-   (let [model (u/subscribe-local widget-id path)]
+  ([component-id min max step path]
+   (let [model (u/subscribe-local component-id path)]
      (fn []
        (if model
          [rc/slider :src (rc/at)
           :model @model
           :width "100px"
           :min min :max max :step step
-          :on-change #(u/dispatch-local widget-id path %)]
+          :on-change #(u/dispatch-local component-id path %)]
          (subscription-error "slider" path)))))
 
-  ([widget-id min max path]
-   [slider-config widget-id min max 1 path]))
+  ([component-id min max path]
+   [slider-config component-id min max 1 path]))
 
 
-(defn text-config [widget-id label path]
-  (let [model (u/subscribe-local widget-id path)]
+(defn text-config [component-id label path]
+  (let [model (u/subscribe-local component-id path)]
     (fn []
       (if model
         [rc/h-box :src (rc/at)
@@ -235,7 +235,7 @@
                     [rc/input-text :src (rc/at)
                      :model (str @model)
                      :width "50px"
-                     :on-change #(u/dispatch-local widget-id path %)]]]
+                     :on-change #(u/dispatch-local component-id path %)]]]
         (subscription-error label path)))))
 
 
@@ -265,13 +265,13 @@
   - path : (vector) path into `config` where the :strokeDasharray is stored
   "
 
-  [widget-id label min max path]
+  [component-id label min max path]
   [rc/h-box :src (rc/at)
    :children [[rc/box :src (rc/at) :align :start :child [:code label]]
               [rc/v-box :src (rc/at)
                :gap "5px"
-               :children [[slider-config widget-id min max (conj path :dash)]
-                          [slider-config widget-id min max (conj path :space)]]]]])
+               :children [[slider-config component-id min max (conj path :dash)]
+                          [slider-config component-id min max (conj path :space)]]]]])
 
 
 (defn enumerated-config
@@ -279,7 +279,7 @@
 
   ---
 
-  - widget-id : (string/keyword) unique ID for this component
+  - component-id : (string/keyword) unique ID for this component
   - btns : (vector) define the button(s) that set the value(s).
 
   | key       | description                                                          |
@@ -292,9 +292,9 @@
   - path : (vector) path into `config` for the correct property
 
   "
-  [widget-id btns label path]
+  [component-id btns label path]
 
-  (let [model (u/subscribe-local widget-id path)]
+  (let [model (u/subscribe-local component-id path)]
     (fn []
       (if model
         [rc/h-box :src (rc/at)
@@ -304,7 +304,7 @@
                      :model @model
                      :tabs btns
                      :style btns-style
-                     :on-change #(u/dispatch-local widget-id path %)]]]
+                     :on-change #(u/dispatch-local component-id path %)]]]
         (subscription-error label path)))))
 
 
@@ -313,7 +313,7 @@
 
   ---
 
-  - widget-id : (string/keyword) unique ID for this component
+  - component-id : (string/keyword) unique ID for this component
   - btns : (vector) define the button that set the value(s).
 
   | key       | description                                                          |
@@ -331,9 +331,9 @@
   - label : (string) tell the user which axis this control is manipulating
   - path : (vector) path into `config` where the orientation for the correct axis is stored
   "
-  [widget-id btns label path]
+  [component-id btns label path]
 
-  (enumerated-config widget-id btns label path))
+  (enumerated-config component-id btns label path))
 
 
 (defn scale-config
@@ -346,17 +346,17 @@
 
   ---
 
-  - config : (atom) holds a hash-map of the actual configuration properties see [[config]].
+  - component-id : id for the component.
   - label : (string) tell the user which axis this control is manipulating
   - path : (vector) path into `config` where the scale for the correct axis is stored
   "
-  [widget-id label path]
+  [component-id label path]
   (let [btns [{:id "auto" :label "auto"}
               {:id "linear" :label "linear"}
               {:id "pow" :label "pow"}
               {:id "sqrt" :label "sqrt"}
               {:id "log" :label "log"}]]
-    (enumerated-config widget-id btns label path)))
+    (enumerated-config component-id btns label path)))
 
 
 (defn layout-config
@@ -367,13 +367,13 @@
 
   ---
 
-  - widget-id : (atom) holds a hash-map of the actual configuration properties see [[config]].
+  - component-id : id of the component
   - path : (vector) path into `config` where the scale for the layout is stored
   "
-  [widget-id path]
+  [component-id path]
   (let [btns [{:id "horizontal" :label "horizontal"}
               {:id "vertical" :label "vertical"}]]
-    (enumerated-config widget-id btns ":layout" path)))
+    (enumerated-config component-id btns ":layout" path)))
 
 
 (defn align-config
@@ -384,14 +384,14 @@
 
   ---
 
-  - config : (atom) holds a hash-map of the actual configuration properties see [[config]].
+  - component-id : id of the component
   - path : (vector) path into `config` where the scale for the layout is stored
   "
-  [widget-id path]
+  [component-id path]
   (let [btns [{:id "left" :label "left"}
               {:id "center" :label "center"}
               {:id "right" :label "right"}]]
-    (enumerated-config widget-id btns ":align" path)))
+    (enumerated-config component-id btns ":align" path)))
 
 
 (defn verticalAlign-config
@@ -402,14 +402,14 @@
 
   ---
 
-  - config : (atom) holds a hash-map of the actual configuration properties see [[config]].
+  - component-id : id of the component
   - path : (vector) path into `config` where the scale for the layout is stored
   "
-  [widget-id path]
+  [component-id path]
   (let [btns [{:id "top" :label "top"}
               {:id "middle" :label "middle"}
               {:id "bottom" :label "bottom"}]]
-    (enumerated-config widget-id btns ":verticalAlign" path)))
+    (enumerated-config component-id btns ":verticalAlign" path)))
 
 
 (defn color-config [config-data label path & [position]]
@@ -436,19 +436,19 @@
                                            :on-change #(h/handle-change-path config-data path %)}]]])))
 
 
-(defn color-config-text [widget-id label path & [position]]
-  ;(log/info "color-config-text" widget-id "//" label "//" path)
+(defn color-config-text [component-id label path & [position]]
+  ;(log/info "color-config-text" component-id "//" label "//" path)
 
-  (let [model (u/subscribe-local widget-id path)]
+  (let [model (u/subscribe-local component-id path)]
     (fn []
       (if model
         [rc/h-box :src (rc/at)
          :gap "5px"
-         :children [[color-config widget-id label path position]
-                    [rc/input-text :src (rc/at)
-                     :width "100px"
-                     :model @model
-                     :on-change #(u/dispatch-local widget-id path %)]]]
+         :children [[color-config component-id label path position
+                      [rc/input-text :src (rc/at)
+                       :width "100px"
+                       :model @model
+                       :on-change #(u/dispatch-local component-id path %)]]]]
         (subscription-error label path)))))
 
 
@@ -464,44 +464,44 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; region
 
-(defn isAnimationActive [widget-id]
-  [boolean-config widget-id ":isAnimationActive" [:isAnimationActive]])
+(defn isAnimationActive [component-id]
+  [boolean-config component-id ":isAnimationActive" [:isAnimationActive]])
 
 
-(defn grid [widget-id]
+(defn grid [component-id]
   [rc/v-box :src (rc/at)
-   :children [[boolean-config widget-id ":grid" [:grid :include]]
-              [dashArray-config widget-id
+   :children [[boolean-config component-id ":grid" [:grid :include]]
+              [dashArray-config component-id
                ":strokeDasharray" 1 10 [:grid :strokeDasharray]]
-              [color-config-text widget-id ":stroke" [:grid :stroke]]]])
+              [color-config-text component-id ":stroke" [:grid :stroke]]]])
 
 
-(defn x-axis [data widget-id]
+(defn x-axis [data component-id]
   [rc/v-box :src (rc/at)
-   :children [[boolean-config widget-id ":x-axis" [:x-axis :include]]
-              [column-picker data widget-id ":dataKey" [:x-axis :dataKey]]
-              [orientation-config widget-id x-axis-btns ":orientation" [:x-axis :orientation]]
-              [scale-config widget-id ":scale" [:x-axis :scale]]]])
+   :children [[boolean-config component-id ":x-axis" [:x-axis :include]]
+              [column-picker data component-id ":dataKey" [:x-axis :dataKey]]
+              [orientation-config component-id x-axis-btns ":orientation" [:x-axis :orientation]]
+              [scale-config component-id ":scale" [:x-axis :scale]]]])
 
 
-(defn y-axis [data widget-id]
+(defn y-axis [data component-id]
   [rc/v-box :src (rc/at)
-   :children [[boolean-config widget-id ":y-axis" [:y-axis :include]]
-              [column-picker data widget-id ":dataKey" [:y-axis :dataKey]]
-              [orientation-config widget-id y-axis-btns ":orientation" [:y-axis :orientation]]
-              [scale-config widget-id ":scale" [:y-axis :scale]]]])
+   :children [[boolean-config component-id ":y-axis" [:y-axis :include]]
+              [column-picker data component-id ":dataKey" [:y-axis :dataKey]]
+              [orientation-config component-id y-axis-btns ":orientation" [:y-axis :orientation]]
+              [scale-config component-id ":scale" [:y-axis :scale]]]])
 
 
-(defn tooltip [widget-id]
-  [boolean-config widget-id ":tooltip" [:tooltip :include]])
+(defn tooltip [component-id]
+  [boolean-config component-id ":tooltip" [:tooltip :include]])
 
 
-(defn legend [widget-id]
+(defn legend [component-id]
   [rc/v-box :src (rc/at)
-   :children [[boolean-config widget-id ":legend" [:legend :include]]
-              [layout-config widget-id [:legend :layout]]
-              [align-config widget-id [:legend :align]]
-              [verticalAlign-config widget-id [:legend :verticalAlign]]]])
+   :children [[boolean-config component-id ":legend" [:legend :include]]
+              [layout-config component-id [:legend :layout]]
+              [align-config component-id [:legend :align]]
+              [verticalAlign-config component-id [:legend :verticalAlign]]]])
 
 
 (defn option [component-id label path-root]
@@ -537,28 +537,28 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; region
 
-(defn standard-chart-config [data widget-id]
+(defn standard-chart-config [data component-id]
   [:<>
-   [isAnimationActive widget-id]
+   [isAnimationActive component-id]
    [rc/line :src (rc/at) :size "2px"]
-   [grid widget-id]
+   [grid component-id]
    [rc/line :src (rc/at) :size "2px"]
-   [x-axis data widget-id]
+   [x-axis data component-id]
    [rc/line :src (rc/at) :size "2px"]
-   [y-axis data widget-id]
+   [y-axis data component-id]
    [rc/line :src (rc/at) :size "2px"]
-   [tooltip widget-id]
+   [tooltip component-id]
    [rc/line :src (rc/at) :size "2px"]
-   [legend widget-id]])
+   [legend component-id]])
 
 
-(defn non-gridded-chart-config [data widget-id]
+(defn non-gridded-chart-config [data component-id]
   [:<>
-   [isAnimationActive widget-id]
+   [isAnimationActive component-id]
    [rc/line :src (rc/at) :size "2px"]
-   [tooltip widget-id]
+   [tooltip component-id]
    [rc/line :src (rc/at) :size "2px"]
-   [legend widget-id]])
+   [legend component-id]])
 
 
 ;; endregion

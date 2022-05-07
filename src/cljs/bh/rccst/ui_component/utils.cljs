@@ -53,24 +53,24 @@
 ; container locals
 ;
 
-(defn init-widget [widget-id locals-and-defaults]
-  (l/init-widget widget-id locals-and-defaults))
+(defn init-widget [container-id locals-and-defaults]
+  (l/init-widget container-id locals-and-defaults))
 
 
-(defn subscribe-local [widget-id value-path]
-  (l/subscribe-local widget-id value-path))
+(defn subscribe-local [container-id value-path]
+  (l/subscribe-local container-id value-path))
 
 
-(defn resolve-subscribe-local [widget-id value-path]
-  (l/resolve-subscribe-local widget-id value-path))
+(defn resolve-subscribe-local [container-id value-path]
+  (l/resolve-subscribe-local container-id value-path))
 
 
-(defn dispatch-local [widget-id value-path new-val]
-  (l/dispatch-local widget-id value-path new-val))
+(defn dispatch-local [container-id value-path new-val]
+  (l/dispatch-local container-id value-path new-val))
 
 
-(defn build-subs [component-id local-config]
-  (l/build-subs component-id local-config))
+(defn build-subs [container-id local-config]
+  (l/build-subs container-id local-config))
 
 
 (defn resolve-sub [subs path]
@@ -168,7 +168,7 @@
   ())
 
 
-; need to mix the widget-id in with the path "inside" the widget's hash-map
+; need to mix the container-id in with the path "inside" the widget's hash-map
 (comment
   (def app-db
     {:widgets {:<guid-1>   {:tab-panel  {:value     :<guid-1>/dummy
@@ -191,14 +191,14 @@
                             :tooltip   {:include true}}}})
 
 
-  (def widget-id "<guid-1>")
+  (def container-id "<guid-1>")
   (def path [:some-value])
   (def path [:tab-panel :value])
 
-  (defn subscribe-local [widget-id [a & more]]
-    (let [p (path->keyword widget-id (str (name a)
-                                       (when more
-                                         (str "." (clojure.string/join "." (map name more))))))]
+  (defn subscribe-local [container-id [a & more]]
+    (let [p (path->keyword container-id (str (name a)
+                                          (when more
+                                            (str "." (clojure.string/join "." (map name more))))))]
       p))
   ;(re-frame/subscribe p)))
 
@@ -206,7 +206,7 @@
     d)
   (path->keyword :line-chart)
 
-  (subscribe-local widget-id [:some-value])
+  (subscribe-local container-id [:some-value])
   (subscribe-local :line-chart [:tab-panel :value])
   (subscribe-local :line-chart [:grid :strokeDasharray :d])
 
@@ -214,15 +214,15 @@
 
 
 ; how do we build all the cascading subscriptions for the widget's locals?
-; rocky-road just uses a single [:widget-locals widget-id :some-value]...
+; rocky-road just uses a single [:widget-locals container-id :some-value]...
 ; so it doesn't HAVE cascaded subscriptions in the first place
 (comment
 
-  (def widget-locals {:tab-panel  {:value     :<guid-1>/dummy
-                                   :data-path [:<guid-1> :tab-panel]}
-                      :some-value "value"
-                      :grid       {}
-                      :x-axis     {}})
+  (def container-locals {:tab-panel  {:value     :<guid-1>/dummy
+                                      :data-path [:<guid-1> :tab-panel]}
+                         :some-value "value"
+                         :grid       {}
+                         :x-axis     {}})
 
   ; NOTE 1: does ':data-path' need the :widgets prefix to work? PROBABLY
 
@@ -231,20 +231,20 @@
 
   ; THE GOAL:
   ;
-  ;      (init-widget-locals "widget-1" widget-locals)
+  ;      (init-container-locals-locals "widget-1" widget-locals)
   ;
   ; this (1) builds all the subscriptions AND (2) loads the initial data into the app-db
   ; at the correct level
 
 
   ;; region ; set initial values into the app-db:
-  (defn load-local-values [widget-id values]
-    (let [target (path->keyword widget-id)
+  (defn load-local-values [container-id values]
+    (let [target (path->keyword container-id)
           path   [:events/init-widget-locals target values]]
       (re-frame/dispatch-sync path)))
 
-  (load-local-values "<guid-1>" widget-locals)
-  (load-local-values "<guid-2>" widget-locals)
+  (load-local-values "<guid-1>" container-locals)
+  (load-local-values "<guid-2>" container-locals)
 
   ;; endregion
 
@@ -290,22 +290,22 @@
   ;; endregion
 
   ;; region ; subscribing to locals (chart around re-frame/subscribe)
-  (defn subscribe-local [widget-id [a & more :as path]]
-    (let [p (path->keyword widget-id (str (name a)
-                                       (when more
-                                         (str "." (clojure.string/join "." (map name more))))))]
-      ;(log/info "subscribe-local" widget-id path p)
+  (defn subscribe-local [container-id [a & more :as path]]
+    (let [p (path->keyword container-id (str (name a)
+                                          (when more
+                                            (str "." (clojure.string/join "." (map name more))))))]
+      ;(log/info "subscribe-local" container-id path p)
       (re-frame/subscribe [p])))
 
   ; let's spell out what we needed to build these subscriptions
-  (def sub-widget ["<guid-1>"])                             ; [(assume :widgets) <widget-id>]
-  (def sub-some-value ["<guid-1>" [:some-value]])           ; [<widget-id> <path>]
-  (def sub-tab-panel ["<guid-1>" [:tab-panel]])             ; [<widget-id> <path>]
-  (def sub-tab-panel-value ["<guid-1>" [:tab-panel :value]]) ; [<widget-id> <path>]
+  (def sub-container ["<guid-1>"])                             ; [(assume :widgets) <container-id>]
+  (def sub-some-value ["<guid-1>" [:some-value]])           ; [<container-id> <path>]
+  (def sub-tab-panel ["<guid-1>" [:tab-panel]])             ; [container-id> <path>]
+  (def sub-tab-panel-value ["<guid-1>" [:tab-panel :value]]) ; [<container-id> <path>]
 
   ; so 2 types:
-  ;      "create-widget-sub"        i.e., [<widget-id>] (`:widget` is assumed)
-  ;      "create-widget-local-sub"  i.e., [<widget-id> [<path>]]
+  ;      "create-widget-sub"        i.e., [<container-id>] (`:widget` is assumed)
+  ;      "create-container-local-sub"  i.e., [<container-id> [<path>]]
 
   (path->keyword :widgets "dummy.part-1.part-2")
   (path->keyword :widgets ":dummy")
@@ -314,9 +314,9 @@
   ;; endregion
 
   ;; region ; create all the subscriptions (by hand)
-  (defn create-widget-sub [widget-id]
-    (let [id (path->keyword widget-id)
-          w  (path->keyword :widgets widget-id)]
+  (defn create-widget-sub [container-id]
+    (let [id (path->keyword container-id)
+          w  (path->keyword :widgets container-id)]
       (re-frame/reg-sub
         w
         :<- [:widgets]
@@ -325,17 +325,17 @@
           (get widgets id)))))
 
 
-  (defn create-widget-local-sub [widget-id [a & more]]
-    (let [p   (path->keyword widget-id (str (name a)
-                                         (when more
-                                           (str "." (clojure.string/join "." (map name more))))))
+  (defn create-container-local-sub [container-id [a & more]]
+    (let [p   (path->keyword container-id (str (name a)
+                                            (when more
+                                              (str "." (clojure.string/join "." (map name more))))))
           dep (if more
-                (path->keyword widget-id
+                (path->keyword container-id
                   (str (name a)
                     (when (seq (drop-last [:value]))
                       (str "." (clojure.string/join "." (map name (drop 1 more)))))))
-                (path->keyword :widgets widget-id))]
-      ;(log/info "create-widget-local-sub" p dep more (if more (last more) a))
+                (path->keyword :widgets container-id))]
+      ;(log/info "create-container-local-sub" p dep more (if more (last more) a))
       (re-frame/reg-sub
         p
         :<- [dep]
@@ -375,11 +375,11 @@
 ; now to figure out what subscriptions need to be built for a
 ; given widget/initial-values-map
 (comment
-  (def widget-id "<guid-1>")
+  (def container-id "<guid-1>")
 
   ; GOAL:
   ;
-  ;   (init-widget-locals widget-id widget-locals)
+  ;   (init-container-locals-locals container-id widget-locals)
   ;
   ; turn widget-locals into:
   ;
@@ -397,7 +397,7 @@
   ;                  [:set-of-data]}
   ;
   ; which can then be processed by
-  ;    (create-widget-sub) and (create-widget-local-sub)
+  ;    (create-widget-sub) and (create-container-local-sub)
   ;
 
   (def widget-locals {:tab-panel   {:value     :<guid-1>/dummy
@@ -508,7 +508,7 @@
 ; and then testing them out
 (comment
   (do
-    (def widget-id "<guid-1>")
+    (def container-id "<guid-1>")
     (def widget-locals {:tab-panel   {:selected-panel :<guid-1>/dummy
                                       :data-path      [:<guid-1> :tab-panel]}
                         :some-value  "value"
@@ -522,32 +522,32 @@
   (apply conj [1 2 3] [4 5])
 
   ; set everything up
-  (init-widget widget-id widget-locals)
+  (init-container-locals container-id widget-locals)
 
   ;; region ; try out some subscriptions
-  (= @(subscribe-local widget-id [:tab-panel])
+  (= @(subscribe-local container-id [:tab-panel])
     [])
-  @(subscribe-local widget-id [:tab-panel :value])
-  @(subscribe-local widget-id [:tab-panel :data-path])
-  @(subscribe-local widget-id [:some-value])
-  @(subscribe-local widget-id [:grid])
-  @(subscribe-local widget-id [:grid :include])
-  @(subscribe-local widget-id [:grid :strokeDasharray])
-  @(subscribe-local widget-id [:grid :strokeDasharray :dash])
-  @(subscribe-local widget-id [:grid :strokeDasharray :space])
-  @(subscribe-local widget-id [:x-axis])
-  @(subscribe-local widget-id [:x-axis :include])
-  @(subscribe-local widget-id [:x-axis :orientation])
-  @(subscribe-local widget-id [:set-of-data])
+  @(subscribe-local container-id [:tab-panel :value])
+  @(subscribe-local container-id [:tab-panel :data-path])
+  @(subscribe-local container-id [:some-value])
+  @(subscribe-local container-id [:grid])
+  @(subscribe-local container-id [:grid :include])
+  @(subscribe-local container-id [:grid :strokeDasharray])
+  @(subscribe-local container-id [:grid :strokeDasharray :dash])
+  @(subscribe-local container-id [:grid :strokeDasharray :space])
+  @(subscribe-local container-id [:x-axis])
+  @(subscribe-local container-id [:x-axis :include])
+  @(subscribe-local container-id [:x-axis :orientation])
+  @(subscribe-local container-id [:set-of-data])
 
   ;; endregion
 
   ;; region ; try out the event-handler (user the subscription above to see the updated value)
-  (dispatch-local widget-id [:grid :include] true)
-  (dispatch-local widget-id [:grid :include] false)
-  (dispatch-local widget-id [:grid :strokeDasharray :dash] 5)
-  (dispatch-local widget-id [:grid :strokeDasharray :space] 1)
-  (dispatch-local widget-id [:set-of-data] #{1 2 3 4 5})
+  (dispatch-local container-id [:grid :include] true)
+  (dispatch-local container-id [:grid :include] false)
+  (dispatch-local container-id [:grid :strokeDasharray :dash] 5)
+  (dispatch-local container-id [:grid :strokeDasharray :space] 1)
+  (dispatch-local container-id [:set-of-data] #{1 2 3 4 5})
 
 
 
@@ -606,11 +606,11 @@
     (into {}))
 
   (do
-    (def widget-id "multi-chart-demo/multi-chart")
+    (def widgcontainer-idet-id "multi-chart-demo/multi-chart")
     (def a :tv)
     (def more [:fill]))
 
-  (compute-container-path widget-id a more)
+  (compute-container-path container-id a more)
 
 
 

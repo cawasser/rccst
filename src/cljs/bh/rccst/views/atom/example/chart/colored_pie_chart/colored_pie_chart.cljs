@@ -9,7 +9,7 @@
   (let [container-id "colored-pie-chart-demo"]
     [example/component-example
      :title "Colored Pie Chart"
-     :widget-id container-id
+     :container-id container-id
      :description "Pie Chart with different colors for each slice. This requires embedding `Cell` elements
 inside the `Pie` element.
 

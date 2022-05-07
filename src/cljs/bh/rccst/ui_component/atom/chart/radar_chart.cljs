@@ -86,7 +86,7 @@
 
 
 (def source-code '[:> RadarChart {:width 400 :height 400 :outerRadius "75%" :data @data}
-                   (utils/non-gridded-chart-components widget-id)
+                   (utils/non-gridded-chart-components component-id)
 
                    [:> PolarGrid]
                    [:> PolarAngleAxis {:dataKey :subject}]
@@ -191,7 +191,7 @@
   ---
 
   - data : (atom) any data used by the component's ui
-  - widget-id : (string) unique identifier for this specific widget
+  - component-id : (string) unique identifier for this specific widget
   "
   [data component-id container-id ui]
   (let [container     (ui-utils/subscribe-local component-id [:container])

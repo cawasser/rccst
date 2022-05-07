@@ -134,7 +134,7 @@
   ---
 
   - data : (atom) any data used by the component's ui
-  - widget-id : (string) unique identifier for this specific widget instance
+  - component-id : (string) unique identifier for this specific widget instance
   "
   [data component-id container-id ui]
   (let [isAnimationActive? (ui-utils/subscribe-local component-id [:isAnimationActive])

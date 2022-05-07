@@ -43,14 +43,14 @@
       (assoc-in [:x-axis :dataKey] (get-in @data [:metadata :id]))))
 
 
-(defn- line-config [widget-id label path position]
+(defn- line-config [component-id label path position]
   [rc/v-box :src (rc/at)
    :gap "5px"
-   :children [[utils/boolean-config widget-id label (conj path :include)]
+   :children [[utils/boolean-config component-id label (conj path :include)]
               [rc/h-box :src (rc/at)
                :gap "5px"
-               :children [[utils/color-config widget-id ":stroke" (conj path :stroke) position]
-                          [utils/color-config widget-id ":fill" (conj path :fill) position]]]]])
+               :children [[utils/color-config component-id ":stroke" (conj path :stroke) position]
+                          [utils/color-config component-id ":fill" (conj path :fill) position]]]]])
 
 
 (defn- make-line-config [component-id data]

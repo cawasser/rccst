@@ -44,9 +44,9 @@
 
 
 (defn init-local-values
-  "add the given 'tree' of values into the app-db under the `[:widgets <widget-id as a keyword>] path
+  "add the given 'tree' of values into the app-db under the `[:widgets <container-id as a keyword>] path
 
-  `widget-id` is automatically converted into a `keyword`
+  `component-id` is automatically converted into a `keyword`
 
   In cases where there are multiple widgets of the same 'type', using 'locals' keeps each
   instance's local state away from all the others, so changing the state of one does _not_ change
@@ -215,14 +215,14 @@
           (rest tree))))))
 
 
-(defn compute-container-path [widget-id a more]
-  (h/path->keyword widget-id "blackboard" a more))
+(defn compute-container-path [container-id a more]
+  (h/path->keyword container-id "blackboard" a more))
 
 
-(defn compute-widget-deps [widget-id a more]
+(defn compute-widget-deps [container-id a more]
   (if more
-    (h/path->keyword widget-id a (drop-last more))
-    (h/path->keyword widget-id)))
+    (h/path->keyword container-id a (drop-last more))
+    (h/path->keyword container-id)))
 
 
 (defn compute-deps [a more]
@@ -233,15 +233,15 @@
 
 (defn create-widget-sub
   "create and registers a re-frame [subscription handler](https://day8.github.io/re-frame/subscriptions/)
-  for the `widget-id` (as a keyword) inside the `:widgets` top-level key in the `app-db`.
+  for the `container-id` (as a keyword) inside the `:widgets` top-level key in the `app-db`.
 
   ---
 
-  - `widget-id` : (string) id for the widget, using a string means we can use generated values, like a guid, for the id
+  - `container-id` : (string) id for the container, using a string means we can use generated values, like a guid, for the id
 
   "
-  [widget-id]
-  (let [id (h/path->keyword widget-id)]
+  [container-id]
+  (let [id (h/path->keyword container-id)]
 
     ;(log/info "create-widget-sub" id)
 
@@ -255,15 +255,15 @@
 
 (defn create-widget-local-sub
   "create and registers a re-frame [subscription handler](https://day8.github.io/re-frame/subscriptions/)
-  for the value at the path inside the [`:widgets` `widget-id as a keyword`] key in the `app-db`.
+  for the value at the path inside the [`:widgets` `container-id as a keyword`] key in the `app-db`.
 
   ---
 
-  - `widget-id` : (string) id for the widget, using a string means we can use generated values, like a guid, for the id
+  - `container-id` : (string) id for the widget, using a string means we can use generated values, like a guid, for the id
   - `value-path` : (vector of keywords) the path into the widget values to locate the specific one for this subscription
 
   `value-path` functions exactly like any other re-frame subscription, but relative to the
-  `[:widgets <widget-id as a keyword>]` in the overall `app-db`
+  `[:widgets <container-id as a keyword>]` in the overall `app-db`
 
   It is destructured as follows:
 
@@ -282,9 +282,9 @@
 > Note: so developer don't need to understand or even remember this encoding scheme, use the [[subscribe-local]] helper function
 > in place of standard re-frame subscription calls. It provides the same result, and does all the encoding for you.
   "
-  [widget-id [a & more :as value-path] default]
-  (let [p    (h/path->keyword widget-id a more)
-        dep  (compute-widget-deps widget-id a more)
+  [container-id [a & more :as value-path] default]
+  (let [p    (h/path->keyword container-id a more)
+        dep  (compute-widget-deps container-id a more)
         item (h/path->keyword (if more (last more) a))]
 
     ;(log/info "create-widget-local-sub" p
@@ -320,15 +320,15 @@
 
 (defn create-widget-event
   "create and registers a re-frame [event handler](https://day8.github.io/re-frame/dominoes-30k/#domino-2-event-handling)
-  for the `widget-id` (as a keyword) inside the `:widgets` top-level key in the `app-db`.
+  for the `container-id` (as a keyword) inside the `:widgets` top-level key in the `app-db`.
 
   ---
 
-  - `widget-id` : (string) id for the widget, using a string means we can use generated values, like a guid, for the id
+  - `container-id` : (string) id for the widget, using a string means we can use generated values, like a guid, for the id
 
   "
-  [widget-id]
-  (let [id (h/path->keyword widget-id)]
+  [container-id]
+  (let [id (h/path->keyword container-id)]
 
     ;(log/info "create-widget-event" id)
 
@@ -341,15 +341,15 @@
 
 (defn create-widget-local-event
   "create and registers a re-frame [event handler](https://day8.github.io/re-frame/dominoes-30k/#domino-2-event-handling)
-  for the value at the path inside the [`:widgets` `widget-id as a keyword`] key in the `app-db`.
+  for the value at the path inside the [`:widgets` `container-id as a keyword`] key in the `app-db`.
 
   ---
 
-  - `widget-id` : (string) id for the widget, using a string means we can use generated values, like a guid, for the id
+  - `container-id` : (string) id for the container, using a string means we can use generated values, like a guid, for the id
   - `value-path` : (vector of keywords) the path into the widget values to locate the specific one for this subscription
 
   `value-path` functions exactly like any other re-frame subscription, but relative to the
-  `[:widgets <widget-id as a keyword>]` in the overall `app-db`
+  `[:widgets <container-id as a keyword>]` in the overall `app-db`
 
   It is destructured as follows:
 
@@ -368,11 +368,11 @@
 > Note: so developer don't need to understand or even remember this encoding scheme, use the [[subscribe-local]] helper function
 > in place of standard re-frame subscription calls. It provides the same result, and does all the encoding for you.
   "
-  [widget-id [a & more :as value-path]]
-  (let [p (h/path->keyword widget-id a more)]
+  [container-id [a & more :as value-path]]
+  (let [p (h/path->keyword container-id a more)]
 
     ;(log/info "create-widget-local-event" p
-    ;  "apply conj" (apply conj [:widgets (h/path->keyword widget-id)] (map h/path->keyword value-path)))
+    ;  "apply conj" (apply conj [:widgets (h/path->keyword container-id)] (map h/path->keyword value-path)))
 
     (re-frame/reg-event-db
       p
@@ -383,7 +383,7 @@
         ; to perform more custom functions (like incremental updates to a collection)
         ;
         (assoc-in db
-          (apply conj [:widgets (h/path->keyword widget-id)] (map h/path->keyword value-path))
+          (apply conj [:widgets (h/path->keyword container-id)] (map h/path->keyword value-path))
           new-val)))))
 
 
@@ -411,9 +411,9 @@
 
 (defn init-widget
   "1. adds the `locals-and-defaults` into the `app-db` in the correct location
-  2. creates and registers a subscription to `:widgets/<widget-id>`
-  3. creates and registers a subscription (cascaded off `:widgets/<widget-id>`) for each relative path in `locals-and-defaults`
-  4. creates and registers an event handler for`:widgets/<widget-id>`
+  2. creates and registers a subscription to `:widgets/<container-id>`
+  3. creates and registers a subscription (cascaded off `:widgets/<container-id>`) for each relative path in `locals-and-defaults`
+  4. creates and registers an event handler for`:widgets/<container-id>`
   5. creates and registers an event handler for each relative path in `locals-and-defaults`
 
   `locals-and-defaults` provides both the structure used to create the subscriptions and the default values when a new widget is
@@ -421,31 +421,31 @@
 
   ---
 
-  - `widget-id` : (string) id for the widget, using a string means we can use generated values, like a guid, for the id
+  - `container-id` : (string) id for the container, using a string means we can use generated values, like a guid, for the id
   - `locals-and-defaults` : (hash-map) hash-map (tree) of values specific to _this_ widget.
 
 > TODO: need to build the reg-event-db handlers so users/ui can change the locals
   "
-  [widget-id locals-and-defaults]
+  [container-id locals-and-defaults]
   (let [paths (process-locals [] nil locals-and-defaults)]
 
-    ;(log/info "init-widget" widget-id
+    ;(log/info "init-widget" container-id
     ;  "//" paths
     ;  "//" locals-and-defaults)
 
     ; load the app-db with the default values
-    (init-local-values widget-id locals-and-defaults)
+    (init-local-values container-id locals-and-defaults)
 
     ; create subscriptions
-    (create-widget-sub widget-id)
+    (create-widget-sub container-id)
     (doall
       ; TODO: consider using locals-and-defaults to put the actual default into the subscription rather than 'nil'
-      (map #(create-widget-local-sub widget-id % nil) paths))
+      (map #(create-widget-local-sub container-id % nil) paths))
 
     ; create event handlers
-    (create-widget-event widget-id)
+    (create-widget-event container-id)
     (doall
-      (map #(create-widget-local-event widget-id %) paths))))
+      (map #(create-widget-local-event container-id %) paths))))
 
 
 (defn subscribe-local
@@ -453,18 +453,18 @@
   widget's 'locals' in the `app-db`. This way the developer isn't concerned about the
   exact location of the data in the `app-db`.
 
-  The widget-id string will be converted into a keyword as appropriate to access the
+  The container-id string will be converted into a keyword as appropriate to access the
   registered subscription, so you can freely use generated values as widget identifiers
 
 > NOTE: the re-frame subscriptions ***MUST*** be created beforehand, using [[init-widget]]
 
   ---
 
-  - `widget-id` : (string) name of the widget, typically a guid, but it can be any string you'd like
+  - `container-id` : (string) name of the widget, typically a guid, but it can be any string you'd like
   - `value-path : (vector of keywords) the path into the widget values to locate the specific one for this subscription
 
   `value-path` functions exactly like any other re-frame subscription, but relative to the
-  `[:widgets <widget-id>]` in the overall `app-db`
+  `[:widgets <container-id>]` in the overall `app-db`
 
   It is destructured as follows:
 
@@ -481,7 +481,7 @@
 
    Assume
 
-   `(def widget-id \"some-guid\")`
+   `(def container-id \"some-guid\")`
 
    and
 
@@ -493,21 +493,21 @@
    | `:value-2`           | `(subscribe-local \"some-guid\" [:value-2])` |
    | `:nested-value`      | `(subscribe-local \"some-guid\" [:value-2 :nested-value])` |
   "
-  [widget-id [a & more :as value-path]]
-  (let [p (h/path->keyword widget-id a more)]
-    ;(log/info "subscribe-local" widget-id value-path p)
+  [container-id [a & more :as value-path]]
+  (let [p (h/path->keyword container-id a more)]
+    ;(log/info "subscribe-local" container-id value-path p)
     (re-frame/subscribe [p])))
 
 
-(defn resolve-subscribe-local [widget-id [a & more :as value-path]]
-  (let [p         (h/path->keyword widget-id a more)
+(defn resolve-subscribe-local [container-id [a & more :as value-path]]
+  (let [p         (h/path->keyword container-id a more)
         sub-ok    (re-frame/subscribe [p])
-        get-ok    (let [x (re-frame/subscribe [(h/path->keyword widget-id a)])]
+        get-ok    (let [x (re-frame/subscribe [(h/path->keyword container-id a)])]
                     (if x (get @x more) nil))
-        get-in-ok (let [x (re-frame/subscribe [(h/path->keyword widget-id)])]
+        get-in-ok (let [x (re-frame/subscribe [(h/path->keyword container-id)])]
                     (if x (get-in @x value-path)))]
 
-    (log/info "resolve-subscribe-local (ret)" widget-id "," value-path "//" sub-ok "//" get-ok "//" get-in-ok)
+    (log/info "resolve-subscribe-local (ret)" container-id "," value-path "//" sub-ok "//" get-ok "//" get-in-ok)
 
     (if sub-ok
       sub-ok
@@ -522,19 +522,19 @@
   widget's 'locals' in the `app-db`. This way the developer isn't concerned about the
   exact location of the data in the `app-db`.
 
-  The widget-id string will be converted into a keyword as appropriate to access the
+  The container-id string will be converted into a keyword as appropriate to access the
   registered subscription, so you can freely use generated values as widget identifiers
 
 > NOTE: the re-frame event-handlers ***MUST*** be created beforehand, using [[init-widget]]
 
   ---
 
-  - `widget-id` : (string) name of the widget, typically a guid, but it can be any string you'd like
+  - `container-id` : (string) name of the container, typically a guid, but it can be any string you'd like
   - `value-path : (vector of keywords) the path into the widget values to locate the specific one for this subscription
   - `new-val` : (any) the new value to store at the given path
 
   `value-path` functions exactly like any other re-frame subscription, but relative to the
-  `[:widgets <widget-id>]` in the overall `app-db`
+  `[:widgets <container-id>]` in the overall `app-db`
 
   It is destructured as follows:
 
@@ -548,12 +548,12 @@
    #### EXAMPLES
 
   "
-  [widget-id [a & more :as value-path] new-val]
+  [container-id [a & more :as value-path] new-val]
 
-  ;(log/info "dispatch-local" widget-id value-path new-val)
+  ;(log/info "dispatch-local" container-id value-path new-val)
 
-  (let [p (h/path->keyword widget-id a more)]
-    ;(log/info "dispatch-local" widget-id "//" value-path "//" p "//" new-val)
+  (let [p (h/path->keyword container-id a more)]
+    ;(log/info "dispatch-local" container-id "//" value-path "//" p "//" new-val)
     (re-frame/dispatch [p new-val])))
 
 
@@ -566,16 +566,16 @@
 
   - fn-to-apply : (function) takes 1 parameter, the original value at the scubscription vector
   "
-  [widget-id [a & more :as value-path] fn-to-apply]
+  [container-id [a & more :as value-path] fn-to-apply]
 
-  (let [p          (h/path->keyword widget-id a more)
+  (let [p          (h/path->keyword container-id a more)
         orig-value @(re-frame/subscribe [p])
         new-value  (fn-to-apply orig-value)]
     ;(log/info "apply-local"
     ;  "//" p
     ;  "//" orig-value
     ;  "//" new-value)
-    (dispatch-local widget-id [value-path] new-value)))
+    (dispatch-local container-id [value-path] new-value)))
 
 
 (defn build-subs
@@ -619,15 +619,15 @@
 
 
   (do
-    (def widget-id [:simple-multi-chart.widget :blackboard :topic.data])
+    (def container-id [:simple-multi-chart.widget :blackboard :topic.data])
     (def a :data)
     (def more nil)
     (def value-path [:data]))
 
-  (def sub-ok (re-frame/subscribe (h/path->keyword widget-id [:data])))
-  (def get-ok (let [x (re-frame/subscribe [(h/path->keyword widget-id a)])]
+  (def sub-ok (re-frame/subscribe (h/path->keyword container-id [:data])))
+  (def get-ok (let [x (re-frame/subscribe [(h/path->keyword container-id a)])]
                 (if x (get @x more) nil)))
-  (def get-in-ok (let [x (re-frame/subscribe [(h/path->keyword widget-id)])]
+  (def get-in-ok (let [x (re-frame/subscribe [(h/path->keyword container-id)])]
                    (if x (get-in @x value-path))))
 
 
@@ -688,14 +688,14 @@
 
 ; play with dispatch-local and related things
 (comment
-  (def widget-id nil)
+  (def container-id nil)
   (def path [:uv :fill])
   (def path [:blackboard :topic/config :uv :fill])
   (def path [:container-widget :blackboard :topic/config :uv :fill])
 
 
   (let [[a & more] path]
-    (h/path->keyword widget-id a more))
+    (h/path->keyword container-id a more))
 
 
 

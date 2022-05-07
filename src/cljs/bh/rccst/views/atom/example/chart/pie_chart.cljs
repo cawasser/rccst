@@ -9,7 +9,7 @@
   (let [container-id "pie-chart-demo"]
     [example/component-example
      :title "Pie Chart"
-     :widget-id container-id
+     :container-id container-id
      :description "Pie Chart with a default fill for each slice. Each slice is sized correctly and labeled with the value, but
       they are all the same color.
 

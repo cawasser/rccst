@@ -166,7 +166,7 @@
   ---
 
   - data : (atom) any data used by the component's ui
-  - widget-id : (string) unique identifier for this specific widget
+  - component-id : (string) unique identifier for this specific widget
   "
   [data component-id container-id ui]
 

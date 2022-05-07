@@ -75,7 +75,7 @@
   ---
 
   - data : (atom) any data shown by the component's ui
-  - widget-id : (string) unique identifier for this specific widget instance
+  - component-id : (string) unique identifier for this specific widget instance
   "
   [data component-id container-id ui]
   (let [scatter-dot-fill   (ui-utils/subscribe-local component-id [:fill :color])

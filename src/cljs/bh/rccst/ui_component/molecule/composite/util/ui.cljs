@@ -51,8 +51,8 @@
 
 
 (defn- open-details [open-details? node]
-  (reset! open-details? (js->clj node))
-  (log/info "open-details" @open-details?))
+  (reset! open-details? (js->clj node)))
+  ;(log/info "open-details" @open-details?))
 
 
 (defn custom-node

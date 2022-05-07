@@ -107,10 +107,10 @@
   ---
 
   - data : (atom) any data shown by the component's ui
-  - widget-id : (string) unique identifier for this widget instance
+  - component-id : (string) unique identifier for this widget instance
   "
   [data component-id container-id ui]
-  (let [;ratio (ui-utils/subscribe-local widget-id [:ratio :include])
+  (let [;ratio (ui-utils/subscribe-local component-id [:ratio :include])
         isAnimationActive? (ui-utils/subscribe-local component-id [:isAnimationActive])
         stroke             (ui-utils/subscribe-local component-id [:stroke :color])
         fill               (ui-utils/subscribe-local component-id [:fill :color])]
