@@ -1,9 +1,10 @@
 (ns bh.rccst.views.template.ui-grid
   (:require [bh.rccst.subs :as subs]
-            [bh.rccst.ui-component.atom.layout.responsive-grid :as grid]
+            [bh.rccst.ui-component.atom.template.ui-grid :as grid]
             [bh.rccst.ui-component.molecule.composite.chart-remote-data :as chart-remote-data]
             [bh.rccst.ui-component.molecule.composite.coverage-plan :as coverage-plan]
             [bh.rccst.ui-component.molecule.composite.simple-multi-chart :as simple-multi-chart]
+            [bh.rccst.ui-component.molecule.composite.simple-multi-chart-2 :as simple-multi-chart-2]
             [bh.rccst.ui-component.molecule.grid-container :as grid-container]
             [bh.rccst.ui-component.utils.helpers :as h]
             [re-com.core :as rc]
@@ -16,7 +17,9 @@
 (log/info "bh.rccst.views.template.ui-grid")
 
 
-(defn example-widgets [container-id]
+(def container-id "ui-grid-demo")
+
+(def default-widgets
   [[:bar-chart "Bar Chart"
     [grid-container/component
      :data (r/atom chart-remote-data/ui-definition)
@@ -37,34 +40,20 @@
     :yellow :black]])
 
 
-(def example-layout [{:i :bar-chart :x 0 :y 0 :w 8 :h 15}
+(def default-layout [{:i :bar-chart :x 0 :y 0 :w 8 :h 15}
                      {:i :multi-chart :x 0 :y 10 :w 8 :h 15}
                      {:i :coverage-plan :x 8 :y 0 :w 12 :h 21}])
 
 
-(defn- make-widget [[id title content bk-color txt-color]]
-  [:div.widget-parent {:key id}
-   [:div.grid-toolbar.title-wrapper.move-cursor
-    [:div {:style {:background-color bk-color
-                   :color            txt-color
-                   :padding          "5px"
-                   :font-weight      :bold
-                   :font-size        "1.1em"}}
-     title]]
-   [:div.widget.widget-content
-    {:style         {:width       "100%"
-                     :height      "90%"
-                     :cursor      :default
-                     :align-items :stretch
-                     :display     :flex}
-     :on-mouse-down #(.stopPropagation %)}
-    content]])
+(def example-widgets {:widgets default-widgets
+                      :layout  default-layout})
+
+
+(def widgets (r/atom example-widgets))
 
 
 (defn page []
-  (let [container-id     "ui-grid-demo"
-        cols             20
-        logged-in?       (re-frame/subscribe [::subs/logged-in?])
+  (let [logged-in?       (re-frame/subscribe [::subs/logged-in?])
         pub-sub-started? (re-frame/subscribe [::subs/pub-sub-started?])]
 
     (if (not @logged-in?)
@@ -74,11 +63,31 @@
       (if (and @logged-in? @pub-sub-started?)
         [layout/page {:extra-classes :is-fluid}
 
-         [grid/grid :id "ui-grid-example"
-          :children (doall (map make-widget (example-widgets container-id)))
-          :cols cols
-          :layout example-layout]]
+         [grid/component
+          :widgets widgets
+          :container-id container-id]]
 
         [rc/alert-box :src (rc/at)
          :alert-type :info
          :heading "Waiting for (demo) Log-in"]))))
+
+
+
+(comment
+  (def res (h/resolve-value widgets))
+
+  (:widgets @res)
+  (:layout @res)
+
+  (swap! widgets assoc
+    :widgets (conj default-widgets
+               [:multi-chart-2 "Multi-Chart-2"
+                [grid-container/component
+                 :data (r/atom simple-multi-chart-2/ui-definition)
+                 :component-id (h/path->keyword container-id "multi-chart-2")
+                 :resizable true]
+                :rebeccapurple :white])
+    :layout (conj default-layout {:i :multi-chart-2 :x 8 :y 21 :w 12 :h 15}))
+
+
+  ())
