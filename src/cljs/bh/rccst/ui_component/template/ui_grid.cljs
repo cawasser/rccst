@@ -1,7 +1,7 @@
 (ns bh.rccst.ui-component.template.ui-grid
   (:require [bh.rccst.ui-component.atom.layout.responsive-grid :as grid]
             [bh.rccst.ui-component.utils.helpers :as h]
-            [reagent.ratom.RAtom]
+            [reagent.ratom]
             [taoensso.timbre :as log]))
 
 
@@ -54,7 +54,7 @@
     (keyword? layout) (update-layout-sub layout updated-layout)
 
     (and (coll? layout)
-      (not (empty? layout))
+      (seq layout)
       (every? keyword? layout)) (update-layout-sub layout updated-layout)
 
     (or (instance? reagent.ratom.RAtom layout)
@@ -70,10 +70,10 @@
 
     ;(log/info "on-layout-change" @widgets "//" new-layout)
 
-    (if (and
-          (not (empty? new-layout))
-          (<= 1 (count new-layout))
-          (not= (:i fst) "null"))
+    (when (and
+            (seq new-layout)
+            (<= 1 (count new-layout))
+            (not= (:i fst) "null"))
       (let [cooked (map #(zipmap '(:i :x :y :w :h) %)
                      (map (juxt :i :x :y :w :h) new-layout))]
         ;(log/info "on-layout-change (cooked)" cooked
