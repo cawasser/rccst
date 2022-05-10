@@ -1,9 +1,9 @@
 (ns bh.rccst.ui-component.atom.chart.pie-chart-2
   (:require [bh.rccst.ui-component.atom.chart.utils :as utils]
+            [bh.rccst.ui-component.atom.chart.wrapper-2 :as wrapper]
             [bh.rccst.ui-component.utils :as ui-utils]
             [bh.rccst.ui-component.utils.color :as color]
             [bh.rccst.ui-component.utils.example-data :as example-data]
-            [bh.rccst.ui-component.atom.chart.wrapper-2 :as wrapper]
             [re-com.core :as rc]
             [taoensso.timbre :as log]
             ["recharts" :refer [ResponsiveContainer PieChart Pie Cell]]))
@@ -15,9 +15,10 @@
 (def source-code '[])
 (def sample-data example-data/meta-tabular-data)
 
+
 (defn local-config [data]
 
-  (log/info "local-config" @data)
+  ;(log/info "local-config" @data)
 
   (let [d      (get @data :data)
         fields (get-in @data [:metadata :fields])]
@@ -27,25 +28,26 @@
 
       ; process options for :name
       (->> fields
-           (filter (fn [[k v]] (= :string v)))
-           keys
-           ((fn [m]
-              {:name {:keys m :chosen (first m)}})))
+        (filter (fn [[k v]] (= :string v)))
+        keys
+        ((fn [m]
+           {:name {:keys m :chosen (first m)}})))
 
       ; process options for :value
       (->> fields
-           (filter (fn [[k v]] (= :number v)))
-           keys
-           ((fn [m]
-              {:value {:keys m :chosen (first m)}}))))))
+        (filter (fn [[k v]] (= :number v)))
+        keys
+        ((fn [m]
+           {:value {:keys m :chosen (first m)}}))))))
 
 
 (defn config [component-id data]
-      (merge
-        ui-utils/default-pub-sub
-        utils/default-config
-        (ui-utils/config-tab-panel component-id)
-        (local-config data)))
+  (merge
+    ui-utils/default-pub-sub
+    utils/default-config
+    (ui-utils/config-tab-panel component-id)
+    (local-config data)))
+
 
 (defn- config-panel [data component-id]
   [rc/v-box :src (rc/at)
@@ -62,28 +64,35 @@
               [utils/option component-id ":value" [:value]]
               [utils/color-config-text component-id ":fill" [:fill] :above-right]]])
 
+
 (defn- included-cells [data subscriptions]
-  (->> data
-       (filter (fn [{:keys [name]}] (ui-utils/resolve-sub subscriptions [name :include])))
-       (into [])))
+  (let [ret (->> data
+              (filter (fn [{:keys [name]}] (ui-utils/resolve-sub subscriptions [:value])))
+              (into []))]
+
+    ;(log/info "included-cells" data "//" subscriptions "//" ret)
+
+    ret))
+
 
 (defn- component* [& {:keys [data component-id container-id
                              subscriptions isAnimationActive?]
-                      :as params}]
-  (let [d (if (empty? data) [] (get data :data))
+                      :as   params}]
+  (let [d        (if (empty? data) [] (get data :data))
         included (included-cells d subscriptions)]
 
-      [:> ResponsiveContainer
-       [:> PieChart {:label (utils/override true {} :label)}
+    [:> ResponsiveContainer
+     [:> PieChart {:label (utils/override true {} :label)}
 
-        (utils/non-gridded-chart-components component-id {})
+      (utils/non-gridded-chart-components component-id {})
 
-        [:> Pie {:dataKey           (ui-utils/resolve-sub subscriptions [:value :chosen])
-                 :nameKey           (ui-utils/resolve-sub subscriptions [:name :chosen])
-                 :data              included
-                 :fill              (ui-utils/resolve-sub subscriptions [:fill])
-                 :label             (utils/override true {} :label)
-                 :isAnimationActive @isAnimationActive?}]]]))
+      [:> Pie {:dataKey           (ui-utils/resolve-sub subscriptions [:value :chosen])
+               :nameKey           (ui-utils/resolve-sub subscriptions [:name :chosen])
+               :data              included
+               :fill              (ui-utils/resolve-sub subscriptions [:fill])
+               :label             (utils/override true {} :label)
+               :isAnimationActive @isAnimationActive?}]]]))
+
 
 (defn component [& {:keys [data config-data component-id container-id
                            data-panel config-panel] :as params}]
@@ -102,9 +111,10 @@
    :config config
    :local-config local-config])
 
-(def meta-data {:component              component
+
+(def meta-data {:component component
                 ;:configurable-component configurable-component
-                :sources                {:data :source-type/meta-tabular}
-                :pubs                   []
-                :subs                   []})
+                :sources   {:data :source-type/meta-tabular}
+                :pubs      []
+                :subs      []})
 
