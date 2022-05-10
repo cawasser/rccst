@@ -38,7 +38,7 @@
 
             ;[bh.rccst.views.atom.example.chart.bar-chart :as bar-chart]
             ;[bh.rccst.views.atom.example.chart.line-chart :as line-chart]
-            [bh.rccst.views.atom.example.chart.pie-chart :as pie-chart]
+            ;[bh.rccst.views.atom.example.chart.pie-chart :as pie-chart]
             ;[bh.rccst.views.atom.example.chart.colored-pie-chart :as colored-piechart]
 
             [bh.rccst.views.atom.example.re-com.table :as table]
@@ -64,7 +64,7 @@
 
    ;[bar-chart/example]
    ;[line-chart/simple-example]
-   [pie-chart/example]
+   ;[pie-chart/example]
    ;[colored-piechart/example]
 
    [rc/line :size "5px" :color "orange"]
