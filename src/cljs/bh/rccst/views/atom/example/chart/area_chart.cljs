@@ -2,9 +2,17 @@
   (:require [bh.rccst.ui-component.atom.chart.area-chart-2 :as chart]
             [bh.rccst.ui-component.atom.chart.utils :as chart-utils]
             [bh.rccst.views.atom.example.chart.alt.data-tools :as data-tools]
+            [bh.rccst.views.atom.example.chart.alt.config-tools :as config-tools]
             [bh.rccst.views.atom.example.chart.alt.data-ratom-example :as data-ratom-example]
             [bh.rccst.views.atom.example.chart.alt.data-structure-example :as data-structure-example]
-            [bh.rccst.views.atom.example.chart.alt.data-sub-example :as data-sub-example]))
+            [bh.rccst.views.atom.example.chart.alt.data-sub-example :as data-sub-example]
+            [bh.rccst.views.atom.example.chart.alt.config-ratom-example :as config-ratom-example]))
+
+(def default-config-data {:brush false
+                          :uv    {:include true, :fill "#ff0000", :stackId ""}
+                          :pv    {:include true, :fill "#00ff00", :stackId ""}
+                          :tv    {:include true, :fill "#0000ff", :stackId "a"}
+                          :amt   {:include true, :fill "#745ea5", :stackId "a"}})
 
 (defn- data-ratom []
   [data-ratom-example/example
@@ -55,9 +63,27 @@
    :data-panel chart-utils/meta-tabular-data-panel
    :config-panel chart/config-panel])
 
+(defn- config-ratom []
+  [config-ratom-example/example
+   :container-id :area-chart-2-config-ratom-demo
+   :title "Area Chart 2 (Live Configuration - ratom)"
+   :description "An Area Chart (2) built using [Recharts](https://recharts.org/en-US/api/AreaChart). This example shows how
+     charts can take [ratoms](http://reagent-project.github.io/docs/master/reagent.ratom.html) as input and re-render as the configuration changes.
+
+> In _this_ case, we are using a ratom to hold the configuration for the chart.
+>
+> You can use the buttons in the bottom-most panel to change some of the chart configuration options and see
+> how that affects the data (shown in the gray panel) and how the chart responds."
+   :sample-data chart/sample-data
+   :source-code chart/source-code
+   :config-tools config-tools/meta-tabular-config-column-ratom-tools
+   :component chart/component
+   :default-config-data default-config-data])
+
 (defn examples []
   [:div
    [data-ratom]
    [data-structure]
-   [data-sub]])
+   [data-sub]
+   [config-ratom]])
 
