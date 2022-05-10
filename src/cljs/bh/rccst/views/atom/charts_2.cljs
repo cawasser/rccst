@@ -9,13 +9,11 @@
             [bh.rccst.views.atom.example.chart.line-chart :as line-chart]))
 
 
-
-
 (def navbar [[:charts/area-chart "Area" [area-chart/examples]]
              [:charts/bar-chart "Bar" [bar-chart/examples]]
-             [:charts/pie-chart "Pie" [pie-chart/examples]]
              [:charts/colored-pie-chart "Colored Pie" [colored-pie-chart/examples]]
              [:charts/line-chart "Line" [line-chart/examples]]
+             [:charts/pie-chart "Pie" [pie-chart/examples]]
              [:charts/other "Other" [charts/examples]]])
                   ;[:charts/colored-pie-chart "Colored Pie" [colored-pie-chart/examples]]
                   ;[:charts/funnel-chart "Funnel" [funnel-chart/examples]]
@@ -37,4 +35,4 @@
    :short-name "charts"
    :description ""
    :children navbar
-   :start-panel :charts/other])
+   :start-panel :charts/area-chart])
