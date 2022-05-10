@@ -7,7 +7,8 @@
             [bh.rccst.views.atom.example.chart.alt.data-structure-example :as data-structure-example]
             [bh.rccst.views.atom.example.chart.alt.data-sub-example :as data-sub-example]
             [bh.rccst.views.atom.example.chart.alt.config-ratom-example :as config-ratom-example]
-            [bh.rccst.views.atom.example.chart.alt.config-structure-example :as config-structure-example]))
+            [bh.rccst.views.atom.example.chart.alt.config-structure-example :as config-structure-example]
+            [bh.rccst.views.atom.example.chart.alt.config-sub-example :as config-sub-example]))
 
 (def default-config-data {:brush false
                           :uv    {:include true, :fill "#ff0000", :stackId ""}
@@ -96,6 +97,22 @@
    :component chart/component
    :default-config-data default-config-data])
 
+(defn- config-sub []
+  (let [container-id :area-chart-2-config-sub-demo]
+    [config-sub-example/example
+     :container-id container-id
+     :title "Area Chart 2 (Live Configuration - subscription)"
+     :description "An Area Chart (2) built using [Recharts](https://recharts.org/en-US/api/AreaChart). This example shows how
+     charts can take [subscriptions](https://day8.github.io/re-frame/subscriptions/) as input and re-render as the configuration changes.
+
+> In _this_ case, we are using a subscription to handle the configuration for the chart."
+     :sample-data chart/sample-data
+     :source-code chart/source-code
+     :config-tools config-tools/meta-tabular-config-column-sub-tools
+     :component chart/component
+     :config-data [container-id :blackboard :config-data]
+     :default-config-data default-config-data]))
+
 
 (defn examples []
   [:div
@@ -103,5 +120,6 @@
    [data-structure]
    [data-sub]
    [config-ratom]
-   [config-structure]])
+   [config-structure]
+   [config-sub]])
 
