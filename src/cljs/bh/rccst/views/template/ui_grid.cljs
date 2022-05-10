@@ -43,17 +43,17 @@
                             :component-id (h/path->keyword container-id "coverage-plan")
                             :resizable true]
                            :yellow :black])
-(def default-widgets [bar-chart-widget])
+(def default-widgets #{bar-chart-widget})
 
 (def bar-chart-layout {:i :bar-chart :x 0 :y 0 :w 8 :h 15})
 (def multi-chart-layout {:i :multi-chart :x 0 :y 10 :w 8 :h 15})
 (def multi-chart-2-layout {:i :multi-chart-2 :x 8 :y 21 :w 12 :h 15})
 (def coverage-plan-layout {:i :coverage-plan :x 8 :y 0 :w 12 :h 21})
-(def default-layout [bar-chart-layout])
+(def default-layout #{bar-chart-layout})
 
 
-(def example-widgets {:widgets default-widgets
-                      :layout  default-layout})
+(def empty-widgets {:widgets #{} :layout  #{}})
+(def example-widgets {:widgets default-widgets :layout  default-layout})
 
 
 (def widgets (r/atom example-widgets))
@@ -65,10 +65,16 @@
      :layout layout-val}))
 
 
+(defn- toggle-val [s val]
+  (if (contains? s val)
+    (disj s val)
+    (conj s val)))
+
+
 (defn- grid-update [widgets widget-val layout-val]
   (swap! widgets assoc
-    :widgets (conj (:widgets @widgets) widget-val)
-    :layout (conj (:layout @widgets) layout-val)))
+    :widgets (toggle-val (:widgets @widgets) widget-val)
+    :layout (toggle-val (:layout @widgets) layout-val)))
 
 
 (defn- widget-tools [widgets default-widgets]
@@ -78,17 +84,17 @@
            :box-shadow "5px 5px 5px 2px"
            :margin     "5px" :padding "5px"}
    :children [[:label.h5 "Widgets:"]
-              [rc/button :on-click #(reset! widgets []) :label "Empty"]
+              [rc/button :on-click #(reset! widgets empty-widgets) :label "Empty"]
               [rc/button :on-click #(grid-reset widgets default-widgets default-layout)
                :label "Default"]
               [rc/button :on-click #(grid-update widgets bar-chart-widget bar-chart-layout)
-               :label "Bar Chart"]
+               :label "! Bar Chart"]
               [rc/button :on-click #(grid-update widgets multi-chart-widget multi-chart-layout)
-               :label "Multi Chart"]
+               :label "! Multi Chart"]
               [rc/button :on-click #(grid-update widgets multi-chart-2-widget multi-chart-2-layout)
-               :label "Multi Chart 2"]
+               :label "! Multi Chart 2"]
               [rc/button :on-click #(grid-update widgets coverage-plan-widget coverage-plan-layout)
-               :label "Coverage Plan"]]])
+               :label "! Coverage Plan"]]])
 
 
 (defn page []
