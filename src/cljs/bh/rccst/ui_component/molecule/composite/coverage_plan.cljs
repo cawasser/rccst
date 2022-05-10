@@ -6,6 +6,8 @@
             [taoensso.timbre :as log]
             [cljs-time.core :as t]
             [cljs-time.coerce :as coerce]
+            [bh.rccst.ui-component.molecule.composite.coverage-plan.support :as s]
+            [bh.rccst.ui-component.utils :as ui-utils]
             ["dagre" :as dagre]
             ["graphlib" :as graphlib]
             ["react-flow-renderer" :refer (ReactFlowProvider Controls Handle Background) :default ReactFlow]))
@@ -30,7 +32,7 @@
   "
   [{:keys [targets satellites coverages current-time shapes]}]
 
-  ;(log/info "fn-coverage" layers
+  ;(log/info "fn-coverage" shapes
   ;  "//" targets
   ;  "//" satellites
   ;  "//" coverages)
@@ -42,11 +44,11 @@
     :<- coverages
     :<- current-time
     (fn [[t s c ct] _]
+      ;(log/info "fn-coverage (sub)" ct "//" (filter #(= (:time %) ct) (:data c)))
+
       (if (or (empty? c) (empty? (:data c)))
         []
-        ; return "pairs" of shapes at each time-frame
-        (let [part-shapes (partition-all 2 1 bh.rccst.ui-component.atom.worldwind.globe/sample-data)]
-          (nth part-shapes ct))))))
+        (s/make-shape (filter #(= (:time %) ct) (:data c)))))))
 
 
 (defn fn-range
@@ -171,3 +173,23 @@
   (re-frame/subscribe [:bh.rccst.subs/source :string])
 
   ())
+
+
+; work out making actual shapes for the coverage data we get from the server
+(comment
+  (do
+    (def coverages (get-in @re-frame.db/app-db [:sources :source/coverages :data]))
+    (def current-time 0)
+
+    (def time-coverage (filter #(= (:time %) current-time) coverages)))
+
+
+  (ui-utils/subscribe-local
+    :ui-grid-ratom-demo.coverage-plan
+    [:blackboard :topic.shapes])
+
+
+  ())
+
+
+
