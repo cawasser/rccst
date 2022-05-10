@@ -6,7 +6,8 @@
             [bh.rccst.views.atom.example.chart.alt.data-ratom-example :as data-ratom-example]
             [bh.rccst.views.atom.example.chart.alt.data-structure-example :as data-structure-example]
             [bh.rccst.views.atom.example.chart.alt.data-sub-example :as data-sub-example]
-            [bh.rccst.views.atom.example.chart.alt.config-ratom-example :as config-ratom-example]))
+            [bh.rccst.views.atom.example.chart.alt.config-ratom-example :as config-ratom-example]
+            [bh.rccst.views.atom.example.chart.alt.config-structure-example :as config-structure-example]))
 
 (def default-config-data {:brush false
                           :uv    {:include true, :fill "#ff0000", :stackId ""}
@@ -80,10 +81,27 @@
    :component chart/component
    :default-config-data default-config-data])
 
+(defn- config-structure []
+  [config-structure-example/example
+   :container-id :area-chart-2-config-structure-demo
+   :title "Area Chart 2 (Live Configuration - structure)"
+   :description "An Area Chart (2) built using [Recharts](https://recharts.org/en-US/api/AreaChart). This example shows how
+     charts can take [ratoms](http://reagent-project.github.io/docs/master/reagent.ratom.html) as input and re-render as the configuration changes.
+
+> In _this_ case, we are using a plain data structure to hold the configuration for the chart.
+>
+> You can see the configuration data in the gray panel and how it how that affects the chart."
+   :sample-data chart/sample-data
+   :source-code chart/source-code
+   :component chart/component
+   :default-config-data default-config-data])
+
+
 (defn examples []
   [:div
    [data-ratom]
    [data-structure]
    [data-sub]
-   [config-ratom]])
+   [config-ratom]
+   [config-structure]])
 
