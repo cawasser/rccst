@@ -1,16 +1,31 @@
 (ns bh.rccst.data-source.coverages
   (:require [bh.rccst.components.system :as system]
             [clojure.tools.logging :as log]
-            [bh.rccst.version :as version]))
+            [bh.rccst.version :as version]
+            [clojure.java.io :as io]
+            [clojure.edn :as edn]))
 
 
 (def source-id :source/coverages)
 
 
-(def sample-data (atom [{:id "alpha":data "ONE ONE ONE"}
-                        {:id "bravo":data "TWO TWO TWO"}
-                        {:id "charlie":data "THREE THREE THREE"}
-                        {:id "delta":data "FOUR FOUR FOUR"}]))
+(def default-data-filename "public/default-data/default-coverages.edn")
+
+
+(comment
+
+  (->> default-data-filename
+    io/resource
+    slurp
+    edn/read-string)
+
+  ())
+
+
+(def sample-data (->> default-data-filename
+                   io/resource
+                   slurp
+                   edn/read-string))
 
 
 (defn- add-random [data])
@@ -18,7 +33,7 @@
 
 (defn- fetch-data []
   (log/info "coverages fetch-data")
-  @sample-data)
+  sample-data)
 
 
 (defn- wrap-meta [data]

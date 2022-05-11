@@ -1,84 +1,8 @@
 (ns bh.rccst.views.template.ui-grid
-  (:require [bh.rccst.subs :as subs]
-            [bh.rccst.ui-component.atom.layout.responsive-grid :as grid]
-            [bh.rccst.ui-component.molecule.composite.chart-remote-data :as chart-remote-data]
-            [bh.rccst.ui-component.molecule.composite.coverage-plan :as coverage-plan]
-            [bh.rccst.ui-component.molecule.composite.simple-multi-chart :as simple-multi-chart]
-            [bh.rccst.ui-component.molecule.grid-container :as grid-container]
-            [bh.rccst.ui-component.utils.helpers :as h]
-            [re-com.core :as rc]
-            [re-frame.core :as re-frame]
-            [reagent.core :as r]
-            [taoensso.timbre :as log]
-            [woolybear.ad.layout :as layout]))
-
-
-(log/info "bh.rccst.views.template.ui-grid")
-
-
-(defn example-widgets [container-id]
-  [[:bar-chart "Bar Chart"
-    [grid-container/component
-     :data (r/atom chart-remote-data/ui-definition)
-     :component-id (h/path->keyword container-id "bar-chart")
-     :resizable true]
-    :green :white]
-   [:multi-chart "Multi-Chart"
-    [grid-container/component
-     :data (r/atom simple-multi-chart/ui-definition)
-     :component-id (h/path->keyword container-id "multi-chart")
-     :resizable true]
-    :blue :white]
-   [:coverage-plan "Coverage Plan"
-    [grid-container/component
-     :data (r/atom coverage-plan/ui-definition)
-     :component-id (h/path->keyword container-id "coverage-plan")
-     :resizable true]
-    :yellow :black]])
-
-
-(def example-layout [{:i :bar-chart :x 0 :y 0 :w 8 :h 15}
-                     {:i :multi-chart :x 0 :y 10 :w 8 :h 15}
-                     {:i :coverage-plan :x 8 :y 0 :w 12 :h 21}])
-
-
-(defn- make-widget [[id title content bk-color txt-color]]
-  [:div.widget-parent {:key id}
-   [:div.grid-toolbar.title-wrapper.move-cursor
-    [:div {:style {:background-color bk-color
-                   :color            txt-color
-                   :padding          "5px"
-                   :font-weight      :bold
-                   :font-size        "1.1em"}}
-     title]]
-   [:div.widget.widget-content
-    {:style         {:width       "100%"
-                     :height      "90%"
-                     :cursor      :default
-                     :align-items :stretch
-                     :display     :flex}
-     :on-mouse-down #(.stopPropagation %)}
-    content]])
+  (:require [bh.rccst.views.template.ui-grid.ratom-example :as ratom-example]))
 
 
 (defn page []
-  (let [container-id     "ui-grid-demo"
-        cols             20
-        logged-in?       (re-frame/subscribe [::subs/logged-in?])
-        pub-sub-started? (re-frame/subscribe [::subs/pub-sub-started?])]
+  [:div
+   [ratom-example/example]])
 
-    (if (not @logged-in?)
-      (re-frame/dispatch [:bh.rccst.events/login "test-user" "test-pwd"]))
-
-    (fn []
-      (if (and @logged-in? @pub-sub-started?)
-        [layout/page {:extra-classes :is-fluid}
-
-         [grid/grid :id "ui-grid-example"
-          :children (doall (map make-widget (example-widgets container-id)))
-          :cols cols
-          :layout example-layout]]
-
-        [rc/alert-box :src (rc/at)
-         :alert-type :info
-         :heading "Waiting for (demo) Log-in"]))))
