@@ -46,30 +46,32 @@
                :margin     "5px" :padding "5px"}
        :children [[:label.h5 "Input Data:"]
 
-                  [rc/button :on-click #(h/handle-change-path data [] []) :label "Empty"]
+                  [rc/button :label "Empty" :on-click #(h/handle-change-path data [] [])]
 
-                  [rc/button :on-click #(h/handle-change-path data [] default-data)
-                   :label "Default"]
+                  [rc/button :label "Default"
+                   :on-click #(h/handle-change-path data [] default-data)]
 
-                  [rc/button :on-click #(h/handle-change-path data [:data]
-                                          (assoc-in @old-data [0 :uv] 10000))
-                   :label "A -> 10000"]
+                  [rc/button :label "A(uv) -> 10000"
+                   :on-click #(h/handle-change-path data [:data]
+                                (assoc-in @old-data [0 :uv] 10000))]
 
-                  [rc/button :on-click #(h/handle-change-path data [:data]
-                                          (conj @old-data
-                                            {:name "Page Q" :uv 1100
-                                             :pv   1100 :tv 1100 :amt 1100}))
-                   :label "Add 'Q'"]
+                  [rc/button :label "Add 'Q'"
+                   :on-click #(h/handle-change-path data [:data]
+                                (conj @old-data
+                                  {:name "Page Q" :uv 1100
+                                   :pv   1100 :tv 1100 :amt 1100}))]
 
-                  [rc/button :on-click #(h/handle-change-path data [:data]
-                                          (into [] (drop-last 2 @old-data)))
-                   :label "Drop Last 2"]
+                  [rc/button :label "Drop Last 2"
+                   :on-click #(h/handle-change-path data [:data]
+                                (into [] (drop-last 2 @old-data)))]
 
-                  [rc/button :on-click #(h/handle-change-path data []
-                                          (-> @old-meta
-                                            (assoc-in [:metadata :fields :new-item] :number)
-                                            (assoc :data (into []
-                                                           (map (fn [x]
-                                                                  (assoc x :new-item (rand-int 7000)))
-                                                             @old-data)))))
-                   :label "Add :new-item"]]])))
+                  [rc/button :label "Add :new-item"
+                   :on-click #(h/handle-change-path data []
+                                (-> @old-meta
+                                  (assoc-in [:metadata :fields :new-item] :number)
+                                  (assoc :data (into []
+                                                 (map (fn [x]
+                                                        (assoc x :new-item (rand-int 7000)))
+                                                   @old-data)))))]]])))
+
+
