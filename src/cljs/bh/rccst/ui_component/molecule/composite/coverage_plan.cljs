@@ -44,11 +44,16 @@
     :<- coverages
     :<- current-time
     (fn [[t s c ct] _]
-      ;(log/info "fn-coverage (sub)" ct "//" (filter #(= (:time %) ct) (:data c)))
+      ;(log/info "fn-coverage (sub)" ct
+      ;  ;"// (satellites)" s
+      ;  ;"// (cooked)" (s/cook-coverages c ct)
+      ;  "// (filter)" (filter #(contains? s (get-in % [:coverage :sensor]))
+      ;                  (s/cook-coverages c ct)))
 
       (if (or (empty? c) (empty? (:data c)))
         []
-        (s/make-shape (filter #(= (:time %) ct) (:data c)))))))
+        (map s/make-shape (filter #(contains? s (get-in % [:coverage :sensor]))
+                            (s/cook-coverages c ct)))))))
 
 
 (defn fn-range
@@ -112,8 +117,10 @@
 
                                    ; composite-local data sources
                                    :topic/selected-targets    {:type :source/local :name :selected-targets :default []}
-                                   :topic/selected-satellites {:type :source/local :name :selected-satellites :default []}
-                                   :topic/current-time        {:type :source/local :name :current-time :default 0} ;(js/Date.)}
+                                   :topic/selected-satellites {:type :source/local :name :selected-satellites
+                                                               :default #{"avhhr-6" "viirs-5" "abi-meso-11"
+                                                                          "abi-meso-4" "abi-meso-10" "abi-meso-2"}}
+                                   :topic/current-time        {:type :source/local :name :current-time :default 0}
                                    :topic/shapes              {:type :source/local :name :shapes}
                                    :topic/time-range          {:type :source/local :name :time-range}
                                    :topic/current-slider      {:type :source/local :name :current-slider :default 0}

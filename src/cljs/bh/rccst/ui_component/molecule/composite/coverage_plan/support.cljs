@@ -102,7 +102,7 @@
   (get cell-boundaries cell))
 
 
-(defn- make-one-shape [c]
+(defn make-shape [c]
   (let [fill    (get-in dummy-sensor-color-pallet [(get-in c [:coverage :sensor]) 2])
         [r g b a] fill
         outline [r g b (+ a 0.3)]]
@@ -117,11 +117,32 @@
      :outline-color outline}))
 
 
-(defn make-shape [c]
-  (mapcat (fn [{:keys [coverage time cell computed_at] :as all}]
-            (map #(make-one-shape {:time time :coverage % :cell cell :computed_at computed_at})
-              coverage))
-    c))
+(defn cook-coverages [coverages current-time]
+  (->> coverages
+    :data
+    (filter #(= (:time %) current-time))
+    (mapcat (fn [{:keys [coverage time cell computed_at] :as all}]
+              (map (fn [c] {:time time :coverage c :cell cell :computed_at computed_at})
+                coverage)))))
+
+
+(comment
+  (do
+    (def current-time 0)
+    (def coverages {:data [{:time        0
+                            :cell        [9 7]
+                            :coverage    #{{:platform "goes-west", :sensor "abi-3"} {:platform "goes-east", :sensor "abi-1"}},
+                            :computed_at "2021-08-02T15:16:05.558813"}]}))
+
+  (->> coverages
+    :data
+    (filter #(= (:time %) current-time))
+    (mapcat (fn [{:keys [coverage time cell computed_at] :as all}]
+              (map (fn [c] {:time time :coverage c :cell cell :computed_at computed_at})
+                coverage))))
+
+
+  ())
 
 
 (comment
