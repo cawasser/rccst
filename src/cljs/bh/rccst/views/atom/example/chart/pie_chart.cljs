@@ -12,17 +12,10 @@
 
 
 
-(def default-config-data {:Page-A {:name "Page A" :include true}
-                          :Page-B {:name "Page B" :include true}
-                          :Page-C {:name "Page C" :include true}
-                          :Page-D {:name "Page D" :include true}
-                          :Page-E {:name "Page E" :include true}
-                          :Page-F {:name "Page F" :include true}
-                          :Page-G {:name "Page G" :include true}
-                          :value {:keys [:uv :pv :tv :amt] :chosen :uv}
-                          :color "#8884d8"})
+(def default-config-data {:name {:keys [:Page-A :Page-B :Page-C :Page-D :Page-E :Page-F :Page-G] :color "#00e5ff"}
+                          :value {:keys [:uv :pv :tv :amt] :chosen :uv}})
 
-
+;"Page-A" "Page-B" "Page-C" "Page-D" "Page-E" "Page-F" "Page-G"
 (defn- data-ratom []
   [data-ratom-example/example
    :container-id :pie-chart-data-ratom-demo
@@ -87,7 +80,7 @@
 > You can use the buttons in the bottom-most panel to change some of the chart configuration options and see
 > how that affects the data (shown in the gray panel) and how the chart responds."
    :sample-data chart/sample-data
-   :config-tools config-tools/meta-tabular-config-row-ratom-tools
+   :config-tools config-tools/meta-tabular-config-pie-row-ratom-tools
    :source-code chart/source-code
    :component chart/component
    :default-config-data default-config-data])
@@ -119,7 +112,7 @@
 
 > In _this_ case, we are using a subscription to handle the configuration for the chart."
      :sample-data chart/sample-data
-     :config-tools config-tools/meta-tabular-config-row-sub-tools
+     :config-tools config-tools/meta-tabular-config-pie-row-sub-tools
      :source-code chart/source-code
      :component chart/component
      :config-data [container-id :blackboard :config-data]
@@ -129,10 +122,10 @@
 
 (defn examples []
   [:div
-   [data-ratom]])
-   ;[data-structure]
-   ;[data-sub]
-   ;[config-ratom]
-   ;[config-structure]
-   ;[config-sub]])
+   [data-ratom]
+   [data-structure]
+   [data-sub]
+   [config-ratom]
+   [config-structure]
+   [config-sub]])
 
