@@ -4,7 +4,8 @@
 (defn overview []
       (o/overview "Woolybear"
 
-"#### A re-frame application demonstrating some principles of Atomic Design and reusable re-frame components.\n
+        "#### _A re-frame application/framework demonstrating some principles of Atomic Design and reusable re-frame components_
+
 Woolybear is a demonstration of how to implement re-usable re-frame components inspired by the principles of Atomic Design.
 There's no back-end functionality-all of the forms and actions are simulated.
 

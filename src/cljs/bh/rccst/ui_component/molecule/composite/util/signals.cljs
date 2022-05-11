@@ -63,10 +63,10 @@
     (ul/dispatch-local container-id [:blackboard node] (:default meta-data)))
 
   ; 2. create the subscription against the new :blackboard key
-  (ul/create-widget-local-sub container-id [:blackboard node] (:default meta-data))
+  (ul/create-container-local-sub container-id [:blackboard node] (:default meta-data))
 
   ; 3. create the event against the new :blackboard key
-  (ul/create-widget-local-event container-id [:blackboard node])
+  (ul/create-container-local-event container-id [:blackboard node])
 
   ; 4. return the signal vector for the new subscription
   [(ui-utils/path->keyword container-id [:blackboard node])])

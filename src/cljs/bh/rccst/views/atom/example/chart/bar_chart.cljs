@@ -6,7 +6,9 @@
             [bh.rccst.views.atom.example.chart.alt.data-sub-example :as data-sub-example]
             [bh.rccst.views.atom.example.chart.alt.config-ratom-example :as config-ratom-example]
             [bh.rccst.views.atom.example.chart.alt.config-structure-example :as config-structure-example]
-            [bh.rccst.views.atom.example.chart.alt.config-sub-example :as config-sub-example]))
+            [bh.rccst.views.atom.example.chart.alt.config-sub-example :as config-sub-example]
+            [bh.rccst.views.atom.example.chart.alt.data-tools :as data-tools]
+            [bh.rccst.views.atom.example.chart.alt.config-tools :as config-tools]))
 
 
 (def default-config-data {:brush false
@@ -27,6 +29,7 @@
   >
   > You can use the buttons below to change some of the data and see how the chart responds."
    :sample-data chart/sample-data
+   :data-tools data-tools/meta-tabular-data-ratom-tools
    :source-code chart/source-code
    :component chart/component
    :data-panel chart-utils/meta-tabular-data-panel
@@ -60,6 +63,7 @@
 "
    :sample-data [:bar-chart-2-data-sub-demo :blackboard :topic.sample-data]
    :default-data chart/sample-data
+   :data-tools data-tools/meta-tabular-data-sub-tools
    :source-code chart/source-code
    :component chart/component
    :data-panel chart-utils/meta-tabular-data-panel
@@ -79,6 +83,7 @@
 > how that affects the data (shown in the gray panel) and how the chart responds."
    :sample-data chart/sample-data
    :source-code chart/source-code
+   :config-tools config-tools/meta-tabular-config-column-ratom-tools
    :component chart/component
    :default-config-data default-config-data])
 
@@ -110,6 +115,7 @@
 > In _this_ case, we are using a subscription to handle the configuration for the chart."
      :sample-data chart/sample-data
      :source-code chart/source-code
+     :config-tools config-tools/meta-tabular-config-column-sub-tools
      :component chart/component
      :config-data [container-id :blackboard :config-data]
      :default-config-data default-config-data]))

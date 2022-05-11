@@ -28,8 +28,8 @@
              :flex-flow         "column wrap"})
 
 
-(defn config-tab-panel [chart-id]
-  (h/config-tab-panel chart-id))
+(defn config-tab-panel [component-id]
+  (h/config-tab-panel component-id))
 
 
 (defn component-id []
@@ -53,24 +53,24 @@
 ; container locals
 ;
 
-(defn init-widget [widget-id locals-and-defaults]
-  (l/init-widget widget-id locals-and-defaults))
+(defn init-container-locals [container-id locals-and-defaults]
+  (l/init-container-locals container-id locals-and-defaults))
 
 
-(defn subscribe-local [widget-id value-path]
-  (l/subscribe-local widget-id value-path))
+(defn subscribe-local [container-id value-path]
+  (l/subscribe-local container-id value-path))
 
 
-(defn resolve-subscribe-local [widget-id value-path]
-  (l/resolve-subscribe-local widget-id value-path))
+(defn resolve-subscribe-local [container-id value-path]
+  (l/resolve-subscribe-local container-id value-path))
 
 
-(defn dispatch-local [widget-id value-path new-val]
-  (l/dispatch-local widget-id value-path new-val))
+(defn dispatch-local [container-id value-path new-val]
+  (l/dispatch-local container-id value-path new-val))
 
 
-(defn build-subs [component-id local-config]
-  (l/build-subs component-id local-config))
+(defn build-subs [container-id local-config]
+  (l/build-subs container-id local-config))
 
 
 (defn resolve-sub [subs path]
@@ -168,37 +168,37 @@
   ())
 
 
-; need to mix the widget-id in with the path "inside" the widget's hash-map
+; need to mix the container-id in with the path "inside" the container's hash-map
 (comment
   (def app-db
-    {:widgets {:<guid-1>   {:tab-panel  {:value     :<guid-1>/dummy
-                                         :data-path [:<guid-1> :tab-panel]}
-                            :some-value "value"
-                            :grid       {:include false}
-                            :x-axis     {:include false}}
-               :catalog    {:tab-panel {:value     :catalog/atoms
-                                        :data-path [:catalog :tab-panel]}}
-               :line-chart {:tab-panel {:value     :line-chart/config
-                                        :data-path [:line-chart :tab-panel]}
-                            :grid      {:include true :strokeDasharray {:d 3 :g 3}
-                                        :stroke  "#ffffff"}
-                            :x-axis    {:include     true :dataKey ""
-                                        :orientation :bottom :scale "auto"}
-                            :y-axis    {:include       true :dataKey "" :orientation
-                                        :bottom :scale "auto"}
-                            :legend    {:include true :layout :horizontal
-                                        :align   :center :verticalAlign :bottom}
-                            :tooltip   {:include true}}}})
+    {:containers {:<guid-1>   {:tab-panel  {:value     :<guid-1>/dummy
+                                            :data-path [:<guid-1> :tab-panel]}
+                               :some-value "value"
+                               :grid       {:include false}
+                               :x-axis     {:include false}}
+                  :catalog    {:tab-panel {:value     :catalog/atoms
+                                           :data-path [:catalog :tab-panel]}}
+                  :line-chart {:tab-panel {:value     :line-chart/config
+                                           :data-path [:line-chart :tab-panel]}
+                               :grid      {:include true :strokeDasharray {:d 3 :g 3}
+                                           :stroke  "#ffffff"}
+                               :x-axis    {:include     true :dataKey ""
+                                           :orientation :bottom :scale "auto"}
+                               :y-axis    {:include       true :dataKey "" :orientation
+                                           :bottom :scale "auto"}
+                               :legend    {:include true :layout :horizontal
+                                           :align   :center :verticalAlign :bottom}
+                               :tooltip   {:include true}}}})
 
 
-  (def widget-id "<guid-1>")
+  (def container-id "<guid-1>")
   (def path [:some-value])
   (def path [:tab-panel :value])
 
-  (defn subscribe-local [widget-id [a & more]]
-    (let [p (path->keyword widget-id (str (name a)
-                                       (when more
-                                         (str "." (clojure.string/join "." (map name more))))))]
+  (defn subscribe-local [container-id [a & more]]
+    (let [p (path->keyword container-id (str (name a)
+                                          (when more
+                                            (str "." (clojure.string/join "." (map name more))))))]
       p))
   ;(re-frame/subscribe p)))
 
@@ -206,76 +206,76 @@
     d)
   (path->keyword :line-chart)
 
-  (subscribe-local widget-id [:some-value])
+  (subscribe-local container-id [:some-value])
   (subscribe-local :line-chart [:tab-panel :value])
   (subscribe-local :line-chart [:grid :strokeDasharray :d])
 
   ())
 
 
-; how do we build all the cascading subscriptions for the widget's locals?
-; rocky-road just uses a single [:widget-locals widget-id :some-value]...
+; how do we build all the cascading subscriptions for the container's locals?
+; rocky-road just uses a single [containers "locals" container-id :some-value]...
 ; so it doesn't HAVE cascaded subscriptions in the first place
 (comment
 
-  (def widget-locals {:tab-panel  {:value     :<guid-1>/dummy
-                                   :data-path [:<guid-1> :tab-panel]}
-                      :some-value "value"
-                      :grid       {}
-                      :x-axis     {}})
+  (def container-locals {:tab-panel  {:value     :<guid-1>/dummy
+                                      :data-path [:<guid-1> :tab-panel]}
+                         :some-value "value"
+                         :grid       {}
+                         :x-axis     {}})
 
-  ; NOTE 1: does ':data-path' need the :widgets prefix to work? PROBABLY
+  ; NOTE 1: does ':data-path' need the :containers prefix to work? PROBABLY
 
-  ; NOTE 2: widget-locals is both the structure AND the initial value
+  ; NOTE 2: container-locals is both the structure AND the initial value
 
 
   ; THE GOAL:
   ;
-  ;      (init-widget-locals "widget-1" widget-locals)
+  ;      (init-container-locals-locals "container-1" container-locals)
   ;
   ; this (1) builds all the subscriptions AND (2) loads the initial data into the app-db
   ; at the correct level
 
 
   ;; region ; set initial values into the app-db:
-  (defn load-local-values [widget-id values]
-    (let [target (path->keyword widget-id)
-          path   [:events/init-widget-locals target values]]
+  (defn load-local-values [container-id values]
+    (let [target (path->keyword container-id)
+          path   [:events/init-container-locals target values]]
       (re-frame/dispatch-sync path)))
 
-  (load-local-values "<guid-1>" widget-locals)
-  (load-local-values "<guid-2>" widget-locals)
+  (load-local-values "<guid-1>" container-locals)
+  (load-local-values "<guid-2>" container-locals)
 
   ;; endregion
 
   ;; region ; building the subscriptions
 
   ; let's start with hand-crafted, artisanal subscriptions
-  ; sub-widget
+  ; sub-container
   (re-frame/reg-sub
-    :widgets/<guid-1>
-    :<- [:widgets]
-    (fn [widgets _]
-      (:<guid-1> widgets)))
-  @(re-frame/subscribe [:widgets])
-  (->> @(re-frame/subscribe [:widgets/<guid-1>])
+    :containers/<guid-1>
+    :<- [:containers]
+    (fn [containers _]
+      (:<guid-1> containers)))
+  @(re-frame/subscribe [:containers])
+  (->> @(re-frame/subscribe [:containers/<guid-1>])
     keys)
 
   ; sub-some-value
   (re-frame/reg-sub
     :<guid-1>/some-value
-    :<- [:widgets/<guid-1>]
-    (fn [widget _]
-      (:some-value widget)))
+    :<- [:containers/<guid-1>]
+    (fn [containers _]
+      (:some-value containers)))
   @(re-frame/subscribe [:<guid-1>/some-value])
 
   ; sub-tab-panel
   (re-frame/reg-sub
     :<guid-1>/tab-panel
-    :<- [:widgets/<guid-1>]
-    (fn [widget _]
-      (:tab-panel widget)))
-  @(re-frame/subscribe [:widgets/<guid-1>])
+    :<- [:containers/<guid-1>]
+    (fn [containers _]
+      (:tab-panel container)))
+  @(re-frame/subscribe [:containers/<guid-1>])
   @(re-frame/subscribe [:<guid-1>/tab-panel])
 
   ; sub-tab-panel-value
@@ -290,69 +290,69 @@
   ;; endregion
 
   ;; region ; subscribing to locals (chart around re-frame/subscribe)
-  (defn subscribe-local [widget-id [a & more :as path]]
-    (let [p (path->keyword widget-id (str (name a)
-                                       (when more
-                                         (str "." (clojure.string/join "." (map name more))))))]
-      ;(log/info "subscribe-local" widget-id path p)
+  (defn subscribe-local [container-id [a & more :as path]]
+    (let [p (path->keyword container-id (str (name a)
+                                          (when more
+                                            (str "." (clojure.string/join "." (map name more))))))]
+      ;(log/info "subscribe-local" container-id path p)
       (re-frame/subscribe [p])))
 
   ; let's spell out what we needed to build these subscriptions
-  (def sub-widget ["<guid-1>"])                             ; [(assume :widgets) <widget-id>]
-  (def sub-some-value ["<guid-1>" [:some-value]])           ; [<widget-id> <path>]
-  (def sub-tab-panel ["<guid-1>" [:tab-panel]])             ; [<widget-id> <path>]
-  (def sub-tab-panel-value ["<guid-1>" [:tab-panel :value]]) ; [<widget-id> <path>]
+  (def sub-container ["<guid-1>"])                             ; [(assume :containers) <container-id>]
+  (def sub-some-value ["<guid-1>" [:some-value]])           ; [<container-id> <path>]
+  (def sub-tab-panel ["<guid-1>" [:tab-panel]])             ; [container-id> <path>]
+  (def sub-tab-panel-value ["<guid-1>" [:tab-panel :value]]) ; [<container-id> <path>]
 
   ; so 2 types:
-  ;      "create-widget-sub"        i.e., [<widget-id>] (`:widget` is assumed)
-  ;      "create-widget-local-sub"  i.e., [<widget-id> [<path>]]
+  ;      "create-container-sub"        i.e., [<container-id>] (`:widget` is assumed)
+  ;      "create-container-local-sub"  i.e., [<container-id> [<path>]]
 
-  (path->keyword :widgets "dummy.part-1.part-2")
-  (path->keyword :widgets ":dummy")
+  (path->keyword :containers "dummy.part-1.part-2")
+  (path->keyword :containers ":dummy")
   (name :dummy)
 
   ;; endregion
 
   ;; region ; create all the subscriptions (by hand)
-  (defn create-widget-sub [widget-id]
-    (let [id (path->keyword widget-id)
-          w  (path->keyword :widgets widget-id)]
+  (defn create-container-sub [container-id]
+    (let [id (path->keyword container-id)
+          w  (path->keyword :containers container-id)]
       (re-frame/reg-sub
         w
-        :<- [:widgets]
-        (fn [widgets _]
+        :<- [:containers]
+        (fn [containers _]
           (log/info w id)
-          (get widgets id)))))
+          (get containers id)))))
 
 
-  (defn create-widget-local-sub [widget-id [a & more]]
-    (let [p   (path->keyword widget-id (str (name a)
-                                         (when more
-                                           (str "." (clojure.string/join "." (map name more))))))
+  (defn create-container-local-sub [container-id [a & more]]
+    (let [p   (path->keyword container-id (str (name a)
+                                            (when more
+                                              (str "." (clojure.string/join "." (map name more))))))
           dep (if more
-                (path->keyword widget-id
+                (path->keyword container-id
                   (str (name a)
                     (when (seq (drop-last [:value]))
                       (str "." (clojure.string/join "." (map name (drop 1 more)))))))
-                (path->keyword :widgets widget-id))]
-      ;(log/info "create-widget-local-sub" p dep more (if more (last more) a))
+                (path->keyword :containers container-id))]
+      ;(log/info "create-container-local-sub" p dep more (if more (last more) a))
       (re-frame/reg-sub
         p
         :<- [dep]
-        (fn [widget _]
-          (log/info p dep widget (last more))
-          (get widget (if more (last more) a))))))
+        (fn [container _]
+          (log/info p dep container (last more))
+          (get container (if more (last more) a))))))
 
 
-  (create-widget-sub "<guid-1>")
-  @(re-frame/subscribe [:widgets/<guid-1>])
+  (create-container-sub "<guid-1>")
+  @(re-frame/subscribe [:containers/<guid-1>])
 
-  (create-widget-local-sub "<guid-1>" [:tab-panel])
-  (create-widget-local-sub "<guid-1>" [:tab-panel :value])
-  (create-widget-local-sub "<guid-1>" [:tab-panel :data-path])
-  (create-widget-local-sub "<guid-1>" [:some-value])
-  (create-widget-local-sub "<guid-1>" [:grid])
-  (create-widget-local-sub "<guid-1>" [:x-axis])
+  (create-container-local-sub "<guid-1>" [:tab-panel])
+  (create-container-local-sub "<guid-1>" [:tab-panel :value])
+  (create-container-local-sub "<guid-1>" [:tab-panel :data-path])
+  (create-container-local-sub "<guid-1>" [:some-value])
+  (create-container-local-sub "<guid-1>" [:grid])
+  (create-container-local-sub "<guid-1>" [:x-axis])
 
   @(subscribe-local :<guid-1> [:tab-panel])
   @(subscribe-local :<guid-1> [:tab-panel :value])
@@ -364,7 +364,7 @@
 
   @(re-frame/subscribe [:<guid-1>/tab-panel])
 
-  (create-widget-local-sub "<guid-1>" [:tab-panel :value])
+  (create-container-local-sub "<guid-1>" [:tab-panel :value])
   @(subscribe-local :<guid-1> [:tab-panel :value])
 
   ;; endregion
@@ -373,15 +373,15 @@
 
 
 ; now to figure out what subscriptions need to be built for a
-; given widget/initial-values-map
+; given container/initial-values-map
 (comment
-  (def widget-id "<guid-1>")
+  (def container-id "<guid-1>")
 
   ; GOAL:
   ;
-  ;   (init-widget-locals widget-id widget-locals)
+  ;   (init-container-locals-locals container-id container-locals)
   ;
-  ; turn widget-locals into:
+  ; turn container-locals into:
   ;
   ;     {"<guid-1>" [[:tab-panel]                    => :<guid-1>/tab-panel
   ;                  [:tab-panel :value]             =>
@@ -397,17 +397,17 @@
   ;                  [:set-of-data]}
   ;
   ; which can then be processed by
-  ;    (create-widget-sub) and (create-widget-local-sub)
+  ;    (create-container-sub) and (create-container-local-sub)
   ;
 
-  (def widget-locals {:tab-panel   {:value     :<guid-1>/dummy
-                                    :data-path [:<guid-1> :tab-panel]}
-                      :some-value  "value"
-                      :grid        {:include         true
-                                    :strokeDasharray {:dash 3 :space 3}}
-                      :x-axis      {:include     true
-                                    :orientation :bottom}
-                      :set-of-data {}})
+  (def container-locals {:tab-panel   {:value     :<guid-1>/dummy
+                                       :data-path [:<guid-1> :tab-panel]}
+                         :some-value  "value"
+                         :grid        {:include         true
+                                       :strokeDasharray {:dash 3 :space 3}}
+                         :x-axis      {:include     true
+                                       :orientation :bottom}
+                         :set-of-data {}})
 
   (reduce + 0 [1 2 3 4 5])
 
@@ -483,7 +483,7 @@
      [:b :d :f :g] [:b :d :f :h] [:b :d :f :h :i]])
 
 
-  (= (process-locals [] nil widget-locals)
+  (= (process-locals [] nil container-locals)
     [[:tab-panel]
      [:tab-panel :value]
      [:tab-panel :data-path]
@@ -504,50 +504,50 @@
   ())
 
 
-; building the complete set of subscriptions and event-handlers for a 'widget'
+; building the complete set of subscriptions and event-handlers for a 'container'
 ; and then testing them out
 (comment
   (do
-    (def widget-id "<guid-1>")
-    (def widget-locals {:tab-panel   {:selected-panel :<guid-1>/dummy
-                                      :data-path      [:<guid-1> :tab-panel]}
-                        :some-value  "value"
-                        :grid        {:include         true
-                                      :strokeDasharray {:dash 3 :space 3}}
-                        :x-axis      {:include     true
-                                      :orientation :bottom}
-                        :set-of-data #{}}))
+    (def container-id "<guid-1>")
+    (def container-locals {:tab-panel   {:selected-panel :<guid-1>/dummy
+                                         :data-path      [:<guid-1> :tab-panel]}
+                           :some-value  "value"
+                           :grid        {:include         true
+                                         :strokeDasharray {:dash 3 :space 3}}
+                           :x-axis      {:include     true
+                                         :orientation :bottom}
+                           :set-of-data #{}}))
 
   (conj [1 2 3] [4 5])
   (apply conj [1 2 3] [4 5])
 
   ; set everything up
-  (init-widget widget-id widget-locals)
+  (init-container-locals container-id container-locals)
 
   ;; region ; try out some subscriptions
-  (= @(subscribe-local widget-id [:tab-panel])
+  (= @(subscribe-local container-id [:tab-panel])
     [])
-  @(subscribe-local widget-id [:tab-panel :value])
-  @(subscribe-local widget-id [:tab-panel :data-path])
-  @(subscribe-local widget-id [:some-value])
-  @(subscribe-local widget-id [:grid])
-  @(subscribe-local widget-id [:grid :include])
-  @(subscribe-local widget-id [:grid :strokeDasharray])
-  @(subscribe-local widget-id [:grid :strokeDasharray :dash])
-  @(subscribe-local widget-id [:grid :strokeDasharray :space])
-  @(subscribe-local widget-id [:x-axis])
-  @(subscribe-local widget-id [:x-axis :include])
-  @(subscribe-local widget-id [:x-axis :orientation])
-  @(subscribe-local widget-id [:set-of-data])
+  @(subscribe-local container-id [:tab-panel :value])
+  @(subscribe-local container-id [:tab-panel :data-path])
+  @(subscribe-local container-id [:some-value])
+  @(subscribe-local container-id [:grid])
+  @(subscribe-local container-id [:grid :include])
+  @(subscribe-local container-id [:grid :strokeDasharray])
+  @(subscribe-local container-id [:grid :strokeDasharray :dash])
+  @(subscribe-local container-id [:grid :strokeDasharray :space])
+  @(subscribe-local container-id [:x-axis])
+  @(subscribe-local container-id [:x-axis :include])
+  @(subscribe-local container-id [:x-axis :orientation])
+  @(subscribe-local container-id [:set-of-data])
 
   ;; endregion
 
   ;; region ; try out the event-handler (user the subscription above to see the updated value)
-  (dispatch-local widget-id [:grid :include] true)
-  (dispatch-local widget-id [:grid :include] false)
-  (dispatch-local widget-id [:grid :strokeDasharray :dash] 5)
-  (dispatch-local widget-id [:grid :strokeDasharray :space] 1)
-  (dispatch-local widget-id [:set-of-data] #{1 2 3 4 5})
+  (dispatch-local container-id [:grid :include] true)
+  (dispatch-local container-id [:grid :include] false)
+  (dispatch-local container-id [:grid :strokeDasharray :dash] 5)
+  (dispatch-local container-id [:grid :strokeDasharray :space] 1)
+  (dispatch-local container-id [:set-of-data] #{1 2 3 4 5})
 
 
 
@@ -574,16 +574,16 @@
 
 ; how do we publish things to a "container"?
 (comment
-  (do (def db {:widgets {:container {:blackboard {}}}})
+  (do (def db {:containers {:container {:blackboard {}}}})
       (def container-id :container)
       (def component-path [:chart-1 :data]))
 
-  (get-in db [:widgets container-id :blackboard])
+  (get-in db [:containers container-id :blackboard])
 
   (-> db
-    (update-in [:widgets container-id :blackboard]
+    (update-in [:containers container-id :blackboard]
       assoc [:chart-1 :data] "new-val")
-    (update-in [:widgets container-id :blackboard]
+    (update-in [:containers container-id :blackboard]
       assoc [:chart-2 :data] "another-val"))
 
   ())
@@ -606,11 +606,11 @@
     (into {}))
 
   (do
-    (def widget-id "multi-chart-demo/multi-chart")
+    (def widgcontainer-idet-id "multi-chart-demo/multi-chart")
     (def a :tv)
     (def more [:fill]))
 
-  (compute-container-path widget-id a more)
+  (compute-container-path container-id a more)
 
 
 

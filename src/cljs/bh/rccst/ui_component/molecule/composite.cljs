@@ -46,10 +46,10 @@ distinction, so we can quickly build all the Nodes and Handles used for the diag
 (log/info "bh.rccst.ui-component.molecule.composite")
 
 
-(re-frame/reg-event-db
-  ::add-component
-  (fn-traced [db [_ id component]]
-    (update-in db [:widgets (keyword id) :components] (partial apply conj) component)))
+;(re-frame/reg-event-db
+;  ::add-component
+;  (fn-traced [db [_ id component]]
+;    (update-in db [:containers (keyword id) :components] (partial apply conj) component)))
 
 
 (def meta-data-registry
@@ -498,7 +498,7 @@ distinction, so we can quickly build all the Nodes and Handles used for the diag
   ;     subscriptions for the "locals"
   ;
   ; [SIDE EFFECT]
-  (ui-utils/create-widget-sub container-id)
+  (ui-utils/create-container-sub container-id)
 
 
   ; 2. add blackboard data to the app-db and build local subscriptions/events against the blackboard
@@ -776,10 +776,10 @@ distinction, so we can quickly build all the Nodes and Handles used for the diag
   (process-components configuration :source/local meta-data-registry component-id)
 
 
-  (ui-utils/init-widget component-id {:blackboard {}})
+  (ui-utils/init-container-locals component-id {:blackboard {}})
 
-  (ui-utils/create-widget-local-sub component-id [:container] "")
-  (ui-utils/create-widget-local-event component-id [:container])
+  (ui-utils/create-container-local-sub component-id [:container] "")
+  (ui-utils/create-container-local-event component-id [:container])
 
   (ui-utils/subscribe-local component-id [:container])
   (ui-utils/dispatch-local component-id [:container] container-id)
@@ -789,8 +789,8 @@ distinction, so we can quickly build all the Nodes and Handles used for the diag
 
   (ui-utils/dispatch-local component-id [:blackboard] {:dummy "dummy"})
 
-  (ui-utils/create-widget-local-sub component-id [:blackboard :topic/layers] [])
-  (ui-utils/create-widget-local-event component-id [:blackboard :topic/layers])
+  (ui-utils/create-container-local-sub component-id [:blackboard :topic/layers] [])
+  (ui-utils/create-container-local-event component-id [:blackboard :topic/layers])
   (ui-utils/dispatch-local component-id [:blackboard :topic/layers] {:dummy "ui-utils"})
 
   (re-frame/dispatch [:coverage-plan-demo.component.blackboard.topic.layers {:dummy "re-frame"}])
@@ -798,8 +798,8 @@ distinction, so we can quickly build all the Nodes and Handles used for the diag
 
   (ui-utils/subscribe-local component-id [:blackboard :topic/current-time])
 
-  (ui-utils/create-widget-local-sub component-id [:blackboard :topic/current-time] "")
-  (ui-utils/create-widget-local-event component-id [:blackboard :topic/current-time])
+  (ui-utils/create-container-local-sub component-id [:blackboard :topic/current-time] "")
+  (ui-utils/create-container-local-event component-id [:blackboard :topic/current-time])
   (ui-utils/dispatch-local component-id [:blackboard :topic/current-time] {})
 
 
@@ -1001,7 +1001,7 @@ distinction, so we can quickly build all the Nodes and Handles used for the diag
 ; make sure the event handler preserves the ordering of the components in the DSL
 (comment
   (def id "dummy")
-  (def c {:widgets {id (config id)}})
+  (def c {:containers {id (config id)}})
 
   ((partial apply conj) [] [[:a :b] [:c :d]])
 
@@ -1011,7 +1011,7 @@ distinction, so we can quickly build all the Nodes and Handles used for the diag
   (def components [[[:div "1"] [empty] [:div "2"]]
                    [[:div "3"] [:div "4"]]])
 
-  (update-in c [:widgets id :components] (partial apply conj) components)
+  (update-in c [:containers id :components] (partial apply conj) components)
 
   ())
 

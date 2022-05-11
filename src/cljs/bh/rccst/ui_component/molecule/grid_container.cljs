@@ -1,4 +1,4 @@
-(ns bh.rccst.ui-component.molecule.grid-widget
+(ns bh.rccst.ui-component.molecule.grid-container
   (:require [bh.rccst.ui-component.atom.layout.responsive-grid :as grid]
             [bh.rccst.ui-component.molecule.composite :as composite]
             [bh.rccst.ui-component.molecule.composite.util.digraph :as dig]
@@ -14,7 +14,7 @@
             [taoensso.timbre :as log]))
 
 
-(log/info "bh.rccst.ui-component.molecule.grid-widget")
+(log/info "bh.rccst.ui-component.molecule.grid-container")
 
 
 (defn- config
@@ -87,7 +87,9 @@
   (map #(assoc % :static (-> % :static not)) orig-value))
 
 
-(defn- component-panel [& {:keys [configuration component-id]}]
+(defn- component-panel [& {:keys [configuration component-id resizable] :as params}]
+  ;(log/info "component-panel (params)" params)
+
   ;(log/info "component-panel" component-id
   ;  "//" (keys configuration)
   ;  "// dummy-layout" dummy-layout
@@ -115,8 +117,8 @@
       ; 5. return the composed component layout!
       [rc/v-box :src (rc/at)
        :gap "2px"
-       :children [[ct/configure-toggle open? #(locals/apply-local component-id
-                                                [:layout] toggle-editable)]
+       :children [(when resizable [ct/configure-toggle open? #(locals/apply-local component-id
+                                                                [:layout] toggle-editable)])
                   [:div.grid-container {:style {:width "100%" :height "100%"}}
                    ; TODO: convert to responsive-grid
                    [grid/grid
@@ -131,43 +133,44 @@
                     :widthFn #(on-width-update %1 %2 %3 %4)]]]])))
 
 
-(defn component [& {:keys [data component-id container-id]}]
+(defn component [& {:keys [data component-id container-id resizable tools] :as params}]
 
   ;(log/info "component" data "//" component-id "//" container-id)
+  ;(log/info "component (params)" params)
 
   (let [id            (r/atom nil)
         configuration @data
         graph         (apply lg/digraph (ui/compute-edges configuration))
         comp-or-dag?  (r/atom :component)
-        full-config   (assoc configuration
-                        :graph graph
-                        :denorm (dig/denorm-components graph (:links configuration) (lg/nodes graph))
-                        :nodes (lg/nodes graph)
-                        :edges (lg/edges graph))]
+        partial-config   (assoc configuration
+                           :denorm (dig/denorm-components graph (:links configuration) (lg/nodes graph))
+                           :nodes (lg/nodes graph)
+                           :edges (into [] (lg/edges graph)))
+        full-config (assoc partial-config :graph graph)]
 
     (fn []
       (when (nil? @id)
         (reset! id component-id)
-        (ui-utils/init-widget @id (config full-config))
+        (ui-utils/init-container-locals @id (config partial-config))
         (ui-utils/dispatch-local @id [:container] container-id)
-        (ui/prep-environment full-config @id composite/meta-data-registry))
+        (ui/prep-environment partial-config @id composite/meta-data-registry))
 
       (let [buttons [{:id :component :tooltip "Widget view" :label [:i {:class "zmdi zmdi-view-compact"}]}
                      {:id :dag :tooltip "Event model view" :label [:i {:class "zmdi zmdi-share"}]}
                      {:id :definition :tooltip "Text view"  :label [:i {:class "zmdi zmdi-format-subject"}]}]]
 
-        [:div.box {:style {:background "#faeee8"}}
+        [:div.box {:style {:width "100%" :height "100%" :background "#faeee8"}}
          [rc/v-box :src (rc/at)
           :justify :end
           :width "100%"
           :height "100%"
           :gap "5px"
-          :children [[rc/h-box :src (rc/at)
-                      :justify :end
-                      :children [[rc/horizontal-bar-tabs
-                                  :model comp-or-dag?
-                                  :tabs buttons
-                                  :on-change #(reset! comp-or-dag? %)]]]
+          :children [(when tools [rc/h-box :src (rc/at)
+                                  :justify :end
+                                  :children [[rc/horizontal-bar-tabs
+                                              :model comp-or-dag?
+                                              :tabs buttons
+                                              :on-change #(reset! comp-or-dag? %)]]])
                      (condp = @comp-or-dag?
                        :dag [composite/dag-panel
                              :configuration full-config
@@ -176,7 +179,8 @@
                        :component [component-panel
                                    :configuration full-config
                                    :component-id @id
-                                   :container-id container-id]
+                                   :container-id container-id
+                                   :resizable resizable]
                        :definition [composite/definition-panel
                                     :configuration configuration]
                        :default [rc/alert-box :src (rc/at)

@@ -92,7 +92,7 @@
       (when (nil? @id)
         ;(log/info "initializing" component-id)
         (reset! id component-id)
-        (ui-utils/init-widget @id config)
+        (ui-utils/init-container-locals @id config)
         (ui-utils/dispatch-local @id [:container] container-id))
 
       (if not-configurable?
@@ -126,7 +126,7 @@
                  :legend {:include true, :layout "horizontal", :align "center", :verticalAlign "bottom"},
                  :type "line-chart",
                  :amt {:include true, :stroke "#ff00ff", :fill "#ff00ff"},
-                 :tab-panel {:value :line-chart-demo.line-chart.config, :data-path [:widgets :line-chart-demo.line-chart :tab-panel]},
+                 :tab-panel {:value :line-chart-demo.line-chart.config, :data-path [:containers :line-chart-demo.line-chart :tab-panel]},
                  :pv {:include true, :stroke "#ffc107", :fill "#ffc107"},
                  :container "",
                  :x-axis {:include true, :dataKey :name, :orientation :bottom, :scale "auto"},
@@ -135,7 +135,7 @@
                  :tooltip {:include true},
                  :isAnimationActive true}))
 
-  (ui-utils/init-widget id config)
+  (ui-utils/init-container-locals id config)
   (ui-utils/dispatch-local id [:container] container-id)
 
   @(ui-utils/subscribe-local id [:container])

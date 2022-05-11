@@ -34,7 +34,7 @@
   (merge
     ui-utils/default-pub-sub
     {:tab-panel {:value     (keyword component-id "config")
-                 :data-path [:widgets (keyword component-id) :tab-panel]}
+                 :data-path [:containers (keyword component-id) :tab-panel]}
      :tooltip   {:include true}
      :node      {:fill "#77c878" :stroke "#000000"}
      :link      {:stroke "#77c878" :curve 0.5}}))
@@ -126,7 +126,7 @@
   ---
 
   - data : (atom) any data shown by the component's ui
-  - chart-id : (string) unique identifier for this chart instance within this container
+  - component-id : (string) unique identifier for this chart instance within this container
   - container-id : (string) name of the container this chart is inside of
   "
   [data component-id container-ui ui]
@@ -156,7 +156,7 @@
   ---
 
   - data : (atom) any data shown by the component's ui
-  - chart-id : (string) unique identifier of this chart insatnce within this container
+  - component-id : (string) unique identifier of this chart insatnce within this container
   - container-id : (string) name of the container this chart is inside of
   "
   [& {:keys [data component-id container-id ui]}]
@@ -199,6 +199,6 @@
 
 
 (comment
-  (def chart-id "sankey-chart-demo")
+  (def component-id "sankey-chart-demo")
 
   ())

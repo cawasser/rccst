@@ -60,16 +60,16 @@
 
   ---
 
-  - chart-id : (string) unique id of the chart
+  - component-id : (string) unique id of the chart
   - data : (atom) data and meta-data for the chart
   "
-  [chart-id data]
+  [component-id data]
   (-> ui-utils/default-pub-sub
     (merge
       utils/default-config
       {:type      "line-chart"
-       :tab-panel {:value     (keyword chart-id "config")
-                   :data-path [:widgets (keyword chart-id) :tab-panel]}}
+       :tab-panel {:value     (keyword component-id "config")
+                   :data-path [:containers (keyword component-id) :tab-panel]}}
       (local-config data))
     (assoc-in [:x-axis :dataKey] (get-in @data [:metadata :id]))
     (assoc-in [:pub] :name)
@@ -81,22 +81,22 @@
                       [:pv :include] [:pv :stroke] [:pv :fill]])))
 
 
-(defn- line-config [widget-id label path position]
+(defn- line-config [component-id label path position]
   [rc/v-box :src (rc/at)
    :gap "5px"
-   :children [[utils/boolean-config widget-id label (conj path :include)]
+   :children [[utils/boolean-config component-id label (conj path :include)]
               [rc/h-box :src (rc/at)
                :gap "5px"
-               :children [[utils/color-config widget-id ":stroke" (conj path :stroke) position]
-                          [utils/color-config widget-id ":fill" (conj path :fill) position]]]]])
+               :children [[utils/color-config component-id ":stroke" (conj path :stroke) position]
+                          [utils/color-config component-id ":fill" (conj path :fill) position]]]]])
 
 
-(defn- make-line-config [chart-id data]
+(defn- make-line-config [component-id data]
   (->> (get-in @data [:metadata :fields])
     (filter (fn [[k v]] (= :number v)))
     keys
     (map-indexed (fn [idx a]
-                   [line-config chart-id a [a] :above-right]))
+                   [line-config component-id a [a] :above-right]))
     (into [])))
 
 
@@ -106,11 +106,11 @@
   ---
 
   - data : (atom) data to display (may be used by the standard configuration components for thins like axes, etc.
-  - chart-id : (string) unique identifier for this chart instance
+  - component-id : (string) unique identifier for this chart instance
   "
-  [data chart-id]
+  [data component-id]
 
-  ;(log/info "config-panel" @data chart-id)
+  ;(log/info "config-panel" @data component-id)
 
   [rc/v-box :src (rc/at)
    :gap "10px"
@@ -118,16 +118,16 @@
    :style {:padding          "15px"
            :border-top       "1px solid #DDD"
            :background-color "#f7f7f7"}
-   :children [[utils/standard-chart-config data chart-id]
+   :children [[utils/standard-chart-config data component-id]
               [rc/line :src (rc/at) :size "2px"]
               [rc/h-box :src (rc/at)
                :gap "10px"
-               :children (make-line-config chart-id data)]
+               :children (make-line-config component-id data)]
               [rc/line :src (rc/at) :size "2px"]
-              [utils/boolean-config chart-id ":brush?" [:brush]]]])
+              [utils/boolean-config component-id ":brush?" [:brush]]]])
 
 
-(defn- make-line-display [chart-id data subscriptions isAnimationActive?]
+(defn- make-line-display [component-id data subscriptions isAnimationActive?]
   (->> (get-in @data [:metadata :fields])
     (filter (fn [[_ v]] (= :number v)))
     keys
@@ -151,12 +151,12 @@
   ---
 
   - data : (atom) any data shown by the component's ui
-  - chart-id : (string) unique identifier for this chart instance within this container
+  - component-id : (string) unique identifier for this chart instance within this container
   - container-id : (string) name of the container this chart is inside of
   "
   [data component-id container-id ui]
 
-  ;(log/info "component-panel" chart-id "///" @(ui-utils/subscribe-local chart-id [:container]))
+  ;(log/info "component-panel" component-id "///" @(ui-utils/subscribe-local component-id [:container]))
 
   (let [container          @(ui-utils/subscribe-local component-id [:container])
         isAnimationActive? (ui-utils/subscribe-local component-id [:isAnimationActive])
@@ -232,21 +232,21 @@
 ; subscriptions
 (comment
   (def data sample-data)
-  (def chart-id "line-chart-demo/line-chart")
+  (def component-id "line-chart-demo/line-chart")
   (def container-id "line-chart-demo")
-  (def chart-id "multi-chart-demo/multi-chart/line-chart")
+  (def component-id "multi-chart-demo/multi-chart/line-chart")
   (def container-id "multi-chart-demo/multi-chart")
 
   (get-in @re-frame.db/app-db
-    [:widgets
+    [:containers
      (keyword "multi-chart-demo/multi-chart/line-chart")
      :sub])
 
 
-  (ui-utils/subscribe-local chart-id [:sub])
+  (ui-utils/subscribe-local component-id [:sub])
 
 
-  (def c (config chart-id data))
+  (def c (config component-id data))
   (get-in c [:tab-panel :value])
 
   (def subscriptions

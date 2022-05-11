@@ -51,7 +51,7 @@
 
   ;(log/info "example" params)
 
-  (ui-utils/init-widget container-id config)
+  (ui-utils/init-container-locals container-id config)
 
   (let [config-key (keyword container-id "config")
         data-key (keyword container-id "data")

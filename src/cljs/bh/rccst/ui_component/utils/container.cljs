@@ -16,28 +16,28 @@
   :events/init-container
   (fn-traced [db [_ container]]
     ;(log/info ":events/init-container" container)
-    (if (get-in db [:widgets container])
+    (if (get-in db [:containers container])
       (do
         ;(log/info ":events/init-container // already exists")
         db)
       (do
         ;(log/info ":events/init-container // adding")
-        (assoc-in db [:widgets container] default-composite)))))
+        (assoc-in db [:containers container] default-composite)))))
 
 
 (defn init-container [container-id]
   (let [id         (h/path->keyword container-id)
-        c          (h/path->keyword :widgets container-id)
+        c          (h/path->keyword :containers container-id)
         blackboard (h/path->keyword container-id "blackboard")]
 
     ;(log/info "init-container" container-id id c blackboard)
 
     (re-frame/reg-sub
       c
-      :<- [:widgets]
-      (fn [widgets _]
+      :<- [:containers]
+      (fn [containers _]
         ;(log/info "sub" c id)
-        (get widgets id)))
+        (get containers id)))
 
     (re-frame/reg-sub
       blackboard
@@ -50,7 +50,7 @@
       blackboard
       (fn [bb [_ id component-path new-val]]
         ;(log/info "container-event blackboard" id component-path new-val)
-        (update-in bb [:widgets id :blackboard]
+        (update-in bb [:containers id :blackboard]
           assoc component-path new-val)))))
 
 ;(re-frame/dispatch-sync [:events/init-container id])))
@@ -64,7 +64,7 @@
 
 (defn publish-to-container
   "
-> NOTE: the re-frame event-handlers ***MUST*** be created beforehand, using [[init-widget]]
+> NOTE: the re-frame event-handlers ***MUST*** be created beforehand, using [[init-container-locals]]
 
   ---
 
@@ -73,7 +73,7 @@
   - `new-val` : (any) the new value to store at the given path
 
   `value-path` functions exactly like any other re-frame subscription, but relative to the
-  `[:widgets <widget-id>]` in the overall `app-db`
+  `[:containers <component-id>]` in the overall `app-db`
 
   It is destructured as follows:
 

@@ -33,13 +33,13 @@
 
   ---
 
-  - chart-id : (string) unique id of the chart
+  - component-id : (string) unique id of the chart
   "
   [component-id data]
   (merge
     ui-utils/default-pub-sub
     {:tab-panel         {:value     (keyword component-id "config")
-                         :data-path [:widgets (keyword component-id) :tab-panel]}
+                         :data-path [:containers (keyword component-id) :tab-panel]}
      :isAnimationActive true
      :ratio             {:include true
                          :n       4
@@ -71,7 +71,7 @@
   ---
 
   - data : (atom) data to display (may be used by the standard configuration components for thins like axes, etc.
-  - chart-id : (string) unique identifier for this chart instance
+  - component-id : (string) unique identifier for this chart instance
   "
   [_ component-id]
 
@@ -107,10 +107,10 @@
   ---
 
   - data : (atom) any data shown by the component's ui
-  - widget-id : (string) unique identifier for this widget instance
+  - component-id : (string) unique identifier for this widget instance
   "
   [data component-id container-id ui]
-  (let [;ratio (ui-utils/subscribe-local widget-id [:ratio :include])
+  (let [;ratio (ui-utils/subscribe-local component-id [:ratio :include])
         isAnimationActive? (ui-utils/subscribe-local component-id [:isAnimationActive])
         stroke             (ui-utils/subscribe-local component-id [:stroke :color])
         fill               (ui-utils/subscribe-local component-id [:fill :color])]

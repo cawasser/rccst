@@ -9,7 +9,7 @@
   (let [container-id "funnel-chart-demo"]
     [example/component-example
      :title "Funnel Chart"
-     :widget-id container-id
+     :container-id container-id
      :description "A simple Funnel Chart built using [Recharts](https://recharts.org/en-US/api/FunnelChart)"
      :data chart/sample-data
      :component chart/configurable-component

@@ -4,7 +4,7 @@
 
 (defn overview []
   (o/overview "Atomic Design"
-    "### _Composing Complex UIs from Simpler Elements_
+    "#### _Composing Complex UIs from Simpler Elements_
 
 > We’re not designing pages, we’re designing systems of components.
 >

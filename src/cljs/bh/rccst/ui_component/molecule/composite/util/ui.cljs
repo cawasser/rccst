@@ -51,8 +51,8 @@
 
 
 (defn- open-details [open-details? node]
-  (reset! open-details? (js->clj node))
-  (log/info "open-details" @open-details?))
+  (reset! open-details? (js->clj node)))
+  ;(log/info "open-details" @open-details?))
 
 
 (defn custom-node
@@ -158,8 +158,8 @@
   ;     subscriptions for the "locals"
   ;
   ; [SIDE EFFECT]
-  (ul/create-widget-sub component-id)
-  (ul/create-widget-local-sub component-id [:blackboard] {})
+  (ul/create-container-sub component-id)
+  (ul/create-container-local-sub component-id [:blackboard] {})
 
   ; 3. add blackboard data to the app-db and build local subscriptions/events against the blackboard
   ;

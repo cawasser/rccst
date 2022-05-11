@@ -172,24 +172,24 @@
   (re-frame/dispatch [:multi-chart-widget.widget.blackboard.topic.config.uv.include true])
 
 
-  (get-in @re-frame.db/app-db [:widgets :multi-chart-widget.widget])
-  (get-in @re-frame.db/app-db [:widgets :multi-chart-widget.widget :blackboard])
-  (get-in @re-frame.db/app-db [:widgets :multi-chart-widget.widget
+  (get-in @re-frame.db/app-db [:containers :multi-chart-widget.widget])
+  (get-in @re-frame.db/app-db [:containers :multi-chart-widget.widget :blackboard])
+  (get-in @re-frame.db/app-db [:containers :multi-chart-widget.widget
                                :blackboard (ui-utils/path->keyword :topic/config)])
-  (get-in @re-frame.db/app-db [:widgets :multi-chart-widget.widget.blackboard])
+  (get-in @re-frame.db/app-db [:containers :multi-chart-widget.widget.blackboard])
 
 
-  (reduce conj [:widget :dummy] [:blackboard :topic.config])
+  (reduce conj [:containers :dummy] [:blackboard :topic.config])
 
-  (reduce conj [:widgets] [:dummy])
-  (reduce conj [:widgets] [[:blackboard :topic.config]])
+  (reduce conj [:containers] [:dummy])
+  (reduce conj [:containers] [[:blackboard :topic.config]])
 
   (def container :multi-chart-widget.widget)
   (def container [:multi-chart-widget.widget :blackboard :topic.config])
   (def values "")
   (let [data-path (cond
-                    (coll? container) (reduce conj [:widgets] container)
-                    :else [:widget container])]
+                    (coll? container) (reduce conj [:containers] container)
+                    :else [:containers container])]
     (get-in @re-frame/app-db data-path values))
 
 

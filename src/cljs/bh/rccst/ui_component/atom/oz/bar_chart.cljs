@@ -22,16 +22,16 @@
                                        :type  "nominal"}}}])
 
 
-(defn- config [chart-id data]
+(defn- config [component-id data]
   (-> ui-utils/default-pub-sub
     (merge
       utils/default-config
       {:type "oz-line-chart"}
-      (ui-utils/config-tab-panel chart-id))))
+      (ui-utils/config-tab-panel component-id))))
 
 
 (defn- config-panel
-  [data chart-id]
+  [data component-id]
 
   [:div "config panel here"])
 
@@ -92,7 +92,7 @@
 
 
 (defn- component-panel
-  [data chart-id]
+  [data component-id]
 
   [:div {:style {:width "400px" :height "500px"}}
    [oz/vega-lite @data]])
@@ -105,7 +105,7 @@
 
    ;(if (not= :tabular (get-in @data [:metadata :type]))
    ;  [rc/alert-box :src (rc/at)
-   ;   :id (str container-id "/" chart-id ".ERROR")
+   ;   :id (str container-id "/" component-id ".ERROR")
    ;   :alert-type :danger
    ;   :closeable? false
    ;   :body [:div "The data passed is NOT of type :tabular!"]]
@@ -115,7 +115,7 @@
      (fn []
        (when (nil? @id)
          (reset! id component-id)
-         (ui-utils/init-widget @id (config @id data))
+         (ui-utils/init-container-locals @id (config @id data))
          (ui-utils/dispatch-local @id [:container] (or container-id "")))
 
        ;(log/info "component" @id)

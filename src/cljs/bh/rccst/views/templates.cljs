@@ -2,13 +2,15 @@
   (:require [bh.rccst.events :as events]
             [taoensso.timbre :as log]
             [woolybear.ad.layout :as layout]
+            [bh.rccst.views.template.ui-grid :as ui-grid]
             [bh.rccst.ui-component.tabbed-panel :as tabbed-panel]))
 
 
 (log/info "bh.rccst.views.templates")
 
 
-(def navbar [[:templates/all "All" [:div "all Templates"]]])
+(def navbar [[:templates/ui-grid "UI Grid" [ui-grid/page]]
+             [:templates/all "All" [:div "all Templates"]]])
 
 
 (defn page
@@ -27,4 +29,4 @@
     :short-name "templates"
     :description ""
     :children navbar
-    :start-panel :templates/all]])
+    :start-panel :templates/ui-grid]])

@@ -1,6 +1,6 @@
 (ns bh.rccst.views.molecule.example.composite.grid-widget
   (:require [bh.rccst.ui-component.molecule.composite.coverage-plan :as plan]
-            [bh.rccst.ui-component.molecule.grid-widget :as grid]
+            [bh.rccst.ui-component.molecule.grid-container :as grid]
             [bh.rccst.ui-component.utils.helpers :as h]
             [woolybear.ad.catalog.utils :as acu]
             [bh.rccst.subs :as subs]
@@ -25,7 +25,9 @@
            [grid/component
             :data plan/ui-definition
             :component-id (h/path->keyword container-id "grid-widget")
-            :container-id container-id]])
+            :container-id container-id
+            :resizable true
+            :tools true]])
         (acu/demo
           "Coverage Plan"
           [rc/alert-box :src (rc/at)

@@ -5,14 +5,15 @@
 (defn overview []
   (o/overview "Hiccup"
 
-    "#### Hiccup is a library for representing HTML in Clojure. It uses
-    vectors to represent elements, and maps to represent an element's attributes.
+    "#### _Hiccup is a library for representing HTML in Clojure_
+
+It uses vectors to represent elements, and maps to represent an element's attributes.
 
 Hiccup turns Clojure data structures like this:
 
   `[:a {:href \"http://github.com\"} \"GitHub\"]`
 
-Into strings of HTML like this:
+Into HTML tags like this:
 
   `<a href=\"http://github.com\">GitHub</a>`
 

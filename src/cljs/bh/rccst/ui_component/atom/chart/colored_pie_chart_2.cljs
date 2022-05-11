@@ -59,16 +59,16 @@
 
 (defn- cell-config [component-id label path position]
   (let [p (ui-utils/path->keyword path)]
-    (log/info "cell-config" component-id "//" label "//" p)
-    [utils/color-config-text component-id label (conj [p] :color) :right-above]))
+    ;(log/info "cell-config" component-id "//" label "//" p)
+    [rc/h-box
+     :gap "5px"
+     :children [[utils/boolean-config component-id "" (conj [p] :include)]
+                [utils/color-config-text component-id label (conj [p] :color) :right-above]]]))
 
 
 (defn- make-cell-config [component-id data]
-  (log/info "make-cell-config" component-id "//" @data)
-
   (->> (:data @data)
     (map-indexed (fn [idx {:keys [name] :as item}]
-                   (log/info "make-cell-config (loop)" idx item)
                    [cell-config component-id name [name] :above-right]))
     (into [:<>])))
 
@@ -91,7 +91,32 @@
                :gap "5px"
                :children [[rc/label :src (rc/at) :label "Pie Colors"]
                           (make-cell-config component-id data)]]]])
-                          ;(color-anchors component-id @data (ui-utils/subscribe-local component-id [:colors]))]]]])
+
+
+(defn- make-cells [data subscriptions]
+  ;(log/info "make-cells" data
+  ;  "// (subscriptions)" subscriptions)
+
+  (let [ret (->> data
+              (map-indexed (fn [idx {:keys [name]}]
+                             (if (ui-utils/resolve-sub subscriptions [name :include])
+                               (do
+                                 [:> Cell {:key  (str "cell-" idx)
+                                           :fill (or (ui-utils/resolve-sub subscriptions [name :color])
+                                                   (color/get-color 0))}])
+                               [])))
+              (remove empty?)
+              (into [:<>]))]
+    ;(log/info "ret" ret)
+
+    ret))
+
+
+(defn- included-cells [data subscriptions]
+  (->> data
+    (filter (fn [{:keys [name]}] (ui-utils/resolve-sub subscriptions [name :include])))
+    (into [])))
+
 
 
 (defn- component* [& {:keys [data component-id container-id
@@ -99,9 +124,12 @@
                       :as params}]
 
 
-  (let [d (if (empty? data) [] (get data :data))]
+  (let [d (if (empty? data) [] (get data :data))
+        included (included-cells d subscriptions)]
 
-    ;(log/info "colored-pie-chart" component-id "//" data "//" d)
+    ;(log/info "colored-pie-chart" component-id
+      ;"//" data "//" d
+      ;"//" included
 
     [:> ResponsiveContainer
      [:> PieChart {:label true} (utils/override true {} :label)
@@ -110,17 +138,10 @@
 
       [:> Pie {:dataKey           (ui-utils/resolve-sub subscriptions [:value :chosen])
                :nameKey           (ui-utils/resolve-sub subscriptions [:name :chosen])
-               :data              d
+               :data              included
                :label             (utils/override true {} :label)
                :isAnimationActive @isAnimationActive?}
-       (doall
-         (map-indexed
-           (fn [idx {name :name}]
-             ^{:key (str idx name)}
-             [:> Cell {:key  (str "cell-" idx)
-                       :fill (or (:color (ui-utils/resolve-sub subscriptions [name]))
-                               (color/get-color 0))}])
-           d))]]]))
+       (make-cells d subscriptions)]]]))
 
 
 (defn component [& {:keys [data config-data component-id container-id

@@ -21,11 +21,11 @@
     (local-config data)))
 
 
-(defn- three-d-view [data chart-id container-id]
+(defn- three-d-view [data component-id container-id]
   [:div "3D view"])
 
 
-(defn- two-d-view [data chart-id container-id]
+(defn- two-d-view [data component-id container-id]
   [:div "2D view"])
 
 
@@ -59,7 +59,7 @@
      (fn []
        (when (nil? @id)
          (reset! id component-id)
-         (ui-utils/init-widget @id (config @id data))
+         (ui-utils/init-container-locals @id (config @id data))
          (ui-utils/dispatch-local @id [:container] container-id))
 
        ;(log/info "component" @id)

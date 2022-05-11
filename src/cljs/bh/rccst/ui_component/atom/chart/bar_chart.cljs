@@ -73,18 +73,18 @@
 
   ---
 
-  - chart-id : (string) unique id of the chart
+  - component-id : (string) unique id of the chart
   - data : (atom) metadata wrapped data  to display
   "
-  [chart-id data]
+  [component-id data]
 
-  ;(log/info "config" chart-id "//" data)
+  ;(log/info "config" component-id "//" data)
 
   (-> ui-utils/default-pub-sub
     (merge
       utils/default-config
-      {:tab-panel {:value     (keyword chart-id "config")
-                   :data-path [:widgets (keyword chart-id) :tab-panel]}}
+      {:tab-panel {:value     (keyword component-id "config")
+                   :data-path [:containers (keyword component-id) :tab-panel]}}
       (local-config data))
     (assoc-in [:x-axis :dataKey] :name)
     ; TODO: this should be produced by a function that processes the data
@@ -93,22 +93,22 @@
                       [:pv :include] [:pv :stroke] [:pv :fill]])))
 
 
-(defn- bar-config [chart-id label path position]
+(defn- bar-config [component-id label path position]
   [rc/v-box :src (rc/at)
    :gap "5px"
-   :children [[utils/boolean-config chart-id label (conj path :include)]
-              [utils/color-config chart-id ":fill" (conj path :fill) position]
-              [utils/text-config chart-id ":stackId" (conj path :stackId)]]])
+   :children [[utils/boolean-config component-id label (conj path :include)]
+              [utils/color-config component-id ":fill" (conj path :fill) position]
+              [utils/text-config component-id ":stackId" (conj path :stackId)]]])
 
 
-(defn- make-bar-config [chart-id data]
-  ;(log/info "make-bar-config" chart-id "//" data)
+(defn- make-bar-config [component-id data]
+  ;(log/info "make-bar-config" component-id "//" data)
 
   (->> (get-in @data [:metadata :fields])
     (filter (fn [[k v]] (= :number v)))
     keys
     (map-indexed (fn [idx a]
-                   [bar-config chart-id a [a] :above-right]))
+                   [bar-config component-id a [a] :above-right]))
     (into [])))
 
 
@@ -119,7 +119,7 @@
 
   - data : (atom) data to display (may be used by the standard configuration components for thins like axes, etc.\n  - config : (atom) holds all the configuration settings made by the user
   "
-  [data chart-id]
+  [data component-id]
 
   [rc/v-box :src (rc/at)
    :gap "10px"
@@ -127,21 +127,21 @@
    :style {:padding          "15px"
            :border-top       "1px solid #DDD"
            :background-color "#f7f7f7"}
-   :children [[utils/standard-chart-config data chart-id]
+   :children [[utils/standard-chart-config data component-id]
               [rc/line :src (rc/at) :size "2px"]
               [rc/h-box :src (rc/at)
                :width "400px"
                :style ui-utils/h-wrap
                :gap "10px"
-               :children (make-bar-config chart-id data)]
+               :children (make-bar-config component-id data)]
               [rc/line :src (rc/at) :size "2px"]
-              [utils/boolean-config chart-id ":brush?" [:brush]]]])
+              [utils/boolean-config component-id ":brush?" [:brush]]]])
 
 
 (def source-code '[:> BarChart {:width 400 :height 400 :data (get @data :data)}])
 
 
-(defn- make-bar-display [chart-id data subscriptions isAnimationActive?]
+(defn- make-bar-display [component-id data subscriptions isAnimationActive?]
   ;(log/info "make-bar-display" data "//" @data "//" @isAnimationActive?
   ;  "//" subscriptions)
 
@@ -166,7 +166,7 @@
   ---
 
   - data : (atom) any data used by the component's ui
-  - widget-id : (string) unique identifier for this specific widget
+  - component-id : (string) unique identifier for this specific widget
   "
   [data component-id container-id ui]
 
@@ -292,12 +292,12 @@
 
 (comment
   (do
-    (def chart-id "bar-chart-demo/bar-chart")
+    (def component-id "bar-chart-demo/bar-chart")
     (def data sample-data)
-    (def subscriptions (ui-utils/build-subs chart-id (local-config data)))
+    (def subscriptions (ui-utils/build-subs component-id (local-config data)))
     (def isAnimationActive? (r/atom true)))
 
-  (make-bar-display chart-id data subscriptions isAnimationActive?)
+  (make-bar-display component-id data subscriptions isAnimationActive?)
 
 
   (->> (get-in @data [:metadata :fields])

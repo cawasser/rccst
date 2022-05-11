@@ -4,7 +4,7 @@
 (defn overview []
       (o/overview "Recharts"
 
-"#### A composable charting library built on React components\n\n
+"#### _A composable charting library built on React components_
 
 **Features**
 - *composable:*  Builds charts quickly with decoupled, reusable React components.

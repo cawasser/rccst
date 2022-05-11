@@ -22,7 +22,7 @@
     ;  "// (data)" data "// (d)" @d
     ;  "// (config-data)" config-data "// (c)" @c)
 
-    ;(log/info "component-panel (override)" override-subs )
+    ;(log/info "component-panel (override)" override-subs)
 
     (fn []
 
@@ -37,9 +37,9 @@
 
         ;(log/info "component-panel (render)" @c
           ;"// (local-config)" l-c
-          ;"// (override)" override-subs
-          ;"// (subscriptions)" subscriptions
-          ;"// (local-subs)" local-subs
+         ;"// (override)" override-subs
+         ;"// (subscriptions)" subscriptions
+         ;"// (local-subs)" local-subs
 
         (if (empty? @d)
           [rc/alert-box :src (rc/at)
@@ -69,12 +69,14 @@
 
     ;(log/info "configurable-component" component-id "//" data "//" @d)
 
-    (ui-utils/init-widget component-id (config component-id (h/resolve-value data)))
+    (ui-utils/init-container-locals component-id (config component-id (h/resolve-value data)))
 
     (fn []
       (let [d (h/resolve-value data)]
 
         ;(log/info "configurable-component (INNER)" data "//" @d)
+
+        (l/update-local-values component-id (local-config d))
 
         [rc/v-box :src (rc/at)
          :class "configurable-component-panel"
@@ -135,7 +137,7 @@
       (when (nil? @id)
         ;(log/info "initializing" component-id)
         (reset! id component-id)
-        (ui-utils/init-widget @id c)
+        (ui-utils/init-container-locals @id c)
         (ui-utils/dispatch-local @id [:container] container-id))
 
       [:div.base-chart {:style {:width "100%" :height "100%"}}

@@ -97,7 +97,7 @@
     (fn []
       (when (nil? @id)
         (reset! id component-id)
-        (ui-utils/init-widget @id (config default-config-data))
+        (ui-utils/init-container-locals @id (config default-config-data))
         (ui-utils/dispatch-local @id [:container] container-id))
 
       [config-update-example

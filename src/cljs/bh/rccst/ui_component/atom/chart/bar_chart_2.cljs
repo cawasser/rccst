@@ -40,12 +40,12 @@
     ret))
 
 
-(defn config [chart-id data]
+(defn config [component-id data]
   (-> ui-utils/default-pub-sub
     (merge
       utils/default-config
-      {:tab-panel {:value     (keyword chart-id "config")
-                   :data-path [:widgets (keyword chart-id) :tab-panel]}}
+      {:tab-panel {:value     (keyword component-id "config")
+                   :data-path [:containers (keyword component-id) :tab-panel]}}
       (local-config data))
     (assoc-in [:x-axis :dataKey] :name)))
 
@@ -153,7 +153,8 @@
 (comment
   (def component-id ":bar-chart-2-demo.bar-chart-2")
   (def data {:metadata {} :data []})
-  (def data example-data/meta-tabular-data)
+  (def data (r/atom example-data/meta-tabular-data))
+  (config component-id data)
 
   (def d (h/resolve-value data))
 

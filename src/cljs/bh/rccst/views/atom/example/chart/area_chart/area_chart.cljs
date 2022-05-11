@@ -8,7 +8,7 @@
 (defn example []
   (let [container-id "area-chart-demo"]
     [example/component-example
-     :widget-id container-id
+     :container-id container-id
      :title "Area Chart"
      :description "A simple Area Chart built using [Recharts](https://recharts.org/en-US/api/AreaChart)"
      :data chart/sample-data

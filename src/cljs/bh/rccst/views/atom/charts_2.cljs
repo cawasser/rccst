@@ -4,16 +4,18 @@
             [bh.rccst.views.atom.charts :as charts]
             [bh.rccst.views.atom.example.chart.area-chart :as area-chart]
             [bh.rccst.views.atom.example.chart.bar-chart :as bar-chart]
+            [bh.rccst.views.atom.example.chart.radial-bar-chart :as radial-bar-chart]
+            [bh.rccst.views.atom.example.chart.pie-chart :as pie-chart]
             [bh.rccst.views.atom.example.chart.colored-pie-chart :as colored-pie-chart]
             [bh.rccst.views.atom.example.chart.line-chart :as line-chart]))
 
 
-
-
 (def navbar [[:charts/area-chart "Area" [area-chart/examples]]
              [:charts/bar-chart "Bar" [bar-chart/examples]]
+             [:charts/radial-bar-chart "Radial Bar" [radial-bar-chart/examples]]
              [:charts/colored-pie-chart "Colored Pie" [colored-pie-chart/examples]]
              [:charts/line-chart "Line" [line-chart/examples]]
+             [:charts/pie-chart "Pie" [pie-chart/examples]]
              [:charts/other "Other" [charts/examples]]])
                   ;[:charts/colored-pie-chart "Colored Pie" [colored-pie-chart/examples]]
                   ;[:charts/funnel-chart "Funnel" [funnel-chart/examples]]
@@ -35,4 +37,4 @@
    :short-name "charts"
    :description ""
    :children navbar
-   :start-panel :charts/other])
+   :start-panel :charts/area-chart])

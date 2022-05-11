@@ -9,7 +9,7 @@
   (let [container-id "radar-chart-demo"]
     [example/component-example
      :title "Radar Chart"
-     :widget-id container-id
+     :container-id container-id
      :description "A simple Radar Chart built using [Recharts](https://recharts.org/en-US/api/RadarChart)"
      :data chart/sample-data
      :component chart/configurable-component

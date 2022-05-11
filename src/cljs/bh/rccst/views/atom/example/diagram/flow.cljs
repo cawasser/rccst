@@ -8,7 +8,7 @@
 (defn example []
   (let [container-id "flow-diagram-demo"]
     [example/component-example
-     :widget-id container-id
+     :container-id container-id
      :title "Flow Diagram"
      :description "A simple Flow Diagram built using [react-flow](https://reactflow.dev)"
      :data flow/sample-data

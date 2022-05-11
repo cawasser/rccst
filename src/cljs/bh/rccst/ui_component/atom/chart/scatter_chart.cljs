@@ -28,7 +28,7 @@
 
   ---
 
-  - chart-id : (string) unique id of the chart
+  - component-id : (string) unique id of the chart
   "
   [component-id data]
   (->
@@ -36,7 +36,7 @@
     (merge
       utils/default-config
       {:tab-panel {:value     (keyword component-id "config")
-                   :data-path [:widgets (keyword component-id) :tab-panel]}
+                   :data-path [:containers (keyword component-id) :tab-panel]}
        :brush     false})
     (assoc-in [:x-axis :dataKey] :x)
     (assoc-in [:y-axis :dataKey] :y)
@@ -75,7 +75,7 @@
   ---
 
   - data : (atom) any data shown by the component's ui
-  - widget-id : (string) unique identifier for this specific widget instance
+  - component-id : (string) unique identifier for this specific widget instance
   "
   [data component-id container-id ui]
   (let [scatter-dot-fill   (ui-utils/subscribe-local component-id [:fill :color])

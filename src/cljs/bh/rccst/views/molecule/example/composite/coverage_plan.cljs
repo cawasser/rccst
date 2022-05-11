@@ -1,7 +1,7 @@
 (ns bh.rccst.views.molecule.example.composite.coverage-plan
   (:require [bh.rccst.subs :as subs]
             [bh.rccst.ui-component.molecule.composite.coverage-plan :as coverage-plan]
-            [bh.rccst.ui-component.molecule.grid-widget :as grid]
+            [bh.rccst.ui-component.molecule.grid-container :as grid]
             [bh.rccst.ui-component.utils.helpers :as h]
             [re-com.core :as rc]
             [re-frame.core :as re-frame]
@@ -36,7 +36,9 @@
             [grid/component
              :data (r/atom coverage-plan/ui-definition)
              :component-id (h/path->keyword container-id "grid-widget")
-             :container-id container-id]]])
+             :container-id container-id
+             :resizable true
+             :tools true]]])
         (acu/demo
           "Coverage Plan"
           [rc/alert-box :src (rc/at)
@@ -73,7 +75,9 @@
                      (assoc-in coverage-plan/ui-definition
                        [:components :ui/globe :name] :r/globe))
              :component-id (h/path->keyword container-id "grid-widget")
-             :container-id container-id]]])
+             :container-id container-id
+             :resizable true
+             :tools true]]])
         (acu/demo
           "Coverage Plan"
           [rc/alert-box :src (rc/at)

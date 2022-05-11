@@ -58,14 +58,14 @@
 
   ---
 
-  - chart-id : (string) unique id of the chart
+  - component-id : (string) unique id of the chart
   - data : (atom) atom holding metadata-wrapped data to display
   "
-  [chart-id data]
+  [component-id data]
   (-> ui-utils/default-pub-sub
     (merge
       utils/default-config
-      (ui-utils/config-tab-panel chart-id)
+      (ui-utils/config-tab-panel component-id)
       (local-config data))))
 
 
@@ -75,10 +75,10 @@
   ---
 
   - _ (ignored)
-  - chart-id : (string) unique identifier for this specific widget instance
+  - component-id : (string) unique identifier for this specific widget instance
 
   "
-  [_ chart-id]
+  [_ component-id]
 
   [rc/v-box :src (rc/at)
    :gap "10px"
@@ -87,12 +87,12 @@
    :style {:padding          "15px"
            :border-top       "1px solid #DDD"
            :background-color "#f7f7f7"}
-   :children [[utils/non-gridded-chart-config chart-id]
+   :children [[utils/non-gridded-chart-config component-id]
               [rc/line :src (rc/at) :size "2px"]
-              [utils/option chart-id ":name" [:name]]
+              [utils/option component-id ":name" [:name]]
               [rc/line :src (rc/at) :size "2px"]
-              [utils/option chart-id ":value" [:value]]
-              [utils/color-config-text chart-id ":fill" [:fill] :above-right]]])
+              [utils/option component-id ":value" [:value]]
+              [utils/color-config-text component-id ":fill" [:fill] :above-right]]])
 
 
 (def source-code '[:> PieChart {:width 400 :height 400}
@@ -107,7 +107,7 @@
   ---
 
   - data : (atom) any data used by the component's ui
-  - widget-id : (string) unique identifier for this specific widget instance
+  - component-id : (string) unique identifier for this specific widget instance
   "
   [data component-id container-id ui]
   (let [container          (ui-utils/subscribe-local component-id [:container])

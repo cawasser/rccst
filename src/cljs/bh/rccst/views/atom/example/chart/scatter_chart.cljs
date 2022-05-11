@@ -9,7 +9,7 @@
   (let [container-id "scatter-chart-demo"]
     [example/component-example
      :title "Scatter Chart"
-     :widget-id container-id
+     :container-id container-id
      :description "A simple Scatter Chart built using [Recharts](https://recharts.org/en-US/api/ScatterChart)"
      :data chart/sample-data
      :component chart/configurable-component
