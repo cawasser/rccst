@@ -75,3 +75,15 @@
                                                    @old-data)))))]]])))
 
 
+(comment
+  (def data [:area-chart-2-data-sub-demo :blackboard :topic.sample-data])
+  (def old-data (ui-utils/subscribe-local data [:data]))
+
+
+  (h/handle-change-path data [:data]
+    (assoc-in @(ui-utils/subscribe-local data [:data]) [0 :uv] 10000))
+  (h/handle-change-path data [:data]
+    (assoc-in @(ui-utils/subscribe-local data [:data]) [0 :pv] 7000))
+
+
+  ())
