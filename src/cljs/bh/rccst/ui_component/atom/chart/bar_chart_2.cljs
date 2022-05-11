@@ -153,7 +153,8 @@
 (comment
   (def component-id ":bar-chart-2-demo.bar-chart-2")
   (def data {:metadata {} :data []})
-  (def data example-data/meta-tabular-data)
+  (def data (r/atom example-data/meta-tabular-data))
+  (config component-id data)
 
   (def d (h/resolve-value data))
 

@@ -33,7 +33,7 @@
    ;[line-chart/simple-example]
    ;[pie-chart/example]
    [radar-chart/example]
-   [radial-bar-chart/example]
+   ;[radial-bar-chart/example]
    [sankey-chart/example]
    [scatter-chart/example]
    [treemap-chart/example]])

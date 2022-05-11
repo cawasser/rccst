@@ -33,6 +33,14 @@
         ((fn [m]
            {:name {:keys m :chosen (first m)}})))
 
+      (->> d
+           (map-indexed (fn [idx entry]
+                          ;(log/info "local-config (:color loop)" entry)
+                          {(ui-utils/path->keyword (:name entry))
+                           {:name  (:name entry)
+                            :include true}}))
+           (into {}))
+
       ; process options for :value
       (->> fields
         (filter (fn [[k v]] (= :number v)))
@@ -49,6 +57,13 @@
     (local-config data)))
 
 
+(defn- make-cell-config [component-id data]
+    (->> (:data @data)
+         (map-indexed (fn [idx {:keys [name] :as item}]
+                        [utils/boolean-config component-id name (conj [name] :include)]))
+         (into [:<>])))
+
+
 (defn- config-panel [data component-id]
   [rc/v-box :src (rc/at)
    :gap "10px"
@@ -62,12 +77,16 @@
               [utils/option component-id ":name" [:name]]
               [rc/line :src (rc/at) :size "2px"]
               [utils/option component-id ":value" [:value]]
-              [utils/color-config-text component-id ":fill" [:fill] :above-right]]])
+              [utils/color-config-text component-id ":fill" [:fill] :above-right]
+              [rc/v-box :src (rc/at)
+               :gap "5px"
+               :children [[rc/label :src (rc/at) :label "Pie Slices"]
+                          (make-cell-config component-id data)]]]])
 
 
 (defn- included-cells [data subscriptions]
   (let [ret (->> data
-              (filter (fn [{:keys [name]}] (ui-utils/resolve-sub subscriptions [:value])))
+              (filter (fn [{:keys [name]}] (ui-utils/resolve-sub subscriptions [name :include])))
               (into []))]
 
     ;(log/info "included-cells" data "//" subscriptions "//" ret)

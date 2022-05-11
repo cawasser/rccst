@@ -106,4 +106,39 @@
                   [rc/button :on-click #(h/handle-change-path config-data [:value :chosen] :amt) :label ":amt"]]])))
 
 
+(defn meta-tabular-config-pie-row-ratom-tools [config-data default-config-data]
+  [rc/h-box :src (rc/at)
+   :gap "10px"
+   :style {:border     "1px solid" :border-radius "3px"
+           :box-shadow "5px 5px 5px 2px"
+           :margin     "5px" :padding "5px"}
+   :children [[:label.h5 "Config:"]
+              [rc/button :on-click #(reset! config-data default-config-data) :label "Default"]
+              [rc/button :on-click #(swap! config-data update-in [:Page-A :include] not) :label "! Page A"]
+              [rc/button :on-click #(swap! config-data update-in [:Page-C :include] not) :label "! Page C"]
+              [chart-utils/color-config config-data "Pie Color" [:name :color] :above-center]
+              [rc/button :on-click #(swap! config-data assoc-in [:value :chosen] :uv) :label ":uv"]
+              [rc/button :on-click #(swap! config-data assoc-in [:value :chosen] :tv) :label ":tv"]
+              [rc/button :on-click #(swap! config-data assoc-in [:value :chosen] :amt) :label ":amt"]]])
+
+
+(defn meta-tabular-config-pie-row-sub-tools [config-data default-config-data]
+  (let [page-a (ui-utils/subscribe-local config-data [:Page-A :include])
+        page-c (ui-utils/subscribe-local config-data [:Page-C :include])
+        tv? (ui-utils/subscribe-local config-data [:tv :include])]
+
+    (fn []
+      [rc/h-box :src (rc/at)
+       :gap "10px"
+       :style {:border     "1px solid" :border-radius "3px"
+               :box-shadow "5px 5px 5px 2px"
+               :margin     "5px" :padding "5px"}
+       :children [[:label.h5 "Config:"]
+                  [rc/button :on-click #(h/handle-change-path config-data [] default-config-data) :label "Default"]
+                  [rc/button :on-click #(h/handle-change-path config-data [:Page-A :include] (not @page-a)) :label "! Page A"]
+                  [rc/button :on-click #(h/handle-change-path config-data [:Page-C :include] (not @page-c)) :label "! Page C"]
+                  [chart-utils/color-config config-data "Pie Color" [:name :color] :above-center]
+                  [rc/button :on-click #(h/handle-change-path config-data [:value :chosen] :uv) :label ":uv"]
+                  [rc/button :on-click #(h/handle-change-path config-data [:value :chosen] :tv) :label ":tv"]
+                  [rc/button :on-click #(h/handle-change-path config-data [:value :chosen] :amt) :label ":amt"]]])))
 
