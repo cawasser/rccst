@@ -62,8 +62,8 @@
   (let [p (ui-utils/path->keyword path)]
     [rc/h-box :src (rc/at)
      :gap "5px"
-     :children [[utils/boolean-config component-id label (conj [p] :include)]
-                [utils/color-config-text component-id label (conj [p] :color) position]]]))
+     :children [[utils/boolean-config component-id "" (conj [p] :include)]
+                [utils/color-config-text component-id label (conj [p] :fill) position]]]))
 
 
 (defn- make-radial-bar-config [component-id data]
@@ -90,6 +90,9 @@
            :background-color "#f7f7f7"}
    :children [[utils/non-gridded-chart-components component-id]
               [rc/line :src (rc/at) :size "2px"]
+              [utils/option component-id ":name" [:name]]
+              [rc/line :src (rc/at) :size "2px"]
+              [utils/column-picker data component-id ":value" [:value :chosen]]
               [rc/v-box :src (rc/at)
                :gap "10px"
                :children [[rc/label :src (rc/at) :label "Bar Colors"]
