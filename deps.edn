@@ -41,8 +41,10 @@
              com.lucasbradstreet/cljs-uuid-utils           {:mvn/version "1.0.2"}
              aysylu/loom                                   {:mvn/version "1.0.2"}
              thheller/shadow-cljs                          {:mvn/version "2.16.12"}
-             io.github.kovasap/oz {:git/tag "vega-import-fix" :git/sha "4bf14e7"}}
-             ;metasoarous/oz                                {:mvn/version "2.0.0-alpha5"}}
+             io.github.kovasap/oz                          {:git/url "https://github.com/kovasap/oz"
+                                                            :git/sha     "d5d490d21ea8d42740b09def2abab7c334d52520"}}
+                                                            ;:git/tag "vega-import-fix" :git/sha "4bf14e7"}}
+ ;metasoarous/oz                                {:mvn/version "2.0.0-alpha5"}}
 
 
  :aliases   {:run         {:main-opts ["-m" "bh.rccst.core"]}
@@ -123,7 +125,7 @@
 
              ;; Useage at the command line, run from the this projects directory:
              ;; clojure -T:build uber
-             :build       {:deps {io.github.seancorfield/build-clj {:git/tag "v0.8.0" :git/sha "9bd8b8a"}}
+             :build       {:deps       {io.github.seancorfield/build-clj {:git/tag "v0.8.0" :git/sha "9bd8b8a"}}
                            :ns-default build}
 
 
