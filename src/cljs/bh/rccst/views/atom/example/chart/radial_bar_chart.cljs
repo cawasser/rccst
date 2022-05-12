@@ -12,11 +12,14 @@
 
 
 
-(def default-config-data {:brush false
-                          :uv    {:include true, :fill "#ff0000", :stackId ""}
-                          :pv    {:include true, :fill "#00ff00", :stackId ""}
-                          :tv    {:include true, :fill "#0000ff", :stackId "a"}
-                          :amt   {:include true, :fill "#745ea5", :stackId "a"}})
+(def default-config-data {:Page-A {:name "Page A" :include true :color "#8884d8"}
+                          :Page-B {:name "Page B" :include true :color "#ffc107"}
+                          :Page-C {:name "Page C" :include true :color "#82ca9d"}
+                          :Page-D {:name "Page D" :include true :color "#ff00ff"}
+                          :Page-E {:name "Page E" :include true :color "#00e5ff"}
+                          :Page-F {:name "Page F" :include true :color "#4db6ac"}
+                          :Page-G {:name "Page G" :include true :color "#83a6ed"}
+                          :value {:keys [:uv :pv :tv :amt] :chosen :uv}})
 
 
 (defn- data-ratom []
@@ -84,7 +87,7 @@
 > how that affects the data (shown in the gray panel) and how the chart responds."
    :sample-data chart/sample-data
    :source-code chart/source-code
-   :config-tools config-tools/meta-tabular-config-column-ratom-tools
+   :config-tools config-tools/meta-tabular-config-row-ratom-tools
    :component chart/component
    :default-config-data default-config-data])
 
@@ -126,8 +129,8 @@
 (defn examples []
   [:div
    [data-ratom]
-   ;[data-structure]
-   ;[data-sub]
-   ;[config-ratom]
-   ;[config-structure]
+   [data-structure]
+   [data-sub]
+   [config-ratom]
+   [config-structure]
    [config-sub]])

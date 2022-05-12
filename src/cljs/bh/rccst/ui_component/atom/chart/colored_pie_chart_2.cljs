@@ -5,8 +5,9 @@
             [bh.rccst.ui-component.utils.example-data :as example-data]
             [bh.rccst.ui-component.atom.chart.wrapper-2 :as wrapper]
             [re-com.core :as rc]
+            [reagent.core :as r]
             [taoensso.timbre :as log]
-            ["recharts" :refer [ResponsiveContainer PieChart Pie Cell]]))
+            ["recharts" :refer [ResponsiveContainer PieChart Pie Cell Tooltip Legend]]))
 
 
 (log/info "bh.rccst.views.atom.example.chart.bar-chart-2")
@@ -118,6 +119,26 @@
     (into [])))
 
 
+(defn- custom-tooltip [tooltip-map]
+  ;(log/info "custom-tooltip" (js->clj x))
+  (let [{:keys [payload]} (js->clj tooltip-map :keywordize-keys true)
+        [p _] payload
+        p-p (:payload p)
+        dataKey (:dataKey p)
+        name (:name p-p)
+        data (get p-p (keyword dataKey))]
+
+    (r/as-element
+      [rc/v-box
+       :style {:background "rgba(255, 255, 255, 0.8)"
+               :border     "1px solid" :border-radius "3px"
+               :box-shadow "5px 5px 5px 2px"
+               :margin     "5px" :padding "5px"}
+       :gap "2px"
+       :children [[:p.has-text-centered.has-text-weight-bold (str name)]
+                  [rc/line :size "1px"]
+                  [:p.has-text-centered (str dataKey " : " data)]]])))
+
 
 (defn- component* [& {:keys [data component-id container-id
                              subscriptions isAnimationActive?]
@@ -134,14 +155,15 @@
     [:> ResponsiveContainer
      [:> PieChart {:label true} (utils/override true {} :label)
 
-      (utils/non-gridded-chart-components component-id {})
-
       [:> Pie {:dataKey           (ui-utils/resolve-sub subscriptions [:value :chosen])
                :nameKey           (ui-utils/resolve-sub subscriptions [:name :chosen])
                :data              included
                :label             (utils/override true {} :label)
                :isAnimationActive @isAnimationActive?}
-       (make-cells d subscriptions)]]]))
+       (make-cells d subscriptions)]
+      [:> Legend] ;{:iconSize 10 :width 120 :height 140 :layout "horizontal" :verticalAlign "bottom" :align "middle"}]
+      [:> Tooltip {:content custom-tooltip}]]]))
+
 
 
 (defn component [& {:keys [data config-data component-id container-id

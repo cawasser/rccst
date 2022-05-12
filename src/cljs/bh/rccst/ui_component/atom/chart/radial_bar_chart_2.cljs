@@ -5,6 +5,7 @@
             [bh.rccst.ui-component.utils.color :as color]
             [bh.rccst.ui-component.utils.example-data :as example-data]
             [re-com.core :as rc]
+            [reagent.core :as r]
             [taoensso.timbre :as log]
             ["recharts" :refer [ResponsiveContainer RadialBarChart RadialBar Legend Tooltip Cell]]))
 
@@ -32,7 +33,7 @@
                        {(ui-utils/path->keyword (:name entry))
                         {:name    (:name entry)
                          :include true
-                         :fill   (nth (cycle color/default-stroke-fill-colors) idx)}}))
+                         :color   (nth (cycle color/default-stroke-fill-colors) idx)}}))
         (into {}))
 
       ; process options for :value
@@ -63,7 +64,7 @@
     [rc/h-box :src (rc/at)
      :gap "5px"
      :children [[utils/boolean-config component-id "" (conj [p] :include)]
-                [utils/color-config-text component-id label (conj [p] :fill) position]]]))
+                [utils/color-config-text component-id label (conj [p] :color) position]]]))
 
 
 (defn- make-radial-bar-config [component-id data]
@@ -100,9 +101,9 @@
 
 
 (defn- make-cell [name idx subscriptions]
- [:> Cell {:key  (str (ui-utils/resolve-sub subscriptions [:value :chosen]) "-" idx)
-           :fill (or (ui-utils/resolve-sub subscriptions [name :fill])
-                   (color/get-color 0))}])
+  [:> Cell {:key  (str name) ;(ui-utils/resolve-sub subscriptions [:value :chosen]) "-" idx)
+            :fill (or (ui-utils/resolve-sub subscriptions [name :color])
+                    (color/get-color 0))}])
 
 
 (defn- make-radial-bar-display [data subscriptions isAnimationActive?]
@@ -127,6 +128,27 @@
     (into [])))
 
 
+(defn- custom-tooltip [tooltip-map]
+  ;(log/info "custom-tooltip" (js->clj x))
+  (let [{:keys [payload]} (js->clj tooltip-map :keywordize-keys true)
+        [p _] payload
+        p-p (:payload p)
+        dataKey (:dataKey p)
+        name (:name p-p)
+        data (get p-p (keyword dataKey))]
+
+    (r/as-element
+      [rc/v-box
+       :style {:background "rgba(255, 255, 255, 0.8)"
+               :border     "1px solid" :border-radius "3px"
+               :box-shadow "5px 5px 5px 2px"
+               :margin     "5px" :padding "5px"}
+       :gap "2px"
+       :children [[:p.has-text-centered.has-text-weight-bold (str name)]
+                  [rc/line :size "1px"]
+                  [:p.has-text-centered (str dataKey " : " data)]]])))
+
+
 (defn- component* [& {:keys [data component-id container-id
                              subscriptions isAnimationActive?]
                       :as   params}]
@@ -138,19 +160,17 @@
     [:> ResponsiveContainer
      [:> RadialBarChart {:innerRadius "10%"
                          :outerRadius "80%"
-                         :data        d
+                         :data        included
                          :startAngle  180
                          :endAngle    0}
-
-      (utils/non-gridded-chart-components component-id {})
 
       [:> RadialBar {:minAngle   15
                      :background {:clockWise true}
                      :dataKey    (ui-utils/resolve-sub subscriptions [:value :chosen])}
-       (make-radial-bar-display d subscriptions isAnimationActive?)]
+       (make-radial-bar-display included subscriptions isAnimationActive?)]
 
-      [:> Legend {:iconSize 10 :width 120 :height 140 :layout "vertical" :verticalAlign "middle" :align "right"}]
-      [:> Tooltip]]]))
+      [:> Legend] ;{:iconSize 10 :width 120 :height 140 :layout "horizontal" :verticalAlign "bottom" :align "middle"}]
+      [:> Tooltip {:content custom-tooltip}]]]))
 
 
 (defn component [& {:keys [data config-data component-id container-id
