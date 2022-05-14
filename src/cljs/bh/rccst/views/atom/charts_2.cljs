@@ -12,10 +12,10 @@
 
 (def navbar [[:charts/area-chart "Area" [area-chart/examples]]
              [:charts/bar-chart "Bar" [bar-chart/examples]]
-             [:charts/radial-bar-chart "Radial Bar" [radial-bar-chart/examples]]
              [:charts/colored-pie-chart "Colored Pie" [colored-pie-chart/examples]]
              [:charts/line-chart "Line" [line-chart/examples]]
              [:charts/pie-chart "Pie" [pie-chart/examples]]
+             [:charts/radial-bar-chart "Radial Bar" [radial-bar-chart/examples]]
              [:charts/other "Other" [charts/examples]]])
                   ;[:charts/colored-pie-chart "Colored Pie" [colored-pie-chart/examples]]
                   ;[:charts/funnel-chart "Funnel" [funnel-chart/examples]]

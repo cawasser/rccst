@@ -1,9 +1,9 @@
 (ns bh.rccst.ui-component.atom.diagram.flow
   (:require [bh.rccst.ui-component.atom.card.flippable-card :as card]
-            [bh.rccst.ui-component.atom.chart.area-chart :as area-chart]
-            [bh.rccst.ui-component.atom.chart.bar-chart :as bar-chart]
-            [bh.rccst.ui-component.atom.chart.colored-pie-chart :as pie-chart]
-            [bh.rccst.ui-component.atom.chart.line-chart :as line-chart]
+            [bh.rccst.ui-component.atom.chart.area-chart-2 :as area-chart]
+            [bh.rccst.ui-component.atom.chart.bar-chart-2 :as bar-chart]
+            [bh.rccst.ui-component.atom.chart.colored-pie-chart-2 :as pie-chart]
+            [bh.rccst.ui-component.atom.chart.line-chart-2 :as line-chart]
             [bh.rccst.ui-component.utils :as ui-utils]
             [reagent.core :as r]
             ["react-flow-renderer" :refer (ReactFlowProvider MiniMap Controls Handle) :default ReactFlow]))

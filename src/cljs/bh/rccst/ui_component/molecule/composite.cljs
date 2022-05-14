@@ -28,7 +28,7 @@ distinction, so we can quickly build all the Nodes and Handles used for the diag
             [bh.rccst.ui-component.molecule.composite.util.signals :as sig]
             [bh.rccst.ui-component.molecule.composite.util.ui :as ui]
             [bh.rccst.ui-component.utils :as ui-utils]
-            [bh.rccst.ui-component.atom.chart.bar-chart :as bar-chart]
+            [bh.rccst.ui-component.atom.chart.bar-chart-2 :as bar-chart]
             [bh.rccst.ui-component.atom.chart.area-chart-2 :as area-chart-2]
             [bh.rccst.ui-component.atom.chart.bar-chart-2 :as bar-chart-2]
             [bh.rccst.ui-component.atom.chart.colored-pie-chart-2 :as colored-pie-chart-2]
@@ -89,7 +89,6 @@ distinction, so we can quickly build all the Nodes and Handles used for the diag
   {:blackboard {:defs {:source full-config
                        :dag    {:open-details ""}}}
    :container  ""})
-
 
 
 (defn definition-panel
@@ -153,23 +152,6 @@ distinction, so we can quickly build all the Nodes and Handles used for the diag
 ; RICH COMMENTS
 ;; region
 
-(comment
-  (def configuration @bh.rccst.ui-component.molecule.composite.coverage-plan/ui-definition)
-  (def graph (apply lg/digraph (compute-edges @bh.rccst.ui-component.molecule.composite.coverage-plan/ui-definition)))
-  (def denorm (denorm-components graph (:links @bh.rccst.ui-component.molecule.composite.coverage-plan/ui-definition)
-                (lg/nodes graph)))
-
-
-  (assoc configuration
-    :graph graph
-    :denorm (denorm-components graph (:links configuration) (lg/nodes graph))
-    :nodes (lg/nodes graph)
-    :edges (lg/edges graph))
-
-
-  ())
-
-
 ;; basics of Loom (https://github.com/aysylu/loom)
 (comment
   (do
@@ -191,8 +173,9 @@ distinction, so we can quickly build all the Nodes and Handles used for the diag
 
 
 ;; how do we use Loom for our composite?
-
 (comment
+  (def composite-def {})
+
   ; a Loom digraph only needs EDGES (:links)
   (def edges (->> composite-def
                :links
@@ -209,66 +192,6 @@ distinction, so we can quickly build all the Nodes and Handles used for the diag
   ())
 
 
-;; playing with the graph
-(comment
-  (def graph (apply lg/digraph (compute-edges composite-def)))
-
-  (apply conj
-    (map #(create-flow-node %) (lg/nodes graph))
-    (map-indexed (fn [idx node]
-                   (create-flow-edge idx node))
-      (lg/edges graph)))
-
-  (def nodes (lg/nodes graph))
-
-  (create-flow-node (first nodes))
-
-  (apply conj '(:a :b) '(:c :d))
-
-
-  (def config-graph (apply lg/digraph (compute-edges composite-def)))
-  (def config-flow (make-flow config-graph))
-
-
-  ())
-
-
-;; layout!
-(comment
-  (def configuration @bh.rccst.ui-component.molecule.composite.coverage-plan/ui-definition)
-  (def links (:links configuration))
-  (def layout (:layout configuration))
-  (def components (:components configuration))
-
-  (group-by :user-id [{:user-id 1 :uri "/"}
-                      {:user-id 2 :uri "/foo"}
-                      {:user-id 1 :uri "/account"}])
-
-  (def comp-by-type (->> components
-                      seq
-                      (group-by (fn [[id meta]]
-                                  (:type meta)))))
-
-  (def links-by-type ())
-
-  ; process local subscriptions
-  (def local-meta [:topic/selected-coverages {:type :source/local,
-                                              :name :selected-coverages}])
-
-  {:selected-coverages (subscribe-local container-id :topic/selected-coverages)}
-
-
-  (do
-    (def graph (apply lg/digraph (compute-edges @bh.rccst.ui-component.molecule.composite.coverage-plan/ui-definition)))
-    (def configuration
-      (assoc @bh.rccst.ui-component.molecule.composite.coverage-plan/ui-definition
-        :graph graph
-        :denorm (denorm-components graph (:links configuration) (lg/nodes graph))
-        :nodes (lg/nodes graph)
-        :edges (lg/edges graph))))
-  (def config-flow (make-flow configuration))
-
-  ())
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -286,14 +209,14 @@ distinction, so we can quickly build all the Nodes and Handles used for the diag
     (def links (:links config))
     (def layout (:layout config))
     (def components (:components config))
-    (def graph (apply lg/digraph (compute-edges config)))
+    (def graph (apply lg/digraph (ui/compute-edges config)))
     (def nodes (lg/nodes graph))
     (def edges (lg/edges graph))
     (def registry meta-data-registry)
 
     (def configuration (assoc @bh.rccst.ui-component.molecule.composite.coverage-plan/ui-definition
                          :graph graph
-                         :denorm (denorm-components graph (:links config) (lg/nodes graph))
+                         :denorm (dig/denorm-components graph (:links config) (lg/nodes graph))
                          :nodes (lg/nodes graph)
                          :edges (lg/edges graph))))
 
@@ -366,13 +289,13 @@ distinction, so we can quickly build all the Nodes and Handles used for the diag
     (apply merge))
 
 
-  {:fn/range {:outputs (get-outputs links :fn/range)}}
-  (get-outputs links :fn/coverage)
+  {:fn/range {:outputs (dig/get-outputs links :fn/range)}}
+  (dig/get-outputs links :fn/coverage)
 
-  ; map over all the cmoponets (:ui/globe & :ui/current-time should have not outputs!)
+  ; map over all the components (:ui/globe & :ui/current-time should have not outputs!)
   (->> nodes
     (map (fn [node]
-           {node (get-outputs links node)})))
+           {node (dig/get-outputs links node)})))
 
 
   ;; endregion
@@ -401,13 +324,13 @@ distinction, so we can quickly build all the Nodes and Handles used for the diag
 
   (:topic/coverage-data links)
 
-  (get-inputs links graph :ui/globe)
-  (get-inputs links graph :fn/range)
+  (dig/get-inputs links graph :ui/globe)
+  (dig/get-inputs links graph :fn/range)
 
 
   (->> nodes
     (map (fn [node]
-           {node (get-inputs links graph node)})))
+           {node (dig/get-inputs links graph node)})))
 
   ;; endregion
 
@@ -418,11 +341,11 @@ distinction, so we can quickly build all the Nodes and Handles used for the diag
   (->> nodes
     (map (fn [node]
            {node
-            {:inputs  (get-inputs links graph node)
-             :outputs (get-outputs links node)}}))
+            {:inputs  (dig/get-inputs links graph node)
+             :outputs (dig/get-outputs links node)}}))
     (into {}))
 
-  (denorm-components-2 graph links nodes)
+  (dig/denorm-components graph links nodes)
 
   ;; endregion
 
@@ -461,28 +384,15 @@ distinction, so we can quickly build all the Nodes and Handles used for the diag
   (apply conj [:dummy] (flatten (seq thing)))
 
 
-
-  (make-params configuration :fn/range :inputs :dummy)
-  (make-params configuration :fn/range :outputs :dummy)
-
-
-  (make-params configuration :fn/coverage :inputs :dummy)
-
-  (apply fn-range
-    (flatten (seq (merge
-                    (make-params configuration :fn/range :inputs :dummy)
-                    (make-params configuration :fn/range :outputs :dummy)))))
-
-
   (->> components
     (filter (fn [[node meta-data]]
               (= :ui/component (:type meta-data))))
     (map (fn [[node meta-data]]
-           (component->ui {:node          node
-                           :type          (:type meta-data)
-                           :configuration configuration
-                           :registry      meta-data-registry
-                           :container-id  :dummy}))))
+           (sig/component->ui {:node          node
+                               :type          (:type meta-data)
+                               :configuration configuration
+                               :registry      meta-data-registry
+                               :container-id  :dummy}))))
 
   ;; endregion
 
@@ -492,7 +402,7 @@ distinction, so we can quickly build all the Nodes and Handles used for the diag
   ; 1. remote subscriptions (including the remote call)
   ;
   ; [SIDE EFFECT]
-  (process-components configuration :source/remote meta-data-registry :coverage-plan)
+  (sig/process-components configuration :source/remote meta-data-registry :coverage-plan)
 
   ; 1a. build the subscription for the "container" which provide the basis for the
   ;     subscriptions for the "locals"
@@ -504,12 +414,12 @@ distinction, so we can quickly build all the Nodes and Handles used for the diag
   ; 2. add blackboard data to the app-db and build local subscriptions/events against the blackboard
   ;
   ; [SIDE EFFECT]
-  (process-components configuration :source/local meta-data-registry :coverage-plan)
+  (sig/process-components configuration :source/local meta-data-registry :coverage-plan)
 
   ; 3. local functions (to build subscriptions against the blackboard or remotes)
   ;
   ; [SIDE EFFECT]
-  (process-components configuration :source/fn meta-data-registry :coverage-plan)
+  (sig/process-components configuration :source/fn meta-data-registry :coverage-plan)
 
   ; 4. build UI components (with subscriptions against the blackboard or remotes)
   ;
@@ -518,7 +428,7 @@ distinction, so we can quickly build all the Nodes and Handles used for the diag
   ; this just builds the vectors and maps them to the component-id in the configuration in pre for Step 5
   ;
   (def component-lookup (into {}
-                          (process-components
+                          (sig/process-components
                             configuration :ui/component
                             meta-data-registry :coverage-plan)))
 
@@ -547,11 +457,11 @@ distinction, so we can quickly build all the Nodes and Handles used for the diag
 (comment
   (do
     (def node-id :fn/range)
-    (def graph (apply lg/digraph (compute-edges @bh.rccst.ui-component.molecule.composite.coverage-plan/ui-definition)))
+    (def graph (apply lg/digraph (ui/compute-edges @bh.rccst.ui-component.molecule.composite.coverage-plan/ui-definition)))
     (def configuration
       (assoc @bh.rccst.ui-component.molecule.composite.coverage-plan/ui-definition
         :graph graph
-        :denorm (denorm-components graph (:links configuration) (lg/nodes graph))
+        :denorm (dig/denorm-components graph (:links configuration) (lg/nodes graph))
         :nodes (lg/nodes graph)
         :edges (lg/edges graph))))
 
@@ -577,12 +487,12 @@ distinction, so we can quickly build all the Nodes and Handles used for the diag
 (comment
   (do
     (def data @bh.rccst.ui-component.molecule.composite.coverage-plan/ui-definition)
-    (def graph (apply lg/digraph (compute-edges @bh.rccst.ui-component.molecule.composite.coverage-plan/ui-definition)))
+    (def graph (apply lg/digraph (ui/compute-edges @bh.rccst.ui-component.molecule.composite.coverage-plan/ui-definition)))
     (def nodes (lg/nodes graph))
     (def links (:links data))
     (def components (:components data))
     (def configuration (assoc @bh.rccst.ui-component.molecule.composite.coverage-plan/ui-definition
-                         :components (expand-components data)
+                         :components (dig/expand-components data meta-data-registry)
                          :graph graph
                          :nodes (lg/nodes graph)
                          :edges (lg/edges graph)))
@@ -592,7 +502,7 @@ distinction, so we can quickly build all the Nodes and Handles used for the diag
 
   (->> data
     :components
-    (map (fn [[id meta-data] component]
+    (map (fn [[id meta-data]]
            {id (assoc meta-data
                  :ports
                  (condp = (:type meta-data)
@@ -602,14 +512,14 @@ distinction, so we can quickly build all the Nodes and Handles used for the diag
                    :source/fn (:ports meta-data)))}))
     (assoc data :components))
 
-  (expand-components data)
+  (dig/expand-components data meta-data-registry)
 
   (map #(assoc % :ports "x") (:components data))
 
 
   (def target-meta (map (fn [[target _]] (target meta-data-registry)) node-meta))
 
-  (denorm-components graph links nodes)
+  (dig/denorm-components graph links nodes)
 
 
   ())
@@ -623,22 +533,22 @@ distinction, so we can quickly build all the Nodes and Handles used for the diag
     (def links (:links config))
     (def layout (:layout config))
     (def components (:components config))
-    (def graph (apply lg/digraph (compute-edges config)))
+    (def graph (apply lg/digraph (ui/compute-edges config)))
     (def nodes (lg/nodes graph))
     (def edges (lg/edges graph))
     (def registry meta-data-registry)
 
     (def configuration (assoc @bh.rccst.ui-component.molecule.composite.coverage-plan/ui-definition
                          :graph graph
-                         :denorm (denorm-components graph (:links config) (lg/nodes graph))
+                         :denorm (dig/denorm-components graph (:links config) (lg/nodes graph))
                          :nodes (lg/nodes graph)
                          :edges (lg/edges graph)
                          :ui-lookup (into {}
-                                      (process-components
+                                      (sig/process-components
                                         configuration :ui/component
                                         meta-data-registry :coverage-plan))))
     (def component-lookup (into {}
-                            (process-components
+                            (sig/process-components
                               configuration :ui/component
                               meta-data-registry :coverage-plan)))
     (def node :h-box))
@@ -649,235 +559,6 @@ distinction, so we can quickly build all the Nodes and Handles used for the diag
 
   ;(into (parse-token lookup node) [:children [:a :b :c]])
 
-
-  ())
-
-
-; make-param
-(comment
-  (do
-    (def config @bh.rccst.ui-component.molecule.composite.coverage-plan/ui-definition)
-    (def container-id "dummy")
-    (def links (:links config))
-    (def layout (:layout config))
-    (def components (:components config))
-    (def graph (apply lg/digraph (ui/compute-edges config)))
-    (def nodes (lg/nodes graph))
-    (def edges (lg/edges graph))
-    (def registry meta-data-registry)
-    (def configuration (assoc @bh.rccst.ui-component.molecule.composite.coverage-plan/ui-definition
-                         :graph graph
-                         :denorm (dig/denorm-components graph (:links config) (lg/nodes graph))
-                         :nodes (lg/nodes graph)
-                         :edges (lg/edges graph)))
-    (def node :fn/coverage)
-    (def direction :inputs))
-
-  (make-params configuration :fn/coverage :inputs :dummy)
-
-  (->> configuration
-    :denorm
-    node
-    direction)
-
-  (->> configuration
-    :denorm
-    node
-    direction
-    (map (fn [[target ports]]
-           (let [remote (-> configuration :components target :name)]
-             [target remote]))))
-
-  ; make-param
-  (->> configuration
-    :denorm
-    node
-    direction
-    (map (fn [[target ports]]
-           (let [[source-port target-port] ports
-                 remote (-> configuration :components target :name)]
-             ;(println target (-> configuration :components target :type))
-             (if (= direction :outputs)
-               {source-port (if (= :source/local (-> configuration :components target :type))
-                              [(ui-utils/path->keyword container-id :blackboard target)]
-                              [:bh.rccst.subs/source remote])}
-               {target-port (if (= :source/local (-> configuration :components target :type))
-                              [(ui-utils/path->keyword container-id :blackboard target)]
-                              [:bh.rccst.subs/source remote])}))))
-    (into {}))
-
-
-  ; process-component :ui/component
-  (do
-    (def node :ui/targets)
-    (def ui-type (->> configuration :components node :name))
-    (def ui-component (->> registry ui-type :component))
-    (def container-id "dummy"))
-
-  (let [ui-type      (->> configuration :components node :name)
-        ui-component (->> registry ui-type :component)]
-    {node
-     ; TODO: can this be converted to (apply concat...)? (see https://clojuredesign.club/episode/080-apply-as-needed/)
-     (reduce into [ui-component]
-       (seq
-         (merge
-           (make-params configuration node :inputs container-id)
-           (make-params configuration node :outputs container-id))))})
-
-  (def params '([:data [:one :two]] [:thing [:one :three]]))
-
-  (reduce into [] params)
-
-  (reduce into [:node] '([:data [:one :two]] [:thing [:one :three]]))
-
-  ())
-
-
-; process-components
-(comment
-  (do
-    (def data @bh.rccst.ui-component.molecule.composite.coverage-plan/ui-definition)
-    (def container-id "coverage-plan-demo")
-    (def component-id :coverage-plan-demo.component)
-    (def links (:links data))
-    (def layout (:layout data))
-    (def components (:components data))
-    (def graph (apply lg/digraph (compute-edges data)))
-    (def nodes (lg/nodes graph))
-    (def edges (lg/edges graph))
-    (def registry meta-data-registry)
-    (def configuration (assoc @bh.rccst.ui-component.molecule.composite.coverage-plan/ui-definition
-                         :graph graph
-                         :denorm (denorm-components graph (:links data) (lg/nodes graph))
-                         :nodes (lg/nodes graph)
-                         :edges (lg/edges graph)))
-    (def source-type :source/local)
-    (def node-type :source/local))
-
-
-
-  (->> configuration
-    :components
-    (filter (fn [[_ meta-data]]
-              (= node-type (:type meta-data))))
-    (map (fn [[node meta-data]]
-           ;(log/info "process-components (nodes)" node "//" meta-data "//" (:type meta-data))
-           (component->ui {:node          node
-                           :type          (:type meta-data)
-                           :configuration configuration
-                           :registry      registry
-                           :component-id  (ui-utils/path->keyword container-id node)
-                           :container-id  container-id}))))
-
-
-
-
-
-  (process-components configuration :source/local meta-data-registry component-id)
-
-
-  (ui-utils/init-container-locals component-id {:blackboard {}})
-
-  (ui-utils/create-container-local-sub component-id [:container] "")
-  (ui-utils/create-container-local-event component-id [:container])
-
-  (ui-utils/subscribe-local component-id [:container])
-  (ui-utils/dispatch-local component-id [:container] container-id)
-
-  (ui-utils/subscribe-local component-id [:blackboard])
-  (re-frame/subscribe [:coverage-plan-demo.component.blackboard])
-
-  (ui-utils/dispatch-local component-id [:blackboard] {:dummy "dummy"})
-
-  (ui-utils/create-container-local-sub component-id [:blackboard :topic/layers] [])
-  (ui-utils/create-container-local-event component-id [:blackboard :topic/layers])
-  (ui-utils/dispatch-local component-id [:blackboard :topic/layers] {:dummy "ui-utils"})
-
-  (re-frame/dispatch [:coverage-plan-demo.component.blackboard.topic.layers {:dummy "re-frame"}])
-
-
-  (ui-utils/subscribe-local component-id [:blackboard :topic/current-time])
-
-  (ui-utils/create-container-local-sub component-id [:blackboard :topic/current-time] "")
-  (ui-utils/create-container-local-event component-id [:blackboard :topic/current-time])
-  (ui-utils/dispatch-local component-id [:blackboard :topic/current-time] {})
-
-
-
-
-
-  (re-frame/subscribe [:coverage-plan-demo.component.blackboard.topic.layers])
-
-  (->> configuration
-    :components
-    (filter (fn [[_ meta-data]]
-              (= type (:type meta-data))))
-    (map (fn [[node meta-data]]
-           ;(log/info "process-components (nodes)" node "//"
-           ;  meta-data "//" (:type meta-data))
-           (component->ui {:node          node
-                           :type          (:type meta-data)
-                           :configuration configuration
-                           :registry      registry
-                           :component-id  component-id
-                           :container-id  container-id}))))
-
-
-
-  (re-frame/subscribe [:coverage-plan-demo/component])
-  (re-frame/subscribe [:coverage-plan-demo/blackboard])
-  (re-frame/subscribe [:coverage-plan-demo/blackboard.layers])
-  (re-frame/dispatch [:coverage-plan-demo/blackboard.layers {:dummy "one"}])
-
-
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  ;
-  ; the problem is KEYWORDS, specifically the (keyword ...) function and the
-  ; (name ...) function as applied to keywords:
-  ;
-
-  (keyword "dummy")
-  ; :dummy
-
-  (keyword "container" "component")
-  ; :namespace/dummy
-
-  (keyword "container/component" "dummy")
-  ; :namespace/component/dummy   <-- BAD!
-  ;      (actually invalid. The runtime is fine, but the reader can't handle it!)
-
-  ;:namespace/component/dummy
-
-  (keyword "namespace/component" :dummy)
-  ; :namespace/component/dummy   <-- BAD!
-
-
-  (keyword :namespace/component :topic/dummy)
-
-  (name :dummy)
-  ; "dummy"
-
-  (name :namespace/dummy)
-  ; "dummy"  <-- also BAD!
-
-  ; so
-  (keyword (name :namespace/component) (name :topic/dummy))
-  ; :component/dummy   <-- really, really BAD
-
-
-
-  ; built the (path->keyword ...) function, but...
-  ;
-  (ui-utils/path->keyword :namespace/component :topic/dummy)
-  ; :component/dummy   <-- STILL BAD
-
-  (ui-utils/path->keyword "namespace/component" :topic/dummy)
-  ; :namespace/component/dummy   <-- STILL BAD
-
-  (keyword (clojure.string/join "." ["container" "component" "topic.dummy"]))
-
-  (str :topic/dummy)
 
   ())
 
@@ -933,58 +614,28 @@ distinction, so we can quickly build all the Nodes and Handles used for the diag
     (def links (:links config))
     (def layout (:layout config))
     (def components (:components config))
-    (def graph (apply lg/digraph (compute-edges config)))
+    (def graph (apply lg/digraph (dig/compute-edges config)))
     (def nodes (lg/nodes graph))
     (def edges (lg/edges graph))
     (def registry meta-data-registry)
 
     (def configuration (assoc @bh.rccst.ui-component.molecule.composite.coverage-plan/ui-definition
                          :graph graph
-                         :denorm (denorm-components graph (:links config) (lg/nodes graph))
+                         :denorm (dig/denorm-components graph (:links config) (lg/nodes graph))
                          :nodes (lg/nodes graph)
                          :edges (lg/edges graph)
                          :ui-lookup (into {}
-                                      (process-components
+                                      (sig/process-components
                                         configuration :ui/component
                                         meta-data-registry :coverage-plan))))
     (def component-lookup (into {}
-                            (process-components
+                            (sig/process-components
                               configuration :ui/component
                               meta-data-registry :coverage-plan)))
     (def node :fn/range)
 
     (def actual-fn (->> configuration :components node :name))
     (def denorm (->> configuration :denorm node)))
-
-  (make-params configuration node :inputs container-id)
-  (make-params configuration node :outputs container-id)
-
-
-  (def built (seq
-               (reduce into [actual-fn]
-                 (seq
-                   (merge
-                     (make-params configuration node :inputs container-id)
-                     (make-params configuration node :outputs container-id))))))
-
-  (built)
-
-  (actual-fn
-    (merge
-      (make-params configuration node :inputs container-id)
-      (make-params configuration node :outputs container-id)))
-
-  (let [actual-fn (->> configuration :components node :name)
-        denorm    (->> configuration :denorm node)
-
-        ;_         (log/info "component->ui :source/fn" node "//" actual-fn "//" denorm)
-
-        built-fn  (apply actual-fn
-                    (seq
-                      (merge
-                        (make-params configuration node :inputs container-id)
-                        (make-params configuration node :outputs container-id))))])
-
 
   ())
 
