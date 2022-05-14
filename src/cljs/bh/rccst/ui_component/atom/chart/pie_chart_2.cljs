@@ -64,7 +64,7 @@
          (into [:<>])))
 
 
-(defn- config-panel [data component-id]
+(defn config-panel [data component-id]
   [rc/v-box :src (rc/at)
    :gap "10px"
    :width "100%"
