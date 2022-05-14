@@ -1,4 +1,4 @@
-(ns bh.rccst.ui-component.atom.chart.pie-chart-2
+(ns bh.rccst.ui-component.atom.chart.pie-chart
   (:require [bh.rccst.ui-component.atom.chart.utils :as utils]
             [bh.rccst.ui-component.atom.chart.wrapper-2 :as wrapper]
             [bh.rccst.ui-component.utils :as ui-utils]

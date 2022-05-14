@@ -1,4 +1,4 @@
-(ns bh.rccst.ui-component.atom.chart.area-chart-2
+(ns bh.rccst.ui-component.atom.chart.area-chart
   (:require [bh.rccst.ui-component.atom.chart.utils :as utils]
             [bh.rccst.ui-component.atom.re-com.configure-toggle :as ct]
             [bh.rccst.ui-component.utils :as ui-utils]
@@ -13,7 +13,7 @@
             [woolybear.ad.layout :as layout]
             ["recharts" :refer [ResponsiveContainer AreaChart Area Brush]]))
 
-(log/info "bh.rccst.views.atom.example.chart.area-chart-2")
+(log/info "bh.rccst.views.atom.example.chart.area-chart")
 
 
 (def source-code '[])

@@ -1,4 +1,4 @@
-(ns bh.rccst.ui-component.atom.chart.line-chart-2
+(ns bh.rccst.ui-component.atom.chart.line-chart
   (:require [bh.rccst.ui-component.atom.chart.utils :as utils]
             [bh.rccst.ui-component.atom.re-com.configure-toggle :as ct]
             [bh.rccst.ui-component.utils :as ui-utils]

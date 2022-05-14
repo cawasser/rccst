@@ -1,4 +1,4 @@
-(ns bh.rccst.ui-component.atom.chart.radial-bar-chart-2
+(ns bh.rccst.ui-component.atom.chart.radial-bar-chart
   (:require [bh.rccst.ui-component.atom.chart.utils :as utils]
             [bh.rccst.ui-component.atom.chart.wrapper-2 :as wrapper]
             [bh.rccst.ui-component.utils :as ui-utils]
@@ -9,7 +9,7 @@
             [taoensso.timbre :as log]
             ["recharts" :refer [ResponsiveContainer RadialBarChart RadialBar Legend Tooltip Cell]]))
 
-(log/info "bh.rccst.ui-component.atom.chart.radial-bar-chart-2")
+(log/info "bh.rccst.ui-component.atom.chart.radial-bar-chart")
 
 (def source-code '[])
 (def sample-data example-data/meta-tabular-data)

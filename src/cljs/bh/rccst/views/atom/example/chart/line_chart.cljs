@@ -1,5 +1,5 @@
 (ns bh.rccst.views.atom.example.chart.line-chart
-  (:require [bh.rccst.ui-component.atom.chart.line-chart-2 :as chart]
+  (:require [bh.rccst.ui-component.atom.chart.line-chart :as chart]
             [bh.rccst.ui-component.atom.chart.utils :as chart-utils]
             [bh.rccst.views.atom.example.chart.alt.config-ratom-example :as config-ratom-example]
             [bh.rccst.views.atom.example.chart.alt.config-structure-example :as config-structure-example]

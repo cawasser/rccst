@@ -1,4 +1,4 @@
-(ns bh.rccst.ui-component.atom.chart.colored-pie-chart-2
+(ns bh.rccst.ui-component.atom.chart.colored-pie-chart
   (:require [bh.rccst.ui-component.atom.chart.utils :as utils]
             [bh.rccst.ui-component.utils :as ui-utils]
             [bh.rccst.ui-component.utils.color :as color]

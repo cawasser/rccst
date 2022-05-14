@@ -1,6 +1,6 @@
 (ns bh.rccst.views.atom.example.re-com.popover
-  (:require [bh.rccst.ui-component.atom.chart.area-chart-2 :as area-chart]
-            [bh.rccst.ui-component.atom.chart.line-chart-2 :as line-chart]
+  (:require [bh.rccst.ui-component.atom.chart.area-chart :as area-chart]
+            [bh.rccst.ui-component.atom.chart.line-chart :as line-chart]
             [bh.rccst.ui-component.atom.chart.sankey-chart :as sankey-chart]
             [re-com.core :as rc]
             [reagent.core :as r]
