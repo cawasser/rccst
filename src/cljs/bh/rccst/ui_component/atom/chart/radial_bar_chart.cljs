@@ -1,22 +1,47 @@
 (ns bh.rccst.ui-component.atom.chart.radial-bar-chart
   (:require [bh.rccst.ui-component.atom.chart.utils :as utils]
-            ["recharts" :refer [ResponsiveContainer RadialBarChart RadialBar Legend Tooltip]]
-            [bh.rccst.ui-component.atom.chart.wrapper :as c]
+            [bh.rccst.ui-component.atom.chart.wrapper-2 :as wrapper]
             [bh.rccst.ui-component.utils :as ui-utils]
+            [bh.rccst.ui-component.utils.color :as color]
+            [bh.rccst.ui-component.utils.example-data :as example-data]
             [re-com.core :as rc]
-            [reagent.core :as r]))
+            [reagent.core :as r]
+            [taoensso.timbre :as log]
+            ["recharts" :refer [ResponsiveContainer RadialBarChart RadialBar Legend Tooltip Cell]]))
+
+(log/info "bh.rccst.ui-component.atom.chart.radial-bar-chart")
+
+(def source-code '[])
+(def sample-data example-data/meta-tabular-data)
 
 
-(def sample-data (r/atom [{:name "18-24", :uv 31.47, :pv 2400, :fill "#8884d8"}
-                          {:name "25-29", :uv 26.69, :pv 4567, :fill "#83a6ed"}
-                          {:name "30-34", :uv -15.69, :pv 1398, :fill "#8dd1e1"}
-                          {:name "35-39", :uv 8.22, :pv 9800, :fill "#82ca9d"}
-                          {:name "40-49", :uv -8.63, :pv 3908, :fill "#a4de6c"}
-                          {:name "50+", :uv -2.63, :pv 4800, :fill "#d0ed57"}
-                          {:name "unknow", :uv 6.67, :pv 4800, :fill "#ffc658"}]))
+(defn local-config [data]
+  (let [d      (get @data :data)
+        fields (get-in @data [:metadata :fields])]
 
+    (merge
+      ; process options for :name
+      (->> fields
+        (filter (fn [[k v]] (= :string v)))
+        keys
+        ((fn [m]
+           {:name {:keys m :chosen (first m)}})))
 
-(def source-code "dummy Radial Bar Chart Code")
+      ; process :name to map up the :colors
+      (->> d
+        (map-indexed (fn [idx entry]
+                       {(ui-utils/path->keyword (:name entry))
+                        {:name    (:name entry)
+                         :include true
+                         :color   (nth (cycle color/default-stroke-fill-colors) idx)}}))
+        (into {}))
+
+      ; process options for :value
+      (->> fields
+        (filter (fn [[k v]] (= :number v)))
+        keys
+        ((fn [m]
+           {:value {:keys m :chosen (first m)}}))))))
 
 
 (defn config
@@ -27,21 +52,26 @@
   - component-id : (string) id of the widget, in this specific case
   "
   [component-id data]
-  (-> ui-utils/default-pub-sub
-    (merge
-      utils/default-config
-      {:tab-panel {:value     (keyword component-id "config")
-                   :data-path [:containers (keyword component-id) :tab-panel]}
-       :radial-uv {:include    true :minAngle 15
-                   :label      {:fill "#666", :position "insideStart"}
-                   :background {:clockWise true}
-                   :dataKey    :uv}})))
+  (merge
+    ui-utils/default-pub-sub
+    utils/default-config
+    (ui-utils/config-tab-panel component-id)
+    (local-config data)))
 
 
 (defn- radial-config [component-id label path position]
-  [rc/v-box :src (rc/at)
-   :gap "5px"
-   :children [[utils/boolean-config component-id label (conj path :include)]]])
+  (let [p (ui-utils/path->keyword path)]
+    [rc/h-box :src (rc/at)
+     :gap "5px"
+     :children [[utils/boolean-config component-id "" (conj [p] :include)]
+                [utils/color-config-text component-id label (conj [p] :color) position]]]))
+
+
+(defn- make-radial-bar-config [component-id data]
+  (->> (:data @data)
+    (map-indexed (fn [idx {:keys [name] :as item}]
+                   [radial-config component-id name [name] :above-right]))
+    (into [:<>])))
 
 
 (defn config-panel
@@ -61,83 +91,140 @@
            :background-color "#f7f7f7"}
    :children [[utils/non-gridded-chart-components component-id]
               [rc/line :src (rc/at) :size "2px"]
-              [rc/h-box :src (rc/at)
+              [utils/option component-id ":name" [:name]]
+              [rc/line :src (rc/at) :size "2px"]
+              [utils/column-picker data component-id ":value" [:value :chosen]]
+              [rc/v-box :src (rc/at)
                :gap "10px"
-               :children [[radial-config component-id "uv" [:radial-uv] :above-right]]]]])
+               :children [[rc/label :src (rc/at) :label "Bar Colors"]
+                          (make-radial-bar-config component-id data)]]]])
 
 
-(defn- component-panel
-  "the chart to draw, taking cues from the settings of the configuration panel
-
-  ---
-
-  - data : (atom) any data used by the component's ui
-  - component-id : (string) unique identifier for this specific widget
-  "
-  [data component-id container-id ui]
-  (let [container  (ui-utils/subscribe-local component-id [:container])
-        radial-uv? (ui-utils/subscribe-local component-id [:radial-uv :include])]
-
-    (fn [data component-id container-id ui]
-      [:> ResponsiveContainer
-       [:> RadialBarChart {:innerRadius "10%"
-                           :outerRadius "80%"
-                           :data        @data
-                           :startAngle  180
-                           :endAngle    0}
-
-        ;(utils/non-gridded-chart-components component-id ui)
-
-        (when @radial-uv? [:> RadialBar {:minAngle   15
-                                         :label      {:fill "#666", :position "insideStart"}
-                                         :background {:clockWise true}
-                                         :dataKey    :uv}])
-        [:> Legend {:iconSize 10 :width 120 :height 140 :layout "vertical" :verticalAlign "middle" :align "right"}]
-        [:> Tooltip]]])))
+(defn- make-cell [name idx subscriptions]
+  [:> Cell {:key  (str name) ;(ui-utils/resolve-sub subscriptions [:value :chosen]) "-" idx)
+            :fill (or (ui-utils/resolve-sub subscriptions [name :color])
+                    (color/get-color 0))}])
 
 
-(defn configurable-component
-  "the chart to draw, taking cues from the settings of the configuration panel
+(defn- make-radial-bar-display [data subscriptions isAnimationActive?]
+  ;(log/info "make-radial-bar-display: " data "//" subscriptions)
 
-  ---
+  (let [ret (->> data
+              (map-indexed (fn [idx {:keys [name]}]
+                             (log/info "make-radial-bar-display (name)" name)
+                             (if (ui-utils/resolve-sub subscriptions [name :include])
+                               (make-cell name idx subscriptions)
+                               [])))
+              (remove empty?)
+              (into [:<>]))]
+    ;(log/info "make-radial-bar-display (ret)" ret)
 
-  - data : (atom) any data shown by the component's ui
-  - :component-id : (string) name of this chart\n  - container-id : (string) name of the container this chart is inside of
-  "
-  [& {:keys [data component-id container-id ui]}]
-  [c/base-chart
+    ret))
+
+
+(defn- included-cells [data subscriptions]
+  (->> data
+    (filter (fn [{:keys [name]}] (ui-utils/resolve-sub subscriptions [name :include])))
+    (into [])))
+
+
+(defn- custom-tooltip [tooltip-map]
+  ;(log/info "custom-tooltip" (js->clj x))
+  (let [{:keys [payload]} (js->clj tooltip-map :keywordize-keys true)
+        [p _] payload
+        p-p (:payload p)
+        dataKey (:dataKey p)
+        name (:name p-p)
+        data (get p-p (keyword dataKey))]
+
+    (r/as-element
+      [rc/v-box
+       :style {:background "rgba(255, 255, 255, 0.8)"
+               :border     "1px solid" :border-radius "3px"
+               :box-shadow "5px 5px 5px 2px"
+               :margin     "5px" :padding "5px"}
+       :gap "2px"
+       :children [[:p.has-text-centered.has-text-weight-bold (str name)]
+                  [rc/line :size "1px"]
+                  [:p.has-text-centered (str dataKey " : " data)]]])))
+
+
+(defn- component* [& {:keys [data component-id container-id
+                             subscriptions isAnimationActive?]
+                      :as   params}]
+  (let [d        (if (empty? data) [] (get data :data))
+        included (included-cells d subscriptions)]
+
+    (log/info "radial component* data: " d "//" included)
+
+    [:> ResponsiveContainer
+     [:> RadialBarChart {:innerRadius "10%"
+                         :outerRadius "80%"
+                         :data        included
+                         :startAngle  180
+                         :endAngle    0}
+
+      [:> RadialBar {:minAngle   15
+                     :background {:clockWise true}
+                     :dataKey    (ui-utils/resolve-sub subscriptions [:value :chosen])}
+       (make-radial-bar-display included subscriptions isAnimationActive?)]
+
+      [:> Legend] ;{:iconSize 10 :width 120 :height 140 :layout "horizontal" :verticalAlign "bottom" :align "middle"}]
+      [:> Tooltip {:content custom-tooltip}]]]))
+
+
+(defn component [& {:keys [data config-data component-id container-id
+                           data-panel config-panel] :as params}]
+
+  [wrapper/base-chart
    :data data
-   :config (config component-id data)
+   :config-data config-data
    :component-id component-id
-   :container-id (or container-id "")
-   :data-panel utils/tabular-data-panel
+   :container-id container-id
+   :component* component*
+   :component-panel wrapper/component-panel
+   :data-panel data-panel
    :config-panel config-panel
-   :component-panel component-panel
-   :ui ui])
+   :config config
+   :local-config local-config])
 
 
-(defn component
-  "the chart to draw. this variant does NOT provide a configuration panel
 
-  ---
-
-  - :data : (atom) any data shown by the component's ui
-  - :component-id : (string) name of this chart
-  - :container-id : (string) name of the container this chart is inside of
-  "
-  [& {:keys [data component-id container-id ui]}]
-  [c/base-chart
-   :data data
-   :config (config component-id data)
-   :component-id component-id
-   :container-id (or container-id "")
-   :component-panel component-panel
-   :ui ui])
+(def meta-data {:rechart/radial-bar-2 {:component component
+                                       :ports     {:data   :port/sink
+                                                   :config :port/sink}}})
 
 
-(def meta-data {:component              component
-                :configurable-component configurable-component
-                :sources                {:data :source-type/meta-tabular}
-                :pubs                   []
-                :subs                   []})
+(comment
+
+  (def data example-data/meta-tabular-data)
+
+  (:data data)
+  (->> data
+    :data
+    (map (juxt :name :uv))
+    (map (fn [[k v]] {:name k :uv v})))
+  (config "comp-id" data)
+
+
+  ;{[:tv :fill] #object[reagent.ratom.Reaction {:val "#82ca9d"}],
+  ; [:uv :fill] #object[reagent.ratom.Reaction {:val "#8884d8"}],
+  ; [:pv] #object[reagent.ratom.Reaction {:val {:include false, :fill "#ffc107", :stackId ""}}],
+  ; [:pv :stackId] #object[reagent.ratom.Reaction {:val ""}],
+  ; [:tv] #object[reagent.ratom.Reaction {:val {:include false, :fill "#82ca9d", :stackId ""}}],
+  ; [:amt :stackId] #object[reagent.ratom.Reaction {:val ""}],
+  ; [:pv :include] #object[reagent.ratom.Reaction {:val nil}],
+  ; [:amt :fill] #object[reagent.ratom.Reaction {:val "#ff00ff"}],
+  ; [:uv :include] #object[reagent.ratom.Reaction {:val true}],
+  ; [:brush] #object[reagent.ratom.Reaction {:val nil}],
+  ; [:tv :include] #object[reagent.ratom.Reaction {:val nil}],
+  ; [:amt] #object[reagent.ratom.Reaction {:val {:include false, :fill "#ff00ff", :stackId ""}}],
+  ; [:pv :fill] #object[reagent.ratom.Reaction {:val "#ffc107"}],
+  ; [:uv :stackId] #object[reagent.ratom.Reaction {:val ""}],
+  ; [:tv :stackId] #object[reagent.ratom.Reaction {:val ""}],
+  ; [:uv] #object[reagent.ratom.Reaction {:val {:include true, :fill "#8884d8", :stackId ""}}],
+  ; [:amt :include] #object[reagent.ratom.Reaction {:val nil}]}
+
+
+  ())
 

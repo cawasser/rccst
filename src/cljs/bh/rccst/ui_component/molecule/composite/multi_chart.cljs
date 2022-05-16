@@ -1,5 +1,5 @@
 (ns bh.rccst.ui-component.molecule.composite.multi-chart
-  (:require [bh.rccst.ui-component.atom.chart.bar-chart-2 :as chart]
+  (:require [bh.rccst.ui-component.atom.chart.bar-chart :as chart]
             [bh.rccst.ui-component.atom.chart.utils :as utils]
             [bh.rccst.ui-component.utils :as ui-utils]
             [bh.rccst.ui-component.utils.color :as color]

@@ -1,5 +1,5 @@
 (ns bh.rccst.views.atom.example.chart.radial-bar-chart
-  (:require [bh.rccst.ui-component.atom.chart.radial-bar-chart-2 :as chart]
+  (:require [bh.rccst.ui-component.atom.chart.radial-bar-chart :as chart]
             [bh.rccst.ui-component.atom.chart.utils :as chart-utils]
             [bh.rccst.views.atom.example.chart.alt.data-ratom-example :as data-ratom-example]
             [bh.rccst.views.atom.example.chart.alt.data-structure-example :as data-structure-example]

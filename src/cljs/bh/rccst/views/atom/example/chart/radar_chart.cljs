@@ -5,7 +5,7 @@
             [taoensso.timbre :as log]))
 
 
-(defn example []
+(defn example* []
   (let [container-id "radar-chart-demo"]
     [example/component-example
      :title "Radar Chart"
@@ -16,3 +16,7 @@
      :component-id (utils/path->keyword container-id "radar-chart")
      :source-code chart/source-code]))
 
+
+(defn examples []
+  [:div
+   [example*]])

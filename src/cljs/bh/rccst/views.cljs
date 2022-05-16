@@ -7,6 +7,7 @@
             [bh.rccst.views.giants :as giants]
 
             [bh.rccst.views.molecules :as molecules]
+            [bh.rccst.views.organisms :as organisms]
             [bh.rccst.views.technologies :as tech]
             [bh.rccst.views.templates :as templates]
             [bh.rccst.views.welcome :as welcome]
@@ -21,6 +22,7 @@
                   [:app-bar/tech "Technologies"]
                   [:app-bar/atoms "'Atoms'"]
                   [:app-bar/molecules "'Molecules'"]
+                  [:app-bar/organisms "'Organisms'"]
                   [:app-bar/templates "'Templates'"]
                   [:app-bar/giants "'Giants'"]])
 
@@ -60,6 +62,9 @@
 
          [tab-panel/sub-panel {:extra-classes :is-fluid :panel-id :app-bar/molecules}
           [molecules/page]]
+
+         [tab-panel/sub-panel {:extra-classes :is-fluid :panel-id :app-bar/organisms}
+          [organisms/page]]
 
          [tab-panel/sub-panel {:extra-classes :is-fluid :panel-id :app-bar/templates}
           [templates/page]]

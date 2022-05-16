@@ -2,7 +2,8 @@
   (:require [bh.rccst.ui-component.atom.card.flippable-card :as card]
             [bh.rccst.ui-component.atom.chart.area-chart :as area-chart]
             [bh.rccst.ui-component.atom.chart.bar-chart :as bar-chart]
-            [bh.rccst.ui-component.atom.chart.colored-pie-chart :as pie-chart]
+            [bh.rccst.ui-component.atom.chart.colored-pie-chart :as colored-pie-chart]
+            [bh.rccst.ui-component.atom.chart.pie-chart :as pie-chart]
             [bh.rccst.ui-component.atom.chart.line-chart :as line-chart]
             [bh.rccst.ui-component.utils :as ui-utils]
             [reagent.core :as r]
@@ -18,7 +19,7 @@
                     :el-type   :node
                     :type      "globe"
                     :data      {:label "viirs-5"
-                                :chart pie-chart/component
+                                :chart colored-pie-chart/component
                                 :ui    {:legend false :tooltip false :label false}}
                     :draggable false
                     :position  (diagram-cell 0 1)}
@@ -27,7 +28,7 @@
                     :el-type   :node
                     :type      "globe"
                     :data      {:label "abi-meso-11"
-                                :chart pie-chart/component
+                                :chart colored-pie-chart/component
                                 :ui    {:legend false :tooltip false :label false}}
                     :draggable false
                     :position  (diagram-cell 0 0)}
@@ -106,8 +107,8 @@
                    "Wallops"           bar-chart/sample-data
                    "Svalbaard/McMurdo" bar-chart/sample-data
                    "NSOF Suitland"     line-chart/sample-data
-                   "viirs-5"           pie-chart/sample-data
-                   "abi-meso-11"       pie-chart/sample-data})
+                   "viirs-5"           colored-pie-chart/sample-data
+                   "abi-meso-11"       colored-pie-chart/sample-data})
 
 
 (def source-code '[:> ReactFlowProvider

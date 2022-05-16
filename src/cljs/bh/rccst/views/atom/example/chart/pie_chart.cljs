@@ -1,18 +1,18 @@
 (ns bh.rccst.views.atom.example.chart.pie-chart
-  (:require [bh.rccst.ui-component.atom.chart.pie-chart-2 :as chart]
+  (:require [bh.rccst.ui-component.atom.chart.pie-chart :as chart]
             [bh.rccst.ui-component.atom.chart.utils :as chart-utils]
-            [bh.rccst.views.atom.example.chart.alt.data-ratom-example :as data-ratom-example]
-            [bh.rccst.views.atom.example.chart.alt.data-structure-example :as data-structure-example]
-            [bh.rccst.views.atom.example.chart.alt.data-sub-example :as data-sub-example]
             [bh.rccst.views.atom.example.chart.alt.config-ratom-example :as config-ratom-example]
             [bh.rccst.views.atom.example.chart.alt.config-structure-example :as config-structure-example]
             [bh.rccst.views.atom.example.chart.alt.config-sub-example :as config-sub-example]
-            [bh.rccst.views.atom.example.chart.alt.data-tools :as data-tools]
-            [bh.rccst.views.atom.example.chart.alt.config-tools :as config-tools]))
+            [bh.rccst.views.atom.example.chart.alt.config-tools :as config-tools]
+            [bh.rccst.views.atom.example.chart.alt.data-ratom-example :as data-ratom-example]
+            [bh.rccst.views.atom.example.chart.alt.data-structure-example :as data-structure-example]
+            [bh.rccst.views.atom.example.chart.alt.data-sub-example :as data-sub-example]
+            [bh.rccst.views.atom.example.chart.alt.data-tools :as data-tools]))
 
 
-(def default-config-data {:name [:Page-A :Page-B :Page-C :Page-D :Page-E :Page-F :Page-G]
-                          :fill "#8e81ce"
+(def default-config-data {:name  {:keys [:Page-A :Page-B :Page-C :Page-D :Page-E :Page-F :Page-G]}
+                          :fill "#938ae5"
                           :value {:keys [:uv :pv :tv :amt] :chosen :uv}})
 
 
@@ -32,7 +32,6 @@
    :component chart/component
    :data-panel chart-utils/meta-tabular-data-panel
    :config-panel chart/config-panel])
-
 
 (defn- data-structure []
   [data-structure-example/example
