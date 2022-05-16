@@ -1,5 +1,5 @@
 (ns bh.rccst.views.atom.example.chart.area-chart
-  (:require [bh.rccst.ui-component.atom.chart.area-chart-2 :as chart]
+  (:require [bh.rccst.ui-component.atom.chart.area-chart :as chart]
             [bh.rccst.ui-component.atom.chart.utils :as chart-utils]
             [bh.rccst.views.atom.example.chart.alt.data-tools :as data-tools]
             [bh.rccst.views.atom.example.chart.alt.config-tools :as config-tools]

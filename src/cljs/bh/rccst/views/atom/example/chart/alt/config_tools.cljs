@@ -116,7 +116,7 @@
               [rc/button :on-click #(reset! config-data default-config-data) :label "Default"]
               [rc/button :on-click #(swap! config-data update-in [:Page-A :include] not) :label "! Page A"]
               [rc/button :on-click #(swap! config-data update-in [:Page-C :include] not) :label "! Page C"]
-              [chart-utils/color-config config-data "Pie Color" [:name :color] :above-center]
+              [chart-utils/color-config config-data "Pie Color" [:fill] :above-center]
               [rc/button :on-click #(swap! config-data assoc-in [:value :chosen] :uv) :label ":uv"]
               [rc/button :on-click #(swap! config-data assoc-in [:value :chosen] :tv) :label ":tv"]
               [rc/button :on-click #(swap! config-data assoc-in [:value :chosen] :amt) :label ":amt"]]])
@@ -137,7 +137,7 @@
                   [rc/button :on-click #(h/handle-change-path config-data [] default-config-data) :label "Default"]
                   [rc/button :on-click #(h/handle-change-path config-data [:Page-A :include] (not @page-a)) :label "! Page A"]
                   [rc/button :on-click #(h/handle-change-path config-data [:Page-C :include] (not @page-c)) :label "! Page C"]
-                  [chart-utils/color-config config-data "Pie Color" [:name :color] :above-center]
+                  [chart-utils/color-config config-data "Pie Color" [:fill] :above-center]
                   [rc/button :on-click #(h/handle-change-path config-data [:value :chosen] :uv) :label ":uv"]
                   [rc/button :on-click #(h/handle-change-path config-data [:value :chosen] :tv) :label ":tv"]
                   [rc/button :on-click #(h/handle-change-path config-data [:value :chosen] :amt) :label ":amt"]]])))

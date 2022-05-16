@@ -22,7 +22,7 @@
            :box-shadow "5px 5px 5px 2px"
            :margin     "5px" :padding "5px"}
    :children [[:label.h5 "Input Data:"]
-              [rc/button :on-click #(reset! data []) :label "Empty"]
+              [rc/button :on-click (rc/handler-fn (reset! data [])) :label "Empty"]
               [rc/button :on-click #(reset! data table/sample-meta-data) :label "Default"]
               [rc/button :on-click #(swap! data assoc-in [:data 0 :uv] 10000) :label "A -> 10,000"]
               [rc/button :on-click #(swap! data assoc :data (conj (:data @data)

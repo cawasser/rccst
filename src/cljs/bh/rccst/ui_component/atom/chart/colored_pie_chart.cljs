@@ -1,25 +1,26 @@
 (ns bh.rccst.ui-component.atom.chart.colored-pie-chart
   (:require [bh.rccst.ui-component.atom.chart.utils :as utils]
-            [bh.rccst.ui-component.utils.example-data :as data]
-            [bh.rccst.ui-component.atom.chart.wrapper :as c]
             [bh.rccst.ui-component.utils :as ui-utils]
             [bh.rccst.ui-component.utils.color :as color]
+            [bh.rccst.ui-component.utils.example-data :as example-data]
+            [bh.rccst.ui-component.atom.chart.wrapper-2 :as wrapper]
             [re-com.core :as rc]
             [reagent.core :as r]
             [taoensso.timbre :as log]
-
-            ["recharts" :refer [ResponsiveContainer PieChart Pie Cell]]))
-
-
-(log/info "bh.rccst.ui-component.atom.chart.colored-pie-chart")
+            ["recharts" :refer [ResponsiveContainer PieChart Pie Cell Tooltip Legend]]))
 
 
-(def sample-data
-  "the Pie Chart works best with \"paired data\" so we return the paired-data from utils"
-  (r/atom data/meta-tabular-data))
+(log/info "bh.rccst.views.atom.example.chart.bar-chart-2")
+
+
+(def source-code '[])
+(def sample-data example-data/meta-tabular-data)
 
 
 (defn local-config [data]
+
+  ;(log/info "local-config" @data)
+
   (let [d      (get @data :data)
         fields (get-in @data [:metadata :fields])]
 
@@ -34,11 +35,12 @@
       ; process :name to map up the :colors
       (->> d
         (map-indexed (fn [idx entry]
+                       ;(log/info "local-config (:color loop)" entry)
                        {(ui-utils/path->keyword (:name entry))
                         {:name  (:name entry)
+                         :include true
                          :color (nth (cycle color/default-stroke-fill-colors) idx)}}))
-        (into {})
-        (assoc {} :colors))
+        (into {}))
 
       ; process options for :value
       (->> fields
@@ -48,25 +50,7 @@
            {:value {:keys m :chosen (first m)}}))))))
 
 
-(defn config
-  "constructs the configuration panel for the chart's configurable properties. This is specific to
-  this being a pie-chart component (see [[local-config]]).
-
-  Merges together the configuration needed for:
-
-  1. pie charts
-  2. pub/sub between components of a container
-  3. `default-config` for all Rechart-based types
-  4. the `tab-panel` for view/edit configuration properties and data
-  5. sets properties of the default-config (local config properties are just set inside [[local-config]])
-  6. sets meta-data for properties this component publishes (`:pub`) or subscribes (`:sub`)
-
-  ---
-
-  - component-id : (string) unique id of the chart
-  - data : (atom) metadata wrapped data to display
-  "
-  [component-id data]
+(defn config [component-id data]
   (merge
     ui-utils/default-pub-sub
     utils/default-config
@@ -74,36 +58,24 @@
     (local-config data)))
 
 
-(defn- color-anchors
-  "build the config ui-components needed for each of the pie slices
-  "
-  [component-id]
-  [:<>
-   (doall
-     (map (fn [[id color-data]]
-            (let [text  (:name color-data)]
-              ^{:key id} [utils/color-config-text component-id text [:colors id :color] :right-above]))
-       @(ui-utils/subscribe-local component-id [:colors])))])
+(defn- cell-config [component-id label path position]
+  (let [p (ui-utils/path->keyword path)]
+    ;(log/info "cell-config" component-id "//" label "//" p)
+    [rc/h-box
+     :gap "5px"
+     :children [[utils/boolean-config component-id "" (conj [p] :include)]
+                [utils/color-config-text component-id label (conj [p] :color) :right-above]]]))
 
 
-(defn- config-panel
-  "constructs the configuration panel for the chart's configurable properties. This is specific to
-  this being a colored-pie-chart component (see [[local-config]]).
+(defn- make-cell-config [component-id data]
+  (->> (:data @data)
+    (map-indexed (fn [idx {:keys [name] :as item}]
+                   [cell-config component-id name [name] :above-right]))
+    (into [:<>])))
 
-  Merges together the configuration needed for:
 
-  1. colored pie charts
-  2. pub/sub between components of a container
-  3. `default-config` for all Rechart-based types
-  4. the `tab-panel` for view/edit configuration properties and data
-  5. sets properties of the default-config (local config properties are just set inside [[local-config]])
-  6. sets meta-data for properties this component publishes (`:pub`) or subscribes (`:sub`)
-
-  ---
-
-  - component-id : (string) unique id of the chart
-  "
-  [_ component-id]
+(defn config-panel [data component-id]
+  ;(log/info "config-panel" component-id "//" @data)
 
   [rc/v-box :src (rc/at)
    :gap "10px"
@@ -111,129 +83,109 @@
    :style {:padding          "15px"
            :border-top       "1px solid #DDD"
            :background-color "#f7f7f7"}
-   :children [[utils/non-gridded-chart-config component-id]
+   :children [[utils/non-gridded-chart-config @data component-id]
               [rc/line :src (rc/at) :size "2px"]
               [utils/option component-id ":name" [:name]]
               [rc/line :src (rc/at) :size "2px"]
-              [utils/option component-id ":value" [:value]]
+              [utils/column-picker data component-id ":value" [:value :chosen]]
               [rc/v-box :src (rc/at)
                :gap "5px"
                :children [[rc/label :src (rc/at) :label "Pie Colors"]
-                          (color-anchors component-id)]]]])
+                          (make-cell-config component-id data)]]]])
 
 
-(def source-code '[:> PieChart {:width 400 :height 400}
-                   [:> Tooltip]
-                   [:> Legend]
-                   [:> Pie {:dataKey "value" :data @data}]])
+(defn- make-cells [data subscriptions]
+  ;(log/info "make-cells" data
+  ;  "// (subscriptions)" subscriptions)
+
+  (let [ret (->> data
+              (map-indexed (fn [idx {:keys [name]}]
+                             (if (ui-utils/resolve-sub subscriptions [name :include])
+                               (do
+                                 [:> Cell {:key  (str "cell-" idx)
+                                           :fill (or (ui-utils/resolve-sub subscriptions [name :color])
+                                                   (color/get-color 0))}])
+                               [])))
+              (remove empty?)
+              (into [:<>]))]
+    ;(log/info "ret" ret)
+
+    ret))
 
 
-(defn- component-panel
-  "the chart to draw, taking cues from the settings of the configuration panel
-
-  ---
-
-  - data : (atom) any data used by the component's ui
-  - component-id : (string) unique identifier for this specific widget instance
-  "
-  [data component-id container-id ui]
-  (let [isAnimationActive? (ui-utils/subscribe-local component-id [:isAnimationActive])
-        subscriptions      (ui-utils/build-subs component-id (local-config data))]
-
-    (fn [data component-id container-id ui]
-
-      ;(log/info "colored-pie-chart" component-id "///" ui)
-
-      [:> ResponsiveContainer
-       [:> PieChart {:label true} (utils/override true ui :label)
-
-        (utils/non-gridded-chart-components component-id ui)
-
-        [:> Pie {:dataKey           (ui-utils/resolve-sub subscriptions [:value :chosen])
-                 :nameKey           (ui-utils/resolve-sub subscriptions [:name :chosen])
-                 :data              (get @data :data)
-                 :label             (utils/override true ui :label)
-                 :isAnimationActive @isAnimationActive?}
-         (doall
-           (map-indexed
-             (fn [idx {name :name}]
-               ^{:key (str idx name)}
-               [:> Cell {:key  (str "cell-" idx)
-                         :fill (or (:color (ui-utils/resolve-sub subscriptions [:colors name]))
-                                 (color/get-color 0))}])
-             (get @data :data)))]]])))
+(defn- included-cells [data subscriptions]
+  (->> data
+    (filter (fn [{:keys [name]}] (ui-utils/resolve-sub subscriptions [name :include])))
+    (into [])))
 
 
-(comment
-  (def ui '({:legend false :tooltip false :label false}))
+(defn- custom-tooltip [tooltip-map]
+  ;(log/info "custom-tooltip" (js->clj x))
+  (let [{:keys [payload]} (js->clj tooltip-map :keywordize-keys true)
+        [p _] payload
+        p-p (:payload p)
+        dataKey (:dataKey p)
+        name (:name p-p)
+        data (get p-p (keyword dataKey))]
 
-  ())
+    (r/as-element
+      [rc/v-box
+       :style {:background "rgba(255, 255, 255, 0.8)"
+               :border     "1px solid" :border-radius "3px"
+               :box-shadow "5px 5px 5px 2px"
+               :margin     "5px" :padding "5px"}
+       :gap "2px"
+       :children [[:p.has-text-centered.has-text-weight-bold (str name)]
+                  [rc/line :size "1px"]
+                  [:p.has-text-centered (str dataKey " : " data)]]])))
 
 
-(defn configurable-component
-  "the chart to draw, taking cues from the settings of the configuration panel
+(defn- component* [& {:keys [data component-id container-id
+                             subscriptions isAnimationActive?]
+                      :as params}]
 
-  the component creates its own ID (a random-uuid) to hold the local state. This way multiple charts
-  can be placed inside the same outer container/composite
 
-  ---
+  (let [d (if (empty? data) [] (get data :data))
+        included (included-cells d subscriptions)]
 
-  - :data : (atom) any data shown by the component's ui
-  - :component-id : (string) name of the component itself
-  - :container-id : (string) name of the container this chart is inside of
-  "
-  [& {:keys [data component-id container-id ui]}]
-  [c/base-chart
+    ;(log/info "colored-pie-chart" component-id
+      ;"//" data "//" d
+      ;"//" included
+
+    [:> ResponsiveContainer
+     [:> PieChart {:label true} (utils/override true {} :label)
+
+      [:> Pie {:dataKey           (ui-utils/resolve-sub subscriptions [:value :chosen])
+               :nameKey           (ui-utils/resolve-sub subscriptions [:name :chosen])
+               :data              included
+               :label             (utils/override true {} :label)
+               :isAnimationActive @isAnimationActive?}
+       (make-cells d subscriptions)]
+      [:> Legend] ;{:iconSize 10 :width 120 :height 140 :layout "horizontal" :verticalAlign "bottom" :align "middle"}]
+      [:> Tooltip {:content custom-tooltip}]]]))
+
+
+
+(defn component [& {:keys [data config-data component-id container-id
+                           data-panel config-panel] :as params}]
+
+  ;(log/info "component-2" params)
+
+  [wrapper/base-chart
    :data data
-   :config (config component-id data)
+   :config-data config-data
    :component-id component-id
-   :container-id (or container-id "")
-   :data-panel utils/meta-tabular-data-panel
+   :container-id container-id
+   :component* component*
+   :component-panel wrapper/component-panel
+   :data-panel data-panel
    :config-panel config-panel
-   :component-panel component-panel
-   :ui ui])
+   :config config
+   :local-config local-config])
 
 
-(defn component
-  "the chart to draw. this variant does NOT provide a configuration panel
-
-  the component creates its own ID (a random-uuid) to hold the local state. This way multiple charts
-  can be placed inside the same outer container/composite
-
-  ---
-
-  - data : (atom) any data shown by the component's ui
-  - container-id : (string) name of the container this chart is inside of
-  "
-  [& {:keys [data component-id container-id ui]}]
-  [c/base-chart
-   :data data
-   :config (config component-id data)
-   :component-id component-id
-   :container-id (or container-id "")
-   :component-panel component-panel
-   :ui ui])
-
-
-(def meta-data {:component              component
-                :configurable-component configurable-component
-                :sources                {:data :source-type/meta-tabular}
-                :pubs                   []
-                :subs                   []})
-
-
-
-(comment
-  (do
-    (def data sample-data)
-    (def component-id "colored-pie-chart-demo/colored-pie-chart")
-    (def subscriptions (ui-utils/build-subs component-id (local-config data))))
-
-  (ui-utils/resolve-sub subscriptions [:colors])
-  (:color (ui-utils/resolve-sub subscriptions [:colors "Page A"]))
-
-  (ui-utils/resolve-sub subscriptions [:colors "Page-A"])
-  (ui-utils/resolve-sub subscriptions [:colors :Page-A])
-
-  ())
+(def meta-data {:rechart/colored-pie-2 {:component component
+                                        ;:configurable-component configurable-component
+                                        :ports     {:data   :port/sink
+                                                    :config :port/sink}}})
 

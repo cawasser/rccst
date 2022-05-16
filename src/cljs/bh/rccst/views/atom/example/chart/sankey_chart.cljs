@@ -5,7 +5,7 @@
             [taoensso.timbre :as log]))
 
 
-(defn example []
+(defn example* []
   (let [container-id "sankey-chart-demo"]
     [example/component-example
      :title "Sankey Chart"
@@ -20,4 +20,10 @@
      :component chart/configurable-component
      :component-id (utils/path->keyword container-id "sankey-chart")
      :source-code chart/source-code]))
+
+
+
+(defn examples []
+  [:div
+   [example*]])
 

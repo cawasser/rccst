@@ -1,84 +1,46 @@
 (ns bh.rccst.ui-component.atom.chart.line-chart
   (:require [bh.rccst.ui-component.atom.chart.utils :as utils]
-            [bh.rccst.ui-component.utils.color :as color]
-            [bh.rccst.ui-component.utils.example-data :as data]
-            [bh.rccst.ui-component.atom.chart.wrapper :as c]
+            [bh.rccst.ui-component.atom.re-com.configure-toggle :as ct]
             [bh.rccst.ui-component.utils :as ui-utils]
-            ["recharts" :refer [ResponsiveContainer LineChart Line Brush]]
+            [bh.rccst.ui-component.utils.color :as color]
+            [bh.rccst.ui-component.utils.example-data :as example-data]
+            [bh.rccst.ui-component.utils.helpers :as h]
+            [bh.rccst.ui-component.utils.locals :as l]
+            [bh.rccst.ui-component.atom.chart.wrapper-2 :as wrapper]
             [re-com.core :as rc]
             [reagent.core :as r]
-            [taoensso.timbre :as log]))
+            [taoensso.timbre :as log]
+            [woolybear.ad.layout :as layout]
+            ["recharts" :refer [ResponsiveContainer LineChart Line Brush]]))
 
 
-(log/info "bh.rccst.ui-component.atom.chart.line-chart")
+(def source-code '[])
+(def sample-data example-data/meta-tabular-data)
 
 
-(def sample-data
-  "the Line Chart works best with \"tabular data\" so we return the tabular-data from utils"
-  (r/atom data/meta-tabular-data))
-
-
-(defn local-config
-  "provides both the definition and the initial default values for various properties that
-  allow user to customize the visualization of the chart.
-
-  ---
-
-   - data : (atom) atom containing the data and metadata for this chart
-
-> See Also:
->
-> [Recharts/line-chart](https://recharts.org/en-US/api/LineChart)
-> [tabular-data]()
-  "
-  [data]
+(defn local-config [data]
   (merge
     {:brush false}
     (->> (get-in @data [:metadata :fields])
-      (filter (fn [[k v]] (= :number v)))
-      keys
-      (map-indexed (fn [idx a]
-                     ;(log/info "line color" idx a (ui-utils/get-color idx))
-                     {a {:include true
-                         :stroke  (color/get-color idx)
-                         :fill    (color/get-color idx)}}))
-      (into {}))))
+         (filter (fn [[k v]] (= :number v)))
+         keys
+         (map-indexed (fn [idx a]
+                        ;(log/info "line color" idx a (ui-utils/get-color idx))
+                        {a {:include true
+                            :stroke  (color/get-color idx)
+                            :fill    (color/get-color idx)}}))
+         (into {}))))
 
 
-(defn- config
-  "constructs the configuration panel for the chart's configurable properties. This is specific to
-  this being a line-chart component (see [[local-config]]).
-
-  Merges together the configuration needed for:
-
-  1. line charts
-  2. pub/sub between components of a container
-  3. `default-config` for all Rechart-based types
-  4. the `tab-panel` for view/edit configuration properties and data
-  5. sets properties of the default-config (local config properties are just set inside [[local-config]])
-  6. sets meta-data for properties this component publishes (`:pub`) or subscribes (`:sub`)
-
-  ---
-
-  - component-id : (string) unique id of the chart
-  - data : (atom) data and meta-data for the chart
-  "
-  [component-id data]
+(defn- config [component-id data]
   (-> ui-utils/default-pub-sub
-    (merge
-      utils/default-config
-      {:type      "line-chart"
-       :tab-panel {:value     (keyword component-id "config")
-                   :data-path [:containers (keyword component-id) :tab-panel]}}
-      (local-config data))
-    (assoc-in [:x-axis :dataKey] (get-in @data [:metadata :id]))
-    (assoc-in [:pub] :name)
-    ;; TODO: this should be produced by a function that processes the data
-    ;; or passed in?
-    ;; or looked up from metadata?
-    (assoc-in [:sub] [[:brush]
-                      [:uv :include] [:uv :stroke] [:uv :fill]
-                      [:pv :include] [:pv :stroke] [:pv :fill]])))
+      (merge
+        utils/default-config
+        {:type      "line-chart"
+         :tab-panel {:value     (keyword component-id "config")
+                     :data-path [:containers (keyword component-id) :tab-panel]}}
+        (local-config data))
+      (assoc-in [:x-axis :dataKey] (get-in @data [:metadata :id]))))
 
 
 (defn- line-config [component-id label path position]
@@ -93,24 +55,16 @@
 
 (defn- make-line-config [component-id data]
   (->> (get-in @data [:metadata :fields])
-    (filter (fn [[k v]] (= :number v)))
-    keys
-    (map-indexed (fn [idx a]
-                   [line-config component-id a [a] :above-right]))
-    (into [])))
+       (filter (fn [[k v]] (= :number v)))
+       keys
+       (map-indexed (fn [idx a]
+                      [line-config component-id a [a] :above-right]))
+       (into [])))
 
 
-(defn- config-panel
-  "the panel of configuration controls
+(defn config-panel [data component-id]
 
-  ---
-
-  - data : (atom) data to display (may be used by the standard configuration components for thins like axes, etc.
-  - component-id : (string) unique identifier for this chart instance
-  "
-  [data component-id]
-
-  ;(log/info "config-panel" @data component-id)
+  ;(log/info "config-panel" data component-id)
 
   [rc/v-box :src (rc/at)
    :gap "10px"
@@ -128,201 +82,58 @@
 
 
 (defn- make-line-display [component-id data subscriptions isAnimationActive?]
-  (->> (get-in @data [:metadata :fields])
-    (filter (fn [[_ v]] (= :number v)))
-    keys
-    (map (fn [a]
-           (if (ui-utils/resolve-sub subscriptions [a :include])
-             [:> Line {:type              "monotone" :dataKey a
-                       :isAnimationActive @isAnimationActive?
-                       :stroke            (ui-utils/resolve-sub subscriptions [a :stroke])
-                       :fill              (ui-utils/resolve-sub subscriptions [a :fill])}]
-             [])))
-    (remove empty?)
-    (into [:<>])))
+
+  ;(log/info "make-line-display" data)
+  (->> (get-in data [:metadata :fields])
+       (filter (fn [[_ v]] (= :number v)))
+       keys
+       (map (fn [a]
+              (if (ui-utils/resolve-sub subscriptions [a :include])
+                [:> Line {:type              "monotone" :dataKey a
+                          :isAnimationActive @isAnimationActive?
+                          :stroke            (ui-utils/resolve-sub subscriptions [a :stroke])
+                          :fill              (ui-utils/resolve-sub subscriptions [a :fill])}]
+                [])))
+       (remove empty?)
+       (into [:<>])))
 
 
-(defn- component-panel
-  "the chart to draw, taking cues from the settings of the configuration panel
+(defn- component* [& {:keys [data component-id container-id
+                             subscriptions isAnimationActive?]
+                      :as   params}]
 
-  the component creates its own ID (a random-uuid) to hold the local state. This way multiple charts
-  can be placed inside the same outer container/composite
+  (let [d (if (empty? data) [] (get data :data))]
 
-  ---
+    ;(log/info "component*" data "//" d)
+    [:> ResponsiveContainer
+     [:> LineChart {:data d}
 
-  - data : (atom) any data shown by the component's ui
-  - component-id : (string) unique identifier for this chart instance within this container
-  - container-id : (string) name of the container this chart is inside of
-  "
-  [data component-id container-id ui]
+      (utils/standard-chart-components component-id {})
 
-  ;(log/info "component-panel" component-id "///" @(ui-utils/subscribe-local component-id [:container]))
+      (when (ui-utils/resolve-sub subscriptions [:brush]) [:> Brush])
 
-  (let [container          @(ui-utils/subscribe-local component-id [:container])
-        isAnimationActive? (ui-utils/subscribe-local component-id [:isAnimationActive])
-        override-subs      @(ui-utils/subscribe-local component-id [:sub])
-        local-subs         (ui-utils/build-subs component-id (local-config data))
-        subscriptions      (ui-utils/override-subs container-id local-subs override-subs)]
-
-    (fn [data component-id container-id ui]
-      [:> ResponsiveContainer
-       [:> LineChart {:width 400 :height 400 :data (get @data :data)}
-
-        (utils/standard-chart-components component-id ui)
-
-        (when (ui-utils/resolve-sub subscriptions [:brush]) [:> Brush])
-
-        (make-line-display component-id data subscriptions isAnimationActive?)]])))
+      (make-line-display component-id data subscriptions isAnimationActive?)]]))
 
 
-(def source-code '[:> LineChart {:width 400 :height 400 :data @data}])
+(defn component [& {:keys [data config-data component-id container-id
+                           data-panel config-panel] :as params}]
 
+  ;(log/info "component-2" params)
 
-(defn configurable-component
-  "the chart to draw, taking cues from the settings of the configuration panel
-
-  ---
-
-  - :data : (atom) any data shown by the component's ui
-  - :component-id : (string) name of this component\n
-  - :container-id : (string) name of the container this chart is inside of
-  "
-  [& {:keys [data component-id container-id ui]}]
-  [c/base-chart
+  [wrapper/base-chart
    :data data
-   :config (config component-id data)
+   :config-data config-data
    :component-id component-id
-   :container-id (or container-id "")
-   :data-panel utils/meta-tabular-data-panel
+   :container-id container-id
+   :component* component*
+   :component-panel wrapper/component-panel
+   :data-panel data-panel
    :config-panel config-panel
-   :component-panel component-panel
-   :ui ui])
+   :config config
+   :local-config local-config])
 
 
-(defn component
-  "the chart to draw. this variant does NOT provide a configuration panel
-
-  ---
-
-  - :data : (atom) any data shown by the component's ui
-  - :component-id : (string) name of this component
-  - :container-id : (string) name of the container this chart is inside of
-  "
-  [& {:keys [data component-id container-id ui]}]
-  ;(log/info "line-chart component" container-id)
-  [c/base-chart
-   :data data
-   :config (config component-id data)
-   :component-id component-id
-   :container-id (or container-id "")
-   :component-panel component-panel
-   :ui ui])
-
-
-(def meta-data {:component              component
-                :configurable-component configurable-component
-                :sources                {:data :source-type/meta-tabular}
-                :pubs                   []
-                :subs                   []})
-
-
-
-
-
-; subscriptions
-(comment
-  (def data sample-data)
-  (def component-id "line-chart-demo/line-chart")
-  (def container-id "line-chart-demo")
-  (def component-id "multi-chart-demo/multi-chart/line-chart")
-  (def container-id "multi-chart-demo/multi-chart")
-
-  (get-in @re-frame.db/app-db
-    [:containers
-     (keyword "multi-chart-demo/multi-chart/line-chart")
-     :sub])
-
-
-  (ui-utils/subscribe-local component-id [:sub])
-
-
-  (def c (config component-id data))
-  (get-in c [:tab-panel :value])
-
-  (def subscriptions
-    (ui-utils/build-container-subs container-id (local-config data)))
-
-  (def subscriptions
-    (ui-utils/build-subs container-id (local-config data)))
-
-
-  ())
-
-
-; playing with building keywords
-(comment
-  (def data sample-data)
-
-  (def p1 {:name :string, :uv :number, :pv :number, :amt :number, :owner :string})
-
-  (filter (fn [[k v]] (= :number v)) p1)
-
-  (->> (get-in @data [:metadata :fields])
-    (filter (fn [[k v]] (= :number v)))
-    keys)
-
-  (keyword :line-1)
-  (keyword (clojure.string/replace "line 1" #" " "-"))
-
-  (clojure.string/replace :line-1 #" " "-")
-
-  (def k '(:uv :pv :amt))
-  (map-indexed (fn [idx a]
-                 {a {:include true :stroke "#8884d8" :fill "#8884d8"}})
-    k)
-
-
-  (map-indexed (fn [idx a]
-                 {(keyword (clojure.string/replace a #" " "-"))
-                  {:include true :stroke "#8884d8" :fill "#8884d8"}})
-    k)
-
-  ())
-
-
-
-; override local subscriptions with ones from the container
-(comment
-  (do
-    (def data sample-data)
-    (def component-id "multi-chart-demo/multi-chart/line-chart")
-    (def container-id "multi-chart-demo/multi-chart")
-    (def override-subs @(ui-utils/subscribe-local component-id [:sub]))
-    (def local-subs (ui-utils/build-subs component-id (local-config data))))
-
-  (def path (first override-subs))
-
-  (ui-utils/subscribe-to-container container-id path)
-
-
-  (->> override-subs
-    (map (fn [path]
-           (println "override-subs" container-id path)
-           {path (ui-utils/subscribe-to-container container-id path)}))
-    (apply merge local-subs))
-
-  (->> override-subs
-    (map (fn [path]
-           (println "override-subs" container-id path)
-           {path (ui-utils/subscribe-to-container container-id path)}))
-    (appl assoc local-subs))
-
-
-  (def subscriptions (ui-utils/override-subs container-id local-subs override-subs))
-
-  (deref (get subscriptions [:brush]))
-
-  (ui-utils/resolve-sub subscriptions [:brush])
-
-  ())
-
+(def meta-data {:rechart/line-2 {:component component
+                                 ;:configurable-component configurable-component
+                                 :ports     {:data   :port/sink
+                                             :config :port/sink}}})

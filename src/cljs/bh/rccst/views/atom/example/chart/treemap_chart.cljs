@@ -5,7 +5,7 @@
             [taoensso.timbre :as log]))
 
 
-(defn example []
+(defn example* []
   (let [container-id "treemap-chart-demo"]
     [example/component-example
      :title "Treemap Chart"
@@ -16,3 +16,7 @@
      :component-id (utils/path->keyword container-id "treemap-chart")
      :source-code chart/source-code]))
 
+
+(defn examples []
+  [:div
+   [example*]])

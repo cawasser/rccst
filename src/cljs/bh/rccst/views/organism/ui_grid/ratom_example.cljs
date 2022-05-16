@@ -1,6 +1,6 @@
-(ns bh.rccst.views.template.ui-grid.ratom-example
+(ns bh.rccst.views.organism.ui-grid.ratom-example
   (:require [bh.rccst.subs :as subs]
-            [bh.rccst.ui-component.template.ui-grid :as grid]
+            [bh.rccst.ui-component.organism.ui-grid :as grid]
             [bh.rccst.ui-component.molecule.composite.chart-remote-data :as chart-remote-data]
             [bh.rccst.ui-component.molecule.composite.coverage-plan :as coverage-plan]
             [bh.rccst.ui-component.molecule.composite.simple-multi-chart :as simple-multi-chart]
@@ -15,7 +15,7 @@
             [woolybear.ad.layout :as layout]))
 
 
-(log/info "bh.rccst.views.template.ui-grid.ratom-example")
+(log/info "bh.rccst.views.organism.ui-grid.ratom-example")
 
 
 (def container-id "ui-grid-ratom-demo")

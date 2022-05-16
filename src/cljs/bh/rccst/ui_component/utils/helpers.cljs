@@ -87,7 +87,7 @@
               (keyword? value) (re-frame/subscribe (reduce conj [(path->keyword value)] opts))
               (and (coll? value)
                 (not (empty? value))
-                (every? keyword? value)) (resolve-subscription value opts)
+                (every? (or keyword? string?) value)) (resolve-subscription value opts)
               (instance? reagent.ratom.RAtom value) value
               (instance? Atom value) value
               :else (r/atom value))]

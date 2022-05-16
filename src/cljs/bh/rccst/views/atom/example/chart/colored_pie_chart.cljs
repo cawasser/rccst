@@ -1,5 +1,5 @@
 (ns bh.rccst.views.atom.example.chart.colored-pie-chart
-  (:require [bh.rccst.ui-component.atom.chart.colored-pie-chart-2 :as chart]
+  (:require [bh.rccst.ui-component.atom.chart.colored-pie-chart :as chart]
             [bh.rccst.ui-component.atom.chart.utils :as chart-utils]
             [bh.rccst.views.atom.example.chart.alt.config-ratom-example :as config-ratom-example]
             [bh.rccst.views.atom.example.chart.alt.config-structure-example :as config-structure-example]
