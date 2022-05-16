@@ -1,11 +1,11 @@
-(ns bh.rccst.ui-component.template.ui-grid
+(ns bh.rccst.ui-component.organism.ui-grid
   (:require [bh.rccst.ui-component.atom.layout.responsive-grid :as grid]
             [bh.rccst.ui-component.utils.helpers :as h]
             [reagent.ratom]
             [taoensso.timbre :as log]))
 
 
-(log/info "bh.rccst.ui-component.template.ui-grid")
+(log/info "bh.rccst.ui-component.organism.ui-grid")
 
 
 (defn- make-widget [[id title content bk-color txt-color]]
@@ -31,24 +31,24 @@
 
 
 (defn- update-layout-sub [layout updated-layout]
-  (log/info "update-layout-sub" @layout "//" updated-layout))
+  ;(log/info "update-layout-sub" layout "//" updated-layout)
+  (h/handle-change-path layout [] updated-layout))
 
 
 (defn- update-layout-ratom [layout updated-layout]
-  ;(log/info "update-layout-ratom" @layout "//" updated-layout)
-
-  (let [[item-id item-layout] (first (seq updated-layout))
-        old-val (->> @layout
-                  (filter (fn [x]
-                            (= (:i x) item-id)))
-                  first)]
-    (reset! layout (-> @layout
-                     (disj old-val)
-                     (conj item-layout)))))
+  ;(log/info "update-layout-ratom" layout "//" updated-layout)
+  (reset! layout updated-layout))
 
 
 (defn- update-layout [layout updated-layout]
   ;(log/info "update-layout" layout "//" updated-layout)
+  ;
+  ;(log/info "update-layout" (keyword? layout)
+  ;  "//" (coll? layout)
+  ;  "//" (seq layout)
+  ;  "//" (every? keyword? layout)
+  ;  "////" (instance? reagent.ratom.RAtom layout)
+  ;  "//" (instance? Atom layout))
 
   (cond
     (keyword? layout) (update-layout-sub layout updated-layout)
@@ -78,7 +78,7 @@
                      (map (juxt :i :x :y :w :h) new-layout))]
         ;(log/info "on-layout-change (cooked)" cooked
         ;  "//" (zipmap (map :i cooked) cooked))
-        (update-layout layout (zipmap (map :i cooked) cooked))))))
+        (update-layout layout cooked)))))
 
 
 (defn component [& {:keys [widgets layout container-id]}]
@@ -86,9 +86,9 @@
   (let [r-widgets (h/resolve-value widgets)
         r-layout  (h/resolve-value layout)]
 
-    ;(log/info "component (resolve)" container-id
-    ;  "//" @r-widgets
-    ;  "//" @r-layout)
+    (log/info "component (resolve)" container-id
+      "//" @r-widgets
+      "//" @r-layout)
 
     (fn []
       [grid/grid
@@ -97,4 +97,3 @@
        :cols 20
        :layoutFn (partial on-layout-change layout)
        :layout @r-layout])))
-

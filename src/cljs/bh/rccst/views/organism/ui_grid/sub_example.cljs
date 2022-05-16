@@ -1,11 +1,12 @@
-(ns bh.rccst.views.organism.ui-grid.ratom-example
+(ns bh.rccst.views.organism.ui-grid.sub-example
   (:require [bh.rccst.subs :as subs]
-            [bh.rccst.ui-component.organism.ui-grid :as grid]
             [bh.rccst.ui-component.molecule.composite.chart-remote-data :as chart-remote-data]
             [bh.rccst.ui-component.molecule.composite.coverage-plan :as coverage-plan]
             [bh.rccst.ui-component.molecule.composite.simple-multi-chart :as simple-multi-chart]
             [bh.rccst.ui-component.molecule.composite.simple-multi-chart-2 :as simple-multi-chart-2]
             [bh.rccst.ui-component.molecule.grid-container :as grid-container]
+            [bh.rccst.ui-component.organism.ui-grid :as grid]
+            [bh.rccst.ui-component.utils :as ui-utils]
             [bh.rccst.ui-component.utils.helpers :as h]
             [re-com.core :as rc]
             [re-frame.core :as re-frame]
@@ -15,10 +16,10 @@
             [woolybear.ad.layout :as layout]))
 
 
-(log/info "bh.rccst.views.organism.ui-grid.ratom-example")
+(log/info "bh.rccst.views.organism.ui-grid.sub-example")
 
 
-(def container-id "ui-grid-ratom-demo")
+(def container-id :ui-grid-sub-demo)
 
 (def bar-chart-widget ["bar-chart" "Bar Chart"
                        [grid-container/component
@@ -52,18 +53,18 @@
 (def coverage-plan-layout {:i "coverage-plan" :x 8 :y 0 :w 12 :h 21})
 (def default-layout #{bar-chart-layout})
 
-
 (def empty-widgets #{})
-(def empty-layout  #{})
+(def empty-layout #{})
 
 
-(def widgets (r/atom default-widgets))
-(def layout (r/atom default-layout))
+(def config
+  {:widgets   default-widgets
+   :layout    default-layout
+   :container ""})
 
 
-(defn- grid-reset [widgets layout widget-val layout-val]
-  (reset! widgets widget-val)
-  (reset! layout layout-val))
+(defn- grid-reset [container-id widget-val layout-val]
+  (h/handle-change-path container-id  [] {:widgets  widget-val :layout layout-val}))
 
 
 (defn- toggle-val [s val]
@@ -72,54 +73,80 @@
     (conj s val)))
 
 
-(defn- grid-update [widgets layout widget-val layout-val]
-  (reset! widgets (toggle-val @widgets widget-val))
-  (reset! layout (toggle-val @layout layout-val)))
+(defn- grid-update [container-id widgets layout widget-val layout-val]
+  (h/handle-change-path container-id []
+    {:widgets (toggle-val @(h/resolve-value widgets) widget-val)
+     :layout (toggle-val @(h/resolve-value layout) layout-val)}))
 
 
-(defn- widget-tools [widgets layout default-widgets]
+(defn- widget-tools [container-id widgets layout default-widgets]
   [rc/h-box :src (rc/at)
    :gap "10px"
    :style {:border     "1px solid" :border-radius "3px"
            :box-shadow "5px 5px 5px 2px"
            :margin     "5px" :padding "5px"}
    :children [[:label.h5 "Widgets:"]
-              [rc/button :on-click #(grid-reset widgets layout empty-widgets empty-layout)
+              [rc/button :on-click #(grid-reset container-id
+                                      empty-widgets empty-layout)
                :label "Empty"]
-              [rc/button :on-click #(grid-reset widgets layout default-widgets default-layout)
+              [rc/button :on-click #(grid-reset container-id
+                                      default-widgets default-layout)
                :label "Default"]
-              [rc/button :on-click #(grid-update widgets layout bar-chart-widget bar-chart-layout)
+              [rc/button :on-click #(grid-update container-id widgets layout
+                                      bar-chart-widget bar-chart-layout)
                :label "! Bar Chart"]
-              [rc/button :on-click #(grid-update widgets layout multi-chart-widget multi-chart-layout)
+              [rc/button :on-click #(grid-update container-id widgets layout
+                                      multi-chart-widget multi-chart-layout)
                :label "! Multi Chart"]
-              [rc/button :on-click #(grid-update widgets layout multi-chart-2-widget multi-chart-2-layout)
+              [rc/button :on-click #(grid-update container-id widgets layout
+                                      multi-chart-2-widget multi-chart-2-layout)
                :label "! Multi Chart 2"]
-              [rc/button :on-click #(grid-update widgets layout coverage-plan-widget coverage-plan-layout)
+              [rc/button :on-click #(grid-update container-id widgets layout
+                                      coverage-plan-widget coverage-plan-layout)
                :label "! Coverage Plan"]]])
+
+
+(defn- ui-grid-container [& {:keys [widgets layout container-id] :as params}]
+  (log/info "ui-grid-container" params)
+
+  (let [id (r/atom nil)]
+
+    (fn []
+      (when (nil? @id)
+        (reset! id container-id)
+        (ui-utils/init-container-locals @id config)
+        (ui-utils/dispatch-local @id [:container] container-id)
+        (ui-utils/build-subs container-id config))
+
+      [grid/component
+       :widgets widgets
+       :layout layout
+       :container-id container-id])))
 
 
 (defn example []
   (let [logged-in?       (re-frame/subscribe [::subs/logged-in?])
-        pub-sub-started? (re-frame/subscribe [::subs/pub-sub-started?])]
+        pub-sub-started? (re-frame/subscribe [::subs/pub-sub-started?])
+        widgets          [container-id :widgets]
+        layout           [container-id :layout]]
 
     (if (not @logged-in?)
       (re-frame/dispatch [:bh.rccst.events/login "test-user" "test-pwd"]))
 
     (fn []
-      (acu/demo "Widget Grid (ratom-based)"
-        "A grid of widget, which are composed of UI Components using a data structure that defines a directed graph."
+      (acu/demo "Widget Grid (subscription-based)"
+        "A grid of widget, which are composed of UI Components using subscription to the data structure that defines a directed graph."
 
         (if (and @logged-in? @pub-sub-started?)
           [layout/page {:extra-classes :is-fluid}
 
            [rc/v-box :src (rc/at)
             :gap "5px"
-            :children [[grid/component
+            :children [[ui-grid-container
                         :widgets widgets
                         :layout layout
                         :container-id container-id]
-                       [widget-tools widgets layout default-widgets default-layout]]]]
-
+                       [widget-tools container-id widgets layout default-widgets default-layout]]]]
 
           [rc/alert-box :src (rc/at)
            :alert-type :info
@@ -128,3 +155,4 @@
           :widgets widgets
           :layout layout
           :container-id container-id]))))
+
