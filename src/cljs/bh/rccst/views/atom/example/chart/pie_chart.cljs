@@ -11,11 +11,11 @@
             [bh.rccst.views.atom.example.chart.alt.config-tools :as config-tools]))
 
 
-
-(def default-config-data {:name {:keys [:Page-A :Page-B :Page-C :Page-D :Page-E :Page-F :Page-G] :color "#00e5ff"}
+(def default-config-data {:name [:Page-A :Page-B :Page-C :Page-D :Page-E :Page-F :Page-G]
+                          :fill "#8e81ce"
                           :value {:keys [:uv :pv :tv :amt] :chosen :uv}})
 
-;"Page-A" "Page-B" "Page-C" "Page-D" "Page-E" "Page-F" "Page-G"
+
 (defn- data-ratom []
   [data-ratom-example/example
    :container-id :pie-chart-data-ratom-demo
@@ -32,6 +32,7 @@
    :component chart/component
    :data-panel chart-utils/meta-tabular-data-panel
    :config-panel chart/config-panel])
+
 
 (defn- data-structure []
   [data-structure-example/example
