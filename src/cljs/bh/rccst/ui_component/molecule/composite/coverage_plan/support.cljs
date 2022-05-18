@@ -128,12 +128,13 @@
 (defn make-target-shape [[target-id row col ti]]
   (let [fill    (get-in dummy-target-color-pallet [target-id 2])
         [r g b a] fill
-        f [r g b (+ a 0.9)]
+        f       [r g b (+ a 0.9)]
         outline [r g b (+ a 1.0)]]
     {:shape         :shape/circle
      :id            (clojure.string/join "-"
                       [target-id ti row col])
      :location      (get cell-centers [row col])
+     :radius        300000
      :width         2
      :fill-color    f
      :outline-color outline}))
