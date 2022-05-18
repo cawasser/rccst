@@ -12,7 +12,6 @@
                           [:khaki "rgba(240, 230, 140, .3)" [0.94 0.90 0.55 0.3]] ; "abi-meso-2"
                           [:deepskyblue "rgba(0, 191, 255, .3)" [1.0 0.0 1.0 0.3]]
                           [:navy "rgba(0, 0, 128, .3)" [0.0 0.0 0.5 0.3]]
-                          [:cyan "rgba(0, 255, 255, .3)" [0.0 1.0 1.0 0.9]]
                           [:darkred "rgba(139, 0, 0, .3)" [0.55 0.0 0.0 0.3]]
                           [:darkseagreen "rgba(143, 188, 143, .3)" [0.55 0.74 0.56 0.3]]
                           [:darkviolet "rgba(148, 0, 211, .3)" [0.58 0 0.83 0.3]]
@@ -20,7 +19,8 @@
                           [:orchid "rgba(218, 112, 214, .3)" [0.84 0.44 0.84 0.3]]
                           [:plum "rgba(221, 160, 221, .3)" [0.87 0.63 0.87 0.9]]
                           [:tomato "rgba(255, 99, 71, .3)" [1.0 0.39 0.28 0.3]]
-                          [:orangered "rgba(255, 69, 0, .3)" [1.0 0.27 0.0 0.3]]])
+                          [:orangered "rgba(255, 69, 0, .3)" [1.0 0.27 0.0 0.3]]
+                          [:cyan "rgba(0, 255, 255, .3)" [0.0 1.0 1.0 0.9]]])
 
 (def dummy-sensor-color-pallet
   {"abi-3"       [:green "rgba(0, 128, 0, .3)" [0.0 0.5 0.0 0.1]] ; "abi-3"
@@ -38,12 +38,18 @@
    "bravo-hd"  [:orchid "rgba(218, 112, 214, .3)" [0.84 0.44 0.84 0.3]]
    "fire-hd"   [:plum "rgba(221, 160, 221, .3)" [0.87 0.63 0.87 0.9]]
    "fire-ir"   [:tomato "rgba(255, 99, 71, .3)" [1.0 0.39 0.28 0.3]]
-   "severe-hd" [:orangered "rgba(255, 69, 0, .3)" [1.0 0.27 0.0 0.3]]})
+   "severe-hd" [:cyan "rgba(0, 255, 255, .3)" [0.0 1.0 1.0 0.9]]})
 
 
 (defn- get-sensor-colors [sensors]
   (if (seq sensors)
     (zipmap sensors (cycle sensor-color-pallet))
+    []))
+
+
+(defn- get-target-colors [targets]
+  (if (seq targets)
+    (zipmap targets (cycle (reverse sensor-color-pallet)))
     []))
 
 
@@ -287,5 +293,29 @@
    :fill-color    [0 1 0 0.5]
    :outline-color [1 1 1 1]
    :width         2}
+
+  ())
+
+
+(comment
+  (def targets {"alpha-hd"  #{[7 7 "hidef-image" 0
+                               [7 6 "hidef-image" 1]
+                               [7 6 "hidef-image" 2]
+                               [7 5 "hidef-image" 3]]}
+                "bravo-img" #{[7 2 "image" 0]
+                              [7 1 "image" 1]}
+                "fire-hd"   #{[5 3 "hidef-image" 0]
+                              [4 3 "hidef-image" 2] [5 3 "hidef-image" 2]
+                              [4 3 "hidef-image" 3] [5 3 "hidef-image" 3]}
+                "fire-ir"   #{[5 4 "v/ir" 0]
+                              [5 3 "v/ir" 1] [5 4 "v/ir" 1]
+                              [5 4 "v/ir" 2]
+                              [5 4 "v/ir" 3]}
+                "severe-hd" #{[5 6 "hidef-image" 0]
+                              [5 7 "hidef-image" 1] [6 5 "hidef-image" 1]
+                              [6 6 "hidef-image" 2]
+                              [5 7 "hidef-image" 3]}})
+
+  (get-target-colors (keys targets))
 
   ())

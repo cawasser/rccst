@@ -105,13 +105,13 @@
 
 ;; region ; custom tables for display
 
-(defn- display-checkbox [name under-consideration]
+(defn- display-checkbox [id name under-consideration]
   ^{:key (str "inc-" name)}
   [:td.is-narrow
    {:style    {:text-align :center}
     :on-click #()}
 
-   (if (contains? under-consideration name)
+   (if (contains? under-consideration id)
      [:span.icon.has-text-success.is-small [:i.fas.fa-check]]
      [:span.icon.has-text-success.is-small [:i.far.fa-square]])])
 
@@ -123,7 +123,7 @@
         :on-click #(do)}
    [:span.icon.has-text-success.is-small
     [:i.fas.fa-circle
-     {:style {:color (or color :black)}}]]])
+     {:style {:color (or color :green)}}]]])
 
 
 (defn- display-edit-control [name is-editing]
@@ -148,6 +148,19 @@
    [:span.icon.has-text-danger.is-small [:i.far.fa-trash-alt]]])
 
 
+(defn- display-color [name color]
+  ^{:key (str "color-" name)}
+  [:td {:style (merge
+                 (if color
+                   {:background-color (or color :green)
+                    :border-width     "1px"}
+                   {:background-color :transparent
+                    :border-width     "1px"})
+                 {:text-align :center
+                  :width      100})}
+   [:span]])
+
+
 (defn- target-table [& {:keys [data selection component-id container-id]}]
   (let [d          (h/resolve-value data)
         s          (h/resolve-value selection)
@@ -169,7 +182,7 @@
                (doall
                  ^{:key name}
                  [:tr
-                  [display-checkbox name under-consideration]
+                  [display-checkbox name name under-consideration]
 
                   [display-symbol name color]
 
@@ -178,6 +191,43 @@
                   [display-edit-control name is-editing]
 
                   [display-delete-control name]])))]]]))))
+
+
+(defn- satellite-table [& {:keys [data selection component-id container-id]}]
+  ;(log/info "satellites-table" data "//" selection)
+
+  (let [d          (h/resolve-value data)
+        s          (h/resolve-value selection)
+        is-editing (r/atom "")]
+
+    ;(log/info "satellites-table (s)" @s "//" (:data @d))
+
+    (fn []
+      (let [under-consideration @s]
+        [:div.table-container {:style {:width       "100%"
+                                       :height      "100%"
+                                       :overflow-y  :auto
+                                       :white-space :nowrap
+                                       :border      "1px outset gray"}}
+         [:table.table
+          [:thead {:style {:position :sticky :top 0 :background :lightgray}}
+           [:tr [:th "Include?"] [:th "Color"] [:th "Platform"]]]
+          [:tbody
+           (doall
+             (for [{:keys [platform_id sensor_id color] :as platform} (:data @d)]
+               (doall
+                 ;(log/info "satellites-table (platform)" platform
+                 ;  "//" platform_id "//" sensor_id "//" color)
+
+                 ^{:key name}
+                 [:tr
+                  [display-checkbox sensor_id (str platform_id "-" sensor_id) under-consideration]
+
+                  [display-color (str platform_id "-" sensor_id) color]
+
+                  ^{:key (str "satellite-" platform_id "-" sensor_id)}
+                  [:td (str platform_id "  " sensor_id)]])))]]]))))
+
 
 ;; endregion
 
@@ -199,7 +249,7 @@
                     :component-id :coverage-plan
                     :components   {; ui components
                                    :ui/targets                {:type :ui/component :name target-table}
-                                   :ui/satellites             {:type :ui/component :name :bh/table}
+                                   :ui/satellites             {:type :ui/component :name satellite-table}
                                    :ui/globe                  {:type :ui/component :name :ww/globe}
                                    :ui/time-slider            {:type :ui/component :name :rc/slider}
                                    :ui/current-time           {:type :ui/component :name :rc/label-md}
@@ -267,7 +317,8 @@
                                    :topic/satellite-data      {:data {:ui/satellites :data}}
                                    :topic/selected-targets    {:data {:ui/targets  :selection
                                                                       :fn/coverage :targets}}
-                                   :topic/selected-satellites {:data {:fn/coverage :satellites}}
+                                   :topic/selected-satellites {:data {:ui/satellites :selection
+                                                                      :fn/coverage :satellites}}
                                    :topic/coverage-data       {:data {:fn/coverage :coverages
                                                                       :fn/range    :data}}
                                    :topic/shapes              {:data {:ui/globe :shapes}}
