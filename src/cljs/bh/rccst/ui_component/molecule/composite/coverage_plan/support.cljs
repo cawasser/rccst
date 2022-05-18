@@ -33,6 +33,14 @@
    "abi-meso-2"  [:khaki "rgba(240, 230, 140, .3)" [0.94 0.90 0.55 0.3]]}) ; "abi-meso-2"
 
 
+(def dummy-target-color-pallet
+  {"alpha-hd"  [:forestgreen "rgba(34, 139, 34, .3)" [1.0 0.71 0.76 0.9]]
+   "bravo-hd"  [:orchid "rgba(218, 112, 214, .3)" [0.84 0.44 0.84 0.3]]
+   "fire-hd"   [:plum "rgba(221, 160, 221, .3)" [0.87 0.63 0.87 0.9]]
+   "fire-ir"   [:tomato "rgba(255, 99, 71, .3)" [1.0 0.39 0.28 0.3]]
+   "severe-hd" [:orangered "rgba(255, 69, 0, .3)" [1.0 0.27 0.0 0.3]]})
+
+
 (defn- get-sensor-colors [sensors]
   (if (seq sensors)
     (zipmap sensors (cycle sensor-color-pallet))
@@ -102,7 +110,7 @@
   (get cell-boundaries cell))
 
 
-(defn make-shape [c]
+(defn make-coverage-shape [c]
   (let [fill    (get-in dummy-sensor-color-pallet [(get-in c [:coverage :sensor]) 2])
         [r g b a] fill
         outline [r g b (+ a 0.3)]]
@@ -117,6 +125,20 @@
      :outline-color outline}))
 
 
+(defn make-target-shape [[target-id row col ti]]
+  (let [fill    (get-in dummy-target-color-pallet [target-id 2])
+        [r g b a] fill
+        f [r g b (+ a 0.9)]
+        outline [r g b (+ a 1.0)]]
+    {:shape         :shape/circle
+     :id            (clojure.string/join "-"
+                      [target-id ti row col])
+     :location      (get cell-centers [row col])
+     :width         2
+     :fill-color    f
+     :outline-color outline}))
+
+
 (defn cook-coverages [coverages current-time]
   (->> coverages
     :data
@@ -124,6 +146,16 @@
     (mapcat (fn [{:keys [coverage time cell computed_at] :as all}]
               (map (fn [c] {:time time :coverage c :cell cell :computed_at computed_at})
                 coverage)))))
+
+
+(defn cook-targets [targets current-time]
+  (->> targets
+    seq
+    (mapcat (fn [[t cells]]
+              (map (fn [[r c ty ti]]
+                     [t r c ti])
+                cells)))
+    (filter (fn [[t r c ti]] (= ti current-time)))))
 
 
 (comment
@@ -194,7 +226,7 @@
   (make-one-shape coverage)
 
 
-  (make-shape real-coverage)
+  (make-coverage-shape real-coverage)
 
 
 
@@ -203,3 +235,56 @@
   ())
 
 
+(comment
+  (def targets {"alpha-hd"  #{[7 7 "hidef-image" 0]
+                              [7 6 "hidef-image" 1]
+                              [7 6 "hidef-image" 2]
+                              [7 5 "hidef-image" 3]}
+                "bravo-img" #{[7 2 "image" 0]
+                              [7 1 "image" 1]}
+                "fire-hd"   #{[5 3 "hidef-image" 0]
+                              [4 3 "hidef-image" 2] [5 3 "hidef-image" 2]
+                              [4 3 "hidef-image" 3] [5 3 "hidef-image" 3]}
+                "fire-ir"   #{[5 4 "v/ir" 0]
+                              [5 3 "v/ir" 1] [5 4 "v/ir" 1]
+                              [5 4 "v/ir" 2]
+                              [5 4 "v/ir" 3]}
+                "severe-hd" #{[5 6 "hidef-image" 0]
+                              [5 7 "hidef-image" 1] [6 5 "hidef-image" 1]
+                              [6 6 "hidef-image" 2]
+                              [5 7 "hidef-image" 3]}})
+  (def ct 0)
+
+  (->> targets
+    seq
+    (mapcat (fn [[t cells]]
+              (map (fn [[r c ty ti]]
+                     [t r c ti])
+                cells)))
+    (filter (fn [[t r c ti]] (= ti ct))))
+
+
+  (def target-id "alpha-hd")
+
+  (let [[target-id row col ti] ["alpha-hd" 7 7 0]
+        fill    (get-in dummy-target-color-pallet [target-id 2])
+        [r g b a] fill
+        outline [r g b (+ a 1.0)]]
+    {:shape         :shape/circle
+     :id            (clojure.string/join "-"
+                      [target-id ti row col])
+     :location      (get cell-centers [row col])
+     :radius        300000
+     :width         2
+     :fill-color    fill
+     :outline-color outline})
+
+  {:shape         :shape/circle
+   :id            "circle"
+   :location      [28.538336 -81.379234]
+   :radius        1000000
+   :fill-color    [0 1 0 0.5]
+   :outline-color [1 1 1 1]
+   :width         2}
+
+  ())

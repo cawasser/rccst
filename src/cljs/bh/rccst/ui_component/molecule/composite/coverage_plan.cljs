@@ -45,15 +45,26 @@
     :<- current-time
     (fn [[t s c ct] _]
       ;(log/info "fn-coverage (sub)" ct
+      ;  "// (targets)" t)
       ;  ;"// (satellites)" s
       ;  ;"// (cooked)" (s/cook-coverages c ct)
       ;  "// (filter)" (filter #(contains? s (get-in % [:coverage :sensor]))
       ;                  (s/cook-coverages c ct)))
 
-      (if (or (empty? c) (empty? (:data c)))
-        []
-        (map s/make-shape (filter #(contains? s (get-in % [:coverage :sensor]))
-                            (s/cook-coverages c ct)))))))
+      (let [cvg (if (or (empty? c) (empty? (:data c)))
+                  []
+                  (map s/make-coverage-shape (filter #(contains? s (get-in % [:coverage :sensor]))
+                                               (s/cook-coverages c ct))))
+            trg (if (empty? t)
+                  []
+                  (map s/make-target-shape (s/cook-targets t ct)))
+            ret (concat cvg trg)]
+
+        ;(log/info "fn-coverage (ret)" ret
+        ;  "//" cvg
+        ;  "//" trg)
+
+        ret))))
 
 
 (defn fn-range
@@ -116,7 +127,24 @@
                                    :topic/coverage-data       {:type :source/remote :name :source/coverages}
 
                                    ; composite-local data sources
-                                   :topic/selected-targets    {:type :source/local :name :selected-targets :default []}
+                                   :topic/selected-targets    {:type :source/local :name :selected-targets
+                                                               :default {"alpha-hd"  #{[7 7 "hidef-image" 0]
+                                                                                       [7 6 "hidef-image" 1]
+                                                                                       [7 6 "hidef-image" 2]
+                                                                                       [7 5 "hidef-image" 3]}
+                                                                         "bravo-img" #{[7 2 "image" 0]
+                                                                                       [7 1 "image" 1]}
+                                                                         "fire-hd"   #{[5 3 "hidef-image" 0]
+                                                                                       [4 3 "hidef-image" 2] [5 3 "hidef-image" 2]
+                                                                                       [4 3 "hidef-image" 3] [5 3 "hidef-image" 3]}
+                                                                         "fire-ir"   #{[5 4 "v/ir" 0]
+                                                                                       [5 3 "v/ir" 1] [5 4 "v/ir" 1]
+                                                                                       [5 4 "v/ir" 2]
+                                                                                       [5 4 "v/ir" 3]}
+                                                                         "severe-hd" #{[5 6 "hidef-image" 0]
+                                                                                       [5 7 "hidef-image" 1] [6 5 "hidef-image" 1]
+                                                                                       [6 6 "hidef-image" 2]
+                                                                                       [5 7 "hidef-image" 3]}}}
                                    :topic/selected-satellites {:type :source/local :name :selected-satellites
                                                                :default #{"avhhr-6" "viirs-5" "abi-meso-11"
                                                                           "abi-meso-4" "abi-meso-10" "abi-meso-2"}}
