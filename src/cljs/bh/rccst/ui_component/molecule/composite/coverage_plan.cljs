@@ -84,7 +84,8 @@
     (first range)
     :<- data
     (fn [d _]
-      [0 (dec (count bh.rccst.ui-component.atom.worldwind.globe/sample-data))])))
+      (let [times (->> d :data (map :time) set)]
+        [(apply min times) (apply max times)]))))
 
 
 (defn fn-current-time [{:keys [value current-time]}]
