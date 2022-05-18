@@ -1,13 +1,14 @@
 (ns bh.rccst.ui-component.molecule.composite.coverage-plan
   "provide a composed UI for a \"Coverage Plan\" which shows targets and satellite coverage areas
   on a 3D globe"
-  (:require [re-frame.core :as re-frame]
+  (:require [bh.rccst.ui-component.molecule.composite.coverage-plan.support :as s]
+            [bh.rccst.ui-component.utils :as ui-utils]
+            [bh.rccst.ui-component.utils.helpers :as h]
+            [cljs-time.coerce :as coerce]
+            [cljs-time.core :as t]
+            [re-frame.core :as re-frame]
             [reagent.core :as r]
             [taoensso.timbre :as log]
-            [cljs-time.core :as t]
-            [cljs-time.coerce :as coerce]
-            [bh.rccst.ui-component.molecule.composite.coverage-plan.support :as s]
-            [bh.rccst.ui-component.utils :as ui-utils]
             ["dagre" :as dagre]
             ["graphlib" :as graphlib]
             ["react-flow-renderer" :refer (ReactFlowProvider Controls Handle Background) :default ReactFlow]))
@@ -15,6 +16,8 @@
 
 (log/info "bh.rccst.ui-component.molecule.composite.coverage-plan")
 
+
+;; region ; local function to support :source/local topics
 
 (defn fn-coverage
   "registers the subscription for the entity defined by 'layers'. processing from
@@ -97,7 +100,86 @@
     (fn [v _]
       (coerce/to-date (t/plus (t/now) (t/hours v))))))
 
+;; endregion
 
+
+;; region ; custom tables for display
+
+(defn- display-checkbox [name under-consideration]
+  ^{:key (str "inc-" name)}
+  [:td.is-narrow
+   {:style    {:text-align :center}
+    :on-click #()}
+
+   (if (contains? under-consideration name)
+     [:span.icon.has-text-success.is-small [:i.fas.fa-check]]
+     [:span.icon.has-text-success.is-small [:i.far.fa-square]])])
+
+
+(defn- display-symbol [name color]
+  ^{:key (str "symb-" name)}
+  [:td {:style    {:color      :white
+                   :text-align :center}
+        :on-click #(do)}
+   [:span.icon.has-text-success.is-small
+    [:i.fas.fa-circle
+     {:style {:color (or color :black)}}]]])
+
+
+(defn- display-edit-control [name is-editing]
+  ^{:key (str "edit-" name)}
+  [:td {:on-click #(if (and
+                         @is-editing
+                         (= name @is-editing))
+                     (do
+                       (log/info "SAVE" name)
+                       (reset! is-editing ""))
+                     (do
+                       (log/info "EDIT" name)
+                       (reset! is-editing name)))}
+   (if (and @is-editing (= name @is-editing))
+     [:span.icon.has-text-success.is-small [:i.far.fa-save]]
+     [:span.icon.has-text-info.is-small [:i.far.fa-edit]])])
+
+
+(defn- display-delete-control [name]
+  ^{:key (str "delete-" name)}
+  [:td {:on-click #(do)}
+   [:span.icon.has-text-danger.is-small [:i.far.fa-trash-alt]]])
+
+
+(defn- target-table [& {:keys [data selection component-id container-id]}]
+  (let [d          (h/resolve-value data)
+        s          (h/resolve-value selection)
+        is-editing (r/atom "")]
+
+    (fn []
+      (let [under-consideration (->> @s keys set)]
+        [:div.table-container {:style {:width       "100%"
+                                       :height      "100%"
+                                       :overflow-y  :auto
+                                       :white-space :nowrap
+                                       :border      "1px outset gray"}}
+         [:table.table
+          [:thead {:style {:position :sticky :top 0 :background :lightgray}}
+           [:tr [:th "Include?"] [:th "Symbol"] [:th "AoI"] [:th ""] [:th ""]]]
+          [:tbody
+           (doall
+             (for [{:keys [name cells color]} (:data @d)]
+               (doall
+                 ^{:key name}
+                 [:tr
+                  [display-checkbox name under-consideration]
+
+                  [display-symbol name color]
+
+                  ^{:key (str "target-" name)} [:td name]
+
+                  [display-edit-control name is-editing]
+
+                  [display-delete-control name]])))]]]))))
+
+;; endregion
 
 ;; components have "ports" which define their inputs and outputs:
 ;;
@@ -116,7 +198,7 @@
 (def ui-definition {:title        "Coverage Plan"
                     :component-id :coverage-plan
                     :components   {; ui components
-                                   :ui/targets                {:type :ui/component :name :bh/table}
+                                   :ui/targets                {:type :ui/component :name target-table}
                                    :ui/satellites             {:type :ui/component :name :bh/table}
                                    :ui/globe                  {:type :ui/component :name :ww/globe}
                                    :ui/time-slider            {:type :ui/component :name :rc/slider}
@@ -128,7 +210,7 @@
                                    :topic/coverage-data       {:type :source/remote :name :source/coverages}
 
                                    ; composite-local data sources
-                                   :topic/selected-targets    {:type :source/local :name :selected-targets
+                                   :topic/selected-targets    {:type    :source/local :name :selected-targets
                                                                :default {"alpha-hd"  #{[7 7 "hidef-image" 0]
                                                                                        [7 6 "hidef-image" 1]
                                                                                        [7 6 "hidef-image" 2]
@@ -146,7 +228,7 @@
                                                                                        [5 7 "hidef-image" 1] [6 5 "hidef-image" 1]
                                                                                        [6 6 "hidef-image" 2]
                                                                                        [5 7 "hidef-image" 3]}}}
-                                   :topic/selected-satellites {:type :source/local :name :selected-satellites
+                                   :topic/selected-satellites {:type    :source/local :name :selected-satellites
                                                                :default #{"avhhr-6" "viirs-5" "abi-meso-11"
                                                                           "abi-meso-4" "abi-meso-10" "abi-meso-2"}}
                                    :topic/current-time        {:type :source/local :name :current-time :default 0}
@@ -183,7 +265,8 @@
                                    ; topics are inputs into what?
                                    :topic/target-data         {:data {:ui/targets :data}}
                                    :topic/satellite-data      {:data {:ui/satellites :data}}
-                                   :topic/selected-targets    {:data {:fn/coverage :targets}}
+                                   :topic/selected-targets    {:data {:ui/targets  :selection
+                                                                      :fn/coverage :targets}}
                                    :topic/selected-satellites {:data {:fn/coverage :satellites}}
                                    :topic/coverage-data       {:data {:fn/coverage :coverages
                                                                       :fn/range    :data}}
