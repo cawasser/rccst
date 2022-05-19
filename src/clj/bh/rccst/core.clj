@@ -19,8 +19,8 @@
   "postgresql database connection spec."
   {:dbtype   "postgresql"
    :dbname   "rccst"
-   :user     "postgres"
-   :password "Password"
+   :user     (or (System/getenv "RCCST_DATABASE_USER") "postgres")
+   :password (or (System/getenv "RCCST_DATABASE_PASS") "Password")
    :host     (or (System/getenv "RCCST_DATABASE_HOST") "localhost")
    :port     "5432"})
 
