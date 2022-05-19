@@ -1,15 +1,16 @@
-(ns bh.rccst.ui-component.molecule.composite.coverage-plan.support)
+(ns bh.rccst.ui-component.molecule.composite.coverage-plan.support
+  (:require [taoensso.timbre :as log]))
 
 
 
-(def sensor-color-pallet [[:green "rgba(0, 128, 0, .3)" [0.0 0.5 0.0 0.1]] ; "abi-3"
-                          [:blue "rgba(0, 0, 255, .3)" [0.0 0. 1.0 0.1]] ; "abi-1"
-                          [:orange "rgba(255, 165, 0, .3)" [1.0 0.65 0.0 0.3]] ; "avhhr-6"
-                          [:grey "rgba(128, 128, 128, .3)" [0.5 0.5 0.5 0.3]] ; "viirs-5"
-                          [:cornflowerblue "rgba(100, 149, 237, .3)" [0.4 0.58 0.93 0.3]] ; "abi-meso-11"
-                          [:darkcyan "rgba(0, 139, 139, .3)" [0.0 0.55 0.55 0.3]] ; "abi-meso-4"
-                          [:goldenrod "rgba(218, 165, 32, .3)" [0.84 0.65 0.13 0.3]] ; "abi-meso-10"
-                          [:khaki "rgba(240, 230, 140, .3)" [0.94 0.90 0.55 0.3]] ; "abi-meso-2"
+(def sensor-color-pallet [[:green "rgba(0, 128, 0, .3)" [0.0 0.5 0.0 0.1]]
+                          [:blue "rgba(0, 0, 255, .3)" [0.0 0. 1.0 0.1]]
+                          [:orange "rgba(255, 165, 0, .3)" [1.0 0.65 0.0 0.3]]
+                          [:grey "rgba(128, 128, 128, .3)" [0.5 0.5 0.5 0.3]]
+                          [:cornflowerblue "rgba(100, 149, 237, .3)" [0.4 0.58 0.93 0.3]]
+                          [:darkcyan "rgba(0, 139, 139, .3)" [0.0 0.55 0.55 0.3]]
+                          [:goldenrod "rgba(218, 165, 32, .3)" [0.84 0.65 0.13 0.3]]
+                          [:khaki "rgba(240, 230, 140, .3)" [0.94 0.90 0.55 0.3]]
                           [:deepskyblue "rgba(0, 191, 255, .3)" [1.0 0.0 1.0 0.3]]
                           [:navy "rgba(0, 0, 128, .3)" [0.0 0.0 0.5 0.3]]
                           [:darkred "rgba(139, 0, 0, .3)" [0.55 0.0 0.0 0.3]]
@@ -23,15 +24,14 @@
                           [:cyan "rgba(0, 255, 255, .3)" [0.0 1.0 1.0 0.9]]])
 
 (def dummy-sensor-color-pallet
-  {"abi-3"       [:green "rgba(0, 128, 0, .3)" [0.0 0.5 0.0 0.1]] ; "abi-3"
-   "abi-1"       [:blue "rgba(0, 0, 255, .3)" [0.0 0. 1.0 0.1]] ; "abi-1"
-   "avhhr-6"     [:orange "rgba(255, 165, 0, .3)" [1.0 0.65 0.0 0.3]] ; "avhhr-6"
-   "viirs-5"     [:grey "rgba(128, 128, 128, .3)" [0.5 0.5 0.5 0.3]] ; "viirs-5"
-   "abi-meso-11" [:cornflowerblue "rgba(100, 149, 237, .3)" [0.4 0.58 0.93 0.3]] ; "abi-meso-11"
-   "abi-meso-4"  [:darkcyan "rgba(0, 139, 139, .3)" [0.0 0.55 0.55 0.3]] ; "abi-meso-4"
-   "abi-meso-10" [:goldenrod "rgba(218, 165, 32, .3)" [0.84 0.65 0.13 0.3]] ; "abi-meso-10"
-   "abi-meso-2"  [:khaki "rgba(240, 230, 140, .3)" [0.94 0.90 0.55 0.3]]}) ; "abi-meso-2"
-
+  {"abi-3"       [:green "rgba(0, 128, 0, .3)" [0.0 0.5 0.0 0.1]]
+   "abi-1"       [:blue "rgba(0, 0, 255, .3)" [0.0 0. 1.0 0.1]]
+   "avhhr-6"     [:orange "rgba(255, 165, 0, .3)" [1.0 0.65 0.0 0.3]]
+   "viirs-5"     [:grey "rgba(128, 128, 128, .3)" [0.5 0.5 0.5 0.3]]
+   "abi-meso-11" [:cornflowerblue "rgba(100, 149, 237, .3)" [0.4 0.58 0.93 0.3]]
+   "abi-meso-4"  [:darkcyan "rgba(0, 139, 139, .3)" [0.0 0.55 0.55 0.3]]
+   "abi-meso-10" [:goldenrod "rgba(218, 165, 32, .3)" [0.84 0.65 0.13 0.3]]
+   "abi-meso-2"  [:khaki "rgba(240, 230, 140, .3)" [0.94 0.90 0.55 0.3]]})
 
 (def dummy-target-color-pallet
   {"alpha-hd"  [:forestgreen "rgba(34, 139, 34, .3)" [1.0 0.71 0.76 0.9]]
@@ -39,18 +39,6 @@
    "fire-hd"   [:plum "rgba(221, 160, 221, .3)" [0.87 0.63 0.87 0.9]]
    "fire-ir"   [:tomato "rgba(255, 99, 71, .3)" [1.0 0.39 0.28 0.3]]
    "severe-hd" [:cyan "rgba(0, 255, 255, .3)" [0.0 1.0 1.0 0.9]]})
-
-
-(defn- get-sensor-colors [sensors]
-  (if (seq sensors)
-    (zipmap sensors (cycle sensor-color-pallet))
-    []))
-
-
-(defn- get-target-colors [targets]
-  (if (seq targets)
-    (zipmap targets (cycle (reverse sensor-color-pallet)))
-    []))
 
 
 ; let's change to 60N->5N (65deg), 60->180W (120deg)
@@ -131,10 +119,10 @@
      :outline-color outline}))
 
 
-(defn make-target-shape [[target-id row col ti]]
-  (let [fill    (get-in dummy-target-color-pallet [target-id 2])
-        [r g b a] fill
-        f       [r g b (+ a 0.9)]
+(defn make-target-shape [[target-id row col ti [_ _ color]]]
+  (log/info "make-target-shape" target-id color)
+  (let [[r g b a] color
+        fill    [r g b (+ a 0.9)]
         outline [r g b (+ a 1.0)]]
     {:shape         :shape/circle
      :id            (clojure.string/join "-"
@@ -142,7 +130,7 @@
      :location      (get cell-centers [row col])
      :radius        300000
      :width         2
-     :fill-color    f
+     :fill-color    fill
      :outline-color outline}))
 
 
@@ -156,13 +144,16 @@
 
 
 (defn cook-targets [targets current-time]
-  (->> targets
-    seq
-    (mapcat (fn [[t cells]]
-              (map (fn [[r c ty ti]]
-                     [t r c ti])
-                cells)))
-    (filter (fn [[t r c ti]] (= ti current-time)))))
+  (log/info "cook-targets" targets current-time)
+  (let [ret (->> targets
+              seq
+              (mapcat (fn [{:keys [name cells color]}]
+                        (map (fn [[r c ty ti]]
+                               [name r c ti color])
+                          cells)))
+              (filter (fn [[_ _ _ ti _]] (= ti current-time))))]
+    (log/info "cook-targets (ret)" ret)
+    ret))
 
 
 (comment
@@ -316,6 +307,5 @@
                               [6 6 "hidef-image" 2]
                               [5 7 "hidef-image" 3]}})
 
-  (get-target-colors (keys targets))
 
   ())

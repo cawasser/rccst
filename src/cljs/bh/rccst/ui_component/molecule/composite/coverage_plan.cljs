@@ -100,6 +100,23 @@
     (fn [v _]
       (coerce/to-date (t/plus (t/now) (t/hours v))))))
 
+
+(defn fn-color-target [{:keys [data colored]}]
+ ; (log/info "fn-color-target" data "//" colored)
+  (let [next-color (atom -1)]
+    (re-frame/reg-sub
+      (first colored)
+      :<- data
+      (fn [d _]
+        ;(log/info "fn-color-target (data)" d "//" (:data d))
+        (let [ret (map #(do
+                          (swap! next-color inc)
+                          (assoc % :color (nth s/sensor-color-pallet @next-color)))
+                    (:data d))]
+          ;(log/info "fn-color-target (ret)" d "//" (:data d) "//" ret)
+          ret)))))
+
+
 ;; endregion
 
 
@@ -116,7 +133,8 @@
      [:span.icon.has-text-success.is-small [:i.far.fa-square]])])
 
 
-(defn- display-symbol [name color]
+(defn- display-symbol [name [color _ _]]
+  ;(log/info "display-symbol" name color)
   ^{:key (str "symb-" name)}
   [:td {:style    {:color      :white
                    :text-align :center}
@@ -148,7 +166,7 @@
    [:span.icon.has-text-danger.is-small [:i.far.fa-trash-alt]]])
 
 
-(defn- display-color [name color]
+(defn- display-color [name [_ _ color]]
   ^{:key (str "color-" name)}
   [:td {:style (merge
                  (if color
@@ -167,7 +185,8 @@
         is-editing (r/atom "")]
 
     (fn []
-      (let [under-consideration (->> @s keys set)]
+      (let [under-consideration (->> @s (map :name) set)]
+        ;(log/info "target-table (d)" @d)
         [:div.table-container {:style {:width       "100%"
                                        :height      "100%"
                                        :overflow-y  :auto
@@ -178,8 +197,10 @@
            [:tr [:th "Include?"] [:th "Symbol"] [:th "AoI"] [:th ""] [:th ""]]]
           [:tbody
            (doall
-             (for [{:keys [name cells color]} (:data @d)]
+             (for [{:keys [name cells color]} @d]
                (doall
+                 ;(log/info "target-table (for)" @d "//" name color)
+
                  ^{:key name}
                  [:tr
                   [display-checkbox name name under-consideration]
@@ -261,23 +282,30 @@
 
                                    ; composite-local data sources
                                    :topic/selected-targets    {:type    :source/local :name :selected-targets
-                                                               :default {"alpha-hd"  #{[7 7 "hidef-image" 0]
-                                                                                       [7 6 "hidef-image" 1]
-                                                                                       [7 6 "hidef-image" 2]
-                                                                                       [7 5 "hidef-image" 3]}
-                                                                         "bravo-img" #{[7 2 "image" 0]
-                                                                                       [7 1 "image" 1]}
-                                                                         "fire-hd"   #{[5 3 "hidef-image" 0]
-                                                                                       [4 3 "hidef-image" 2] [5 3 "hidef-image" 2]
-                                                                                       [4 3 "hidef-image" 3] [5 3 "hidef-image" 3]}
-                                                                         "fire-ir"   #{[5 4 "v/ir" 0]
-                                                                                       [5 3 "v/ir" 1] [5 4 "v/ir" 1]
-                                                                                       [5 4 "v/ir" 2]
-                                                                                       [5 4 "v/ir" 3]}
-                                                                         "severe-hd" #{[5 6 "hidef-image" 0]
-                                                                                       [5 7 "hidef-image" 1] [6 5 "hidef-image" 1]
-                                                                                       [6 6 "hidef-image" 2]
-                                                                                       [5 7 "hidef-image" 3]}}}
+                                                               :default [{:name  "alpha-hd" :cells #{[7 7 "hidef-image" 0]
+                                                                                                     [7 6 "hidef-image" 1]
+                                                                                                     [7 6 "hidef-image" 2]
+                                                                                                     [7 5 "hidef-image" 3]}
+                                                                          :color [:green "rgba(0, 128, 0, .3)" [0.0 0.5 0.0 0.1]]}
+                                                                         {:name  "bravo-img" :cells #{[7 2 "image" 0]
+                                                                                                      [7 1 "image" 1]}
+                                                                          :color [:blue "rgba(0, 0, 255, .3)" [0.0 0. 1.0 0.1]]}
+                                                                         {:name  "fire-hd" :cells #{[5 3 "hidef-image" 0]
+                                                                                                    [4 3 "hidef-image" 2] [5 3 "hidef-image" 2]
+                                                                                                    [4 3 "hidef-image" 3] [5 3 "hidef-image" 3]}
+                                                                          :color [:orange "rgba(255, 165, 0, .3)" [1.0 0.65 0.0 0.3]]}
+                                                                         {:name  "fire-ir" :cells #{[5 4 "v/ir" 0]
+                                                                                                    [5 3 "v/ir" 1] [5 4 "v/ir" 1]
+                                                                                                    [5 4 "v/ir" 2]
+                                                                                                    [5 4 "v/ir" 3]}
+                                                                          :color [:grey "rgba(128, 128, 128, .3)" [0.5 0.5 0.5 0.3]]}
+                                                                         {:name  "severe-hd" :cells #{[5 6 "hidef-image" 0]
+                                                                                                      [5 7 "hidef-image" 1] [6 5 "hidef-image" 1]
+                                                                                                      [6 6 "hidef-image" 2]
+                                                                                                      [5 7 "hidef-image" 3]}
+                                                                          :color [:cornflowerblue "rgba(100, 149, 237, .3)" [0.4 0.58 0.93 0.3]]}]}
+
+                                   :topic/colored-target      {:type :source/local :name :colored-targets}
                                    :topic/selected-satellites {:type    :source/local :name :selected-satellites
                                                                :default #{"avhhr-6" "viirs-5" "abi-meso-11"
                                                                           "abi-meso-4" "abi-meso-10" "abi-meso-2"}}
@@ -294,14 +322,16 @@
                                    :fn/range                  {:type  :source/fn :name fn-range
                                                                :ports {:data :port/sink :range :port/source}}
                                    :fn/current-time           {:type  :source/fn :name fn-current-time
-                                                               :ports {:value :port/sink :current-time :port/source}}}
+                                                               :ports {:value :port/sink :current-time :port/source}}
+                                   :fn/color-target           {:type  :source/fn :name fn-color-target
+                                                               :ports {:data :port/sink :colored :port/source}}}
 
                     :links        {; components publish to what? via which port?
                                    ;
                                    ; <source>                 {<source-port>  {<target> <target-port>
                                    ;                                           <target> <target-port>}}
                                    ;
-                                   :ui/targets                {:data      {:topic/target-data :data}
+                                   :ui/targets                {;:data      {:topic/target-data :data}
                                                                :selection {:topic/selected-targets :data}}
                                    :ui/satellites             {:data      {:topic/satellite-data :data}
                                                                :selection {:topic/selected-satellites :data}}
@@ -311,14 +341,20 @@
                                    :fn/coverage               {:shapes {:topic/shapes :data}}
                                    :fn/range                  {:range {:topic/time-range :data}}
                                    :fn/current-time           {:current-time {:topic/current-time :data}}
+                                   :fn/color-target           {:colored {:topic/colored-target :data}}
 
                                    ; topics are inputs into what?
-                                   :topic/target-data         {:data {:ui/targets :data}}
-                                   :topic/satellite-data      {:data {:ui/satellites :data}}
+                                   :topic/target-data         {:data {:fn/color-target :data}}
+                                   :topic/colored-target      {:data {:ui/targets :data}}
                                    :topic/selected-targets    {:data {:ui/targets  :selection
                                                                       :fn/coverage :targets}}
+
+                                   :topic/satellite-data      {:data {;:fn/add-satellite-color :data
+                                                                      :ui/satellites :data}}
+                                   ;:topic/colored-satellites  {:data {:ui/satellites :data}}
                                    :topic/selected-satellites {:data {:ui/satellites :selection
-                                                                      :fn/coverage :satellites}}
+                                                                      :fn/coverage   :satellites}}
+
                                    :topic/coverage-data       {:data {:fn/coverage :coverages
                                                                       :fn/range    :data}}
                                    :topic/shapes              {:data {:ui/globe :shapes}}
