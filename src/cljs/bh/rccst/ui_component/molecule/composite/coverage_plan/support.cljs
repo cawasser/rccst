@@ -24,8 +24,9 @@
                           [:cyan "rgba(0, 255, 255, .3)" [0.0 1.0 1.0 0.9]]])
 
 ;(def dummy-sensor-color-pallet
-;  {"abi-3"       [:green "rgba(0, 128, 0, .3)" [0.0 0.5 0.0 0.1]]
-;   "abi-1"       [:blue "rgba(0, 0, 255, .3)" [0.0 0. 1.0 0.1]]
+;  {
+;   "abi-1"       [:green "rgba(0, 128, 0, .3)" [0.0 0.5 0.0 0.1]]
+;   "abi-3"       [:blue "rgba(0, 0, 255, .3)" [0.0 0. 1.0 0.1]]
 ;   "avhhr-6"     [:orange "rgba(255, 165, 0, .3)" [1.0 0.65 0.0 0.3]]
 ;   "viirs-5"     [:grey "rgba(128, 128, 128, .3)" [0.5 0.5 0.5 0.3]]
 ;   "abi-meso-11" [:cornflowerblue "rgba(100, 149, 237, .3)" [0.4 0.58 0.93 0.3]]
@@ -105,7 +106,7 @@
 
 
 (defn make-coverage-shape [{:keys [cell coverage time color] :as params}]
-  (log/info "make-coverage-shape" cell coverage "//" color "//" (keys params))
+  ;(log/info "make-coverage-shape" cell coverage "//" color "//" (keys params))
   (let [[_ _ fill]    color
         [r g b a] fill
         outline [r g b (+ a 0.3)]]
@@ -121,7 +122,7 @@
 
 
 (defn make-target-shape [[target-id row col ti [_ _ color]]]
-  (log/info "make-target-shape" target-id color)
+  ;(log/info "make-target-shape" target-id color)
   (let [[r g b a] color
         fill    [r g b (+ a 0.9)]
         outline [r g b (+ a 1.0)]]
@@ -155,7 +156,7 @@
                                               satellites))]
                        (assoc cvg :color (:color satellite))))))]
 
-    (log/info "cook-coverages (ret)" ret)
+    ;(log/info "cook-coverages (ret)" ret)
     ret))
 
 

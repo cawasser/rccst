@@ -6,6 +6,7 @@
             [bh.rccst.ui-component.utils.helpers :as h]
             [cljs-time.coerce :as coerce]
             [cljs-time.core :as t]
+            [re-com.core :as rc]
             [re-frame.core :as re-frame]
             [reagent.core :as r]
             [taoensso.timbre :as log]
@@ -52,7 +53,7 @@
                         :sensor_steering [[-5 5] [-5 5]],
                         :sensor_size     [1 1],
                         :sensor_id       "abi-meso-2"
-                        :color           [:khaki "rgba(240, 230, 140, .3)" [0.94 0.90 0.55 0.3]]}
+                        :color           [:blue "rgba(0, 0, 255, .3)" [0.0 0. 1.0 0.1]]}
                        {:name            "goes-east",
                         :start           [9 6],
                         :path            "geo",
@@ -61,7 +62,7 @@
                         :sensor_steering [[-5 5] [-5 5]],
                         :sensor_size     [1 1],
                         :sensor_id       "abi-meso-10"
-                        :color           [:goldenrod "rgba(218, 165, 32, .3)" [0.84 0.65 0.13 0.3]]}
+                        :color           [:orange "rgba(255, 165, 0, .3)" [1.0 0.65 0.0 0.3]]}
                        {:name            "goes-west",
                         :start           [9 2],
                         :path            "geo",
@@ -70,7 +71,7 @@
                         :sensor_steering [[-5 5] [-5 5]],
                         :sensor_size     [1 1],
                         :sensor_id       "abi-meso-4"
-                        :color           [:darkcyan "rgba(0, 139, 139, .3)" [0.0 0.55 0.55 0.3]]}
+                        :color           [:cornflowerblue "rgba(100, 149, 237, .3)" [0.4 0.58 0.93 0.3]]}
                        {:name            "goes-west",
                         :start           [9 2],
                         :path            "geo",
@@ -79,7 +80,7 @@
                         :sensor_steering [[-5 5] [-5 5]],
                         :sensor_size     [1 1],
                         :sensor_id       "abi-meso-11"
-                        :color           [:cornflowerblue "rgba(100, 149, 237, .3)" [0.4 0.58 0.93 0.3]]}
+                        :color           [:darkcyan "rgba(0, 139, 139, .3)" [0.0 0.55 0.55 0.3]]}
                        {:name            "noaa-xx",
                         :start           [4 3],
                         :path            "horz",
@@ -88,7 +89,7 @@
                         :sensor_steering [[0 0] [0 0]],
                         :sensor_size     [10 2],
                         :sensor_id       "viirs-5"
-                        :color           [:grey "rgba(128, 128, 128, .3)" [0.5 0.5 0.5 0.3]]}
+                        :color           [:goldenrod "rgba(218, 165, 32, .3)" [0.84 0.65 0.13 0.3]]}
                        {:name            "metop-yy",
                         :start           [4 1],
                         :path            "horz",
@@ -97,7 +98,7 @@
                         :sensor_steering [[0 0] [0 0]],
                         :sensor_size     [10 2],
                         :sensor_id       "avhhr-6"
-                        :color           [:orange "rgba(255, 165, 0, .3)" [1.0 0.65 0.0 0.3]]}])
+                        :color           [:khaki "rgba(240, 230, 140, .3)" [0.94 0.90 0.55 0.3]]}])
 
 
 ;; endregion
@@ -146,7 +147,7 @@
                                           s-under-c
                                           (get-in % [:coverage :sensor]))
                                  (s/cook-coverages s c ct))
-            _                  (log/info "fn-coverage (filter)" filtered-coverages)
+            ;_                  (log/info "fn-coverage (filter)" filtered-coverages)
             cvg                (if (seq c)
                                  (map s/make-coverage-shape filtered-coverages)
                                  [])
@@ -230,11 +231,12 @@
 
 ;; region ; custom tables for display
 
-(defn- display-checkbox [id name under-consideration]
-  ^{:key (str "inc-" name)}
+(defn- display-checkbox [id name under-consideration toggle-fn]
+  ^{:key (str "check-" id)}
   [:td.is-narrow
    {:style    {:text-align :center}
-    :on-click #()}
+    :on-click (rc/handler-fn
+                (toggle-fn))}
 
    (if (contains? under-consideration id)
      [:span.icon.has-text-success.is-small [:i.fas.fa-check]]
@@ -275,7 +277,7 @@
 
 
 (defn- display-color [name [color _ _]]
-  (log/info "display-color" name "//" color)
+  ;(log/info "display-color" name "//" color)
   ^{:key (str "color-" name)}
   [:td {:style (merge
                  (if color
@@ -286,6 +288,30 @@
                  {:text-align :center
                   :width      100})}
    [:span]])
+
+
+(defn- toggle-target [targets resolved-selection selection id]
+  (let [s-ids (->> resolved-selection (map :name) set)]
+    (if (contains? s-ids id)
+      ; remove
+      (h/handle-change-path selection []
+        (remove #(= id (:name %)) resolved-selection))
+
+      ; add
+      (h/handle-change-path selection []
+        (concat resolved-selection (filter #(= id (:name %)) targets))))))
+
+
+(defn- toggle-satellite [satellites resolved-selection selection id]
+  (let [s-ids (->> resolved-selection (map :sensor_id) set)]
+    (if (contains? s-ids id)
+      ; remove
+      (h/handle-change-path selection []
+        (remove #(= id (:sensor_id %)) resolved-selection))
+
+      ; add
+      (h/handle-change-path selection []
+        (concat resolved-selection (filter #(= id (:sensor_id %)) satellites))))))
 
 
 (defn- target-table [& {:keys [data selection component-id container-id]}]
@@ -308,11 +334,12 @@
            (doall
              (for [{:keys [name cells color]} @d]
                (doall
-                 ;(log/info "target-table (for)" @d "//" name color)
+                 ;(log/info "target-table (for)" @d
+                 ; "//" name color)
 
                  ^{:key name}
                  [:tr
-                  [display-checkbox name name under-consideration]
+                  [display-checkbox name name under-consideration #(toggle-target @d @s selection name)]
 
                   [display-symbol name color]
 
@@ -324,13 +351,13 @@
 
 
 (defn- satellite-table [& {:keys [data selection component-id container-id]}]
-  (log/info "satellites-table" data "//" selection)
+  ;(log/info "satellites-table" data "//" selection)
 
   (let [d          (h/resolve-value data)
         s          (h/resolve-value selection)
         is-editing (r/atom "")]
 
-    (log/info "satellites-table (s)" @d "//" @s)
+    ;(log/info "satellites-table (s)" @d "//" @s)
 
     (fn []
       (let [under-consideration (->> @s (map :sensor_id) set)]
@@ -346,12 +373,12 @@
            (doall
              (for [{:keys [platform_id sensor_id color] :as platform} @d]
                (doall
-                 (log/info "satellites-table (platform)" platform
-                   "//" platform_id "//" sensor_id "//" color)
-
-                 ^{:key name}
+                 ^{:key sensor_id}
                  [:tr
-                  [display-checkbox sensor_id (str platform_id "-" sensor_id) under-consideration]
+                  [display-checkbox sensor_id
+                   (str platform_id "-" sensor_id)
+                   under-consideration
+                   #(toggle-satellite @d @s selection sensor_id)]
 
                   [display-color (str platform_id "-" sensor_id) color]
 
