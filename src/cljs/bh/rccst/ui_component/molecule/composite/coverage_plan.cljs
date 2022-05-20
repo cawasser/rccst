@@ -135,19 +135,19 @@
       (coerce/to-date (t/plus (t/now) (t/hours v))))))
 
 
-(defn fn-color-target [{:keys [data colored]}]
- ; (log/info "fn-color-target" data "//" colored)
+(defn fn-color-targets [{:keys [data colored]}]
+  ; (log/info "fn-color-targets" data "//" colored)
   (let [next-color (atom -1)]
     (re-frame/reg-sub
       (first colored)
       :<- data
       (fn [d _]
-        ;(log/info "fn-color-target (data)" d "//" (:data d))
+        ;(log/info "fn-color-targets (data)" d "//" (:data d))
         (let [ret (map #(do
                           (swap! next-color inc)
                           (assoc % :color (nth s/sensor-color-pallet @next-color)))
                     (:data d))]
-          ;(log/info "fn-color-target (ret)" d "//" (:data d) "//" ret)
+          ;(log/info "fn-color-targets (ret)" d "//" (:data d) "//" ret)
           ret)))))
 
 
@@ -287,7 +287,6 @@
 ;; endregion
 
 
-
 (def ui-definition {:title        "Coverage Plan"
                     :component-id :coverage-plan
                     :components   {; ui components
@@ -306,7 +305,7 @@
                                    :topic/selected-targets    {:type    :source/local :name :selected-targets
                                                                :default dummy-targets}
 
-                                   :topic/colored-target      {:type :source/local :name :colored-targets}
+                                   :topic/colored-targets     {:type :source/local :name :colored-targets}
                                    :topic/selected-satellites {:type    :source/local :name :selected-satellites
                                                                :default dummy-satellites}
                                    :topic/current-time        {:type :source/local :name :current-time :default 0}
@@ -323,7 +322,7 @@
                                                                :ports {:data :port/sink :range :port/source}}
                                    :fn/current-time           {:type  :source/fn :name fn-current-time
                                                                :ports {:value :port/sink :current-time :port/source}}
-                                   :fn/color-target           {:type  :source/fn :name fn-color-target
+                                   :fn/color-targets          {:type  :source/fn :name fn-color-targets
                                                                :ports {:data :port/sink :colored :port/source}}}
 
                     :links        {; components publish to what? via which port?
@@ -341,11 +340,11 @@
                                    :fn/coverage               {:shapes {:topic/shapes :data}}
                                    :fn/range                  {:range {:topic/time-range :data}}
                                    :fn/current-time           {:current-time {:topic/current-time :data}}
-                                   :fn/color-target           {:colored {:topic/colored-target :data}}
+                                   :fn/color-targets           {:colored {:topic/colored-targets :data}}
 
                                    ; topics are inputs into what?
-                                   :topic/target-data         {:data {:fn/color-target :data}}
-                                   :topic/colored-target      {:data {:ui/targets :data}}
+                                   :topic/target-data         {:data {:fn/color-targets :data}}
+                                   :topic/colored-targets     {:data {:ui/targets :data}}
                                    :topic/selected-targets    {:data {:ui/targets  :selection
                                                                       :fn/coverage :targets}}
 
