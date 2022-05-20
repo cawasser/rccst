@@ -143,11 +143,27 @@
       :<- data
       (fn [d _]
         ;(log/info "fn-color-targets (data)" d "//" (:data d))
-        (let [ret (map #(do
-                          (swap! next-color inc)
-                          (assoc % :color (nth s/sensor-color-pallet @next-color)))
+        (let [cnt (count s/sensor-color-pallet)
+              ret (map #(do
+                          (assoc % :color (nth s/sensor-color-pallet (mod (swap! next-color inc) cnt))))
                     (:data d))]
           ;(log/info "fn-color-targets (ret)" d "//" (:data d) "//" ret)
+          ret)))))
+
+
+(defn fn-color-satellites [{:keys [data colored]}]
+  ; (log/info "fn-color-satellites" data "//" colored)
+  (let [next-color (atom -1)]
+    (re-frame/reg-sub
+      (first colored)
+      :<- data
+      (fn [d _]
+        ;(log/info "fn-color-satellites (data)" d "//" (:data d))
+        (let [cnt (count s/sensor-color-pallet)
+              ret (map #(do
+                          (assoc % :color (nth s/sensor-color-pallet (mod (swap! next-color inc) cnt))))
+                    (:data d))]
+          ;(log/info "fn-color-satellites (ret)" d "//" (:data d) "//" ret)
           ret)))))
 
 
@@ -306,8 +322,11 @@
                                                                :default dummy-targets}
 
                                    :topic/colored-targets     {:type :source/local :name :colored-targets}
+
                                    :topic/selected-satellites {:type    :source/local :name :selected-satellites
                                                                :default dummy-satellites}
+                                   :topic/colored-satellites  {:type :source/local :name :colored-satellites}
+
                                    :topic/current-time        {:type :source/local :name :current-time :default 0}
                                    :topic/shapes              {:type :source/local :name :shapes}
                                    :topic/time-range          {:type :source/local :name :time-range}
@@ -323,16 +342,13 @@
                                    :fn/current-time           {:type  :source/fn :name fn-current-time
                                                                :ports {:value :port/sink :current-time :port/source}}
                                    :fn/color-targets          {:type  :source/fn :name fn-color-targets
+                                                               :ports {:data :port/sink :colored :port/source}}
+                                   :fn/color-satellites       {:type  :source/fn :name fn-color-satellites
                                                                :ports {:data :port/sink :colored :port/source}}}
 
-                    :links        {; components publish to what? via which port?
-                                   ;
-                                   ; <source>                 {<source-port>  {<target> <target-port>
-                                   ;                                           <target> <target-port>}}
-                                   ;
-                                   :ui/targets                {;:data      {:topic/target-data :data}
+                    :links        {:ui/targets                {;:data      {:topic/target-data :data}
                                                                :selection {:topic/selected-targets :data}}
-                                   :ui/satellites             {:data      {:topic/satellite-data :data}
+                                   :ui/satellites             {;:data      {:topic/satellite-data :data}
                                                                :selection {:topic/selected-satellites :data}}
                                    :ui/time-slider            {:value {:topic/current-slider :data}}
 
@@ -340,7 +356,8 @@
                                    :fn/coverage               {:shapes {:topic/shapes :data}}
                                    :fn/range                  {:range {:topic/time-range :data}}
                                    :fn/current-time           {:current-time {:topic/current-time :data}}
-                                   :fn/color-targets           {:colored {:topic/colored-targets :data}}
+                                   :fn/color-targets          {:colored {:topic/colored-targets :data}}
+                                   :fn/color-satellites       {:colored {:topic/colored-satellites :data}}
 
                                    ; topics are inputs into what?
                                    :topic/target-data         {:data {:fn/color-targets :data}}
@@ -348,7 +365,7 @@
                                    :topic/selected-targets    {:data {:ui/targets  :selection
                                                                       :fn/coverage :targets}}
 
-                                   :topic/satellite-data      {:data {;:fn/add-satellite-color :data
+                                   :topic/satellite-data      {:data {:fn/add-satellite-color :data
                                                                       :ui/satellites :data}}
                                    ;:topic/colored-satellites  {:data {:ui/satellites :data}}
                                    :topic/selected-satellites {:data {:ui/satellites :selection
