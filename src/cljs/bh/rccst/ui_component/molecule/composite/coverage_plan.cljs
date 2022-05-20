@@ -17,6 +17,40 @@
 (log/info "bh.rccst.ui-component.molecule.composite.coverage-plan")
 
 
+;; region ; data for developing the UI
+
+
+(def dummy-targets [{:name  "alpha-hd" :cells #{[7 7 "hidef-image" 0]
+                                                [7 6 "hidef-image" 1]
+                                                [7 6 "hidef-image" 2]
+                                                [7 5 "hidef-image" 3]}
+                     :color [:green "rgba(0, 128, 0, .3)" [0.0 0.5 0.0 0.1]]}
+                    {:name  "bravo-img" :cells #{[7 2 "image" 0]
+                                                 [7 1 "image" 1]}
+                     :color [:blue "rgba(0, 0, 255, .3)" [0.0 0. 1.0 0.1]]}
+                    {:name  "fire-hd" :cells #{[5 3 "hidef-image" 0]
+                                               [4 3 "hidef-image" 2] [5 3 "hidef-image" 2]
+                                               [4 3 "hidef-image" 3] [5 3 "hidef-image" 3]}
+                     :color [:orange "rgba(255, 165, 0, .3)" [1.0 0.65 0.0 0.3]]}
+                    {:name  "fire-ir" :cells #{[5 4 "v/ir" 0]
+                                               [5 3 "v/ir" 1] [5 4 "v/ir" 1]
+                                               [5 4 "v/ir" 2]
+                                               [5 4 "v/ir" 3]}
+                     :color [:grey "rgba(128, 128, 128, .3)" [0.5 0.5 0.5 0.3]]}
+                    {:name  "severe-hd" :cells #{[5 6 "hidef-image" 0]
+                                                 [5 7 "hidef-image" 1] [6 5 "hidef-image" 1]
+                                                 [6 6 "hidef-image" 2]
+                                                 [5 7 "hidef-image" 3]}
+                     :color [:cornflowerblue "rgba(100, 149, 237, .3)" [0.4 0.58 0.93 0.3]]}])
+
+
+(def dummy-satellites #{"avhhr-6" "viirs-5" "abi-meso-11"
+                        "abi-meso-4" "abi-meso-10" "abi-meso-2"})
+
+
+;; endregion
+
+
 ;; region ; local function to support :source/local topics
 
 (defn fn-coverage
@@ -252,18 +286,6 @@
 
 ;; endregion
 
-;; components have "ports" which define their inputs and outputs:
-;;
-;;      you SUBSCRIBE with a :port/sink, ie, data come IN   (re-frame/subscribe ...)
-;;
-;;      you PUBLISH to a :port/source, ie, data goes OUT    (re-frame/dispatch ...)
-;;
-;;      you do BOTH with :port/source-sink (both)           should we even have this, or should we spell out both directions?
-;;
-;; the question about :port/source-sink arises because building the layout (the call for the UI itself) doesn't actually
-;; need to make a distinction (in fact the code is a bit cleaner if we don't) and we have the callee sort it out (since it
-;; needs to implement the correct usage anyway). The flow-diagram, on the other hand, is easier if we DO make the
-;; distinction, so we can quickly build all the Nodes and Handles used for the diagram...
 
 
 (def ui-definition {:title        "Coverage Plan"
@@ -282,33 +304,11 @@
 
                                    ; composite-local data sources
                                    :topic/selected-targets    {:type    :source/local :name :selected-targets
-                                                               :default [{:name  "alpha-hd" :cells #{[7 7 "hidef-image" 0]
-                                                                                                     [7 6 "hidef-image" 1]
-                                                                                                     [7 6 "hidef-image" 2]
-                                                                                                     [7 5 "hidef-image" 3]}
-                                                                          :color [:green "rgba(0, 128, 0, .3)" [0.0 0.5 0.0 0.1]]}
-                                                                         {:name  "bravo-img" :cells #{[7 2 "image" 0]
-                                                                                                      [7 1 "image" 1]}
-                                                                          :color [:blue "rgba(0, 0, 255, .3)" [0.0 0. 1.0 0.1]]}
-                                                                         {:name  "fire-hd" :cells #{[5 3 "hidef-image" 0]
-                                                                                                    [4 3 "hidef-image" 2] [5 3 "hidef-image" 2]
-                                                                                                    [4 3 "hidef-image" 3] [5 3 "hidef-image" 3]}
-                                                                          :color [:orange "rgba(255, 165, 0, .3)" [1.0 0.65 0.0 0.3]]}
-                                                                         {:name  "fire-ir" :cells #{[5 4 "v/ir" 0]
-                                                                                                    [5 3 "v/ir" 1] [5 4 "v/ir" 1]
-                                                                                                    [5 4 "v/ir" 2]
-                                                                                                    [5 4 "v/ir" 3]}
-                                                                          :color [:grey "rgba(128, 128, 128, .3)" [0.5 0.5 0.5 0.3]]}
-                                                                         {:name  "severe-hd" :cells #{[5 6 "hidef-image" 0]
-                                                                                                      [5 7 "hidef-image" 1] [6 5 "hidef-image" 1]
-                                                                                                      [6 6 "hidef-image" 2]
-                                                                                                      [5 7 "hidef-image" 3]}
-                                                                          :color [:cornflowerblue "rgba(100, 149, 237, .3)" [0.4 0.58 0.93 0.3]]}]}
+                                                               :default dummy-targets}
 
                                    :topic/colored-target      {:type :source/local :name :colored-targets}
                                    :topic/selected-satellites {:type    :source/local :name :selected-satellites
-                                                               :default #{"avhhr-6" "viirs-5" "abi-meso-11"
-                                                                          "abi-meso-4" "abi-meso-10" "abi-meso-2"}}
+                                                               :default dummy-satellites}
                                    :topic/current-time        {:type :source/local :name :current-time :default 0}
                                    :topic/shapes              {:type :source/local :name :shapes}
                                    :topic/time-range          {:type :source/local :name :time-range}
@@ -396,6 +396,24 @@
 
 
   ())
+
+
+
+
+
+;; components have "ports" which define their inputs and outputs:
+;;
+;;      you SUBSCRIBE with a :port/sink, ie, data come IN   (re-frame/subscribe ...)
+;;
+;;      you PUBLISH to a :port/source, ie, data goes OUT    (re-frame/dispatch ...)
+;;
+;;      you do BOTH with :port/source-sink (both)           should we even have this, or should we spell out both directions?
+;;
+;; the question about :port/source-sink arises because building the layout (the call for the UI itself) doesn't actually
+;; need to make a distinction (in fact the code is a bit cleaner if we don't) and we have the callee sort it out (since it
+;; needs to implement the correct usage anyway). The flow-diagram, on the other hand, is easier if we DO make the
+;; distinction, so we can quickly build all the Nodes and Handles used for the diagram...
+
 
 
 
