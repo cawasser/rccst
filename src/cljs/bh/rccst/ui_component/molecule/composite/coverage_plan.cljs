@@ -44,8 +44,60 @@
                      :color [:cornflowerblue "rgba(100, 149, 237, .3)" [0.4 0.58 0.93 0.3]]}])
 
 
-(def dummy-satellites #{"avhhr-6" "viirs-5" "abi-meso-11"
-                        "abi-meso-4" "abi-meso-10" "abi-meso-2"})
+(def dummy-satellites [{:name            "goes-east",
+                        :start           [9 6],
+                        :path            "geo",
+                        :platform_id     "goes-east",
+                        :type            "hidef-image",
+                        :sensor_steering [[-5 5] [-5 5]],
+                        :sensor_size     [1 1],
+                        :sensor_id       "abi-meso-2"
+                        :color           [:khaki "rgba(240, 230, 140, .3)" [0.94 0.90 0.55 0.3]]}
+                       {:name            "goes-east",
+                        :start           [9 6],
+                        :path            "geo",
+                        :platform_id     "goes-east",
+                        :type            "hidef-image",
+                        :sensor_steering [[-5 5] [-5 5]],
+                        :sensor_size     [1 1],
+                        :sensor_id       "abi-meso-10"
+                        :color           [:goldenrod "rgba(218, 165, 32, .3)" [0.84 0.65 0.13 0.3]]}
+                       {:name            "goes-west",
+                        :start           [9 2],
+                        :path            "geo",
+                        :platform_id     "goes-west",
+                        :type            "hidef-image",
+                        :sensor_steering [[-5 5] [-5 5]],
+                        :sensor_size     [1 1],
+                        :sensor_id       "abi-meso-4"
+                        :color           [:darkcyan "rgba(0, 139, 139, .3)" [0.0 0.55 0.55 0.3]]}
+                       {:name            "goes-west",
+                        :start           [9 2],
+                        :path            "geo",
+                        :platform_id     "goes-west",
+                        :type            "hidef-image",
+                        :sensor_steering [[-5 5] [-5 5]],
+                        :sensor_size     [1 1],
+                        :sensor_id       "abi-meso-11"
+                        :color           [:cornflowerblue "rgba(100, 149, 237, .3)" [0.4 0.58 0.93 0.3]]}
+                       {:name            "noaa-xx",
+                        :start           [4 3],
+                        :path            "horz",
+                        :platform_id     "noaa-xx",
+                        :type            "v/ir",
+                        :sensor_steering [[0 0] [0 0]],
+                        :sensor_size     [10 2],
+                        :sensor_id       "viirs-5"
+                        :color           [:grey "rgba(128, 128, 128, .3)" [0.5 0.5 0.5 0.3]]}
+                       {:name            "metop-yy",
+                        :start           [4 1],
+                        :path            "horz",
+                        :platform_id     "metop-yy",
+                        :type            "v/ir",
+                        :sensor_steering [[0 0] [0 0]],
+                        :sensor_size     [10 2],
+                        :sensor_id       "avhhr-6"
+                        :color           [:orange "rgba(255, 165, 0, .3)" [1.0 0.65 0.0 0.3]]}])
 
 
 ;; endregion
@@ -82,20 +134,26 @@
     :<- current-time
     (fn [[t s c ct] _]
       ;(log/info "fn-coverage (sub)" ct
-      ;  "// (targets)" t)
-      ;  ;"// (satellites)" s
+      ;  "// (targets)" t
+      ;  "// (satellites)" s)
       ;  ;"// (cooked)" (s/cook-coverages c ct)
       ;  "// (filter)" (filter #(contains? s (get-in % [:coverage :sensor]))
       ;                  (s/cook-coverages c ct)))
 
-      (let [cvg (if (or (empty? c) (empty? (:data c)))
-                  []
-                  (map s/make-coverage-shape (filter #(contains? s (get-in % [:coverage :sensor]))
-                                               (s/cook-coverages c ct))))
-            trg (if (empty? t)
-                  []
-                  (map s/make-target-shape (s/cook-targets t ct)))
-            ret (concat cvg trg)]
+      (let [s-under-c          (->> s (map #(get-in % [:sensor_id])) set)
+            ;_                              (log/info "fn-coverage (s-u-c)" s-under-c)
+            filtered-coverages (filter #(contains?
+                                          s-under-c
+                                          (get-in % [:coverage :sensor]))
+                                 (s/cook-coverages s c ct))
+            _                  (log/info "fn-coverage (filter)" filtered-coverages)
+            cvg                (if (seq c)
+                                 (map s/make-coverage-shape filtered-coverages)
+                                 [])
+            trg                (if (seq t)
+                                 (map s/make-target-shape (s/cook-targets t ct))
+                                 [])
+            ret                (concat cvg trg)]
 
         ;(log/info "fn-coverage (ret)" ret
         ;  "//" cvg
@@ -152,8 +210,8 @@
 
 
 (defn fn-color-satellites [{:keys [data colored]}]
-  ; (log/info "fn-color-satellites" data "//" colored)
-  (let [next-color (atom -1)]
+  ;(log/info "fn-color-satellites" data "//" colored)
+  (let [next-sat-color (atom -1)]
     (re-frame/reg-sub
       (first colored)
       :<- data
@@ -161,9 +219,9 @@
         ;(log/info "fn-color-satellites (data)" d "//" (:data d))
         (let [cnt (count s/sensor-color-pallet)
               ret (map #(do
-                          (assoc % :color (nth s/sensor-color-pallet (mod (swap! next-color inc) cnt))))
+                          (assoc % :color (nth s/sensor-color-pallet (mod (swap! next-sat-color inc) cnt))))
                     (:data d))]
-          ;(log/info "fn-color-satellites (ret)" d "//" (:data d) "//" ret)
+          ;(log/info "fn-color-satellites (ret)" ret)
           ret)))))
 
 
@@ -216,7 +274,8 @@
    [:span.icon.has-text-danger.is-small [:i.far.fa-trash-alt]]])
 
 
-(defn- display-color [name [_ _ color]]
+(defn- display-color [name [color _ _]]
+  (log/info "display-color" name "//" color)
   ^{:key (str "color-" name)}
   [:td {:style (merge
                  (if color
@@ -265,16 +324,16 @@
 
 
 (defn- satellite-table [& {:keys [data selection component-id container-id]}]
-  ;(log/info "satellites-table" data "//" selection)
+  (log/info "satellites-table" data "//" selection)
 
   (let [d          (h/resolve-value data)
         s          (h/resolve-value selection)
         is-editing (r/atom "")]
 
-    ;(log/info "satellites-table (s)" @s "//" (:data @d))
+    (log/info "satellites-table (s)" @d "//" @s)
 
     (fn []
-      (let [under-consideration @s]
+      (let [under-consideration (->> @s (map :sensor_id) set)]
         [:div.table-container {:style {:width       "100%"
                                        :height      "100%"
                                        :overflow-y  :auto
@@ -285,10 +344,10 @@
            [:tr [:th "Include?"] [:th "Color"] [:th "Platform"]]]
           [:tbody
            (doall
-             (for [{:keys [platform_id sensor_id color] :as platform} (:data @d)]
+             (for [{:keys [platform_id sensor_id color] :as platform} @d]
                (doall
-                 ;(log/info "satellites-table (platform)" platform
-                 ;  "//" platform_id "//" sensor_id "//" color)
+                 (log/info "satellites-table (platform)" platform
+                   "//" platform_id "//" sensor_id "//" color)
 
                  ^{:key name}
                  [:tr
@@ -365,9 +424,8 @@
                                    :topic/selected-targets    {:data {:ui/targets  :selection
                                                                       :fn/coverage :targets}}
 
-                                   :topic/satellite-data      {:data {:fn/add-satellite-color :data
-                                                                      :ui/satellites :data}}
-                                   ;:topic/colored-satellites  {:data {:ui/satellites :data}}
+                                   :topic/satellite-data      {:data {:fn/color-satellites :data}}
+                                   :topic/colored-satellites  {:data {:ui/satellites :data}}
                                    :topic/selected-satellites {:data {:ui/satellites :selection
                                                                       :fn/coverage   :satellites}}
 
