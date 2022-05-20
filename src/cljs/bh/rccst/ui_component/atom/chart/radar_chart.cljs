@@ -1,6 +1,9 @@
 (ns bh.rccst.ui-component.atom.chart.radar-chart
   (:require [bh.rccst.ui-component.atom.chart.utils :as utils]
             [bh.rccst.ui-component.utils.color :as color]
+            [bh.rccst.ui-component.utils.helpers :as h]
+            [bh.rccst.ui-component.utils.locals :as l]
+            [bh.rccst.ui-component.atom.chart.wrapper-2 :as wrapper]
             [bh.rccst.ui-component.atom.chart.wrapper :as c]
             [bh.rccst.ui-component.utils :as ui-utils]
             [re-com.core :as rc]
@@ -72,6 +75,7 @@
 > [tabular-data]()
   "
   [data]
+  (log/info "localconfig: " data)
   (merge (domain-range data)
     (->> (get-in @data [:metadata :fields])
       (filter (fn [[k v]] (= :number v)))
@@ -117,6 +121,7 @@
   - data : (atom) metadata wrapped data  to display
   "
   [component-id data]
+  (log/info "configgg : " @data)
   (-> ui-utils/default-pub-sub
     (merge
       utils/default-config
@@ -128,6 +133,7 @@
 
 
 (defn- radar-config [component-id label path position]
+  (log/info "radarr config")
   [rc/v-box :src (rc/at)
    :gap "5px"
    :children [[utils/boolean-config component-id label (conj path :include)]
@@ -137,6 +143,7 @@
 
 
 (defn- make-radar-config [component-id data]
+  (log/info "make radar config")
   (->> (get-in @data [:metadata :fields])
     (filter (fn [[k v]] (= :number v)))
     keys
@@ -153,6 +160,7 @@
   - data : (atom) data to display (may be used by the standard configuration components for thins like axes, etc.\n  - config : (atom) holds all the configuration settings made by the user
   "
   [data component-id]
+  (log/info "radar config panel")
 
   [rc/v-box :src (rc/at)
    :gap "10px"
@@ -169,8 +177,9 @@
                :children (make-radar-config component-id data)]]])
 
 
-(defn- make-radar-display [component-id data subscriptions]
-  (->> (get-in @data [:metadata :fields])
+(defn- make-radar-display [data subscriptions isAnimationActive?]
+  (log/info "make-radar-display")
+  (->> (get-in data [:metadata :fields])
     (filter (fn [[_ v]] (= :number v)))
     keys
     (map (fn [a]
@@ -185,7 +194,7 @@
     (into [:<>])))
 
 
-(defn- component-panel
+(defn- component*
   "the chart to draw, taking cues from the settings of the configuration panel
 
   ---
@@ -193,13 +202,16 @@
   - data : (atom) any data used by the component's ui
   - component-id : (string) unique identifier for this specific widget
   "
-  [data component-id container-id ui]
-  (let [container     (ui-utils/subscribe-local component-id [:container])
-        subscriptions (ui-utils/build-subs component-id (local-config data))]
+  [& {:keys [data component-id container-id
+             subscriptions isAnimationActive?]
+      :as params}]
+
+  (log/info "radar component* : " data)
+  (let [d (if (empty? data) [] (get data :data))]
 
     (fn [data component-id container-id ui]
       [:> ResponsiveContainer
-       [:> RadarChart {:data (get @data :data)}
+       [:> RadarChart {:data d}
         [:> PolarGrid]
         [:> PolarAngleAxis {:dataKey :subject}]
         [:> PolarRadiusAxis {:angle "30" :domain (ui-utils/resolve-sub subscriptions [:domain])}]
@@ -208,55 +220,73 @@
 
         (make-radar-display component-id data subscriptions)]])))
 
+(defn component [& {:keys [data config-data component-id container-id
+                           data-panel config-panel] :as params}]
 
-(defn configurable-component
-  "the chart to draw, taking cues from the settings of the configuration panel
+  (log/info "Radar component-2" params)
 
-  the component creates its own ID (a random-uuid) to hold the local state. This way multiple charts
-  can be placed inside the same outer container/composite
-
-  ---
-
-  - data : (atom) any data shown by the component's ui
-  - :component-id : (string) name of this chart
-  - container-id : (string) name of the container this chart is inside of
-  "
-  [& {:keys [data component-id container-id ui]}]
-  [c/base-chart
+  [wrapper/base-chart
    :data data
-   :config (config component-id data)
+   :config-data config-data
    :component-id component-id
-   :container-id (or container-id "")
-   :data-panel utils/dummy-data-panel
+   :container-id container-id
+   :component* component*
+   :component-panel wrapper/component-panel
+   :data-panel data-panel
    :config-panel config-panel
-   :component-panel component-panel
-   :ui ui])
-
-
-(defn component
-  "the chart to draw. this variant does NOT provide a configuration panel
-
-  ---
-
-  - :data : (atom) any data shown by the component's ui
-  - :component-id : (string) name of this chart
-  - :container-id : (string) name of the container this chart is inside of
-  "
-  [& {:keys [data component-id container-id ui]}]
-  [c/base-chart
-   :data data
-   :config (config component-id data)
-   :component-id component-id
-   :container-id (or container-id "")
-   :component-panel component-panel
-   :ui ui])
-
+   :config config
+   :local-config local-config])
 
 (def meta-data {:component              component
-                :configurable-component configurable-component
-                :sources                {:data :source-type/meta-tabular}
-                :pubs                   []
-                :subs                   []})
+                :ports     {:data   :port/sink
+                            :config :port/sink}})
+
+
+
+
+
+;(defn configurable-component
+;  "the chart to draw, taking cues from the settings of the configuration panel
+;
+;  the component creates its own ID (a random-uuid) to hold the local state. This way multiple charts
+;  can be placed inside the same outer container/composite
+;
+;  ---
+;
+;  - data : (atom) any data shown by the component's ui
+;  - :component-id : (string) name of this chart
+;  - container-id : (string) name of the container this chart is inside of
+;  "
+;  [& {:keys [data component-id container-id ui]}]
+;  [c/base-chart
+;   :data data
+;   :config (config component-id data)
+;   :component-id component-id
+;   :container-id (or container-id "")
+;   :data-panel utils/dummy-data-panel
+;   :config-panel config-panel
+;   :component-panel component-panel
+;   :ui ui])
+
+
+;(defn component
+;  "the chart to draw. this variant does NOT provide a configuration panel
+;
+;  ---
+;
+;  - :data : (atom) any data shown by the component's ui
+;  - :component-id : (string) name of this chart
+;  - :container-id : (string) name of the container this chart is inside of
+;  "
+;  [& {:keys [data component-id container-id ui]}]
+;  [c/base-chart
+;   :data data
+;   :config (config component-id data)
+;   :component-id component-id
+;   :container-id (or container-id "")
+;   :component-panel component-panel
+;   :ui ui])
+
 
 
 
