@@ -203,11 +203,43 @@
       (fn [d _]
         ;(log/info "fn-color-targets (data)" d "//" (:data d))
         (let [cnt (count s/sensor-color-pallet)
-              ret (map #(do
-                          (assoc % :color (nth s/sensor-color-pallet (mod (swap! next-color inc) cnt))))
+              ret (map-indexed (fn [idx t]
+                                 (assoc t :color (nth s/sensor-color-pallet (mod idx cnt))))
                     (:data d))]
           ;(log/info "fn-color-targets (ret)" d "//" (:data d) "//" ret)
           ret)))))
+
+
+; TODO: can we cache the results in the app-db so we only add :color to "new" elements?
+(comment
+  (do
+    (def colored [:coverage-plan-demo-ww.grid-widget :blackboard :topic.colored-targets])
+    (def current-colors (get-in @re-frame.db/app-db (concat [:containers] colored)))
+    (def assigned (map (juxt :name :color) current-colors))
+    (def assigned-set (->> assigned (map first) set))
+    (def candidate {:name "alpha-hd",
+                    :cells #{[7 7 "hidef-image" 0] [7 6 "hidef-image" 1] [7 5 "hidef-image" 3] [7 6 "hidef-image" 2]},
+                    :color [:darkred "rgba(139, 0, 0, .3)" [0.55 0 0 0.3]]}))
+
+
+  (if (contains? assigned-set (:name candidate))
+    candidate
+    (assoc candidate :color [:dummy :dummy :dummy]))
+
+
+  (get-in @re-frame.db/app-db '(:containers))
+  (get-in @re-frame.db/app-db '(:containers :coverage-plan-demo-ww.grid-widget))
+  (get-in @re-frame.db/app-db '(:containers :coverage-plan-demo-ww.grid-widget
+                                 :blackboard))
+  (get-in @re-frame.db/app-db '(:containers :coverage-plan-demo-ww.grid-widget
+                                 :blackboard :topic.colored-targets))
+
+  @current-colors
+
+
+
+
+  ())
 
 
 (defn fn-color-satellites [{:keys [data colored]}]
@@ -219,8 +251,8 @@
       (fn [d _]
         ;(log/info "fn-color-satellites (data)" d "//" (:data d))
         (let [cnt (count s/sensor-color-pallet)
-              ret (map #(do
-                          (assoc % :color (nth s/sensor-color-pallet (mod (swap! next-sat-color inc) cnt))))
+              ret (map-indexed (fn [idx t]
+                                 (assoc t :color (nth s/sensor-color-pallet (mod idx cnt))))
                     (:data d))]
           ;(log/info "fn-color-satellites (ret)" ret)
           ret)))))
