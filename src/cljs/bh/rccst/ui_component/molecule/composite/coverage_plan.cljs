@@ -1,7 +1,8 @@
 (ns bh.rccst.ui-component.molecule.composite.coverage-plan
   "provide a composed UI for a \"Coverage Plan\" which shows targets and satellite coverage areas
   on a 3D globe"
-  (:require [bh.rccst.ui-component.molecule.composite.coverage-plan.support :as s]
+  (:require [bh.rccst.ui-component.atom.bh.color-picker :as picker]
+            [bh.rccst.ui-component.molecule.composite.coverage-plan.support :as s]
             [bh.rccst.ui-component.utils :as ui-utils]
             [bh.rccst.ui-component.utils.helpers :as h]
             [cljs-time.coerce :as coerce]
@@ -258,6 +259,62 @@
 
 ;; region ; custom tables for display
 
+; TODO: how do we update :topic/colored-targets?
+(defn- update-target-color [])
+
+
+(defn target-color-picker-popover [showing? control data name & [position]]
+  (let [d (h/resolve-value data)
+        p (or position :right-center)]
+
+    (fn []
+      (let [[_ _ _ _ color] (->> @d
+                              (filter #(= name (:name %)))
+                              first
+                              :color)]
+        [rc/popover-anchor-wrapper :src (rc/at)
+         ;:style {:width "100%"}
+         :showing? @showing?
+         :position p
+         :anchor control
+         :popover [rc/popover-content-wrapper :src (rc/at)
+                   :close-button? false
+                   :no-clip? false
+                   :body [picker/hex-color-picker
+                          :color color
+                          :on-change (fn [x]
+                                       (log/info "on-change target-color-picker-popover" (js->clj x)))]]]))))
+
+
+(defn sat-color-picker-popover [showing? control data name & [position]]
+  (let [d (h/resolve-value data)
+        p (or position :right-center)]
+
+    ;(log/info "sat-color-picker-popover" @d)
+
+    (fn []
+      (let [current-color (->> @d
+                            (filter #(= name (:sensor_id %)))
+                            first
+                            :color)
+            [_ _ [r g b a] _ _] current-color]
+
+        ;(log/info "sat-color-picker-popover (color)" current-color "//" {:r r :g g :b b :a a})
+
+        [rc/popover-anchor-wrapper :src (rc/at)
+         ;:style {:width "100%"}
+         :showing? @showing?
+         :position p
+         :anchor control
+         :popover [rc/popover-content-wrapper :src (rc/at)
+                   :close-button? false
+                   :no-clip? false
+                   :body [picker/rgba-color-picker
+                          :color {:r r :g g :b b :a a}
+                          :on-change (fn [x]
+                                       (log/info "on-change sat-color-picker-popover" (js->clj x)))]]]))))
+
+
 (defn- display-checkbox [id name under-consideration toggle-fn]
   ^{:key (str "check-" id)}
   [:td.is-narrow
@@ -270,17 +327,21 @@
      [:span.icon.has-text-success.is-small [:i.far.fa-square]])])
 
 
-(defn- display-symbol [name [color _ _]]
-  ; TODO: add HexColorPicker (also, ad an actual "atom" for the color pickers...)
+(defn- display-symbol [data name [color _ _]]
+  ; TODO: need to sync the different color formats on-change
 
-  ;(log/info "display-symbol" name color)
-  ^{:key (str "symb-" name)}
-  [:td {:style    {:color      :white
-                   :text-align :center}
-        :on-click #(do)}
-   [:span.icon.has-text-success.is-small
-    [:i.fas.fa-circle
-     {:style {:color (or color :green)}}]]])
+  (let [showing? (r/atom false)]
+    ;(log/info "display-symbol" data name color)
+    ^{:key (str "symb-" name)}
+    [:td {:style {:color      :white
+                  :text-align :center}}
+     [target-color-picker-popover
+      showing?
+      [:span.icon.has-text-success.is-small
+       [:i.fas.fa-circle
+        {:style    {:color (or color :green)}
+         :on-click #(swap! showing? not)}]]
+      data name]]))
 
 
 (defn- display-edit-control [name is-editing]
@@ -305,20 +366,26 @@
    [:span.icon.has-text-danger.is-small [:i.far.fa-trash-alt]]])
 
 
-(defn- display-color [name [color _ _]]
-  ; TODO: add RgbaColorPicker (also, ad an actual "atom" for the color pickers...)
+(defn- display-color [data name [_ _ _ _ color]]
+  ; TODO: need to sync the different color formats on-change
 
-  ;(log/info "display-color" name "//" color)
-  ^{:key (str "color-" name)}
-  [:td {:style (merge
-                 (if color
-                   {:background-color (or color :green)
-                    :border-width     "1px"}
-                   {:background-color :transparent
-                    :border-width     "1px"})
-                 {:text-align :center
-                  :width      100})}
-   [:span]])
+  (let [showing? (r/atom false)]
+
+    ;(log/info "display-color" name "//" color)
+    ^{:key (str "color-" name)}
+    [:td {:style (merge
+                   (if color
+                     {:background-color (or color :green)
+                      :border-width     "1px"}
+                     {:background-color :transparent
+                      :border-width     "1px"})
+                   {:text-align :center
+                    :width      100})
+          :on-click #(swap! showing? not)}
+     [sat-color-picker-popover
+      showing?
+      [:span]
+      data name]]))
 
 
 (defn- toggle-target [targets resolved-selection selection id]
@@ -363,16 +430,16 @@
            [:tr [:th "Include?"] [:th "Symbol"] [:th "AoI"] [:th ""] [:th ""]]]
           [:tbody
            (doall
-             (for [{:keys [name cells color]} @d]
+             (for [{:keys [name cells color] :as target} @d]
                (doall
                  ;(log/info "target-table (for)" @d
-                 ; "//" name color)
+                 ; "//" target "//" name "//" color)
 
                  ^{:key name}
                  [:tr
                   [display-checkbox name name under-consideration #(toggle-target @d @s selection name)]
 
-                  [display-symbol name color]
+                  [display-symbol data name color]
 
                   ^{:key (str "target-" name)} [:td name]
 
@@ -411,7 +478,7 @@
                    under-consideration
                    #(toggle-satellite @d @s selection sensor_id)]
 
-                  [display-color (str platform_id "-" sensor_id) color]
+                  [display-color data sensor_id color]
 
                   ^{:key (str "satellite-" platform_id "-" sensor_id)}
                   [:td (str platform_id "  " sensor_id)]])))]]]))))
@@ -441,8 +508,8 @@
 
                                    :topic/colored-targets     {:type :source/local :name :colored-targets}
 
-                                   :topic/selected-satellites {:type    :source/local :name :selected-satellites}
-                                                               ;:default dummy-satellites}
+                                   :topic/selected-satellites {:type :source/local :name :selected-satellites}
+                                   ;:default dummy-satellites}
                                    :topic/colored-satellites  {:type :source/local :name :colored-satellites}
 
                                    :topic/current-time        {:type :source/local :name :current-time :default 0}
