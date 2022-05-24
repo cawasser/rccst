@@ -4,6 +4,7 @@
             [bh.rccst.ui-component.utils.helpers :as h]
             [bh.rccst.ui-component.utils.locals :as l]
             [bh.rccst.ui-component.atom.chart.wrapper-2 :as wrapper]
+            [bh.rccst.ui-component.utils.example-data :as example-data]
             [bh.rccst.ui-component.atom.chart.wrapper :as c]
             [bh.rccst.ui-component.utils :as ui-utils]
             [re-com.core :as rc]
@@ -28,19 +29,29 @@
                               :stroke      "#8884d8"
                               :fillOpacity 0.5}]])
 
+(defn radar-data [data]
+  (let [d (:data data)
+        meta (:metadata data)
+        fields (get-in data [:metadata :fields])]
+    (merge
+      {:metadata (assoc meta :domain :fullMark
+                             :fields (assoc (dissoc fields :tv :amt) :fullMark :number))}
+      {:data (map #(assoc % :fullmark 10000) (map #(dissoc % :tv :amt) d))})))
 
-;tabular data in column mode
 
-(def sample-data {:metadata {:type   :tabular
-                                     :id     :subject
-                                     :domain :fullMark
-                                     :fields {:subject :string :A :number :B :number :fullMark :number}}
-                          :data     [{:subject "Math" :A 120 :B 110 :fullMark 150}
-                                     {:subject "Chinese" :A 98 :B 130 :fullMark 150}
-                                     {:subject "English" :A 100 :B 110 :fullMark 150}
-                                     {:subject "History" :A 77 :B 81 :fullMark 150}
-                                     {:subject "Economics" :A 99 :B 140 :fullMark 150}
-                                     {:subject "Literature" :A 98 :B 105 :fullMark 150}]})
+(def sample-data (radar-data example-data/meta-tabular-data))
+
+
+;(def sample-data {:metadata {:type   :tabular
+;                             :id     :subject
+;                             :domain :fullMark
+;                             :fields {:subject :string :A :number :B :number :fullMark :number}}
+;                  :data     [{:subject "Math" :A 120 :B 110 :fullMark 150}
+;                             {:subject "Chinese" :A 98 :B 130 :fullMark 150}
+;                             {:subject "English" :A 100 :B 110 :fullMark 150}
+;                             {:subject "History" :A 77 :B 81 :fullMark 150}
+;                             {:subject "Economics" :A 99 :B 140 :fullMark 150}
+;                             {:subject "Literature" :A 98 :B 105 :fullMark 150}]})
 
 (defn- get-range-across-fields [data]
   (let [source-data (get-in @data [:data])
@@ -216,7 +227,7 @@
     [:> ResponsiveContainer
      [:> RadarChart {:data d}
       [:> PolarGrid]
-      [:> PolarAngleAxis {:dataKey :subject}]
+      [:> PolarAngleAxis {:dataKey :name}]
       [:> PolarRadiusAxis {:angle "30" :domain (ui-utils/resolve-sub subscriptions [:domain])}]
 
       (utils/non-gridded-chart-components component-id {})
