@@ -196,66 +196,61 @@
 
 (defn fn-color-targets [{:keys [data colored]}]
   ; (log/info "fn-color-targets" data "//" colored)
-  (let [next-color (atom -1)]
+  (let [next-target-color (atom -1)
+        last-target-data  (atom [])]
     (re-frame/reg-sub
       (first colored)
       :<- data
       (fn [d _]
         ;(log/info "fn-color-targets (data)" d "//" (:data d))
-        (let [cnt (count s/sensor-color-pallet)
-              ret (map-indexed (fn [idx t]
-                                 (assoc t :color (nth s/sensor-color-pallet (mod idx cnt))))
-                    (:data d))]
-          ;(log/info "fn-color-targets (ret)" d "//" (:data d) "//" ret)
-          ret)))))
+        (let [cnt          (count s/sensor-color-pallet)
+              assigned     (map (juxt :name :color) @last-target-data)
+              assigned-set (->> assigned (map first) set)
+              ;_            (log/info "fn-color-targets (atom)" @last-target-data "//" assigned "//" assigned-set)
+              ret          (doall
+                             (map (fn [t]
+                                    (if (contains? assigned-set (:name t))
+                                      (assoc t :color (->> @last-target-data
+                                                        (filter #(= (:name t) (:name %)))
+                                                        first
+                                                        :color))
+                                      (assoc t :color (nth s/sensor-color-pallet
+                                                        (mod (swap! next-target-color inc) cnt)))))
+                               (:data d)))]
 
+          ;(log/info "fn-color-targets (ret)" ret "//" @next-target-color)
 
-; TODO: can we cache the results in the app-db so we only add :color to "new" elements?
-(comment
-  (do
-    (def colored [:coverage-plan-demo-ww.grid-widget :blackboard :topic.colored-targets])
-    (def current-colors (get-in @re-frame.db/app-db (concat [:containers] colored)))
-    (def assigned (map (juxt :name :color) current-colors))
-    (def assigned-set (->> assigned (map first) set))
-    (def candidate {:name "alpha-hd",
-                    :cells #{[7 7 "hidef-image" 0] [7 6 "hidef-image" 1] [7 5 "hidef-image" 3] [7 6 "hidef-image" 2]},
-                    :color [:darkred "rgba(139, 0, 0, .3)" [0.55 0 0 0.3]]}))
-
-
-  (if (contains? assigned-set (:name candidate))
-    candidate
-    (assoc candidate :color [:dummy :dummy :dummy]))
-
-
-  (get-in @re-frame.db/app-db '(:containers))
-  (get-in @re-frame.db/app-db '(:containers :coverage-plan-demo-ww.grid-widget))
-  (get-in @re-frame.db/app-db '(:containers :coverage-plan-demo-ww.grid-widget
-                                 :blackboard))
-  (get-in @re-frame.db/app-db '(:containers :coverage-plan-demo-ww.grid-widget
-                                 :blackboard :topic.colored-targets))
-
-  @current-colors
-
-
-
-
-  ())
+          (reset! last-target-data ret)
+          @last-target-data)))))
 
 
 (defn fn-color-satellites [{:keys [data colored]}]
   ;(log/info "fn-color-satellites" data "//" colored)
-  (let [next-sat-color (atom -1)]
+  (let [next-sat-color (atom -1)
+        last-sat-data  (atom [])]
     (re-frame/reg-sub
       (first colored)
       :<- data
       (fn [d _]
         ;(log/info "fn-color-satellites (data)" d "//" (:data d))
-        (let [cnt (count s/sensor-color-pallet)
-              ret (map-indexed (fn [idx t]
-                                 (assoc t :color (nth s/sensor-color-pallet (mod idx cnt))))
-                    (:data d))]
-          ;(log/info "fn-color-satellites (ret)" ret)
-          ret)))))
+        (let [cnt          (count s/sensor-color-pallet)
+              assigned     (map (juxt :sensor_id :color) @last-sat-data)
+              assigned-set (->> assigned (map first) set)
+              ;_            (log/info "fn-color-satellites (atom)" @last-sat-data "//" assigned "//" assigned-set)
+              ret          (doall
+                             (map (fn [t]
+                                    (if (contains? assigned-set (:sensor_id t))
+                                      (assoc t :color (->> @last-sat-data
+                                                        (filter #(= (:sensor_id t) (:sensor_id %)))
+                                                        first
+                                                        :color))
+                                      (assoc t :color (nth s/sensor-color-pallet
+                                                        (mod (swap! next-sat-color inc) cnt)))))
+                               (:data d)))]
+          ;(log/info "fn-color-satellites (ret)" ret "//" @next-sat-color)
+
+          (reset! last-sat-data ret)
+          @last-sat-data)))))
 
 
 ;; endregion
@@ -276,6 +271,8 @@
 
 
 (defn- display-symbol [name [color _ _]]
+  ; TODO: add HexColorPicker (also, ad an actual "atom" for the color pickers...)
+
   ;(log/info "display-symbol" name color)
   ^{:key (str "symb-" name)}
   [:td {:style    {:color      :white
@@ -309,6 +306,8 @@
 
 
 (defn- display-color [name [color _ _]]
+  ; TODO: add RgbaColorPicker (also, ad an actual "atom" for the color pickers...)
+
   ;(log/info "display-color" name "//" color)
   ^{:key (str "color-" name)}
   [:td {:style (merge
@@ -424,6 +423,7 @@
 (def ui-definition {:title        "Coverage Plan"
                     :component-id :coverage-plan
                     :components   {; ui components
+                                   ; TODO: add a :label element for use in the UI
                                    :ui/targets                {:type :ui/component :name target-table}
                                    :ui/satellites             {:type :ui/component :name satellite-table}
                                    :ui/globe                  {:type :ui/component :name :ww/globe}
@@ -436,13 +436,13 @@
                                    :topic/coverage-data       {:type :source/remote :name :source/coverages}
 
                                    ; composite-local data sources
-                                   :topic/selected-targets    {:type    :source/local :name :selected-targets
-                                                               :default dummy-targets}
+                                   :topic/selected-targets    {:type :source/local :name :selected-targets}
+                                   ;:default dummy-targets}
 
                                    :topic/colored-targets     {:type :source/local :name :colored-targets}
 
-                                   :topic/selected-satellites {:type    :source/local :name :selected-satellites
-                                                               :default dummy-satellites}
+                                   :topic/selected-satellites {:type    :source/local :name :selected-satellites}
+                                                               ;:default dummy-satellites}
                                    :topic/colored-satellites  {:type :source/local :name :colored-satellites}
 
                                    :topic/current-time        {:type :source/local :name :current-time :default 0}
@@ -506,6 +506,7 @@
 
 
 
+;; region ; Rich comments
 (comment
   (re-frame/dispatch [:bh.rccst.events/login "test-user" "test-pwd"])
 
@@ -531,6 +532,76 @@
   ())
 
 
+; can we cache the results so we only add :color to "new" elements?
+(comment
+  (do
+    ;(def colored [:coverage-plan-demo-ww.grid-widget.blackboard.topic.colored-targets]) ; actual
+    ;(def colored [:coverage-plan-demo-ww.grid-widget :blackboard :topic.colored-targets]) ; what we'd prefer
+
+    (def last-data (atom []))
+    (def last-target-data (atom dummy-targets))
+    (def assigned (map (juxt :name :color) @last-data))
+    (def assigned-set (->> assigned (map first) set))
+    (def candidate {:name  "alpha-hd",
+                    :cells #{[7 7 "hidef-image" 0] [7 6 "hidef-image" 1]
+                             [7 5 "hidef-image" 3] [7 6 "hidef-image" 2]}}))
+
+
+  (if (contains? assigned-set (:name candidate))
+    candidate
+    (assoc candidate :color [:dummy :dummy :dummy]))
+
+
+  (def last-target-data (atom []))
+
+  (->> @last-target-data
+    (filter #(= (:name candidate) (:name %)))
+    first
+    :color)
+
+
+  @(re-frame/subscribe [:bh.rccst.subs/source :source/targets])
+
+  (re-frame/dispatch [:bh.rccst.events/data-update
+                      {:id    :source/targets
+                       :value {:title    "Targets",
+                               :c-o-c    [{:step      :generated,
+                                           :by        "bh.rccst.data-source.targets",
+                                           :version   "0.6.0",
+                                           :at        "Mon May 23 14:21:10 EDT 2022",
+                                           :signature "73f7a470-ddc9-44d9-84fa-cf1ce1acc8f9"}],
+                               :metadata {:title "Targets", :type :tabular, :id :target, :fields {:target :string, :cells :string}},
+                               :data     [{:name  "alpha-hd",
+                                           :cells #{[7 7 "hidef-image" 0] [7 6 "hidef-image" 1] [7 5 "hidef-image" 3] [7 6 "hidef-image" 2]}}
+                                          {:name "bravo-img", :cells #{[7 2 "image" 0] [7 1 "image" 1]}}
+                                          {:name  "fire-hd",
+                                           :cells #{[5 3 "hidef-image" 2]
+                                                    [4 3 "hidef-image" 3]
+                                                    [4 3 "hidef-image" 2]
+                                                    [5 3 "hidef-image" 0]
+                                                    [5 3 "hidef-image" 3]}}
+                                          {:name "fire-ir", :cells #{[5 4 "v/ir" 2] [5 4 "v/ir" 1] [5 3 "v/ir" 1] [5 4 "v/ir" 0] [5 4 "v/ir" 3]}}
+                                          {:name  "severe-hd",
+                                           :cells #{[5 7 "hidef-image" 3]
+                                                    [5 6 "hidef-image" 0]
+                                                    [6 6 "hidef-image" 2]
+                                                    [6 5 "hidef-image" 1]
+                                                    [5 7 "hidef-image" 1]}}
+                                          {:name  "new-target",
+                                           :cells #{[0 0 "hidef-image" 0]}}]}}])
+
+
+
+  (get-in @re-frame.db/app-db '(:containers))
+  (get-in @re-frame.db/app-db '(:containers :coverage-plan-demo-ww.grid-widget))
+  (get-in @re-frame.db/app-db '(:containers :coverage-plan-demo-ww.grid-widget
+                                 :blackboard))
+  (get-in @re-frame.db/app-db '(:containers :coverage-plan-demo-ww.grid-widget
+                                 :blackboard :topic.colored-targets))
+
+
+  ())
+
 
 
 
@@ -549,4 +620,5 @@
 
 
 
+;; endregion
 
