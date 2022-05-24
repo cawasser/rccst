@@ -6,6 +6,7 @@
             [bh.rccst.ui-component.utils.helpers :as h]
             [cljs-time.coerce :as coerce]
             [cljs-time.core :as t]
+            [re-com.core :as rc]
             [re-frame.core :as re-frame]
             [reagent.core :as r]
             [taoensso.timbre :as log]
@@ -15,6 +16,92 @@
 
 
 (log/info "bh.rccst.ui-component.molecule.composite.coverage-plan")
+
+
+;; region ; data for developing the UI
+
+
+(def dummy-targets [{:name  "alpha-hd" :cells #{[7 7 "hidef-image" 0]
+                                                [7 6 "hidef-image" 1]
+                                                [7 6 "hidef-image" 2]
+                                                [7 5 "hidef-image" 3]}
+                     :color [:green "rgba(0, 128, 0, .3)" [0.0 0.5 0.0 0.1]]}
+                    {:name  "bravo-img" :cells #{[7 2 "image" 0]
+                                                 [7 1 "image" 1]}
+                     :color [:blue "rgba(0, 0, 255, .3)" [0.0 0. 1.0 0.1]]}
+                    {:name  "fire-hd" :cells #{[5 3 "hidef-image" 0]
+                                               [4 3 "hidef-image" 2] [5 3 "hidef-image" 2]
+                                               [4 3 "hidef-image" 3] [5 3 "hidef-image" 3]}
+                     :color [:orange "rgba(255, 165, 0, .3)" [1.0 0.65 0.0 0.3]]}
+                    {:name  "fire-ir" :cells #{[5 4 "v/ir" 0]
+                                               [5 3 "v/ir" 1] [5 4 "v/ir" 1]
+                                               [5 4 "v/ir" 2]
+                                               [5 4 "v/ir" 3]}
+                     :color [:grey "rgba(128, 128, 128, .3)" [0.5 0.5 0.5 0.3]]}
+                    {:name  "severe-hd" :cells #{[5 6 "hidef-image" 0]
+                                                 [5 7 "hidef-image" 1] [6 5 "hidef-image" 1]
+                                                 [6 6 "hidef-image" 2]
+                                                 [5 7 "hidef-image" 3]}
+                     :color [:cornflowerblue "rgba(100, 149, 237, .3)" [0.4 0.58 0.93 0.3]]}])
+
+
+(def dummy-satellites [{:name            "goes-east",
+                        :start           [9 6],
+                        :path            "geo",
+                        :platform_id     "goes-east",
+                        :type            "hidef-image",
+                        :sensor_steering [[-5 5] [-5 5]],
+                        :sensor_size     [1 1],
+                        :sensor_id       "abi-meso-2"
+                        :color           [:blue "rgba(0, 0, 255, .3)" [0.0 0. 1.0 0.1]]}
+                       {:name            "goes-east",
+                        :start           [9 6],
+                        :path            "geo",
+                        :platform_id     "goes-east",
+                        :type            "hidef-image",
+                        :sensor_steering [[-5 5] [-5 5]],
+                        :sensor_size     [1 1],
+                        :sensor_id       "abi-meso-10"
+                        :color           [:orange "rgba(255, 165, 0, .3)" [1.0 0.65 0.0 0.3]]}
+                       {:name            "goes-west",
+                        :start           [9 2],
+                        :path            "geo",
+                        :platform_id     "goes-west",
+                        :type            "hidef-image",
+                        :sensor_steering [[-5 5] [-5 5]],
+                        :sensor_size     [1 1],
+                        :sensor_id       "abi-meso-4"
+                        :color           [:cornflowerblue "rgba(100, 149, 237, .3)" [0.4 0.58 0.93 0.3]]}
+                       {:name            "goes-west",
+                        :start           [9 2],
+                        :path            "geo",
+                        :platform_id     "goes-west",
+                        :type            "hidef-image",
+                        :sensor_steering [[-5 5] [-5 5]],
+                        :sensor_size     [1 1],
+                        :sensor_id       "abi-meso-11"
+                        :color           [:darkcyan "rgba(0, 139, 139, .3)" [0.0 0.55 0.55 0.3]]}
+                       {:name            "noaa-xx",
+                        :start           [4 3],
+                        :path            "horz",
+                        :platform_id     "noaa-xx",
+                        :type            "v/ir",
+                        :sensor_steering [[0 0] [0 0]],
+                        :sensor_size     [10 2],
+                        :sensor_id       "viirs-5"
+                        :color           [:goldenrod "rgba(218, 165, 32, .3)" [0.84 0.65 0.13 0.3]]}
+                       {:name            "metop-yy",
+                        :start           [4 1],
+                        :path            "horz",
+                        :platform_id     "metop-yy",
+                        :type            "v/ir",
+                        :sensor_steering [[0 0] [0 0]],
+                        :sensor_size     [10 2],
+                        :sensor_id       "avhhr-6"
+                        :color           [:khaki "rgba(240, 230, 140, .3)" [0.94 0.90 0.55 0.3]]}])
+
+
+;; endregion
 
 
 ;; region ; local function to support :source/local topics
@@ -48,20 +135,26 @@
     :<- current-time
     (fn [[t s c ct] _]
       ;(log/info "fn-coverage (sub)" ct
-      ;  "// (targets)" t)
-      ;  ;"// (satellites)" s
+      ;  "// (targets)" t
+      ;  "// (satellites)" s)
       ;  ;"// (cooked)" (s/cook-coverages c ct)
       ;  "// (filter)" (filter #(contains? s (get-in % [:coverage :sensor]))
       ;                  (s/cook-coverages c ct)))
 
-      (let [cvg (if (or (empty? c) (empty? (:data c)))
-                  []
-                  (map s/make-coverage-shape (filter #(contains? s (get-in % [:coverage :sensor]))
-                                               (s/cook-coverages c ct))))
-            trg (if (empty? t)
-                  []
-                  (map s/make-target-shape (s/cook-targets t ct)))
-            ret (concat cvg trg)]
+      (let [s-under-c          (->> s (map #(get-in % [:sensor_id])) set)
+            ;_                              (log/info "fn-coverage (s-u-c)" s-under-c)
+            filtered-coverages (filter #(contains?
+                                          s-under-c
+                                          (get-in % [:coverage :sensor]))
+                                 (s/cook-coverages s c ct))
+            ;_                  (log/info "fn-coverage (filter)" filtered-coverages)
+            cvg                (if (seq c)
+                                 (map s/make-coverage-shape filtered-coverages)
+                                 [])
+            trg                (if (seq t)
+                                 (map s/make-target-shape (s/cook-targets t ct))
+                                 [])
+            ret                (concat cvg trg)]
 
         ;(log/info "fn-coverage (ret)" ret
         ;  "//" cvg
@@ -101,19 +194,67 @@
       (coerce/to-date (t/plus (t/now) (t/hours v))))))
 
 
-(defn fn-color-target [{:keys [data colored]}]
- ; (log/info "fn-color-target" data "//" colored)
+(defn fn-color-targets [{:keys [data colored]}]
+  ; (log/info "fn-color-targets" data "//" colored)
   (let [next-color (atom -1)]
     (re-frame/reg-sub
       (first colored)
       :<- data
       (fn [d _]
-        ;(log/info "fn-color-target (data)" d "//" (:data d))
-        (let [ret (map #(do
-                          (swap! next-color inc)
-                          (assoc % :color (nth s/sensor-color-pallet @next-color)))
+        ;(log/info "fn-color-targets (data)" d "//" (:data d))
+        (let [cnt (count s/sensor-color-pallet)
+              ret (map-indexed (fn [idx t]
+                                 (assoc t :color (nth s/sensor-color-pallet (mod idx cnt))))
                     (:data d))]
-          ;(log/info "fn-color-target (ret)" d "//" (:data d) "//" ret)
+          ;(log/info "fn-color-targets (ret)" d "//" (:data d) "//" ret)
+          ret)))))
+
+
+; TODO: can we cache the results in the app-db so we only add :color to "new" elements?
+(comment
+  (do
+    (def colored [:coverage-plan-demo-ww.grid-widget :blackboard :topic.colored-targets])
+    (def current-colors (get-in @re-frame.db/app-db (concat [:containers] colored)))
+    (def assigned (map (juxt :name :color) current-colors))
+    (def assigned-set (->> assigned (map first) set))
+    (def candidate {:name "alpha-hd",
+                    :cells #{[7 7 "hidef-image" 0] [7 6 "hidef-image" 1] [7 5 "hidef-image" 3] [7 6 "hidef-image" 2]},
+                    :color [:darkred "rgba(139, 0, 0, .3)" [0.55 0 0 0.3]]}))
+
+
+  (if (contains? assigned-set (:name candidate))
+    candidate
+    (assoc candidate :color [:dummy :dummy :dummy]))
+
+
+  (get-in @re-frame.db/app-db '(:containers))
+  (get-in @re-frame.db/app-db '(:containers :coverage-plan-demo-ww.grid-widget))
+  (get-in @re-frame.db/app-db '(:containers :coverage-plan-demo-ww.grid-widget
+                                 :blackboard))
+  (get-in @re-frame.db/app-db '(:containers :coverage-plan-demo-ww.grid-widget
+                                 :blackboard :topic.colored-targets))
+
+  @current-colors
+
+
+
+
+  ())
+
+
+(defn fn-color-satellites [{:keys [data colored]}]
+  ;(log/info "fn-color-satellites" data "//" colored)
+  (let [next-sat-color (atom -1)]
+    (re-frame/reg-sub
+      (first colored)
+      :<- data
+      (fn [d _]
+        ;(log/info "fn-color-satellites (data)" d "//" (:data d))
+        (let [cnt (count s/sensor-color-pallet)
+              ret (map-indexed (fn [idx t]
+                                 (assoc t :color (nth s/sensor-color-pallet (mod idx cnt))))
+                    (:data d))]
+          ;(log/info "fn-color-satellites (ret)" ret)
           ret)))))
 
 
@@ -122,11 +263,12 @@
 
 ;; region ; custom tables for display
 
-(defn- display-checkbox [id name under-consideration]
-  ^{:key (str "inc-" name)}
+(defn- display-checkbox [id name under-consideration toggle-fn]
+  ^{:key (str "check-" id)}
   [:td.is-narrow
    {:style    {:text-align :center}
-    :on-click #()}
+    :on-click (rc/handler-fn
+                (toggle-fn))}
 
    (if (contains? under-consideration id)
      [:span.icon.has-text-success.is-small [:i.fas.fa-check]]
@@ -166,7 +308,8 @@
    [:span.icon.has-text-danger.is-small [:i.far.fa-trash-alt]]])
 
 
-(defn- display-color [name [_ _ color]]
+(defn- display-color [name [color _ _]]
+  ;(log/info "display-color" name "//" color)
   ^{:key (str "color-" name)}
   [:td {:style (merge
                  (if color
@@ -177,6 +320,30 @@
                  {:text-align :center
                   :width      100})}
    [:span]])
+
+
+(defn- toggle-target [targets resolved-selection selection id]
+  (let [s-ids (->> resolved-selection (map :name) set)]
+    (if (contains? s-ids id)
+      ; remove
+      (h/handle-change-path selection []
+        (remove #(= id (:name %)) resolved-selection))
+
+      ; add
+      (h/handle-change-path selection []
+        (concat resolved-selection (filter #(= id (:name %)) targets))))))
+
+
+(defn- toggle-satellite [satellites resolved-selection selection id]
+  (let [s-ids (->> resolved-selection (map :sensor_id) set)]
+    (if (contains? s-ids id)
+      ; remove
+      (h/handle-change-path selection []
+        (remove #(= id (:sensor_id %)) resolved-selection))
+
+      ; add
+      (h/handle-change-path selection []
+        (concat resolved-selection (filter #(= id (:sensor_id %)) satellites))))))
 
 
 (defn- target-table [& {:keys [data selection component-id container-id]}]
@@ -199,11 +366,12 @@
            (doall
              (for [{:keys [name cells color]} @d]
                (doall
-                 ;(log/info "target-table (for)" @d "//" name color)
+                 ;(log/info "target-table (for)" @d
+                 ; "//" name color)
 
                  ^{:key name}
                  [:tr
-                  [display-checkbox name name under-consideration]
+                  [display-checkbox name name under-consideration #(toggle-target @d @s selection name)]
 
                   [display-symbol name color]
 
@@ -221,10 +389,10 @@
         s          (h/resolve-value selection)
         is-editing (r/atom "")]
 
-    ;(log/info "satellites-table (s)" @s "//" (:data @d))
+    ;(log/info "satellites-table (s)" @d "//" @s)
 
     (fn []
-      (let [under-consideration @s]
+      (let [under-consideration (->> @s (map :sensor_id) set)]
         [:div.table-container {:style {:width       "100%"
                                        :height      "100%"
                                        :overflow-y  :auto
@@ -235,14 +403,14 @@
            [:tr [:th "Include?"] [:th "Color"] [:th "Platform"]]]
           [:tbody
            (doall
-             (for [{:keys [platform_id sensor_id color] :as platform} (:data @d)]
+             (for [{:keys [platform_id sensor_id color] :as platform} @d]
                (doall
-                 ;(log/info "satellites-table (platform)" platform
-                 ;  "//" platform_id "//" sensor_id "//" color)
-
-                 ^{:key name}
+                 ^{:key sensor_id}
                  [:tr
-                  [display-checkbox sensor_id (str platform_id "-" sensor_id) under-consideration]
+                  [display-checkbox sensor_id
+                   (str platform_id "-" sensor_id)
+                   under-consideration
+                   #(toggle-satellite @d @s selection sensor_id)]
 
                   [display-color (str platform_id "-" sensor_id) color]
 
@@ -251,19 +419,6 @@
 
 
 ;; endregion
-
-;; components have "ports" which define their inputs and outputs:
-;;
-;;      you SUBSCRIBE with a :port/sink, ie, data come IN   (re-frame/subscribe ...)
-;;
-;;      you PUBLISH to a :port/source, ie, data goes OUT    (re-frame/dispatch ...)
-;;
-;;      you do BOTH with :port/source-sink (both)           should we even have this, or should we spell out both directions?
-;;
-;; the question about :port/source-sink arises because building the layout (the call for the UI itself) doesn't actually
-;; need to make a distinction (in fact the code is a bit cleaner if we don't) and we have the callee sort it out (since it
-;; needs to implement the correct usage anyway). The flow-diagram, on the other hand, is easier if we DO make the
-;; distinction, so we can quickly build all the Nodes and Handles used for the diagram...
 
 
 (def ui-definition {:title        "Coverage Plan"
@@ -282,33 +437,14 @@
 
                                    ; composite-local data sources
                                    :topic/selected-targets    {:type    :source/local :name :selected-targets
-                                                               :default [{:name  "alpha-hd" :cells #{[7 7 "hidef-image" 0]
-                                                                                                     [7 6 "hidef-image" 1]
-                                                                                                     [7 6 "hidef-image" 2]
-                                                                                                     [7 5 "hidef-image" 3]}
-                                                                          :color [:green "rgba(0, 128, 0, .3)" [0.0 0.5 0.0 0.1]]}
-                                                                         {:name  "bravo-img" :cells #{[7 2 "image" 0]
-                                                                                                      [7 1 "image" 1]}
-                                                                          :color [:blue "rgba(0, 0, 255, .3)" [0.0 0. 1.0 0.1]]}
-                                                                         {:name  "fire-hd" :cells #{[5 3 "hidef-image" 0]
-                                                                                                    [4 3 "hidef-image" 2] [5 3 "hidef-image" 2]
-                                                                                                    [4 3 "hidef-image" 3] [5 3 "hidef-image" 3]}
-                                                                          :color [:orange "rgba(255, 165, 0, .3)" [1.0 0.65 0.0 0.3]]}
-                                                                         {:name  "fire-ir" :cells #{[5 4 "v/ir" 0]
-                                                                                                    [5 3 "v/ir" 1] [5 4 "v/ir" 1]
-                                                                                                    [5 4 "v/ir" 2]
-                                                                                                    [5 4 "v/ir" 3]}
-                                                                          :color [:grey "rgba(128, 128, 128, .3)" [0.5 0.5 0.5 0.3]]}
-                                                                         {:name  "severe-hd" :cells #{[5 6 "hidef-image" 0]
-                                                                                                      [5 7 "hidef-image" 1] [6 5 "hidef-image" 1]
-                                                                                                      [6 6 "hidef-image" 2]
-                                                                                                      [5 7 "hidef-image" 3]}
-                                                                          :color [:cornflowerblue "rgba(100, 149, 237, .3)" [0.4 0.58 0.93 0.3]]}]}
+                                                               :default dummy-targets}
 
-                                   :topic/colored-target      {:type :source/local :name :colored-targets}
+                                   :topic/colored-targets     {:type :source/local :name :colored-targets}
+
                                    :topic/selected-satellites {:type    :source/local :name :selected-satellites
-                                                               :default #{"avhhr-6" "viirs-5" "abi-meso-11"
-                                                                          "abi-meso-4" "abi-meso-10" "abi-meso-2"}}
+                                                               :default dummy-satellites}
+                                   :topic/colored-satellites  {:type :source/local :name :colored-satellites}
+
                                    :topic/current-time        {:type :source/local :name :current-time :default 0}
                                    :topic/shapes              {:type :source/local :name :shapes}
                                    :topic/time-range          {:type :source/local :name :time-range}
@@ -323,17 +459,14 @@
                                                                :ports {:data :port/sink :range :port/source}}
                                    :fn/current-time           {:type  :source/fn :name fn-current-time
                                                                :ports {:value :port/sink :current-time :port/source}}
-                                   :fn/color-target           {:type  :source/fn :name fn-color-target
+                                   :fn/color-targets          {:type  :source/fn :name fn-color-targets
+                                                               :ports {:data :port/sink :colored :port/source}}
+                                   :fn/color-satellites       {:type  :source/fn :name fn-color-satellites
                                                                :ports {:data :port/sink :colored :port/source}}}
 
-                    :links        {; components publish to what? via which port?
-                                   ;
-                                   ; <source>                 {<source-port>  {<target> <target-port>
-                                   ;                                           <target> <target-port>}}
-                                   ;
-                                   :ui/targets                {;:data      {:topic/target-data :data}
+                    :links        {:ui/targets                {;:data      {:topic/target-data :data}
                                                                :selection {:topic/selected-targets :data}}
-                                   :ui/satellites             {:data      {:topic/satellite-data :data}
+                                   :ui/satellites             {;:data      {:topic/satellite-data :data}
                                                                :selection {:topic/selected-satellites :data}}
                                    :ui/time-slider            {:value {:topic/current-slider :data}}
 
@@ -341,17 +474,17 @@
                                    :fn/coverage               {:shapes {:topic/shapes :data}}
                                    :fn/range                  {:range {:topic/time-range :data}}
                                    :fn/current-time           {:current-time {:topic/current-time :data}}
-                                   :fn/color-target           {:colored {:topic/colored-target :data}}
+                                   :fn/color-targets          {:colored {:topic/colored-targets :data}}
+                                   :fn/color-satellites       {:colored {:topic/colored-satellites :data}}
 
                                    ; topics are inputs into what?
-                                   :topic/target-data         {:data {:fn/color-target :data}}
-                                   :topic/colored-target      {:data {:ui/targets :data}}
+                                   :topic/target-data         {:data {:fn/color-targets :data}}
+                                   :topic/colored-targets     {:data {:ui/targets :data}}
                                    :topic/selected-targets    {:data {:ui/targets  :selection
                                                                       :fn/coverage :targets}}
 
-                                   :topic/satellite-data      {:data {;:fn/add-satellite-color :data
-                                                                      :ui/satellites :data}}
-                                   ;:topic/colored-satellites  {:data {:ui/satellites :data}}
+                                   :topic/satellite-data      {:data {:fn/color-satellites :data}}
+                                   :topic/colored-satellites  {:data {:ui/satellites :data}}
                                    :topic/selected-satellites {:data {:ui/satellites :selection
                                                                       :fn/coverage   :satellites}}
 
@@ -396,6 +529,24 @@
 
 
   ())
+
+
+
+
+
+;; components have "ports" which define their inputs and outputs:
+;;
+;;      you SUBSCRIBE with a :port/sink, ie, data come IN   (re-frame/subscribe ...)
+;;
+;;      you PUBLISH to a :port/source, ie, data goes OUT    (re-frame/dispatch ...)
+;;
+;;      you do BOTH with :port/source-sink (both)           should we even have this, or should we spell out both directions?
+;;
+;; the question about :port/source-sink arises because building the layout (the call for the UI itself) doesn't actually
+;; need to make a distinction (in fact the code is a bit cleaner if we don't) and we have the callee sort it out (since it
+;; needs to implement the correct usage anyway). The flow-diagram, on the other hand, is easier if we DO make the
+;; distinction, so we can quickly build all the Nodes and Handles used for the diagram...
+
 
 
 
