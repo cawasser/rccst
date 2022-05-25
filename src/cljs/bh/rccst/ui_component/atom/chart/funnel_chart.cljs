@@ -1,11 +1,10 @@
 (ns bh.rccst.ui-component.atom.chart.funnel-chart
   (:require [bh.rccst.ui-component.atom.chart.utils :as utils]
-            [bh.rccst.ui-component.utils.color :as color]
-            [bh.rccst.ui-component.utils.example-data :as data]
             [bh.rccst.ui-component.atom.chart.wrapper-2 :as wrapper]
             [bh.rccst.ui-component.utils :as ui-utils]
+            [bh.rccst.ui-component.utils.color :as color]
+            [bh.rccst.ui-component.utils.example-data :as data]
             [re-com.core :as rc]
-            [reagent.core :as r]
             [taoensso.timbre :as log]
 
             ["recharts" :refer [ResponsiveContainer FunnelChart Funnel Cell LabelList
@@ -63,7 +62,7 @@
   [:<>
    (doall
      (map (fn [[id color-data]]
-            (let [text  (:name color-data)]
+            (let [text (:name color-data)]
               ^{:key id} [utils/color-config-text component-id text [:colors id :color] :right-above]))
        @(ui-utils/subscribe-local component-id [:colors])))])
 
@@ -89,37 +88,35 @@
 
 (defn make-cells [data subscriptions]
   (let [ret (->> data
-             (doall
-               (map-indexed
-                 (fn [idx {name :name}]
-                   ^{:key (str idx name)}
-                   [:> Cell {:key  (str "cell-" idx)
-                             :fill (or (:color (ui-utils/resolve-sub subscriptions [:colors name]))
-                                       (color/get-color 0))}])
-                 (get data :data))))]
+              (map-indexed
+                (fn [idx {name :name}]
+                  ^{:key (str idx name)}
+                  [:> Cell {:key  (str "cell-" idx)
+                            :fill (or (ui-utils/resolve-sub subscriptions [:colors name :color])
+                                     (color/get-color 0))}])))]
     ret))
 
 
 (defn- component* [& {:keys [data component-id container-id
                              subscriptions isAnimationActive?]
-                      :as params}]
+                      :as   params}]
 
   (log/info "funnel component*" params)
   (let [d (if (empty? data) [] (get data :data))]
 
-      [:> ResponsiveContainer
-       [:> FunnelChart {:label true}
-        ;(utils/override true {} :label)
+    [:> ResponsiveContainer
+     [:> FunnelChart {:label true}
+      ;(utils/override true {} :label)
 
-        ;(utils/non-gridded-chart-components component-id {})
+      ;(utils/non-gridded-chart-components component-id {})
 
-        [:> Funnel {:dataKey           (ui-utils/resolve-sub subscriptions [:value :chosen])
-                    :nameKey           (ui-utils/resolve-sub subscriptions [:name :chosen])
-                    :label             true
-                    :data              d
-                    :isAnimationActive @isAnimationActive?}
-         (make-cells d subscriptions)
-         [:> LabelList {:position :right :fill "#000000" :stroke "none" :dataKey (ui-utils/resolve-sub subscriptions [:value :chosen])}]]]]))
+      [:> Funnel {:dataKey           (ui-utils/resolve-sub subscriptions [:value :chosen])
+                  :nameKey           (ui-utils/resolve-sub subscriptions [:name :chosen])
+                  :label             true
+                  :data              d
+                  :isAnimationActive @isAnimationActive?}
+       (make-cells d subscriptions)
+       [:> LabelList {:position :right :fill "#000000" :stroke "none" :dataKey (ui-utils/resolve-sub subscriptions [:value :chosen])}]]]]))
 
 
 (def source-code `[:> FunnelChart {:height 400 :width 500}
@@ -148,10 +145,10 @@
    :local-config local-config])
 
 
-(def meta-data {:component              component
-                :sources                {:data :source-type/meta-tabular}
-                :pubs                   []
-                :subs                   []})
+(def meta-data {:component component
+                :sources   {:data :source-type/meta-tabular}
+                :pubs      []
+                :subs      []})
 
 (comment
 
