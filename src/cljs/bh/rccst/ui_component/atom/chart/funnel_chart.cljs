@@ -38,8 +38,7 @@
                        {(ui-utils/path->keyword (:name entry))
                         {:name  (:name entry)
                          :color (nth (cycle color/default-stroke-fill-colors) idx)}}))
-        (into {})
-        (assoc {} :colors))
+        (into {}))
 
       ; process options for :value
       (->> fields
@@ -79,7 +78,7 @@
               [rc/line :src (rc/at) :size "2px"]
               [utils/option component-id ":name" [:name]]
               [rc/line :src (rc/at) :size "2px"]
-              [utils/option component-id ":value" [:value]]
+              [utils/column-picker data component-id ":value" [:value :chosen]]
               [rc/v-box :src (rc/at)
                :gap "5px"
                :children [[rc/label :src (rc/at) :label "Funnel Colors"]
@@ -92,7 +91,7 @@
                 (fn [idx {name :name}]
                   ^{:key (str idx name)}
                   [:> Cell {:key  (str "cell-" idx)
-                            :fill (or (ui-utils/resolve-sub subscriptions [:colors name :color])
+                            :fill (or (ui-utils/resolve-sub subscriptions [name :color])
                                      (color/get-color 0))}])))]
     ret))
 

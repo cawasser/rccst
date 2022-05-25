@@ -128,11 +128,11 @@
 
 (defn examples []
   [:div
-   [data-ratom]])
-   ;[data-structure]
-   ;[data-sub]
-   ;[config-ratom]
-   ;[config-structure]
-   ;[config-sub]])
+   [data-ratom]
+   [data-structure]
+   [data-sub]
+   [config-ratom]
+   [config-structure]
+   [config-sub]])
 
 
