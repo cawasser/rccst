@@ -37,6 +37,7 @@
         (map-indexed (fn [idx entry]
                        {(ui-utils/path->keyword (:name entry))
                         {:name  (:name entry)
+                         :include true
                          :color (nth (cycle color/default-stroke-fill-colors) idx)}}))
         (into {}))
 
@@ -62,8 +63,24 @@
    (doall
      (map (fn [[id color-data]]
             (let [text (:name color-data)]
-              ^{:key id} [utils/color-config-text component-id text [:colors id :color] :right-above]))
+              ^{:key id} [utils/color-config-text component-id text [id :color] :right-above]))
        @(ui-utils/subscribe-local component-id [:colors])))])
+
+
+(defn- cell-config [component-id label path position]
+  (let [p (ui-utils/path->keyword path)]
+    ;(log/info "cell-config" component-id "//" label "//" p)
+    [rc/h-box
+     :gap "5px"
+     :children [[utils/boolean-config component-id "" (conj [p] :include)]
+                [utils/color-config-text component-id label (conj [p] :color) :right-above]]]))
+
+
+(defn- make-cell-config [component-id data]
+  (->> (:data @data)
+       (map-indexed (fn [idx {:keys [name] :as item}]
+                      [cell-config component-id name [name] :above-right]))
+       (into [:<>])))
 
 
 (defn config-panel [data component-id]
@@ -82,18 +99,28 @@
               [rc/v-box :src (rc/at)
                :gap "5px"
                :children [[rc/label :src (rc/at) :label "Funnel Colors"]
-                          (color-anchors component-id)]]]])
+                          (make-cell-config component-id data)]]]])
 
 
 (defn make-cells [data subscriptions]
   (let [ret (->> data
               (map-indexed
                 (fn [idx {name :name}]
-                  ^{:key (str idx name)}
-                  [:> Cell {:key  (str "cell-" idx)
-                            :fill (or (ui-utils/resolve-sub subscriptions [name :color])
-                                     (color/get-color 0))}])))]
+                  (if (ui-utils/resolve-sub subscriptions [name :include])
+                    ^{:key (str idx name)}
+                    [:> Cell {:key  (str "cell-" idx)
+                              :fill (or (ui-utils/resolve-sub subscriptions [name :color])
+                                      (color/get-color 0))}]
+                    [])))
+              (remove empty?)
+              (into [:<>]))]
     ret))
+
+
+(defn- included-cells [data subscriptions]
+  (->> data
+       (filter (fn [{:keys [name]}] (ui-utils/resolve-sub subscriptions [name :include])))
+       (into [])))
 
 
 (defn- component* [& {:keys [data component-id container-id
@@ -101,7 +128,8 @@
                       :as   params}]
 
   (log/info "funnel component*" params)
-  (let [d (if (empty? data) [] (get data :data))]
+  (let [d (if (empty? data) [] (get data :data))
+        included (included-cells d subscriptions)]
 
     [:> ResponsiveContainer
      [:> FunnelChart {:label true}
@@ -112,7 +140,7 @@
       [:> Funnel {:dataKey           (ui-utils/resolve-sub subscriptions [:value :chosen])
                   :nameKey           (ui-utils/resolve-sub subscriptions [:name :chosen])
                   :label             true
-                  :data              d
+                  :data              included
                   :isAnimationActive @isAnimationActive?}
        (make-cells d subscriptions)
        [:> LabelList {:position :right :fill "#000000" :stroke "none" :dataKey (ui-utils/resolve-sub subscriptions [:value :chosen])}]]]]))
