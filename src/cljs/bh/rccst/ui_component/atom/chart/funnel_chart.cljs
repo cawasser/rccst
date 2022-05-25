@@ -2,7 +2,7 @@
   (:require [bh.rccst.ui-component.atom.chart.utils :as utils]
             [bh.rccst.ui-component.utils.color :as color]
             [bh.rccst.ui-component.utils.example-data :as data]
-            [bh.rccst.ui-component.atom.chart.wrapper :as c]
+            [bh.rccst.ui-component.atom.chart.wrapper-2 :as wrapper]
             [bh.rccst.ui-component.utils :as ui-utils]
             [re-com.core :as rc]
             [reagent.core :as r]
@@ -17,13 +17,14 @@
 
 (def sample-data
   "the Funnel Chart works best with \"paired data\" so we return the paired-data from utils"
-  (r/atom data/meta-tabular-data))
+  data/meta-tabular-data)
 
 
 (defn local-config [data]
+  (log/info "local-config" data)
   (let [d      (get @data :data)
         fields (get-in @data [:metadata :fields])]
-
+    ;(log/info "configgg : " @data)
     (merge
       ; process options for :name
       (->> fields
@@ -49,25 +50,8 @@
            {:value {:keys m :chosen (first m)}}))))))
 
 
-(defn config
-  "constructs the configuration panel for the chart's configurable properties. This is specific to
-  this being a line-chart component (see [[local-config]]).
-
-  Merges together the configuration needed for:
-
-  1. funnel charts
-  2. pub/sub between components of a container
-  3. `default-config` for all Rechart-based types
-  4. the `tab-panel` for view/edit configuration properties and data
-  5. sets properties of the default-config (local config properties are just set inside [[local-config]])
-  6. sets meta-data for properties this component publishes (`:pub`) or subscribes (`:sub`)
-
-  ---
-
-  - component-id : (string) unique id of the chart
-  "
-  [component-id data]
-
+(defn config [component-id data]
+  (log/info "config" @data)
   (merge
     ui-utils/default-pub-sub
     utils/default-config
@@ -75,10 +59,7 @@
     (local-config data)))
 
 
-(defn- color-anchors
-  "build the config ui-components needed for each of the funnel slices
-  "
-  [component-id]
+(defn- color-anchors [component-id]
   [:<>
    (doall
      (map (fn [[id color-data]]
@@ -87,27 +68,8 @@
        @(ui-utils/subscribe-local component-id [:colors])))])
 
 
-(defn config-panel
-  "constructs the configuration panel for the chart's configurable properties. This is specific to
-  this being a funnel-chart component (see [[local-config]]).
-
-  Merges together the configuration needed for:
-
-  1. funnel charts
-  2. pub/sub between components of a container
-  3. `default-config` for all Rechart-based types
-  4. the `tab-panel` for view/edit configuration properties and data
-  5. sets properties of the default-config (local config properties are just set inside [[local-config]])
-  6. sets meta-data for properties this component publishes (`:pub`) or subscribes (`:sub`)
-
-  ---
-
-  - _ : (unused) this is where the container will pass in the data, unused by the funner chart's config
-  - component-id : (string) unique id of the chart
-  "
-
-  [_ component-id]
-
+(defn config-panel [data component-id]
+  (log/info "config-panel")
   [rc/v-box :src (rc/at)
    :gap "10px"
    :width "100%"
@@ -125,39 +87,39 @@
                           (color-anchors component-id)]]]])
 
 
-(defn- component-panel
-  "the chart to draw, taking cues from the settings of the configuration panel
+(defn make-cells [data subscriptions]
+  (let [ret (->> data
+             (doall
+               (map-indexed
+                 (fn [idx {name :name}]
+                   ^{:key (str idx name)}
+                   [:> Cell {:key  (str "cell-" idx)
+                             :fill (or (:color (ui-utils/resolve-sub subscriptions [:colors name]))
+                                       (color/get-color 0))}])
+                 (get data :data))))]
+    ret))
 
-  ---
 
-  - data : (atom) any data shown by the component's ui
-  - component-id : (string) unique identifier for this chart instance
-  "
-  [data component-id container-id ui]
-  (let [isAnimationActive? (ui-utils/subscribe-local component-id [:isAnimationActive])
-        subscriptions      (ui-utils/build-subs component-id (local-config data))]
+(defn- component* [& {:keys [data component-id container-id
+                             subscriptions isAnimationActive?]
+                      :as params}]
 
-    (fn [data component-id]
-      ;(log/info "configurable-funnel-chart" @config)
+  (log/info "funnel component*" params)
+  (let [d (if (empty? data) [] (get data :data))]
+
       [:> ResponsiveContainer
        [:> FunnelChart {:label true}
+        ;(utils/override true {} :label)
 
-        (utils/non-gridded-chart-components component-id ui)
+        ;(utils/non-gridded-chart-components component-id {})
 
         [:> Funnel {:dataKey           (ui-utils/resolve-sub subscriptions [:value :chosen])
                     :nameKey           (ui-utils/resolve-sub subscriptions [:name :chosen])
                     :label             true
-                    :data              (get @data :data)
+                    :data              d
                     :isAnimationActive @isAnimationActive?}
-         (doall
-           (map-indexed
-             (fn [idx {name :name}]
-               ^{:key (str idx name)}
-               [:> Cell {:key  (str "cell-" idx)
-                         :fill (or (:color (ui-utils/resolve-sub subscriptions [:colors name]))
-                                 (color/get-color 0))}])
-             (get @data :data)))
-         [:> LabelList {:position :right :fill "#000000" :stroke "none" :dataKey (ui-utils/resolve-sub subscriptions [:value :chosen])}]]]])))
+         (make-cells d subscriptions)
+         [:> LabelList {:position :right :fill "#000000" :stroke "none" :dataKey (ui-utils/resolve-sub subscriptions [:value :chosen])}]]]]))
 
 
 (def source-code `[:> FunnelChart {:height 400 :width 500}
@@ -168,51 +130,39 @@
                                :isAnimationActive @isAnimationActive?}]])
 
 
-(defn configurable-component
-  "the chart to draw, taking cues from the settings of the configuration panel
+(defn component [& {:keys [data config-data component-id container-id
+                           data-panel config-panel] :as params}]
 
-  ---
+  (log/info "component-2 funnel" params)
 
-  - :data : (atom) any data shown by the component's ui
-  - :component-id : (string) name of this component\n
-  - :container-id : (string) name of the container this chart is inside of
-  "
-  [& {:keys [data component-id container-id ui]}]
-  [c/base-chart
+  [wrapper/base-chart
    :data data
-   :config (config component-id data)
+   :config-data config-data
    :component-id component-id
-   :container-id (or container-id "")
-   :data-panel utils/meta-tabular-data-panel
+   :container-id container-id
+   :component* component*
+   :component-panel wrapper/component-panel
+   :data-panel data-panel
    :config-panel config-panel
-   :component-panel component-panel
-   :ui ui])
-
-
-(defn component
-  "the chart to draw. this variant does NOT provide a configuration panel
-
-  ---
-
-  - :data : (atom) any data shown by the component's ui
-  - :component-id : (string) name of this component
-  - :container-id : (string) name of the container this chart is inside of
-  "
-  [& {:keys [data component-id container-id ui]}]
-  [c/base-chart
-   :data data
-   :config (config component-id data)
-   :component-id component-id
-   :container-id (or container-id "")
-   :component-panel component-panel
-   :ui ui])
+   :config config
+   :local-config local-config])
 
 
 (def meta-data {:component              component
-                :configurable-component configurable-component
                 :sources                {:data :source-type/meta-tabular}
                 :pubs                   []
                 :subs                   []})
+
+(comment
+
+  ())
+
+
+
+
+
+
+
 
 
 
