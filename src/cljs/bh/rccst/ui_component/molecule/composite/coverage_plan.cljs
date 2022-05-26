@@ -198,31 +198,40 @@
 (defn fn-color-targets [{:keys [data colored]}]
   ; (log/info "fn-color-targets" data "//" colored)
   (let [next-target-color (atom -1)
-        last-target-data  (atom [])]
+        [component topic] (-> colored
+                            first
+                            name
+                            (clojure.string/split #".blackboard."))
+        path              [(keyword (str component ".blackboard"))]]
+
     (re-frame/reg-sub
       (first colored)
       :<- data
-      (fn [d _]
-        ;(log/info "fn-color-targets (data)" d "//" (:data d))
-        (let [cnt          (count s/sensor-color-pallet)
-              assigned     (map (juxt :name :color) @last-target-data)
-              assigned-set (->> assigned (map first) set)
+      :<- path
+      (fn [[d p] _]
+        ;(log/info "fn-color-targets (data)" d "//" (:data d) "//" (keyword topic) "//" ((keyword topic) p))
+        (let [cnt              (count s/sensor-color-pallet)
+              last-target-data ((keyword topic) p)
+              assigned         (map (juxt :name :color) last-target-data)
+              assigned-set     (->> assigned (map first) set)
+
               ;_            (log/info "fn-color-targets (atom)" @last-target-data "//" assigned "//" assigned-set)
-              ret          (doall
-                             (map (fn [t]
-                                    (if (contains? assigned-set (:name t))
-                                      (assoc t :color (->> @last-target-data
-                                                        (filter #(= (:name t) (:name %)))
-                                                        first
-                                                        :color))
-                                      (assoc t :color (nth s/sensor-color-pallet
-                                                        (mod (swap! next-target-color inc) cnt)))))
-                               (:data d)))]
+              ret              (doall
+                                 (map (fn [t]
+                                        (if (contains? assigned-set (:name t))
+                                          (assoc t :color (->> last-target-data
+                                                            (filter #(= (:name t) (:name %)))
+                                                            first
+                                                            :color))
+                                          (assoc t :color (nth s/sensor-color-pallet
+                                                            (mod (swap! next-target-color inc) cnt)))))
+                                   (:data d)))]
 
-          ;(log/info "fn-color-targets (ret)" ret "//" @next-target-color)
+          ;(log/info "fn-color-targets (ret)" ret)
 
-          (reset! last-target-data ret)
-          @last-target-data)))))
+          (h/handle-change-path path [topic] ret)
+
+          ret)))))
 
 
 (defn fn-color-satellites [{:keys [data colored]}]
@@ -259,31 +268,53 @@
 
 ;; region ; custom tables for display
 
+
+(defn match-colors-hex [hex-color]
+  [:white "rgba(255, 0, 0, 0.3)" [1.0 0.0 0.0 0.3] [255 0 0 0.3] hex-color])
+
+
 ; TODO: how do we update :topic/colored-targets?
-(defn- update-target-color [])
+(defn- update-target-color [data id new-color]
+  (let [path      (-> data
+                    first
+                    name
+                    (clojure.string/split #".blackboard.")
+                    (#(map keyword %))
+                    ((fn [[c p]] [c :blackboard p])))
+        orig-data (h/resolve-value data)
+        target    (first (filter #(= (:name %) id) @orig-data))
+        kept      (remove #(= (:name %) id) @orig-data)
+        new-data  (conj kept (assoc target :color (match-colors-hex new-color)))]
+
+    (log/info "update-target-color (path)" id "//" path "//" new-data)
+    (h/handle-change-path path [] new-data)))
 
 
-(defn target-color-picker-popover [showing? control data name & [position]]
-  (let [d (h/resolve-value data)
-        p (or position :right-center)]
+; update the correct target's color with the new value
+(comment
+  (do
+    (def data [:coverage-plan-demo-ww.grid-widget.blackboard.topic.colored-targets])
+    (def id "alpha-hd")
+    (def new-color "#000000"))
 
-    (fn []
-      (let [[_ _ _ _ color] (->> @d
-                              (filter #(= name (:name %)))
-                              first
-                              :color)]
-        [rc/popover-anchor-wrapper :src (rc/at)
-         ;:style {:width "100%"}
-         :showing? @showing?
-         :position p
-         :anchor control
-         :popover [rc/popover-content-wrapper :src (rc/at)
-                   :close-button? false
-                   :no-clip? false
-                   :body [picker/hex-color-picker
-                          :color color
-                          :on-change (fn [x]
-                                       (log/info "on-change target-color-picker-popover" (js->clj x)))]]]))))
+
+  (let [path      (-> data
+                    first
+                    name
+                    (clojure.string/split #".blackboard.")
+                    (#(map keyword %))
+                    ((fn [[c p]] [c :blackboard p])))
+        orig-data (h/resolve-value data)
+        target    (first (filter #(= (:name %) id) @orig-data))
+        kept      (remove #(= (:name %) id) @orig-data)
+        new-data  (conj kept (assoc target :color (match-colors-hex new-color)))]
+    [target kept new-data])
+
+  (update-target-color data id new-color)
+
+
+  ())
+
 
 
 (defn sat-color-picker-popover [showing? control data name & [position]]
@@ -327,21 +358,33 @@
      [:span.icon.has-text-success.is-small [:i.far.fa-square]])])
 
 
-(defn- display-symbol [data name [color _ _]]
+(defn- display-symbol [data name [_ _ _ _ color]]
   ; TODO: need to sync the different color formats on-change
 
-  (let [showing? (r/atom false)]
-    ;(log/info "display-symbol" data name color)
-    ^{:key (str "symb-" name)}
-    [:td {:style {:color      :white
-                  :text-align :center}}
-     [target-color-picker-popover
-      showing?
-      [:span.icon.has-text-success.is-small
-       [:i.fas.fa-circle
-        {:style    {:color (or color :green)}
-         :on-click #(swap! showing? not)}]]
-      data name]]))
+  (let [showing? (r/atom false)
+        d        (h/resolve-value data)]
+
+    (fn [data name [_ _ _ _ color]]
+
+      (log/info "display-symbol" name "//" color "//" @d)
+
+      ^{:key (str "symb-" name)}
+      [:td {:style {:color      :white
+                    :text-align :center}}
+       [rc/popover-anchor-wrapper :src (rc/at)
+        :showing? @showing?
+        :position :right-center
+        :anchor [:span.icon.has-text-success.is-small
+                 [:i.fas.fa-circle
+                  {:style    {:color color}                 ;(or color :white)}
+                   :on-click #(swap! showing? not)}]]
+        :popover [rc/popover-content-wrapper :src (rc/at)
+                  :close-button? false
+                  :no-clip? false
+                  :body [picker/hex-color-picker
+                         :color color
+                         :on-change (fn [x]
+                                      (update-target-color data name (js->clj x)))]]]])))
 
 
 (defn- display-edit-control [name is-editing]
@@ -373,14 +416,14 @@
 
     ;(log/info "display-color" name "//" color)
     ^{:key (str "color-" name)}
-    [:td {:style (merge
-                   (if color
-                     {:background-color (or color :green)
-                      :border-width     "1px"}
-                     {:background-color :transparent
-                      :border-width     "1px"})
-                   {:text-align :center
-                    :width      100})
+    [:td {:style    (merge
+                      (if color
+                        {:background-color (or color :green)
+                         :border-width     "1px"}
+                        {:background-color :transparent
+                         :border-width     "1px"})
+                      {:text-align :center
+                       :width      100})
           :on-click #(swap! showing? not)}
      [sat-color-picker-popover
       showing?
@@ -419,7 +462,7 @@
 
     (fn []
       (let [under-consideration (->> @s (map :name) set)]
-        ;(log/info "target-table (d)" @d)
+        (log/info "target-table (d)" @d)
         [:div.table-container {:style {:width       "100%"
                                        :height      "100%"
                                        :overflow-y  :auto
@@ -432,8 +475,8 @@
            (doall
              (for [{:keys [name cells color] :as target} @d]
                (doall
-                 ;(log/info "target-table (for)" @d
-                 ; "//" target "//" name "//" color)
+                 (log/info "target-table (for)" @d
+                  "//" target "//" name "//" color)
 
                  ^{:key name}
                  [:tr
@@ -602,8 +645,8 @@
 ; can we cache the results so we only add :color to "new" elements?
 (comment
   (do
-    ;(def colored [:coverage-plan-demo-ww.grid-widget.blackboard.topic.colored-targets]) ; actual
-    ;(def colored [:coverage-plan-demo-ww.grid-widget :blackboard :topic.colored-targets]) ; what we'd prefer
+    (def colored [:coverage-plan-demo-ww.grid-widget.blackboard.topic.colored-targets]) ; actual
+    (def colored [:coverage-plan-demo-ww.grid-widget :blackboard :topic.colored-targets]) ; what we'd prefer
 
     (def last-data (atom []))
     (def last-target-data (atom dummy-targets))
@@ -612,6 +655,19 @@
     (def candidate {:name  "alpha-hd",
                     :cells #{[7 7 "hidef-image" 0] [7 6 "hidef-image" 1]
                              [7 5 "hidef-image" 3] [7 6 "hidef-image" 2]}}))
+
+  (-> colored
+    first
+    name
+    (clojure.string/split #".blackboard.")
+    (#(map keyword %))
+    ((fn [[c p]] [c :blackboard p])))
+
+  (let [[component topic] (-> colored
+                            first
+                            name
+                            (clojure.string/split #".blackboard."))]
+    {:c [(keyword (str component ".blackboard"))] :t (keyword topic)})
 
 
   (if (contains? assigned-set (:name candidate))
@@ -629,6 +685,8 @@
 
   @(re-frame/subscribe [:bh.rccst.subs/source :source/targets])
 
+  ; can we change the data in :source/targets and have the UI update?
+  ;
   (re-frame/dispatch [:bh.rccst.events/data-update
                       {:id    :source/targets
                        :value {:title    "Targets",
@@ -666,6 +724,26 @@
   (get-in @re-frame.db/app-db '(:containers :coverage-plan-demo-ww.grid-widget
                                  :blackboard :topic.colored-targets))
 
+  ; can we change the data in :topic/colored-targets?
+  ;
+  (def new-colors [{:name  "alpha-hd", :cells #{[7 7 "hidef-image" 0] [7 6 "hidef-image" 1]
+                                                [7 5 "hidef-image" 3] [7 6 "hidef-image" 2]},
+                    :color [:darkred "rgba(139, 0, 0, .3)" [139 0 0 0.3] [0.55 0.0 0.0 0.1] "#8B0000"]}
+                   {:name  "bravo-img", :cells #{[7 2 "image" 0] [7 1 "image" 1]},
+                    :color [:blue "rgba(0, 0, 255, .3)" [0 0 255 0.3] [0 0 1 0.1] "#0000FF"]}
+                   {:name  "fire-hd", :cells #{[5 3 "hidef-image" 2] [4 3 "hidef-image" 3]
+                                               [4 3 "hidef-image" 2] [5 3 "hidef-image" 0] [5 3 "hidef-image" 3]},
+                    :color [:orange "rgba(255, 165, 0, .3)" [255 165 0 0.3] [1 0.65 0 0.3] "#FFA500"]}
+                   {:name  "fire-ir", :cells #{[5 4 "v/ir" 2] [5 4 "v/ir" 1] [5 3 "v/ir" 1]
+                                               [5 4 "v/ir" 0] [5 4 "v/ir" 3]},
+                    :color [:grey "rgba(128, 128, 128, .3)" [128 128 128 0.3] [0.5 0.5 0.5 0.3] "#808080"]}
+                   {:name  "severe-hd", :cells #{[5 7 "hidef-image" 3] [5 6 "hidef-image" 0]
+                                                 [6 6 "hidef-image" 2] [6 5 "hidef-image" 1] [5 7 "hidef-image" 1]},
+                    :color [:cornflowerblue "rgba(100, 149, 237, .3)"
+                            [100 149 237 0.3] [0.4 0.58 0.93 0.3] "#6495ED"]}])
+
+  (h/handle-change-path [:coverage-plan-demo-ww.grid-widget :blackboard :topic.colored-targets] []
+    new-colors)
 
   ())
 
