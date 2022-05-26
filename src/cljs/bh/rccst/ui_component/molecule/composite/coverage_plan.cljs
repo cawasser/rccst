@@ -300,7 +300,7 @@
                     :text-align :center}}
        [rc/popover-anchor-wrapper :src (rc/at)
         :showing? @showing?
-        :position :right-center
+        :position :below-right
         :anchor [:span.icon.has-text-success.is-small
                  [:i.fas.fa-circle
                   {:style    {:color color}                 ;(or color :white)}
@@ -356,7 +356,7 @@
             :on-click #(swap! showing? not)}
        [rc/popover-anchor-wrapper :src (rc/at)
         :showing? @showing?
-        :position :right-center
+        :position :below-right
         :anchor [:span]
         :popover [rc/popover-content-wrapper :src (rc/at)
                   :close-button? false
