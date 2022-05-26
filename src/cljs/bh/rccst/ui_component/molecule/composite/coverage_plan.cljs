@@ -4,8 +4,8 @@
   (:require [bh.rccst.ui-component.atom.bh.color-picker :as picker]
             [bh.rccst.ui-component.molecule.composite.coverage-plan.support :as s]
             [bh.rccst.ui-component.utils :as ui-utils]
-            [bh.rccst.ui-component.utils.helpers :as h]
             [bh.rccst.ui-component.utils.color :as c]
+            [bh.rccst.ui-component.utils.helpers :as h]
             [cljs-time.coerce :as coerce]
             [cljs-time.core :as t]
             [re-com.core :as rc]
@@ -154,12 +154,10 @@
 
       ; TODO: convert to getting sets for both selected-targets and selected-satellites
       ; and using them to filter
-      (let [s-under-c          (->> s-s (map #(get-in % [:sensor_id])) set)
-            ;_                              (log/info "fn-coverage (s-u-c)" s-under-c)
-            filtered-coverages (filter #(contains?
-                                          s-under-c
+      (let [filtered-coverages (filter #(contains?
+                                          s-s
                                           (get-in % [:coverage :sensor]))
-                                 (s/cook-coverages s-s c ct))
+                                 (s/cook-coverages s s-s c ct))
             ;_                  (log/info "fn-coverage (filter)" filtered-coverages)
             cvg                (if (seq c)
                                  (map s/make-coverage-shape filtered-coverages)
@@ -249,30 +247,37 @@
 (defn fn-color-satellites [{:keys [data colored]}]
   ;(log/info "fn-color-satellites" data "//" colored)
   (let [next-sat-color (atom -1)
-        last-sat-data  (atom [])]
+        [component topic] (-> colored
+                            first
+                            name
+                            (clojure.string/split #".blackboard."))
+        path           [(keyword (str component ".blackboard"))]]
     (re-frame/reg-sub
       (first colored)
       :<- data
-      (fn [d _]
+      :<- path
+      (fn [[d p] _]
         ;(log/info "fn-color-satellites (data)" d "//" (:data d))
-        (let [cnt          (count s/sensor-color-pallet)
-              assigned     (map (juxt :sensor_id :color) @last-sat-data)
-              assigned-set (->> assigned (map first) set)
+        (let [cnt           (count s/sensor-color-pallet)
+              last-sat-data ((keyword topic) p)
+              assigned      (map (juxt :sensor_id :color) last-sat-data)
+              assigned-set  (->> assigned (map first) set)
               ;_            (log/info "fn-color-satellites (atom)" @last-sat-data "//" assigned "//" assigned-set)
-              ret          (doall
-                             (map (fn [t]
-                                    (if (contains? assigned-set (:sensor_id t))
-                                      (assoc t :color (->> @last-sat-data
-                                                        (filter #(= (:sensor_id t) (:sensor_id %)))
-                                                        first
-                                                        :color))
-                                      (assoc t :color (nth s/sensor-color-pallet
-                                                        (mod (swap! next-sat-color inc) cnt)))))
-                               (:data d)))]
-          ;(log/info "fn-color-satellites (ret)" ret "//" @next-sat-color)
+              ret           (doall
+                              (map (fn [t]
+                                     (if (contains? assigned-set (:sensor_id t))
+                                       (assoc t :color (->> last-sat-data
+                                                         (filter #(= (:sensor_id t) (:sensor_id %)))
+                                                         first
+                                                         :color))
+                                       (assoc t :color (nth s/sensor-color-pallet
+                                                         (mod (swap! next-sat-color inc) cnt)))))
+                                (:data d)))]
 
-          (reset! last-sat-data ret)
-          @last-sat-data)))))
+          ;(log/info "fn-color-satellites (ret)" ret )
+          (h/handle-change-path path [topic] ret)
+
+          ret)))))
 
 
 ;; endregion
@@ -294,6 +299,25 @@
         new-data  (conj kept (assoc target :color (c/match-colors-hex new-color)))]
 
     ;(log/info "update-target-color (path)" id "//" path "//" new-data)
+    (h/handle-change-path path [] new-data)))
+
+
+(defn- update-satellite-color [data id new-color]
+  (log/info "update-satellite-color" id "//" new-color)
+  (let [path      (-> data
+                    first
+                    name
+                    (clojure.string/split #".blackboard.")
+                    (#(map keyword %))
+                    ((fn [[c p]] [c :blackboard p])))
+        orig-data (h/resolve-value data)
+        target    (first (filter #(= (:sensor_id %) id) @orig-data))
+        kept      (remove #(= (:sensor_id %) id) @orig-data)
+        cooked-color {:r (get new-color "r") :g (get new-color "g")
+                      :b (get new-color "b") :a (get new-color "a")}
+        new-data  (conj kept (assoc target :color (c/match-colors-rgba cooked-color)))]
+
+    ;(log/info "update-satellite-color (path)" id "//" path "//" new-data)
     (h/handle-change-path path [] new-data)))
 
 
@@ -387,49 +411,45 @@
    [:span.icon.has-text-danger.is-small [:i.far.fa-trash-alt]]])
 
 
-(defn- display-color [data name [_ _ _ _ color]]
-  ; TODO: need to sync the different color formats on-change
+(defn- display-color [data name [_ js-color rgba-color _  _]]
+  (let [showing? (r/atom false)
+        d        (h/resolve-value data)]
 
-  (let [showing? (r/atom false)]
+    (fn [data name [_ js-color [r g b a] _  _]]
 
-    ;(log/info "display-color" name "//" color)
-    ^{:key (str "color-" name)}
-    [:td {:style    (merge
-                      (if color
-                        {:background-color (or color :green)
-                         :border-width     "1px"}
-                        {:background-color :transparent
-                         :border-width     "1px"})
-                      {:text-align :center
-                       :width      100})
-          :on-click #(swap! showing? not)}
-     [sat-color-picker-popover
-      showing?
-      [:span]
-      data name]]))
+      (log/info "display-color" name "//" js-color "//" @d)
+
+      ^{:key (str "color-" name)}
+      [:td {:style    (merge
+                        (if js-color
+                          {:background-color (or js-color :green)
+                           :border-width     "1px"}
+                          {:background-color :transparent
+                           :border-width     "1px"})
+                        {:text-align :center
+                         :width      100})
+            :on-click #(swap! showing? not)}
+       [rc/popover-anchor-wrapper :src (rc/at)
+        :showing? @showing?
+        :position :right-center
+        :anchor [:span]
+        :popover [rc/popover-content-wrapper :src (rc/at)
+                  :close-button? false
+                  :no-clip? false
+                  :body [picker/rgba-color-picker
+                         :color {:r r :g g :b b :a a}
+                         :on-change (fn [x]
+                                      (update-satellite-color data name (js->clj x)))]]]])))
 
 
-(defn- toggle-target [targets resolved-selection selection id]
+(defn- toggle-selection [resolved-selection selection-path id]
   (let [s-ids (or resolved-selection #{})]
-    (if (contains? s-ids id)
+    (if (contains? resolved-selection id)
       ; remove
-      (h/handle-change-path selection [] (disj s-ids id))
+      (h/handle-change-path selection-path [] (disj s-ids id))
 
       ; add
-      (h/handle-change-path selection [] (conj s-ids id)))))
-
-
-(defn- toggle-satellite [satellites resolved-selection selection id]
-  ; TODO: convert to just returning the set of selections
-  (let [s-ids (->> resolved-selection (map :sensor_id) set)]
-    (if (contains? s-ids id)
-      ; remove
-      (h/handle-change-path selection []
-        (remove #(= id (:sensor_id %)) resolved-selection))
-
-      ; add
-      (h/handle-change-path selection []
-        (concat resolved-selection (filter #(= id (:sensor_id %)) satellites))))))
+      (h/handle-change-path selection-path [] (conj s-ids id)))))
 
 
 (defn- target-table [& {:keys [data selection component-id container-id]}]
@@ -438,34 +458,33 @@
         is-editing (r/atom "")]
 
     (fn []
-      (let [under-consideration (or @s #{})]
-        ;(log/info "target-table (d)" @d "//" @s)
-        [:div.table-container {:style {:width       "100%"
-                                       :height      "100%"
-                                       :overflow-y  :auto
-                                       :white-space :nowrap
-                                       :border      "1px outset gray"}}
-         [:table.table
-          [:thead {:style {:position :sticky :top 0 :background :lightgray}}
-           [:tr [:th "Include?"] [:th "Symbol"] [:th "AoI"] [:th ""] [:th ""]]]
-          [:tbody
-           (doall
-             (for [{:keys [name cells color] :as target} @d]
-               (doall
-                 ;(log/info "target-table (for)" @d
-                 ; "//" target "//" name "//" color)
+      ;(log/info "target-table (d)" @d "//" @s)
+      [:div.table-container {:style {:width       "100%"
+                                     :height      "100%"
+                                     :overflow-y  :auto
+                                     :white-space :nowrap
+                                     :border      "1px outset gray"}}
+       [:table.table
+        [:thead {:style {:position :sticky :top 0 :background :lightgray}}
+         [:tr [:th "Include?"] [:th "Symbol"] [:th "AoI"] [:th ""] [:th ""]]]
+        [:tbody
+         (doall
+           (for [{:keys [name cells color] :as target} @d]
+             (doall
+               ;(log/info "target-table (for)" @d
+               ; "//" target "//" name "//" color)
 
-                 ^{:key name}
-                 [:tr
-                  [display-checkbox name name under-consideration #(toggle-target @d @s selection name)]
+               ^{:key name}
+               [:tr
+                [display-checkbox name name @s #(toggle-selection @s selection name)]
 
-                  [display-symbol data name color]
+                [display-symbol data name color]
 
-                  ^{:key (str "target-" name)} [:td name]
+                ^{:key (str "target-" name)} [:td name]
 
-                  [display-edit-control name is-editing]
+                [display-edit-control name is-editing]
 
-                  [display-delete-control name]])))]]]))))
+                [display-delete-control name]])))]]])))
 
 
 (defn- satellite-table [& {:keys [data selection component-id container-id]}]
@@ -479,30 +498,27 @@
 
     (fn []
       ; TODO: convert to just returning the set of selections
-      (let [under-consideration (->> @s (map :sensor_id) set)]
-        [:div.table-container {:style {:width       "100%"
-                                       :height      "100%"
-                                       :overflow-y  :auto
-                                       :white-space :nowrap
-                                       :border      "1px outset gray"}}
-         [:table.table
-          [:thead {:style {:position :sticky :top 0 :background :lightgray}}
-           [:tr [:th "Include?"] [:th "Color"] [:th "Platform"]]]
-          [:tbody
-           (doall
-             (for [{:keys [platform_id sensor_id color] :as platform} @d]
-               (doall
-                 ^{:key sensor_id}
-                 [:tr
-                  [display-checkbox sensor_id
-                   (str platform_id "-" sensor_id)
-                   under-consideration
-                   #(toggle-satellite @d @s selection sensor_id)]
+      [:div.table-container {:style {:width       "100%"
+                                     :height      "100%"
+                                     :overflow-y  :auto
+                                     :white-space :nowrap
+                                     :border      "1px outset gray"}}
+       [:table.table
+        [:thead {:style {:position :sticky :top 0 :background :lightgray}}
+         [:tr [:th "Include?"] [:th "Color"] [:th "Platform"]]]
+        [:tbody
+         (doall
+           (for [{:keys [platform_id sensor_id color] :as platform} @d]
+             (doall
+               ^{:key sensor_id}
+               [:tr
+                [display-checkbox sensor_id (str platform_id "-" sensor_id)
+                 @s #(toggle-selection @s selection sensor_id)]
 
-                  [display-color data sensor_id color]
+                [display-color data sensor_id color]
 
-                  ^{:key (str "satellite-" platform_id "-" sensor_id)}
-                  [:td (str platform_id "  " sensor_id)]])))]]]))))
+                ^{:key (str "satellite-" platform_id "-" sensor_id)}
+                [:td (str platform_id "  " sensor_id)]])))]]])))
 
 
 ;; endregion
@@ -537,11 +553,10 @@
 
                                    ; transformation functions
                                    :fn/coverage               {:type  :source/fn :name fn-coverage
-                                                               ; TODO: looks like we need both selected-targets AND colored-targets!
-                                                               :ports {:targets   :port/sink :satellites :port/sink
+                                                               :ports {:targets          :port/sink :satellites :port/sink
                                                                        :selected-targets :port/sink :selected-satellites :port/sink
-                                                                       :coverages :port/sink :current-time :port/sink
-                                                                       :shapes    :port/source}}
+                                                                       :coverages        :port/sink :current-time :port/sink
+                                                                       :shapes           :port/source}}
                                    :fn/range                  {:type  :source/fn :name fn-range
                                                                :ports {:data :port/sink :range :port/source}}
                                    :fn/current-time           {:type  :source/fn :name fn-current-time
@@ -566,7 +581,7 @@
 
                                    ; topics are inputs into what?
                                    :topic/target-data         {:data {:fn/color-targets :data}}
-                                   :topic/colored-targets     {:data {:ui/targets :data
+                                   :topic/colored-targets     {:data {:ui/targets  :data
                                                                       :fn/coverage :targets}}
                                    :topic/selected-targets    {:data {:ui/targets  :selection
                                                                       :fn/coverage :selected-targets}}

@@ -145,18 +145,6 @@
      (rgba->hex rgba-color)]))
 
 
-(comment
-  (-> "#ff0000" hex->rgba rgba-normal rgba-map->rgba-vector)
-  (-> "#ff00ff" hex->rgba rgba-normal rgba-map->rgba-vector)
-
-  (match-colors-hex "#000000")
-  (match-colors-hex "#ff0000")
-  (match-colors-hex "#ff00ff")
-
-  (match-colors-rgba {:r 255 :g 0 :b 0 :a 1.0})
-  ())
-
-
 (defn relative-luminance
   "computes _relative luminance_ per the [W3C](https://www.w3.org/TR/WCAG20/#relativeluminancedef)
 
@@ -231,4 +219,18 @@
   (if (<= (relative-luminance rgba-color) 0.1833)
     (if (<= 0.25 a) "white" "black")
     "black"))
+
+
+
+(comment
+  (-> "#ff0000" hex->rgba rgba-normal rgba-map->rgba-vector)
+  (-> "#ff00ff" hex->rgba rgba-normal rgba-map->rgba-vector)
+
+  (match-colors-hex "#000000")
+  (match-colors-hex "#ff0000")
+  (match-colors-hex "#ff00ff")
+
+  (match-colors-rgba {:r 255 :g 0 :b 0 :a 1.0})
+  ())
+
 

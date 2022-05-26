@@ -98,7 +98,7 @@
      :id            (clojure.string/join "-"
                       [(:platform coverage)
                        time
-                       (str cell)])
+                       (str cell) r g b a])
      :locations     (boundary-locations cell)
      :width         2
      :fill-color    fill
@@ -121,10 +121,10 @@
      :outline-color outline}))
 
 
-(defn cook-coverages [satellites coverages current-time]
+(defn cook-coverages [satellites selected-satellites coverages current-time]
   ;(log/info "cook-coverages" satellites
-  ; "//" coverages
-  ; "//" current-time)
+  ;  "//" coverages
+  ;  "//" current-time)
 
   (let [ret (->> coverages
               :data
@@ -132,6 +132,9 @@
               (mapcat (fn [{:keys [coverage time cell computed_at color] :as all}]
                         (map (fn [c] {:time time :coverage c :cell cell :computed_at computed_at})
                           coverage)))
+              (filter (fn [x]
+                        (contains? selected-satellites
+                          (get-in x [:coverage :sensor]))))
               (map (fn [cvg]
                      (let [platform  (get-in cvg [:coverage :platform])
                            sensor    (get-in cvg [:coverage :sensor])
