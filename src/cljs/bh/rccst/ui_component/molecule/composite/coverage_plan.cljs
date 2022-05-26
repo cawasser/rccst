@@ -77,8 +77,6 @@
       ;  "// (filter)" (filter #(contains? s (get-in % [:coverage :sensor]))
       ;                  (s/cook-coverages c ct)))
 
-      ; TODO: convert to getting sets for both selected-targets and selected-satellites
-      ; and using them to filter
       (let [filtered-coverages (filter #(contains?
                                           s-s
                                           (get-in % [:coverage :sensor]))
@@ -342,7 +340,7 @@
 
     (fn [data name [_ js-color [r g b a] _  _]]
 
-      (log/info "display-color" name "//" js-color "//" @d)
+      ;(log/info "display-color" name "//" js-color "//" @d)
 
       ^{:key (str "color-" name)}
       [:td {:style    (merge
@@ -453,8 +451,8 @@
                     :component-id :coverage-plan
                     :components   {; ui components
                                    ; TODO: add a :label element for use in the UI
-                                   :ui/targets                {:type :ui/component :name target-table}
-                                   :ui/satellites             {:type :ui/component :name satellite-table}
+                                   :ui/targets                {:type :ui/component :name target-table :label "Targets"}
+                                   :ui/satellites             {:type :ui/component :name satellite-table :label "Platforms"}
                                    :ui/globe                  {:type :ui/component :name :ww/globe}
                                    :ui/time-slider            {:type :ui/component :name :rc/slider}
                                    :ui/current-time           {:type :ui/component :name :rc/label-md}
