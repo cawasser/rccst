@@ -122,45 +122,56 @@
   builds and registers the subscription provided by 'layers'
 
   "
-  [{:keys [targets satellites coverages current-time shapes]}]
+  [{:keys [targets satellites
+           selected-targets selected-satellites
+           coverages
+           current-time shapes]}]
 
   ;(log/info "fn-coverage" shapes
   ;  "//" targets
   ;  "//" satellites
+  ;  "//" selected-targets
+  ;  "//" selected-satellites
   ;  "//" coverages)
 
   (re-frame/reg-sub
     (first shapes)
     :<- targets
     :<- satellites
+    :<- selected-targets
+    :<- selected-satellites
     :<- coverages
     :<- current-time
-    (fn [[t s c ct] _]
+    (fn [[t s s-t s-s c ct] _]
       ;(log/info "fn-coverage (sub)" ct
       ;  "// (targets)" t
-      ;  "// (satellites)" s)
-      ;  ;"// (cooked)" (s/cook-coverages c ct)
+      ;  "// (satellites)" s
+      ;  "// (selected-targets)" s-t
+      ;  "// (selected-satellites)" s-s)
+      ;  "// (cooked)" (s/cook-coverages c ct)
       ;  "// (filter)" (filter #(contains? s (get-in % [:coverage :sensor]))
       ;                  (s/cook-coverages c ct)))
 
-      (let [s-under-c          (->> s (map #(get-in % [:sensor_id])) set)
+      ; TODO: convert to getting sets for both selected-targets and selected-satellites
+      ; and using them to filter
+      (let [s-under-c          (->> s-s (map #(get-in % [:sensor_id])) set)
             ;_                              (log/info "fn-coverage (s-u-c)" s-under-c)
             filtered-coverages (filter #(contains?
                                           s-under-c
                                           (get-in % [:coverage :sensor]))
-                                 (s/cook-coverages s c ct))
+                                 (s/cook-coverages s-s c ct))
             ;_                  (log/info "fn-coverage (filter)" filtered-coverages)
             cvg                (if (seq c)
                                  (map s/make-coverage-shape filtered-coverages)
                                  [])
             trg                (if (seq t)
-                                 (map s/make-target-shape (s/cook-targets t ct))
+                                 (map s/make-target-shape (s/cook-targets t s-t ct))
                                  [])
             ret                (concat cvg trg)]
 
         ;(log/info "fn-coverage (ret)" ret
         ;  "//" cvg
-        ;  "//" trg)
+        ;  "//" trg
 
         ret))))
 
@@ -282,7 +293,7 @@
         kept      (remove #(= (:name %) id) @orig-data)
         new-data  (conj kept (assoc target :color (c/match-colors-hex new-color)))]
 
-    (log/info "update-target-color (path)" id "//" path "//" new-data)
+    ;(log/info "update-target-color (path)" id "//" path "//" new-data)
     (h/handle-change-path path [] new-data)))
 
 
@@ -333,7 +344,7 @@
 
     (fn [data name [_ _ _ _ color]]
 
-      (log/info "display-symbol" name "//" color "//" @d)
+      ;(log/info "display-symbol" name "//" color "//" @d)
 
       ^{:key (str "symb-" name)}
       [:td {:style {:color      :white
@@ -399,18 +410,17 @@
 
 
 (defn- toggle-target [targets resolved-selection selection id]
-  (let [s-ids (->> resolved-selection (map :name) set)]
+  (let [s-ids (or resolved-selection #{})]
     (if (contains? s-ids id)
       ; remove
-      (h/handle-change-path selection []
-        (remove #(= id (:name %)) resolved-selection))
+      (h/handle-change-path selection [] (disj s-ids id))
 
       ; add
-      (h/handle-change-path selection []
-        (concat resolved-selection (filter #(= id (:name %)) targets))))))
+      (h/handle-change-path selection [] (conj s-ids id)))))
 
 
 (defn- toggle-satellite [satellites resolved-selection selection id]
+  ; TODO: convert to just returning the set of selections
   (let [s-ids (->> resolved-selection (map :sensor_id) set)]
     (if (contains? s-ids id)
       ; remove
@@ -428,8 +438,8 @@
         is-editing (r/atom "")]
 
     (fn []
-      (let [under-consideration (->> @s (map :name) set)]
-        ;(log/info "target-table (d)" @d)
+      (let [under-consideration (or @s #{})]
+        ;(log/info "target-table (d)" @d "//" @s)
         [:div.table-container {:style {:width       "100%"
                                        :height      "100%"
                                        :overflow-y  :auto
@@ -442,8 +452,8 @@
            (doall
              (for [{:keys [name cells color] :as target} @d]
                (doall
-                 (log/info "target-table (for)" @d
-                  "//" target "//" name "//" color)
+                 ;(log/info "target-table (for)" @d
+                 ; "//" target "//" name "//" color)
 
                  ^{:key name}
                  [:tr
@@ -468,6 +478,7 @@
     ;(log/info "satellites-table (s)" @d "//" @s)
 
     (fn []
+      ; TODO: convert to just returning the set of selections
       (let [under-consideration (->> @s (map :sensor_id) set)]
         [:div.table-container {:style {:width       "100%"
                                        :height      "100%"
@@ -514,12 +525,9 @@
 
                                    ; composite-local data sources
                                    :topic/selected-targets    {:type :source/local :name :selected-targets}
-                                   ;:default dummy-targets}
-
                                    :topic/colored-targets     {:type :source/local :name :colored-targets}
 
                                    :topic/selected-satellites {:type :source/local :name :selected-satellites}
-                                   ;:default dummy-satellites}
                                    :topic/colored-satellites  {:type :source/local :name :colored-satellites}
 
                                    :topic/current-time        {:type :source/local :name :current-time :default 0}
@@ -531,6 +539,7 @@
                                    :fn/coverage               {:type  :source/fn :name fn-coverage
                                                                ; TODO: looks like we need both selected-targets AND colored-targets!
                                                                :ports {:targets   :port/sink :satellites :port/sink
+                                                                       :selected-targets :port/sink :selected-satellites :port/sink
                                                                        :coverages :port/sink :current-time :port/sink
                                                                        :shapes    :port/source}}
                                    :fn/range                  {:type  :source/fn :name fn-range
@@ -557,14 +566,17 @@
 
                                    ; topics are inputs into what?
                                    :topic/target-data         {:data {:fn/color-targets :data}}
-                                   :topic/colored-targets     {:data {:ui/targets :data}}
-                                   :topic/selected-targets    {:data {:ui/targets  :selection
+                                   :topic/colored-targets     {:data {:ui/targets :data
                                                                       :fn/coverage :targets}}
+                                   :topic/selected-targets    {:data {:ui/targets  :selection
+                                                                      :fn/coverage :selected-targets}}
+
 
                                    :topic/satellite-data      {:data {:fn/color-satellites :data}}
-                                   :topic/colored-satellites  {:data {:ui/satellites :data}}
-                                   :topic/selected-satellites {:data {:ui/satellites :selection
+                                   :topic/colored-satellites  {:data {:ui/satellites :data
                                                                       :fn/coverage   :satellites}}
+                                   :topic/selected-satellites {:data {:ui/satellites :selection
+                                                                      :fn/coverage   :selected-satellites}}
 
                                    :topic/coverage-data       {:data {:fn/coverage :coverages
                                                                       :fn/range    :data}}

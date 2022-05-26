@@ -13,7 +13,7 @@
                   "South Gnomonic"])
 
 
-(defn- change-projection [this new-projection]
+(defn change-projection [this new-projection]
   ;(log/info "change-projection" new-projection
   ;  "//// roundGlobe" (.-roundGlobe this)
   ;  "//// flatGlobe " (.-flatGlobe this))

@@ -94,10 +94,10 @@
         [old-id old-props old-children] old-argv]
 
     ;(log/info "component-did-update"
-    ;  "old-children" (sort (keys old-children))
-      ;"//// old-props" old-props
-      ;"//// new-children" (sort (keys new-children))
-      ;"//// new-props" new-props)
+     ; "//// old-children" (sort (keys old-children))
+     ; "//// old-props" old-props
+     ; "//// new-children" (sort (keys new-children))
+     ; "//// new-props" new-props)
 
     ;(log/info "projection"
     ;  (:projection old-props)

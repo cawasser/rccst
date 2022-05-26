@@ -106,14 +106,14 @@
 
 
 (defn make-target-shape [[target-id row col ti color]]
-  (log/info "make-target-shape" target-id color)
+  ;(log/info "make-target-shape" target-id color)
   (let [[_ _ _ c _] color
         [r g b _] c
         fill    [r g b 0.9]
         outline [r g b 1.0]]
     {:shape         :shape/circle
      :id            (clojure.string/join "-"
-                      [target-id ti row col])
+                      [target-id ti row col r g b])
      :location      (get cell-centers [row col])
      :radius        300000
      :width         2
@@ -144,17 +144,51 @@
     ret))
 
 
-(defn cook-targets [targets current-time]
-  ;(log/info "cook-targets" targets current-time)
+(defn cook-targets [targets selected-targets current-time]
+  ;(log/info "cook-targets" targets "//" selected-targets "//" current-time)
   (let [ret (->> targets
               seq
               (mapcat (fn [{:keys [name cells color]}]
                         (map (fn [[r c ty ti]]
                                [name r c ti color])
                           cells)))
+              (filter (fn [[id _ _ _ _]] (contains? selected-targets id)))
               (filter (fn [[_ _ _ ti _]] (= ti current-time))))]
     ;(log/info "cook-targets (ret)" ret)
     ret))
+
+
+(comment
+  (do
+    (def targets [{:name  "alpha-hd", :cells #{[7 7 "hidef-image" 0] [7 6 "hidef-image" 1]
+                                               [7 5 "hidef-image" 3] [7 6 "hidef-image" 2]},
+                   :color [:darkred "rgba(139, 0, 0, .3)" [139 0 0 0.3] [0.55 0.0 0.0 0.1] "#8B0000"]}
+                  {:name  "bravo-img", :cells #{[7 2 "image" 0] [7 1 "image" 1]},
+                   :color [:blue "rgba(0, 0, 255, .3)" [0 0 255 0.3] [0 0 1 0.1] "#0000FF"]}
+                  {:name  "fire-hd", :cells #{[5 3 "hidef-image" 2] [4 3 "hidef-image" 3]
+                                              [4 3 "hidef-image" 2] [5 3 "hidef-image" 0] [5 3 "hidef-image" 3]},
+                   :color [:orange "rgba(255, 165, 0, .3)" [255 165 0 0.3] [1 0.65 0 0.3] "#FFA500"]}
+                  {:name  "fire-ir", :cells #{[5 4 "v/ir" 2] [5 4 "v/ir" 1] [5 3 "v/ir" 1]
+                                              [5 4 "v/ir" 0] [5 4 "v/ir" 3]},
+                   :color [:grey "rgba(128, 128, 128, .3)" [128 128 128 0.3] [0.5 0.5 0.5 0.3] "#808080"]}
+                  {:name  "severe-hd", :cells #{[5 7 "hidef-image" 3] [5 6 "hidef-image" 0]
+                                                [6 6 "hidef-image" 2] [6 5 "hidef-image" 1] [5 7 "hidef-image" 1]},
+                   :color [:cornflowerblue "rgba(100, 149, 237, .3)"
+                           [100 149 237 0.3] [0.4 0.58 0.93 0.3] "#6495ED"]}])
+    (def selected-targets #{"bravo-img"})
+    (def current-time 0))
+
+  (->> targets
+    seq
+    (mapcat (fn [{:keys [name cells color]}]
+              (map (fn [[r c ty ti]]
+                     [name r c ti color])
+                cells)))
+    (filter (fn [[id _ _ _ _]] (contains? selected-targets id)))
+    (filter (fn [[_ _ _ ti _]] (= ti current-time))))
+
+
+  ())
 
 
 (comment

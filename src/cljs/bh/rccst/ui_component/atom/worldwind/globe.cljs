@@ -131,7 +131,8 @@
     ;(log/info "globe" shapes "//" current-time "//" @s "//" @t "//" component-id)
 
     (fn []
-      ;(log/info "globe INNER" shapes time component-id)
+      ;(log/info "globe INNER" shapes current-time component-id
+      ;  "//" @s)
 
       [globe-inter
        :shapes @s
