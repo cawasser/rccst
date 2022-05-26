@@ -432,7 +432,7 @@
 
     (fn []
       (let [under-consideration (->> @s (map :name) set)]
-        (log/info "target-table (d)" @d)
+        ;(log/info "target-table (d)" @d)
         [:div.table-container {:style {:width       "100%"
                                        :height      "100%"
                                        :overflow-y  :auto

@@ -131,8 +131,8 @@
   (let [rgba (hex->rgba hex-color)]
     [:custom
      (rgba-map->js-function rgba)
-     (-> hex-color hex->rgba rgba-normal rgba-map->rgba-vector)
      (rgba-map->rgba-vector rgba)
+     (-> hex-color hex->rgba rgba-normal rgba-map->rgba-vector)
      hex-color]))
 
 
@@ -140,8 +140,8 @@
   (let [hex (rgba->hex rgba-color)]
     [:custom
      (rgba-map->js-function rgba-color)
-     (rgba-map->rgba-vector (rgba-normal rgba-color))
      (rgba-map->rgba-vector rgba-color)
+     (rgba-map->rgba-vector (rgba-normal rgba-color))
      (rgba->hex rgba-color)]))
 
 

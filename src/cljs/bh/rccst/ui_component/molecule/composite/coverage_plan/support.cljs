@@ -2,6 +2,8 @@
   (:require [taoensso.timbre :as log]))
 
 
+(log/info "bh.rccst.ui-component.molecule.composite.coverage-plan.support")
+
 
 (def sensor-color-pallet [[:green "rgba(0, 128, 0, .3)" [0, 128, 0, 0.3] [0.0 0.5 0.0 0.1] "#008000"]
                           [:blue "rgba(0, 0, 255, .3)" [0, 0, 255, 0.3] [0.0 0. 1.0 0.1] "#0000FF"]
@@ -89,7 +91,7 @@
 
 (defn make-coverage-shape [{:keys [cell coverage time color] :as params}]
   ;(log/info "make-coverage-shape" cell coverage "//" color "//" (keys params))
-  (let [[_ _ fill]    color
+  (let [[_ _ _ fill _] color
         [r g b a] fill
         outline [r g b (+ a 0.3)]]
     {:shape         :shape/polygon
@@ -103,11 +105,12 @@
      :outline-color outline}))
 
 
-(defn make-target-shape [[target-id row col ti [_ _ color]]]
-  ;(log/info "make-target-shape" target-id color)
-  (let [[r g b a] color
-        fill    [r g b (+ a 0.9)]
-        outline [r g b (+ a 1.0)]]
+(defn make-target-shape [[target-id row col ti color]]
+  (log/info "make-target-shape" target-id color)
+  (let [[_ _ _ c _] color
+        [r g b _] c
+        fill    [r g b 0.9]
+        outline [r g b 1.0]]
     {:shape         :shape/circle
      :id            (clojure.string/join "-"
                       [target-id ti row col])
@@ -131,8 +134,8 @@
                           coverage)))
               ; TODO: need to mix in the correct color form the associated platform/sensor
               (map (fn [cvg]
-                     (let [platform (get-in cvg [:coverage :platform])
-                           sensor (get-in cvg [:coverage :sensor])
+                     (let [platform  (get-in cvg [:coverage :platform])
+                           sensor    (get-in cvg [:coverage :sensor])
                            satellite (first (filter #(and (= platform (:platform_id %))
                                                        (= sensor (:sensor_id %)))
                                               satellites))]
