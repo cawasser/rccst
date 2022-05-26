@@ -23,85 +23,10 @@
 ;; region ; data for developing the UI
 
 
-(def dummy-targets [{:name  "alpha-hd" :cells #{[7 7 "hidef-image" 0]
-                                                [7 6 "hidef-image" 1]
-                                                [7 6 "hidef-image" 2]
-                                                [7 5 "hidef-image" 3]}
-                     :color [:green "rgba(0, 128, 0, .3)" [0.0 0.5 0.0 0.1]]}
-                    {:name  "bravo-img" :cells #{[7 2 "image" 0]
-                                                 [7 1 "image" 1]}
-                     :color [:blue "rgba(0, 0, 255, .3)" [0.0 0. 1.0 0.1]]}
-                    {:name  "fire-hd" :cells #{[5 3 "hidef-image" 0]
-                                               [4 3 "hidef-image" 2] [5 3 "hidef-image" 2]
-                                               [4 3 "hidef-image" 3] [5 3 "hidef-image" 3]}
-                     :color [:orange "rgba(255, 165, 0, .3)" [1.0 0.65 0.0 0.3]]}
-                    {:name  "fire-ir" :cells #{[5 4 "v/ir" 0]
-                                               [5 3 "v/ir" 1] [5 4 "v/ir" 1]
-                                               [5 4 "v/ir" 2]
-                                               [5 4 "v/ir" 3]}
-                     :color [:grey "rgba(128, 128, 128, .3)" [0.5 0.5 0.5 0.3]]}
-                    {:name  "severe-hd" :cells #{[5 6 "hidef-image" 0]
-                                                 [5 7 "hidef-image" 1] [6 5 "hidef-image" 1]
-                                                 [6 6 "hidef-image" 2]
-                                                 [5 7 "hidef-image" 3]}
-                     :color [:cornflowerblue "rgba(100, 149, 237, .3)" [0.4 0.58 0.93 0.3]]}])
+(def dummy-targets #{"alpha-hd" "bravo-img" "fire-hd" "fire-ir" "severe-hd"})
 
 
-(def dummy-satellites [{:name            "goes-east",
-                        :start           [9 6],
-                        :path            "geo",
-                        :platform_id     "goes-east",
-                        :type            "hidef-image",
-                        :sensor_steering [[-5 5] [-5 5]],
-                        :sensor_size     [1 1],
-                        :sensor_id       "abi-meso-2"
-                        :color           [:blue "rgba(0, 0, 255, .3)" [0.0 0. 1.0 0.1]]}
-                       {:name            "goes-east",
-                        :start           [9 6],
-                        :path            "geo",
-                        :platform_id     "goes-east",
-                        :type            "hidef-image",
-                        :sensor_steering [[-5 5] [-5 5]],
-                        :sensor_size     [1 1],
-                        :sensor_id       "abi-meso-10"
-                        :color           [:orange "rgba(255, 165, 0, .3)" [1.0 0.65 0.0 0.3]]}
-                       {:name            "goes-west",
-                        :start           [9 2],
-                        :path            "geo",
-                        :platform_id     "goes-west",
-                        :type            "hidef-image",
-                        :sensor_steering [[-5 5] [-5 5]],
-                        :sensor_size     [1 1],
-                        :sensor_id       "abi-meso-4"
-                        :color           [:cornflowerblue "rgba(100, 149, 237, .3)" [0.4 0.58 0.93 0.3]]}
-                       {:name            "goes-west",
-                        :start           [9 2],
-                        :path            "geo",
-                        :platform_id     "goes-west",
-                        :type            "hidef-image",
-                        :sensor_steering [[-5 5] [-5 5]],
-                        :sensor_size     [1 1],
-                        :sensor_id       "abi-meso-11"
-                        :color           [:darkcyan "rgba(0, 139, 139, .3)" [0.0 0.55 0.55 0.3]]}
-                       {:name            "noaa-xx",
-                        :start           [4 3],
-                        :path            "horz",
-                        :platform_id     "noaa-xx",
-                        :type            "v/ir",
-                        :sensor_steering [[0 0] [0 0]],
-                        :sensor_size     [10 2],
-                        :sensor_id       "viirs-5"
-                        :color           [:goldenrod "rgba(218, 165, 32, .3)" [0.84 0.65 0.13 0.3]]}
-                       {:name            "metop-yy",
-                        :start           [4 1],
-                        :path            "horz",
-                        :platform_id     "metop-yy",
-                        :type            "v/ir",
-                        :sensor_steering [[0 0] [0 0]],
-                        :sensor_size     [10 2],
-                        :sensor_id       "avhhr-6"
-                        :color           [:khaki "rgba(240, 230, 140, .3)" [0.94 0.90 0.55 0.3]]}])
-
+(def dummy-satellites #{"abi-meso-2" "abi-meso-10" "abi-meso-4" "abi-meso-11" "viirs-5" "avhhr-6"})
 
 ;; endregion
 
@@ -540,10 +465,10 @@
                                    :topic/coverage-data       {:type :source/remote :name :source/coverages}
 
                                    ; composite-local data sources
-                                   :topic/selected-targets    {:type :source/local :name :selected-targets}
+                                   :topic/selected-targets    {:type :source/local :name :selected-targets :default dummy-targets}
                                    :topic/colored-targets     {:type :source/local :name :colored-targets}
 
-                                   :topic/selected-satellites {:type :source/local :name :selected-satellites}
+                                   :topic/selected-satellites {:type :source/local :name :selected-satellites :default dummy-satellites}
                                    :topic/colored-satellites  {:type :source/local :name :colored-satellites}
 
                                    :topic/current-time        {:type :source/local :name :current-time :default 0}
