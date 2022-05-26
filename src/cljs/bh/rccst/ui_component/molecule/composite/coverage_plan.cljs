@@ -270,7 +270,6 @@
 ;; region ; custom tables for display
 
 
-; TODO: how do we update :topic/colored-targets?
 (defn- update-target-color [data id new-color]
   (let [path      (-> data
                     first
@@ -329,8 +328,6 @@
 
 
 (defn- display-symbol [data name [_ _ _ _ color]]
-  ; TODO: need to sync the different color formats on-change
-
   (let [showing? (r/atom false)
         d        (h/resolve-value data)]
 
@@ -532,6 +529,7 @@
 
                                    ; transformation functions
                                    :fn/coverage               {:type  :source/fn :name fn-coverage
+                                                               ; TODO: looks like we need both selected-targets AND colored-targets!
                                                                :ports {:targets   :port/sink :satellites :port/sink
                                                                        :coverages :port/sink :current-time :port/sink
                                                                        :shapes    :port/source}}

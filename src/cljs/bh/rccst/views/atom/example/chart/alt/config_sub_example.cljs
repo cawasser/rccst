@@ -11,8 +11,6 @@
 
 
 (defn- config [config-data]
-  ; TODO: notice how we need to use '.' instead of '/' for this :topic? how can we fix this
-  ; which causes an issue with subscriptions and resolve-value
   {:blackboard {:config-data config-data}
    :container  ""})
 

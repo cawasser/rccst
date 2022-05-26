@@ -132,7 +132,6 @@
               (mapcat (fn [{:keys [coverage time cell computed_at color] :as all}]
                         (map (fn [c] {:time time :coverage c :cell cell :computed_at computed_at})
                           coverage)))
-              ; TODO: need to mix in the correct color form the associated platform/sensor
               (map (fn [cvg]
                      (let [platform  (get-in cvg [:coverage :platform])
                            sensor    (get-in cvg [:coverage :sensor])

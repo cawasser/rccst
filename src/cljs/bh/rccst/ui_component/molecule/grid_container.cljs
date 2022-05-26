@@ -120,7 +120,6 @@
        :children [(when resizable [ct/configure-toggle open? #(locals/apply-local component-id
                                                                 [:layout] toggle-editable)])
                   [:div.grid-container {:style {:width "100%" :height "100%"}}
-                   ; TODO: convert to responsive-grid
                    [grid/grid
                     :id component-id
                     :class "layout"
