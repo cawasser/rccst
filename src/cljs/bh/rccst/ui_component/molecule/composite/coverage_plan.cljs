@@ -5,6 +5,7 @@
             [bh.rccst.ui-component.molecule.composite.coverage-plan.support :as s]
             [bh.rccst.ui-component.utils :as ui-utils]
             [bh.rccst.ui-component.utils.helpers :as h]
+            [bh.rccst.ui-component.utils.color :as c]
             [cljs-time.coerce :as coerce]
             [cljs-time.core :as t]
             [re-com.core :as rc]
@@ -269,10 +270,6 @@
 ;; region ; custom tables for display
 
 
-(defn match-colors-hex [hex-color]
-  [:white "rgba(255, 0, 0, 0.3)" [1.0 0.0 0.0 0.3] [255 0 0 0.3] hex-color])
-
-
 ; TODO: how do we update :topic/colored-targets?
 (defn- update-target-color [data id new-color]
   (let [path      (-> data
@@ -284,37 +281,10 @@
         orig-data (h/resolve-value data)
         target    (first (filter #(= (:name %) id) @orig-data))
         kept      (remove #(= (:name %) id) @orig-data)
-        new-data  (conj kept (assoc target :color (match-colors-hex new-color)))]
+        new-data  (conj kept (assoc target :color (c/match-colors-hex new-color)))]
 
     (log/info "update-target-color (path)" id "//" path "//" new-data)
     (h/handle-change-path path [] new-data)))
-
-
-; update the correct target's color with the new value
-(comment
-  (do
-    (def data [:coverage-plan-demo-ww.grid-widget.blackboard.topic.colored-targets])
-    (def id "alpha-hd")
-    (def new-color "#000000"))
-
-
-  (let [path      (-> data
-                    first
-                    name
-                    (clojure.string/split #".blackboard.")
-                    (#(map keyword %))
-                    ((fn [[c p]] [c :blackboard p])))
-        orig-data (h/resolve-value data)
-        target    (first (filter #(= (:name %) id) @orig-data))
-        kept      (remove #(= (:name %) id) @orig-data)
-        new-data  (conj kept (assoc target :color (match-colors-hex new-color)))]
-    [target kept new-data])
-
-  (update-target-color data id new-color)
-
-
-  ())
-
 
 
 (defn sat-color-picker-popover [showing? control data name & [position]]
@@ -748,6 +718,30 @@
   ())
 
 
+; update the correct target's color with the new value
+(comment
+  (do
+    (def data [:coverage-plan-demo-ww.grid-widget.blackboard.topic.colored-targets])
+    (def id "alpha-hd")
+    (def new-color "#000000"))
+
+
+  (let [path      (-> data
+                    first
+                    name
+                    (clojure.string/split #".blackboard.")
+                    (#(map keyword %))
+                    ((fn [[c p]] [c :blackboard p])))
+        orig-data (h/resolve-value data)
+        target    (first (filter #(= (:name %) id) @orig-data))
+        kept      (remove #(= (:name %) id) @orig-data)
+        new-data  (conj kept (assoc target :color (c/match-colors-hex new-color)))]
+    [target kept new-data])
+
+  (update-target-color data id new-color)
+
+
+  ())
 
 
 ;; components have "ports" which define their inputs and outputs:

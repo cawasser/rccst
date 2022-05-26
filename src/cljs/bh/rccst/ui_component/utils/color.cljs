@@ -49,8 +49,38 @@
      :a 1.0}))
 
 
+(defn rgba-normal
+  "convert a color hash-map of RGBA to a hash-map where the values are
+  in the range of 0.0 - 1.0
+
+  ---
+
+  - hex-color : (string) hex encoded color, such as \"#ff0000\" (red) or \"#00CED1\" (dark turquoise)
+
+  returns hash-map containing:
+
+  | key  | type    | range   | description    |
+  |:-----|:-------:|:-------:|:---------------|
+  | `:r` | float   | 0.0-1.0 | red value      |
+  | `:g` | float   | 0.0-1.0 | green value    |
+  | `:b` | float   | 0.0-1.0 | blue value     |
+  | `:a` | float   | 1.0     | alpha channel value, always returned as 1.0 |
+  "
+  [{:keys [r g b a]}]
+
+  {:r (/ r 255) :g (/ g 255) :b (/ b 255) :a a})
+
+
+(defn rgba-map->rgba-vector [{:keys [r g b a] :as rgba-map}]
+  [r g b a])
+
+
+(defn rgba-map->js-function [{:keys [r g b a] :as rgba-map}]
+  (str "rgba(" r ", " g ", " b ", " a ")"))
+
+
 (defn rgba->hex
-  "convert a color hash-map of RGBA into a hexidcemial (string)
+  "convert a color hash-map of RGBA into a hexadecimal (string)
 
   ---
 
@@ -95,6 +125,36 @@
   [{:keys [r g b a] :as hash-color}]
 
   (str "rgba(" r "," g "," b "," a ")"))
+
+
+(defn match-colors-hex [hex-color]
+  (let [rgba (hex->rgba hex-color)]
+    [:custom
+     (rgba-map->js-function rgba)
+     (-> hex-color hex->rgba rgba-normal rgba-map->rgba-vector)
+     (rgba-map->rgba-vector rgba)
+     hex-color]))
+
+
+(defn match-colors-rgba [rgba-color]
+  (let [hex (rgba->hex rgba-color)]
+    [:custom
+     (rgba-map->js-function rgba-color)
+     (rgba-map->rgba-vector (rgba-normal rgba-color))
+     (rgba-map->rgba-vector rgba-color)
+     (rgba->hex rgba-color)]))
+
+
+(comment
+  (-> "#ff0000" hex->rgba rgba-normal rgba-map->rgba-vector)
+  (-> "#ff00ff" hex->rgba rgba-normal rgba-map->rgba-vector)
+
+  (match-colors-hex "#000000")
+  (match-colors-hex "#ff0000")
+  (match-colors-hex "#ff00ff")
+
+  (match-colors-rgba {:r 255 :g 0 :b 0 :a 1.0})
+  ())
 
 
 (defn relative-luminance
