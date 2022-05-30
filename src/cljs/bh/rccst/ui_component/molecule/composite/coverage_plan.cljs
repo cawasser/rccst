@@ -209,7 +209,8 @@
 ;; region ; custom tables for display
 
 
-(defn- update-target-color [data id new-color]
+(defn- update-color [data id id-key color-type new-color]
+  (log/info "update-color" id color-type new-color)
   (let [path      (-> data
                     first
                     name
@@ -217,60 +218,15 @@
                     (#(map keyword %))
                     ((fn [[c p]] [c :blackboard p])))
         orig-data (h/resolve-value data)
-        target    (first (filter #(= (:name %) id) @orig-data))
-        kept      (remove #(= (:name %) id) @orig-data)
-        new-data  (conj kept (assoc target :color (c/match-colors-hex new-color)))]
+        target    (first (filter #(= (id-key %) id) @orig-data))
+        kept      (remove #(= (id-key %) id) @orig-data)
+        new-data  (conj kept (assoc target :color (case color-type
+                                                    :hex (c/match-colors-hex new-color)
+                                                    :rgba (c/match-colors-rgba new-color)
+                                                    (c/match-colors-hex new-color))))]
 
-    ;(log/info "update-target-color (path)" id "//" path "//" new-data)
+    ;(log/info "update-color (path)" id "//" path "//" new-data)
     (h/handle-change-path path [] new-data)))
-
-
-(defn- update-satellite-color [data id new-color]
-  (log/info "update-satellite-color" id "//" new-color)
-  (let [path      (-> data
-                    first
-                    name
-                    (clojure.string/split #".blackboard.")
-                    (#(map keyword %))
-                    ((fn [[c p]] [c :blackboard p])))
-        orig-data (h/resolve-value data)
-        target    (first (filter #(= (:sensor_id %) id) @orig-data))
-        kept      (remove #(= (:sensor_id %) id) @orig-data)
-        cooked-color {:r (get new-color "r") :g (get new-color "g")
-                      :b (get new-color "b") :a (get new-color "a")}
-        new-data  (conj kept (assoc target :color (c/match-colors-rgba cooked-color)))]
-
-    ;(log/info "update-satellite-color (path)" id "//" path "//" new-data)
-    (h/handle-change-path path [] new-data)))
-
-
-(defn sat-color-picker-popover [showing? control data name & [position]]
-  (let [d (h/resolve-value data)
-        p (or position :right-center)]
-
-    ;(log/info "sat-color-picker-popover" @d)
-
-    (fn []
-      (let [current-color (->> @d
-                            (filter #(= name (:sensor_id %)))
-                            first
-                            :color)
-            [_ _ [r g b a] _ _] current-color]
-
-        ;(log/info "sat-color-picker-popover (color)" current-color "//" {:r r :g g :b b :a a})
-
-        [rc/popover-anchor-wrapper :src (rc/at)
-         ;:style {:width "100%"}
-         :showing? @showing?
-         :position p
-         :anchor control
-         :popover [rc/popover-content-wrapper :src (rc/at)
-                   :close-button? false
-                   :no-clip? false
-                   :body [picker/rgba-color-picker
-                          :color {:r r :g g :b b :a a}
-                          :on-change (fn [x]
-                                       (log/info "on-change sat-color-picker-popover" (js->clj x)))]]]))))
 
 
 (defn- display-checkbox [id name under-consideration toggle-fn]
@@ -289,9 +245,13 @@
   (let [showing? (r/atom false)
         d        (h/resolve-value data)]
 
+    ;(log/info "display-symbol" name "//" @showing?)
+
     (fn [data name [_ _ _ _ color]]
 
-      ;(log/info "display-symbol" name "//" color "//" @d)
+      ;(log/info "display-symbol (inner)" name
+        ;"//" color "//" @d
+        ;"//" @showing?
 
       ^{:key (str "symb-" name)}
       [:td {:style {:color      :white
@@ -301,15 +261,17 @@
         :position :below-right
         :anchor [:span.icon.has-text-success.is-small
                  [:i.fas.fa-circle
-                  {:style    {:color color}                 ;(or color :white)}
-                   :on-click #(swap! showing? not)}]]
+                  {:style    {:color color}
+                   :on-click #(do
+                                (swap! showing? not))}]]
+                                ;(log/info "display-symbol (click)" name "//" @showing?))}]]
         :popover [rc/popover-content-wrapper :src (rc/at)
                   :close-button? false
                   :no-clip? false
                   :body [picker/hex-color-picker
                          :color color
                          :on-change (fn [x]
-                                      (update-target-color data name (js->clj x)))]]]])))
+                                      (update-color data name :name :hex (js->clj x)))]]]])))
 
 
 (defn- display-edit-control [name is-editing]
@@ -334,35 +296,40 @@
    [:span.icon.has-text-danger.is-small [:i.far.fa-trash-alt]]])
 
 
-(defn- display-color [data name [_ js-color rgba-color _  _]]
+(defn- display-color [data name [_ js-color rgba-color _ icon-color]]
+
   (let [showing? (r/atom false)
         d        (h/resolve-value data)]
 
-    (fn [data name [_ js-color [r g b a] _  _]]
+    ;(log/info "display-color" name "//" @showing?)
 
-      ;(log/info "display-color" name "//" js-color "//" @d)
+    (fn [data name [_ js-color [r g b a] _ icon-color]]
+
+      ;(log/info "display-color (inner)" name
+        ;"//" js-color "//" @d
+        ;"//" @showing?
 
       ^{:key (str "color-" name)}
-      [:td {:style    (merge
-                        (if js-color
-                          {:background-color (or js-color :green)
-                           :border-width     "1px"}
-                          {:background-color :transparent
-                           :border-width     "1px"})
-                        {:text-align :center
-                         :width      100})
-            :on-click #(swap! showing? not)}
+      [:td
+       {:style    {:background-color :transparent
+                   :border-width     "1px"
+                    :text-align :center
+                     :width      100}}
        [rc/popover-anchor-wrapper :src (rc/at)
         :showing? @showing?
         :position :below-right
-        :anchor [:span]
+        :anchor [:div {:style {:padding "5px 10px 5px 10px"
+                               :background-color (or js-color :green)}
+                       :on-click #(swap! showing? not)}
+                 name]
         :popover [rc/popover-content-wrapper :src (rc/at)
                   :close-button? false
                   :no-clip? false
                   :body [picker/rgba-color-picker
                          :color {:r r :g g :b b :a a}
                          :on-change (fn [x]
-                                      (update-satellite-color data name (js->clj x)))]]]])))
+                                      (update-color data name :sensor_id :rgba
+                                        (js->clj x :keywordize-keys true)))]]]])))
 
 
 (defn- toggle-selection [resolved-selection selection-path id]
@@ -373,6 +340,14 @@
 
       ; add
       (h/handle-change-path selection-path [] (conj s-ids id)))))
+
+
+(def target-row-def {:columns [{:include ["Include?" :cell/boolean]}
+                               {:symbol [ "Symbol" :cell/colored-icon]}
+                               {:aoi ["AoI" :cell/text]}
+                               {:edit ["" :cell/edit-toggle]}
+                               {:delete ["" :cell/delete-toggle]}]
+                     :id :name})
 
 
 (defn- target-table [& {:keys [data selection component-id container-id]}]
@@ -420,7 +395,6 @@
     ;(log/info "satellites-table (s)" @d "//" @s)
 
     (fn []
-      ; TODO: convert to just returning the set of selections
       [:div.table-container {:style {:width       "100%"
                                      :height      "100%"
                                      :overflow-y  :auto
@@ -428,7 +402,7 @@
                                      :border      "1px outset gray"}}
        [:table.table
         [:thead {:style {:position :sticky :top 0 :background :lightgray}}
-         [:tr [:th "Include?"] [:th "Color"] [:th "Platform"]]]
+         [:tr [:th "Include?"] [:th "Sensor/Color"] [:th "Platform"]]]
         [:tbody
          (doall
            (for [{:keys [platform_id sensor_id color] :as platform} @d]
@@ -441,7 +415,7 @@
                 [display-color data sensor_id color]
 
                 ^{:key (str "satellite-" platform_id "-" sensor_id)}
-                [:td (str platform_id "  " sensor_id)]])))]]])))
+                [:td platform_id]])))]]])))
 
 
 ;; endregion
@@ -686,7 +660,7 @@
         new-data  (conj kept (assoc target :color (c/match-colors-hex new-color)))]
     [target kept new-data])
 
-  (update-target-color data id new-color)
+  (update-color data id :name :hex new-color)
 
 
   ())

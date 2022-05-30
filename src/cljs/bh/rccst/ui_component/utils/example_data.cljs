@@ -1,9 +1,12 @@
 (ns bh.rccst.ui-component.utils.example-data
   (:require [cljs-uuid-utils.core :as uuid]
-            [cljs.spec.alpha]
-            [clojure.spec.alpha :as spec]
-            [re-frame.core :as re-frame]))
+            [cljs.spec.alpha :as spec]
+            [bh.rccst.subs :as subs]
+            [re-frame.core :as re-frame]
+            [taoensso.timbre :as log]))
 
+
+(log/info "bh.rccst.ui-component.utils.example-data")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -15,7 +18,7 @@
 
 (def default-coc [{:coc/step      :generated
                    :coc/by        "bh.rccst.ui-component.atom.bh.table"
-                   :coc/version   (or @(re-frame/subscribe [:bh.rccst.subs/version]) "no version")
+                   :coc/version   (or @(re-frame/subscribe [::subs/version]) "no version")
                    :coc/at        (str (js/Date.))
                    :coc/signature (uuid/uuid-string (uuid/make-random-uuid))}])
 
@@ -78,7 +81,6 @@
 
 
 (def meta-tabular-data
-  "docstring"
   {:metadata {:type   :data/tabular
               :id     :name
               :title  "Tabular Data with Metadata"
