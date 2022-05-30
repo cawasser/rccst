@@ -20,37 +20,47 @@ we are developing in: transformations of immutable data, glued together into sys
 strongly promotes the use of queue as a system implementation mechanism (see [here](https://www.youtube.com/watch?v=LKtk3HCgTa8) and
 [here](https://www.youtube.com/watch?v=ROor6_NGIWU)) to decouple the elements of computation/transformation.
 
-As can be seen through a survey of dataflow system approaches, this model is often applied only to the 'services' portion, often called
-the 'back-end', but we have determined that this approach is perfectly amenable to developing User Interfaces (UIs), or 'front-ends'.
-This is a significant shift form how UI development if typically taught and practiced.
+As can be seen through a survey of dataflow system approaches, this model is often applied only to the 'services' portion,
+often called the 'back-end', but we have determined that this approach is perfectly amenable to developing User Interfaces
+(UIs), or 'front-ends'. This is a significant shift from how UI development is typically taught and practiced.
+
+
 
 ### How we got here.
-
 
 The breakthrough came when we recognized that 'molecules', as introduced by Brad Frost as part of his [Atomic Design](),
 in chemistry classes are physically modeled using balls and sticks, as show in Figure 1.
 
-![](/imgs/data-flow/chemical-modeling-kit.jpeg)
+![Molecule Modeling Kit](/imgs/data-flow/chemical-modeling-kit.jpeg)
 
 _Figure 1. Molecule Modeling Kit_
 
 Combined with Clojure's, and most other functional programming languages', idiomatic approach promoting system composition from
-transformations of data (using map, filter, and reduce), and the Re-frame notion of the [_signal graph_](https://day8.github.io/re-frame/a-loop/#domino-4-query)
-we saw that by placing the Signal Graph center of the design, rather than being a by product of a more typical approach, we could unlock
-the power of the directed graph, simplifying both design and implementation. And standarizing UI developer, rarher than perpetuations
-the _ad hoc_ approach commonly used.
+transformations of data (using map, filter, and reduce), and the Re-frame notion of the
+[_signal graph_](https://day8.github.io/re-frame/subscriptions/)
+we saw that by placing the Signal Graph center of the design, rather than being a by product of a more typical approach, we
+could unlock the power of the directed graph, simplifying both design and implementation.
 
-We could implement any UI in a standard way, using a standard software mechanism, rather than continually developing one-off, custom
-UI elements and composed widgets.
+We can also implement any and all UIs in a single, standard way, using a single, standard software mechanism, rather than
+continually developing one-off, custom UI elements and composed widgets.
 
 This approach also means we can apply the same System Engineering approach used for the services on the back-end to the
-front-end as well! In fact, the front-end is not really a separate system, as it is typically considered in the ad hoc approach, but
-just one more collection of transformations of data within the boundary of the 'system' as a whole. So, instead of depositing
-the results of a transformation into a database or a channel, queue, or topic, the results are converted one last time into HTML
-and deposited on the User's display!
+front-end as well! In fact, the front-end is not really a separate system as it is typically considered in the ad hoc approach, but
+just one more collection of transformations of data within the boundary of the 'system' as a whole. However, instead of depositing
+the results of a transformation into a database or a channel, queue, or topic, in the case of the UI, the results are converted into
+HTML and 'deposited' on the User's display!
 
 
 ### Transforming Data
+
+Sticking with our chemistry analogy, chemical processes also perform transformations on the molecules, as
+shown in Figure 2.
+
+![Chemical outputs from the combustion of Ethanol_](/imgs/data-flow/combustion-reaction-model.jpeg)
+
+_Figure 2. Chemical outputs from the combustion of Ethanol_
+
+Note the arrow! Even in this simple example we can see the flow.
 
 
 #### Types of transforms:
@@ -62,10 +72,10 @@ and deposited on the User's display!
 
 The flow can be defined and visualized as a directed graph (digraph)
 
-
 One of the keys to designing software using data-flow is to focus on that data at the
 beginning (the original source) and the end of the flow (typically the UI or the output)
 of a microservice)
+
 
 
 ### Other Similar Approaches
@@ -81,6 +91,7 @@ of a microservice)
 - [Re-frame](https://day8.github.io/re-frame/re-frame/)
 
 
+
 ### Differences from Dataflow programming
 
 Dataflow programming (see [here]()), is often implemented (defined?) such that the processing steps
@@ -93,7 +104,7 @@ any of the inputs change.
 
 
 
-### Links
+### Additional Links
 
 - [Data Flow (Wikipedia)](https://en.wikipedia.org/wiki/Dataflow)
 - [Dataflow programming (Wikipedia)](https://en.wikipedia.org/wiki/Dataflow_programming)
