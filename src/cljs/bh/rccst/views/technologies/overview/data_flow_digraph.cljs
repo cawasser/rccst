@@ -50,6 +50,9 @@ just one more collection of transformations of data within the boundary of the '
 the results of a transformation into a database or a channel, queue, or topic, in the case of the UI, the results are converted into
 HTML and 'deposited' on the User's display!
 
+> ***Note:*** Although we've developed this sophisticated graph-based capability, ad we encourage you to use it,
+> all the UI components are still available for use in developing more 'typical' ad-hoc UIs. The Data-flow approach
+> is build _on top_ of the basic components. Developers get the best of both worlds!
 
 ### Transforming Data
 
@@ -76,6 +79,19 @@ One of the keys to designing software using data-flow is to focus on that data a
 beginning (the original source) and the end of the flow (typically the UI or the output)
 of a microservice)
 
+
+### Our Implementation
+
+Since we are working in Clojure, and, on the UI side, using Re-frame, we take advantage of the Signal Graph
+and take advantage of the [Layer 2 'Extractors' and Layer 3 'Materialized Views'](https://day8.github.io/re-frame/subscriptions/#the-four-layers)
+as the primary mechanisms for the various data transformations needed to support the UI.
+
+Layer 2 extractors are used for remote sources (`:source/remote`), while Layer 3 materialized views provide
+the computational logic to produce the values for use with `:topic/local`.
+
+Layer 4, the View Functions, are provided by the various UI Components we have developed. The Catalog
+show them and how they can be used, but within the Data-flow implementation, or more 'manually' as part
+of some custom UI.
 
 
 ### Other Similar Approaches
