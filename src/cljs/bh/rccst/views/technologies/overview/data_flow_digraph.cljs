@@ -31,7 +31,7 @@ often called the 'back-end', but we have determined that this approach is perfec
 The breakthrough came when we recognized that 'molecules', as introduced by Brad Frost as part of his [Atomic Design](),
 in chemistry classes are physically modeled using balls and sticks, as show in Figure 1.
 
-![Molecule Modeling Kit](/imgs/data-flow/chemical-modeling-kit.jpeg)
+![Figure 1. Molecule Modeling Kit](/imgs/data-flow/chemical-modeling-kit.jpeg)
 
 _Figure 1. Molecule Modeling Kit_
 
@@ -59,9 +59,9 @@ HTML and 'deposited' on the User's display!
 Sticking with our chemistry analogy, chemical processes also perform transformations on the molecules, as
 shown in Figure 2.
 
-![Chemical outputs from the combustion of Ethanol_](/imgs/data-flow/combustion-reaction-model.jpeg)
+![Figure 2. Chemical outputs from the combustion of Ethanol_](/imgs/data-flow/combustion-reaction-model.jpeg)
 
-_Figure 2. Chemical outputs from the combustion of Ethanol_
+_Figure 2. Chemical outputs from the combustion of Ethanol._
 
 Note the arrow! Even in this simple example we can see the flow.
 
@@ -87,11 +87,66 @@ and take advantage of the [Layer 2 'Extractors' and Layer 3 'Materialized Views'
 as the primary mechanisms for the various data transformations needed to support the UI.
 
 Layer 2 extractors are used for remote sources (`:source/remote`), while Layer 3 materialized views provide
-the computational logic to produce the values for use with `:topic/local`.
+the computational logic to produce the values for use with `:source/local`.
 
 Layer 4, the View Functions, are provided by the various UI Components we have developed. The Catalog
 show them and how they can be used, but within the Data-flow implementation, or more 'manually' as part
 of some custom UI.
+
+The 'magic' is that our implementation build the Layer 3 subscriptions programmatically, based upon the structure of the data
+you define for the intermediary, what we call a `:source/local`. In those cases where you must perform some custom logic,
+you also inject a `:source/fn` or 'source function' to produce the data, and the output can then be fed into other Layer 3 or
+even Layer 4 subscriptions, depending upon how you wire everything together in the graph.
+
+#### Development Process
+
+Overall, the approach to developing using this technique is:
+
+1. Identify the original source(s) of data, typically of 'type' `:source/remote`
+2. Identify the UI components (i.e., `:ui/component`) to visualize the data
+3. Determine the transformations from the source data to the visualization, specifically:
+    - filtering
+    - additional _enhancing_ data, sometimes called _mix-ins_
+    - any re-formatting of the data (rearranging fields, changing hash-map keys, etc.)
+4. Connect the various nodes to each other, from sources, through transformations, and into the UI components
+
+One way to think of this is as a _directed graph_, with the sources at the top and the UI at the bottom;
+the data flows _down hill_.
+
+![Figure 3. A simplified directed graph of a UI.]()
+
+_Figure 3. A simplified directed graph of a UI._
+
+Let's walk through an example.
+
+#### Example
+
+The very simplest example is to take a single source and connect it directly to a UI component without
+any additional processing, so:
+
+
+![Figure 4. Simplest possible UI example.]()
+
+_Figure 4. Simplest possible UI example._
+
+As you can see, we have a single `:source/remote`, which we will call `:topic/data` and a single UI
+components, which we will call `:ui/data-table`. By design, we give each element of the model a
+name (`:topic/data` and `:ui/data-table`) so we can refer to them throughout the definition.
+
+Each element also has a _type_ which tells the processing logic how to actually implement the required logic.
+Our toolkit provides dozens of pre-built data and UI components, and you can always develop you own.
+
+
+
+``` clojure
+(def ui-definition
+  {:components   {:topic/measurements {:type :source/remote :name :source/measurements}
+                  :ui/bar-chart       {:type :ui/component :name :rechart/bar-2}}
+
+   :links        {:topic/measurements {:data {:ui/bar-chart :data}}}
+
+   :grid-layout  [{:i :ui/bar-chart :x 0 :y 0 :w 20 :h 11 :static true}]})
+```
 
 
 ### Other Similar Approaches
