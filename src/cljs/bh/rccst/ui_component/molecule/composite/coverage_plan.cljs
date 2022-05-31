@@ -284,20 +284,20 @@
                                       (update-color data name :name :hex (js->clj x)))]]]])))
 
 
-(defn- display-edit-control [name is-editing]
-  ^{:key (str "edit-" name)}
-  [:td {:on-click #(if (and
-                         @is-editing
-                         (= name @is-editing))
-                     (do
-                       (log/info "SAVE" name)
-                       (reset! is-editing ""))
-                     (do
-                       (log/info "EDIT" name)
-                       (reset! is-editing name)))}
-   (if (and @is-editing (= name @is-editing))
-     [:span.icon.has-text-success.is-small [:i.far.fa-save]]
-     [:span.icon.has-text-info.is-small [:i.far.fa-edit]])])
+(defn- display-edit-control [name]
+  (let [is-editing (r/atom false)]
+    (fn []
+      ^{:key (str "edit-" name)}
+      [:td {:on-click #(if @is-editing
+                         (do
+                           (log/info "SAVE" name)
+                           (reset! is-editing false))
+                         (do
+                           (log/info "EDIT" name)
+                           (reset! is-editing true)))}
+       (if @is-editing
+         [:span.icon.has-text-success.is-small [:i.far.fa-save]]
+         [:span.icon.has-text-info.is-small [:i.far.fa-edit]])])))
 
 
 (defn- display-delete-control [name]
@@ -343,7 +343,7 @@
 
 
 (defn- display-text [cell]
-  [:td cell])
+  ^{:key (str "target-" cell)} [:td cell])
 
 
 (def column-types {:column/boolean display-checkbox
@@ -369,13 +369,12 @@
 
 
 (defn- column-header-cell [column]
-  [:th (:column/label column)])
+  ^{:key (str (:column/label column) "-" (rand-int 1000))} [:th (:column/label column)])
 
 
 (defn- target-table [& {:keys [data selection component-id container-id]}]
   (let [d          (h/resolve-value data)
-        s          (h/resolve-value selection)
-        is-editing (r/atom "")]
+        s          (h/resolve-value selection)]
 
     (fn []
       ;(log/info "target-table (d)" @d "//" @s)
@@ -402,9 +401,9 @@
 
                 [display-symbol data name color]
 
-                ^{:key (str "target-" name)} [display-text name]
+                [display-text name]
 
-                [display-edit-control name is-editing]
+                [display-edit-control name]
 
                 [display-delete-control name]])))]]])))
 
