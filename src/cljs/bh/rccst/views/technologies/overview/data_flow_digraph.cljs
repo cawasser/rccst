@@ -124,21 +124,29 @@ Let's walk through an example.
 The very simplest example is to take a single source and connect it directly to a UI component without
 any additional processing, so:
 
+![Figure 4. Simplest possible UI example visualized as a directed graph.](/imgs/data-flow/simplest-digraph-model.png)
 
-![Figure 4. Simplest possible UI example.]()
-
-_Figure 4. Simplest possible UI example._
+_Figure 4. Simplest possible UI example visualized as a directed graph._
 
 As you can see, we have a single `:source/remote`, which we will call `:topic/data` and a single UI
 components, which we will call `:ui/data-table`. By design, we give each element of the model a
 name (`:topic/data` and `:ui/data-table`) so we can refer to them throughout the definition.
 
+It is also possible to visualize the same UI as an Event Model, as shown in Figure 5. As you can see, the Event Model shows the
+UI element, called the 'View' in EM-speak, with the data source at the bottom, represented as line, showing the data as an 'Event',
+hence the Orange color
+
+![Figure 5. A UI can also be visualized as an Event Model](/imgs/data-flow/simplest-event-model.png)
+
+_Figure 5. A UI can also be visualized as an Event Model._
+
+
 Each element also has a _type_ which tells the processing logic how to actually implement the required logic.
-Our toolkit provides dozens of pre-built data and UI components, and you can always develop you own.
+Our toolkit provides dozens of pre-built data and UI components, and you can always develop your own.
 
 
 
-``` clojure
+```
 (def ui-definition
   {:components   {:topic/measurements {:type :source/remote :name :source/measurements}
                   :ui/bar-chart       {:type :ui/component :name :rechart/bar-2}}
