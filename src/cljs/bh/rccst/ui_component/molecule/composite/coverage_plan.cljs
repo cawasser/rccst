@@ -229,6 +229,16 @@
     (h/handle-change-path path [] new-data)))
 
 
+(defn- toggle-selection [resolved-selection selection-path id]
+  (let [s-ids (or resolved-selection #{})]
+    (if (contains? resolved-selection id)
+      ; remove
+      (h/handle-change-path selection-path [] (disj s-ids id))
+
+      ; add
+      (h/handle-change-path selection-path [] (conj s-ids id)))))
+
+
 (defn- display-checkbox [id name under-consideration toggle-fn]
   ^{:key (str "check-" id)}
   [:td.is-narrow
@@ -332,22 +342,34 @@
                                         (js->clj x :keywordize-keys true)))]]]])))
 
 
-(defn- toggle-selection [resolved-selection selection-path id]
-  (let [s-ids (or resolved-selection #{})]
-    (if (contains? resolved-selection id)
-      ; remove
-      (h/handle-change-path selection-path [] (disj s-ids id))
-
-      ; add
-      (h/handle-change-path selection-path [] (conj s-ids id)))))
+(defn- display-text [cell]
+  [:td cell])
 
 
-(def target-row-def {:columns [{:include ["Include?" :cell/boolean]}
-                               {:symbol [ "Symbol" :cell/colored-icon]}
-                               {:aoi ["AoI" :cell/text]}
-                               {:edit ["" :cell/edit-toggle]}
-                               {:delete ["" :cell/delete-toggle]}]
-                     :id :name})
+(def column-types {:column/boolean display-checkbox
+                   :column/colored-cell display-color
+                   :column/colored-icon display-symbol
+                   :column/delete display-delete-control
+                   :column/edit display-edit-control
+                   :column/text display-text})
+
+
+(def target-row-def {:columns [{:column/key :include :column/label "Include?" :column/type :cell/boolean}
+                               {:column/key :symbol :column/label "Symbol" :column/type :cell/colored-icon}
+                               {:column/key :aoi :column/label "AoI" :column/type :cell/text}
+                               {:column/key :edit :column/label "" :column/type :cell/edit-toggle}
+                               {:column/key :delete :column/label "" :column/type :cell/delete-toggle}]
+                     :unique-key :name})
+
+
+(def satellite-row-def {:columns [{:column/key :include :column/label "Include?" :column/type :cell/boolean}
+                                  {:column/key :sensor_id :column/label "Sensor/Color" :column/type :cell/colored-cell}
+                                  {:column/key :platform_id :column/label "Platform" :column/type :cell/text}]
+                        :unique-key :sensor_id})
+
+
+(defn- column-header-cell [column]
+  [:th (:column/label column)])
 
 
 (defn- target-table [& {:keys [data selection component-id container-id]}]
@@ -364,7 +386,9 @@
                                      :border      "1px outset gray"}}
        [:table.table
         [:thead {:style {:position :sticky :top 0 :background :lightgray}}
-         [:tr [:th "Include?"] [:th "Symbol"] [:th "AoI"] [:th ""] [:th ""]]]
+         [:tr
+          (doall (->> target-row-def :columns (map column-header-cell)))]]
+
         [:tbody
          (doall
            (for [{:keys [name cells color] :as target} @d]
@@ -378,7 +402,7 @@
 
                 [display-symbol data name color]
 
-                ^{:key (str "target-" name)} [:td name]
+                ^{:key (str "target-" name)} [display-text name]
 
                 [display-edit-control name is-editing]
 
@@ -402,7 +426,9 @@
                                      :border      "1px outset gray"}}
        [:table.table
         [:thead {:style {:position :sticky :top 0 :background :lightgray}}
-         [:tr [:th "Include?"] [:th "Sensor/Color"] [:th "Platform"]]]
+         [:tr
+          (doall (->> satellite-row-def :columns (map column-header-cell)))]]
+
         [:tbody
          (doall
            (for [{:keys [platform_id sensor_id color] :as platform} @d]
@@ -415,7 +441,7 @@
                 [display-color data sensor_id color]
 
                 ^{:key (str "satellite-" platform_id "-" sensor_id)}
-                [:td platform_id]])))]]])))
+                [display-text platform_id]])))]]])))
 
 
 ;; endregion
