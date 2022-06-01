@@ -14,8 +14,10 @@
 
 
 (def ui-definition
-  {:components  {:ui/bar-chart   {:type :ui/component :name :rechart/bar-2}
-                 :ui/line-chart  {:type :ui/component :name :rechart/line-2}
+  {:components  {:ui/bar-chart   {:type :ui/component :name :rechart/bar-2
+                                  :config-data []}
+                 :ui/line-chart  {:type :ui/component :name :rechart/line-2
+                                  :config-data []}
                  :topic/data     {:type :source/local :name :topic/data :default sample-data}}
    :links       {:topic/data     {:data {:ui/bar-chart   :data
                                          :ui/line-chart  :data}}}
@@ -27,9 +29,7 @@
                                            :ui/line-chart  {:type :ui/component :name :rechart/line-2}
                                            :topic/data     {:type :source/local :name :topic/data :default sample-data}}
                              :links       {:topic/data     {:data {:ui/bar-chart   :data
-                                                                   :ui/line-chart  :data}}
-                                           :topic/config   {:data {:ui/line-chart :config-data
-                                                                   :ui/bar-chart  :config-data}}}
+                                                                   :ui/line-chart  :data}}}
                              :grid-layout [{:i :ui/line-chart :x 0 :y 0 :w 7 :h 11 :static true}
                                            {:i :ui/bar-chart :x 7 :y 0 :w 7 :h 11 :static true}]}]
                     [grid-widget/component

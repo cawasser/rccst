@@ -81,7 +81,6 @@
                                           s-s
                                           (get-in % [:coverage :sensor]))
                                  (s/cook-coverages s s-s c ct))
-            ;_                  (log/info "fn-coverage (filter)" filtered-coverages)
             cvg                (if (seq c)
                                  (map s/make-coverage-shape filtered-coverages)
                                  [])
@@ -210,7 +209,7 @@
 
 
 (defn- update-color [data id id-key color-type new-color]
-  (log/info "update-color" id color-type new-color)
+  ;(log/info "update-color" id color-type new-color)
   (let [path      (-> data
                     first
                     name
@@ -260,8 +259,8 @@
     (fn [data name [_ _ _ _ color]]
 
       ;(log/info "display-symbol (inner)" name
-        ;"//" color "//" @d
-        ;"//" @showing?
+      ;"//" color "//" @d
+      ;"//" @showing?
 
       ^{:key (str "symb-" name)}
       [:td {:style {:color      :white
@@ -274,7 +273,7 @@
                   {:style    {:color color}
                    :on-click #(do
                                 (swap! showing? not))}]]
-                                ;(log/info "display-symbol (click)" name "//" @showing?))}]]
+        ;(log/info "display-symbol (click)" name "//" @showing?))}]]
         :popover [rc/popover-content-wrapper :src (rc/at)
                   :close-button? false
                   :no-clip? false
@@ -316,20 +315,20 @@
     (fn [data name [_ js-color [r g b a] _ icon-color]]
 
       ;(log/info "display-color (inner)" name
-        ;"//" js-color "//" @d
-        ;"//" @showing?
+      ;"//" js-color "//" @d
+      ;"//" @showing?
 
       ^{:key (str "color-" name)}
       [:td
-       {:style    {:background-color :transparent
-                   :border-width     "1px"
-                    :text-align :center
-                     :width      100}}
+       {:style {:background-color :transparent
+                :border-width     "1px"
+                :text-align       :center
+                :width            100}}
        [rc/popover-anchor-wrapper :src (rc/at)
         :showing? @showing?
         :position :below-right
-        :anchor [:div {:style {:padding "5px 10px 5px 10px"
-                               :background-color (or js-color :green)}
+        :anchor [:div {:style    {:padding          "5px 10px 5px 10px"
+                                  :background-color (or js-color :green)}
                        :on-click #(swap! showing? not)}
                  name]
         :popover [rc/popover-content-wrapper :src (rc/at)
@@ -346,25 +345,26 @@
   ^{:key (str "target-" cell)} [:td cell])
 
 
-(def column-types {:column/boolean display-checkbox
+(def column-types {:column/boolean      display-checkbox
                    :column/colored-cell display-color
                    :column/colored-icon display-symbol
-                   :column/delete display-delete-control
-                   :column/edit display-edit-control
-                   :column/text display-text})
+                   :column/delete       display-delete-control
+                   :column/edit         display-edit-control
+                   :column/text         display-text
+                   :column/status       #()})
 
 
-(def target-row-def {:columns [{:column/key :include :column/label "Include?" :column/type :cell/boolean}
-                               {:column/key :symbol :column/label "Symbol" :column/type :cell/colored-icon}
-                               {:column/key :aoi :column/label "AoI" :column/type :cell/text}
-                               {:column/key :edit :column/label "" :column/type :cell/edit-toggle}
-                               {:column/key :delete :column/label "" :column/type :cell/delete-toggle}]
+(def target-row-def {:columns    [{:column/key :include :column/label "Include?" :column/type :cell/boolean}
+                                  {:column/key :symbol :column/label "Symbol" :column/type :cell/colored-icon :column/icon :i.fas.fa-circle}
+                                  {:column/key :aoi :column/label "AoI" :column/type :cell/text}
+                                  {:column/key :edit :column/label "" :column/type :cell/edit-toggle}
+                                  {:column/key :delete :column/label "" :column/type :cell/delete-toggle}]
                      :unique-key :name})
 
 
-(def satellite-row-def {:columns [{:column/key :include :column/label "Include?" :column/type :cell/boolean}
-                                  {:column/key :sensor_id :column/label "Sensor/Color" :column/type :cell/colored-cell}
-                                  {:column/key :platform_id :column/label "Platform" :column/type :cell/text}]
+(def satellite-row-def {:columns    [{:column/key :include :column/label "Include?" :column/type :cell/boolean}
+                                     {:column/key :sensor_id :column/label "Sensor/Color" :column/type :cell/colored-cell}
+                                     {:column/key :platform_id :column/label "Platform" :column/type :cell/text}]
                         :unique-key :sensor_id})
 
 
@@ -373,8 +373,8 @@
 
 
 (defn- target-table [& {:keys [data selection component-id container-id]}]
-  (let [d          (h/resolve-value data)
-        s          (h/resolve-value selection)]
+  (let [d (h/resolve-value data)
+        s (h/resolve-value selection)]
 
     (fn []
       ;(log/info "target-table (d)" @d "//" @s)
@@ -411,9 +411,8 @@
 (defn- satellite-table [& {:keys [data selection component-id container-id]}]
   ;(log/info "satellites-table" data "//" selection)
 
-  (let [d          (h/resolve-value data)
-        s          (h/resolve-value selection)
-        is-editing (r/atom "")]
+  (let [d (h/resolve-value data)
+        s (h/resolve-value selection)]
 
     ;(log/info "satellites-table (s)" @d "//" @s)
 
@@ -450,7 +449,14 @@
                     :component-id :coverage-plan
                     :components   {; ui components
                                    ; TODO: add a :label element for use in the UI
-                                   :ui/targets                {:type :ui/component :name target-table :label "Targets"}
+                                   :ui/targets                {:type        :ui/component :name target-table
+                                                               :label       "Targets"
+                                                               :config-data {:columns    [{:column/key :include :column/label "Include?" :column/type :cell/boolean}
+                                                                                          {:column/key :symbol :column/label "Symbol" :column/type :cell/colored-icon :column/icon :i.fas.fa-circle}
+                                                                                          {:column/key :aoi :column/label "AoI" :column/type :cell/text}
+                                                                                          {:column/key :edit :column/label "" :column/type :cell/edit-toggle}
+                                                                                          {:column/key :delete :column/label "" :column/type :cell/delete-toggle}]
+                                                                             :unique-key :name}}
                                    :ui/satellites             {:type :ui/component :name satellite-table :label "Platforms"}
                                    :ui/globe                  {:type :ui/component :name :ww/globe}
                                    :ui/time-slider            {:type :ui/component :name :rc/slider}
@@ -463,7 +469,8 @@
 
                                    ; composite-local data sources
                                    :topic/selected-targets    {:type :source/local :name :selected-targets :default dummy-targets}
-                                   :topic/colored-targets     {:type :source/local :name :colored-targets}
+                                   :topic/colored-targets     {:type   :source/local :name :colored-targets
+                                                               :fields [:target/include :target/symbol :target/name]}
 
                                    :topic/selected-satellites {:type :source/local :name :selected-satellites :default dummy-satellites}
                                    :topic/colored-satellites  {:type :source/local :name :colored-satellites}
