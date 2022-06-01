@@ -139,14 +139,22 @@
                            :main-opts  ["-m" "metav.spit"
                                         "--output-dir" "src/clj"
                                         "--namespace" "bh.rccst.version"
-                                        "--formats" "clj"]}
+                                        "--formats" "clj"]}}
 
-             ;;
-             ;; Checking dependencies against National Vulnerability Database
-             ;; https://github.com/rm-hull/nvd-clojure
-             ;; clojure -M:nvd
-             :nvd         {:extra-deps {nvd-clojure/nvd-clojure {:mvn/version "1.7.0"}}
-                           :main-opts  ["-m" "nvd.task.check"]}}
+ ;;
+ ;; Checking dependencies against National Vulnerability Database
+ ;; https://github.com/rm-hull/nvd-clojure
+ ;;
+ ;; Clojure CLI Tool
+ ;;
+ ;; If you have CLI version 1.10.3.933 or later, you can also install nvd-clojure as a "tool":
+ ;;
+ ;;    clojure -Ttools install nvd-clojure/nvd-clojure '{:mvn/version "RELEASE"}' :as nvd
+ ;;
+ ;; Then you can run:
+ ;;
+ ;;    clojure -J-Dclojure.main.report=stderr -Tnvd nvd.task/check :classpath '"'"$(clojure -Spath -A:run)"'"'}
+
 
 
  :mvn/repos {"confluent" {:url "https://packages.confluent.io/maven/"}
