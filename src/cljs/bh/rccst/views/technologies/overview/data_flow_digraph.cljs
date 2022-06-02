@@ -5,9 +5,10 @@
 (defn page []
   [layout/page {:extra-classes :is-fluid}
    [:div.is-fluid
-    [:h2.has-text-info "Data-flow Oriented Design"]
-    [layout/markdown-block
-     "> _a system design approach where data is transformed across a collection of 'processes',
+    [layout/frame {:extra-classes :is-fluid}
+     [:h2.has-text-info "Data-flow Oriented Design"]
+     [layout/markdown-block
+      "> _a system design approach where data is transformed across a collection of 'processes',
 > sometimes called 'automata' (nodes) that are connected (edges) via 'channels' (pub/sub, topics,
 > queues, function calls, etc.)_
 
@@ -23,10 +24,11 @@ strongly promotes the use of queue as a system implementation mechanism (see [he
 As can be seen through a survey of dataflow system approaches, this model is often applied only to the 'services' portion,
 often called the 'back-end', but we have determined that this approach is perfectly amenable to developing User Interfaces
 (UIs), or 'front-ends'. This is a significant shift from how UI development is typically taught and practiced.
+"]]
 
 
-
-### How we got here.
+    [layout/frame {:extra-classes :is-fluid}
+     [layout/markdown-block "### How we got here
 
 The breakthrough came when we recognized that 'molecules', as introduced by Brad Frost as part of his [Atomic Design](),
 in chemistry classes are physically modeled using balls and sticks, as show in Figure 1.
@@ -52,9 +54,10 @@ HTML and 'deposited' on the User's display!
 
 > ***Note:*** Although we've developed this sophisticated graph-based capability, ad we encourage you to use it,
 > all the UI components are still available for use in developing more 'typical' ad-hoc UIs. The Data-flow approach
-> is build _on top_ of the basic components. Developers get the best of both worlds!
+> is build _on top_ of the basic components. Developers get the best of both worlds!"]]
 
-### Transforming Data
+    [layout/frame {:extra-classes :is-fluid}
+     [layout/markdown-block "### Transforming Data
 
 Sticking with our chemistry analogy, chemical processes also perform transformations on the molecules, as
 shown in Figure 2.
@@ -77,10 +80,10 @@ The flow can be defined and visualized as a directed graph (digraph)
 
 One of the keys to designing software using data-flow is to focus on that data at the
 beginning (the original source) and the end of the flow (typically the UI or the output)
-of a microservice)
+of a microservice)"]]
 
-
-### Our Implementation
+    [layout/frame {:extra-classes :is-fluid}
+     [layout/markdown-block "### Our Implementation
 
 Since we are working in Clojure, and, on the UI side, using Re-frame, we take advantage of the Signal Graph
 and take advantage of the [Layer 2 'Extractors' and Layer 3 'Materialized Views'](https://day8.github.io/re-frame/subscriptions/#the-four-layers)
@@ -155,9 +158,12 @@ Our toolkit provides dozens of pre-built data and UI components, and you can alw
 
    :grid-layout  [{:i :ui/bar-chart :x 0 :y 0 :w 20 :h 11 :static true}]})
 ```
+"]]
 
 
-### Other Similar Approaches
+    [layout/frame {:extra-classes :is-fluid}
+     [layout/markdown-block
+      "### Other Similar Approaches
 
 - [Event Modeling](https://eventmodeling.org)
 - [Stream processing](https://en.wikipedia.org/wiki/Stream_processing)
@@ -167,11 +173,13 @@ Our toolkit provides dozens of pre-built data and UI components, and you can alw
 - [Lucid programming language](https://en.wikipedia.org/wiki/Lucid_(programming_language))
 - [Petri Nets](https://en.wikipedia.org/wiki/Petri_net)
 - [React](https://reactjs.org/)
-- [Re-frame](https://day8.github.io/re-frame/re-frame/)
+- [Re-frame](https://day8.github.io/re-frame/re-frame/)"]]
 
 
 
-### Differences from Dataflow programming
+    [layout/frame {:extra-classes :is-fluid}
+     [layout/markdown-block
+      "### Differences from Dataflow programming
 
 Dataflow programming (see [here]()), is often implemented (defined?) such that the processing steps
 execute as soon as their inputs all become available. In contrast, in our implementation, there are
@@ -180,13 +188,16 @@ assumed to have default values). Our approach assures that transformation update
 any of the inputs change.
 
 > Is this really true? Need to do some investigation/experimentation to determine.
+"]]
 
 
 
-### Additional Links
+    [layout/frame {:extra-classes :is-fluid}
+     [layout/markdown-block
+      "### Additional Links
 
 - [Data Flow (Wikipedia)](https://en.wikipedia.org/wiki/Dataflow)
 - [Dataflow programming (Wikipedia)](https://en.wikipedia.org/wiki/Dataflow_programming)
 - [Kahn process network (Wikipedia)](https://en.wikipedia.org/wiki/Kahn_process_networks)
 
-"]]])
+"]]]])
