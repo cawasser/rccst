@@ -8,7 +8,8 @@
             [bh.rccst.views.atom.example.chart.colored-pie-chart :as colored-pie-chart]
             [bh.rccst.views.atom.example.chart.line-chart :as line-chart]
             [bh.rccst.views.atom.example.chart.funnel-chart :as funnel-chart]
-            [bh.rccst.views.atom.example.chart.sankey-chart :as sankey-chart]
+            ;[bh.rccst.views.atom.example.chart.sankey-chart :as sankey-chart]
+            [bh.rccst.views.atom.example.chart.sankey-chart-2 :as sankey-chart-2]
             [bh.rccst.views.atom.example.chart.scatter-chart :as scatter-chart]
             [bh.rccst.views.atom.example.chart.radar-chart :as radar-chart]
             [bh.rccst.views.atom.example.chart.treemap-chart :as treemap-chart]))
@@ -22,7 +23,8 @@
              [:charts/pie-chart "Pie" [pie-chart/examples]]
              [:charts/radar-chart "Radar" [radar-chart/examples]]
              [:charts/radial-bar-chart "Radial Bar" [radial-bar-chart/examples]]
-             [:charts/sankey-chart "Sankey" [sankey-chart/examples]]
+             ;[:charts/sankey-chart "Sankey" [sankey-chart/examples]]
+             [:charts/sankey-2-chart "Sankey" [sankey-chart-2/examples]]
              [:charts/scatter-chart "Scatter" [scatter-chart/examples]]
              [:charts/treemap-chart "TreeMap" [treemap-chart/examples]]])
                 ;[:charts/all "All" [all-demo/examples]]])
