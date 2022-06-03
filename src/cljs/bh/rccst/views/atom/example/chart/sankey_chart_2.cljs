@@ -30,10 +30,10 @@
   >
   > You can use the buttons below to change some of the data and see how the chart responds."
    :sample-data chart/sample-data
-   :data-tools (fn [& x] [:div "data tools"]) ;data-tools/meta-tabular-data-ratom-tools
+   :data-tools data-tools/dag-data-ratom-tools
    :source-code chart/source-code
    :component chart/component
-   :data-panel (fn [& x] [:div "data panel"]) ;chart-utils/tabular-data-panel
+   :data-panel chart-utils/dag-data-panel
    :config-panel chart/config-panel])
 
 

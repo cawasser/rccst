@@ -36,8 +36,8 @@
       :description "An Editable Digraph, built using [react-flow](https://reactflow.dev)"
       :data (r/atom digraph/sample-data-3)
       :extra-params {:node-types support/default-node-types
-                     :tool-types support/default-tool-types}
-      :extra-params {:force-layout? true}
+                     :tool-types support/default-tool-types
+                     :force-layout? true}
       :component digraph/component
       :component-id (utils/path->keyword container-id "editable-digraph-3")
       :source-code digraph/source-code]]))

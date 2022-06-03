@@ -32,7 +32,6 @@
                                                           (:data @data))))))]]])
 
 
-
 (defn meta-tabular-data-sub-tools [data default-data]
 
   (let [old-data (ui-utils/subscribe-local data [:data])
@@ -73,6 +72,16 @@
                                                  (map (fn [x]
                                                         (assoc x :new-item (rand-int 7000)))
                                                    @old-data)))))]]])))
+
+
+(defn dag-data-ratom-tools [data default-data]
+  [rc/h-box :src (rc/at)
+   :gap "10px"
+   :style {:border     "1px solid" :border-radius "3px"
+           :box-shadow "5px 5px 5px 2px"
+           :margin     "5px" :padding "5px"}
+   :children [[:div "dag-data-ratom-tools"]]])
+
 
 
 (comment
