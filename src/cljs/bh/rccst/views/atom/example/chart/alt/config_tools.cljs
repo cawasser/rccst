@@ -142,3 +142,20 @@
                   [rc/button :on-click #(h/handle-change-path config-data [:value :chosen] :tv) :label ":tv"]
                   [rc/button :on-click #(h/handle-change-path config-data [:value :chosen] :amt) :label ":amt"]]])))
 
+
+(defn dag-data-config-ratom-tools [data default-data]
+  [rc/h-box :src (rc/at)
+   :gap "10px"
+   :style {:border     "1px solid" :border-radius "3px"
+           :box-shadow "5px 5px 5px 2px"
+           :margin     "5px" :padding "5px"}
+   :children [[:div "dag-data-config-ratom-tools"]]])
+
+
+(defn dag-data-config-sub-tools [data default-data]
+  [rc/h-box :src (rc/at)
+   :gap "10px"
+   :style {:border     "1px solid" :border-radius "3px"
+           :box-shadow "5px 5px 5px 2px"
+           :margin     "5px" :padding "5px"}
+   :children [[:div "dag-data-config-sub-tools"]]])

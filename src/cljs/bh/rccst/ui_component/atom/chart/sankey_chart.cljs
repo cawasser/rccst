@@ -1,54 +1,42 @@
 (ns bh.rccst.ui-component.atom.chart.sankey-chart
-  (:require [bh.rccst.ui-component.atom.chart.utils :as utils]
-            [bh.rccst.ui-component.utils.example-data :as data]
-            [bh.rccst.ui-component.atom.chart.wrapper :as c]
+  (:require [bh.rccst.ui-component.atom.chart.wrapper-2 :as wrapper]
             [bh.rccst.ui-component.utils :as ui-utils]
+            [bh.rccst.ui-component.utils.example-data :as data]
+            [bh.rccst.ui-component.atom.chart.utils :as utils]
             ["recharts" :refer [ResponsiveContainer Sankey Tooltip Layer Rectangle]]
+            [reagent.core :as r]
             [re-com.core :as rc]
-            [reagent.core :as r]))
+            [taoensso.timbre :as log]))
+
+
+(log/info "bh.rccst.ui-component.atom.chart.sankey-chart-2")
 
 
 (def sample-data
   "the Sankey Chart works best with \"directed acyclic graph data\" so we return the dag-data from utils"
-  (r/atom data/dag-data))
+  data/dag-data)
 
 
-(defn config
-  "constructs the configuration panel for the chart's configurable properties. This is specific to
-  this being a line-chart component (see [[local-config]]).
+(defn local-config [data]
+  (log/info "local-config" @data)
 
-  Merges together the configuration needed for:
+  {:isAnimationActive true
+   :tooltip           {:include true}
+   :node              {:fill "#77c878" :stroke "#000000"}
+   :link              {:stroke "#77c878" :curve 0.5}})
 
-  1. line charts
-  2. pub/sub between components of a container
-  3. `default-config` for all Rechart-based types
-  4. the `tab-panel` for view/edit configuration properties and data
-  5. sets properties of the default-config (local config properties are just set inside [[local-config]])
-  6. sets meta-data for properties this component publishes (`:pub`) or subscribes (`:sub`)
 
-  ---
-
-  - component-id : (string) unique id of the chart
-  "
-  [component-id data]
+(defn config [component-id data]
   (merge
     ui-utils/default-pub-sub
+    (local-config data)
     {:tab-panel {:value     (keyword component-id "config")
-                 :data-path [:containers (keyword component-id) :tab-panel]}
-     :tooltip   {:include true}
-     :node      {:fill "#77c878" :stroke "#000000"}
-     :link      {:stroke "#77c878" :curve 0.5}}))
+                 :data-path [:containers (keyword component-id) :tab-panel]}}))
 
 
-(defn- config-panel
-  "the panel of configuration controls
+(defn config-panel [data component-id]
+  (log/info "config-panel" data "//" component-id)
 
-  ---
-
-  - _ : (ignored)
-  - component-id : (string) unique identifier for this chart instance
-  "
-  [_ component-id]
   [rc/v-box :src (rc/at)
    :width "400px"
    :height "500px"
@@ -102,6 +90,9 @@
          index                       "index"
          {name "name" value "value"} "payload"} (js->clj props)
         isOut (< containerWidth (+ x width 30 6))]
+
+    (log/info "complex-node" containerWidth fill stroke props)
+
     (r/as-element
       [:> Layer {:key (str "CustomNode$" index)}
        [:> Rectangle {:x x :y y :width width :height height :fill fill :stroke stroke}]
@@ -120,81 +111,51 @@
         (str value "k")]])))
 
 
-(defn- component-panel
-  "the chart to draw, taking cues from the settings of the configuration panel
+(defn- component* [& {:keys [data component-id container-id
+                             subscriptions]
+                      :as   params}]
 
-  ---
+  ;(log/info "component-star" component-id "//" data "//" subscriptions)
 
-  - data : (atom) any data shown by the component's ui
-  - component-id : (string) unique identifier for this chart instance within this container
-  - container-id : (string) name of the container this chart is inside of
-  "
-  [data component-id container-ui ui]
-  (let [tooltip?    (ui-utils/subscribe-local component-id [:tooltip :include])
-        node-fill   (ui-utils/subscribe-local component-id [:node :fill])
-        node-stroke (ui-utils/subscribe-local component-id [:node :stroke])
-        link-stroke (ui-utils/subscribe-local component-id [:link :stroke])
-        curve       (ui-utils/subscribe-local component-id [:link :curve])]
+  (let [tooltip?    (ui-utils/resolve-sub subscriptions [:tooltip :include])
+        node-fill   (ui-utils/resolve-sub subscriptions [:node :fill])
+        node-stroke (ui-utils/resolve-sub subscriptions [:node :stroke])
+        link-stroke (ui-utils/resolve-sub subscriptions [:link :stroke])
+        curve       (ui-utils/resolve-sub subscriptions [:link :curve])]
 
-    (fn [data component-id container-ui ui]
-      [:> ResponsiveContainer
-       [:> Sankey
-        {:node          (partial complex-node 500 @node-fill @node-stroke)
-         :data          @data
-         :margin        {:top 20 :bottom 20 :left 20 :right 20}
-         :nodeWidth     10
-         :nodePadding   60
-         :linkCurvature @curve
-         :iterations    64
-         :link          {:stroke @link-stroke}}
-        (when @tooltip? [:> Tooltip])]])))
+    [:div "sankey chart"]
+    [:> ResponsiveContainer
+     [:> Sankey
+      {:node          (partial complex-node 500 node-fill node-stroke)
+       :data          data
+       :margin        {:top 20 :bottom 20 :left 20 :right 20}
+       :nodeWidth     10
+       :nodePadding   60
+       :linkCurvature curve
+       :iterations    64
+       :link          {:stroke link-stroke}}
+      (when tooltip? [:> Tooltip])]]))
 
 
-(defn configurable-component
-  "the chart to draw, taking cues from the settings of the configuration panel
-
-  ---
-
-  - data : (atom) any data shown by the component's ui
-  - component-id : (string) unique identifier of this chart insatnce within this container
-  - container-id : (string) name of the container this chart is inside of
-  "
-  [& {:keys [data component-id container-id ui]}]
-  [c/base-chart
+(defn component [& {:keys [data config-data component-id container-id
+                           data-panel config-panel] :as params}]
+  [wrapper/base-chart
    :data data
-   :config (config component-id data)
+   :config-data config-data
    :component-id component-id
-   :container-id (or container-id "")
-   :data-panel utils/dag-data-panel
+   :container-id container-id
+   :component* component*
+   :component-panel wrapper/component-panel
+   :data-panel data-panel
    :config-panel config-panel
-   :component-panel component-panel
-   :ui ui])
+   :config config
+   :local-config local-config])
 
 
-(defn component
-  "the chart to draw. this variant does NOT provide a configuration panel
-
-  ---
-
-  - data : (atom) any data shown by the component's ui
-  - component-id : (string) unique identifier of this chart instance within this container
-  - container-id : (string) name of the container this chart is inside of
-  "
-  [& {:keys [data component-id container-id ui]}]
-  [c/base-chart
-   :data data
-   :config (config component-id data)
-   :component-id component-id
-   :container-id (or container-id "")
-   :component-panel component-panel
-   :ui ui])
-
-
-(def meta-data {:component              component
-                :configurable-component configurable-component
-                :sources                {:data :source-type/meta-dag}
-                :pubs                   []
-                :subs                   []})
+(def meta-data {:component component
+                :sources   {:data :source-type/meta-dag}
+                :pubs      []
+                :subs      []})
 
 
 
