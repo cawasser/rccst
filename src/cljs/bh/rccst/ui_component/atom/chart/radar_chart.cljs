@@ -111,7 +111,7 @@
                                    :stroke      (color/get-color idx)
                                    :fillOpacity 0.6}}))
                 (into {})))]
-    (log/info "local-config" ret)
+    ;(log/info "local-config" ret)
     ret))
 
 

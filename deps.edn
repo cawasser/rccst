@@ -11,6 +11,7 @@
              com.stuartsierra/component                    {:mvn/version "1.1.0"}
              com.stuartsierra/component.repl               {:mvn/version "1.0.0"}
              com.taoensso/sente                            {:mvn/version "1.16.2"}
+             expound/expound                               {:mvn/version "0.9.0"}
              http-kit/http-kit                             {:mvn/version "2.5.3"}
              metosin/compojure-api                         {:mvn/version "2.0.0-alpha31"}
              metosin/ring-http-response                    {:mvn/version "0.9.3"}
@@ -105,7 +106,7 @@
              ;
              ; and run it  via:
              ;
-             ; clojure -J-Dclojure.main.report=stderr -Tnvd nvd.task/check :classpath '"'"$(clojure -Spath -A:any:aliases)"'"'
+             ; clojure -J-Dclojure.main.report=stderr -Tnvd nvd.task/check :classpath '"'"$(clojure -Spath -A:run)"'"'
              ;
              ; be sure to put any aliases (if we develop any) in place of -A:any:aliases
              ;

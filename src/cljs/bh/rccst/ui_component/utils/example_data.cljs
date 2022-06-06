@@ -1,6 +1,7 @@
 (ns bh.rccst.ui-component.utils.example-data
   (:require [cljs-uuid-utils.core :as uuid]
             [cljs.spec.alpha :as spec]
+            [expound.alpha :as expound]
             [bh.rccst.subs :as subs]
             [re-frame.core :as re-frame]
             [taoensso.timbre :as log]))
@@ -92,6 +93,23 @@
               {:name "Page E" :uv 1890 :pv 4800 :tv 1500 :amt 2181}
               {:name "Page F" :uv 2390 :pv 3800 :tv 1500 :amt 2500}
               {:name "Page G" :uv 3490 :pv 4300 :tv 1500 :amt 2100}]})
+(def BAD-meta-tabular-data-missing-type
+  {:metadata {:id     :name
+              :title  "Tabular Data with Metadata"
+              :fields {:name :string :uv :number :pv :number :tv :number :amt :number}}
+   :data     [{:name "Page A" :uv 4000 :pv 2400 :tv 1500 :amt 2400}
+              {:name "Page B" :uv 3000 :pv 1398 :tv 1500 :amt 2210}
+              {:name "Page C" :uv 2000 :pv 9800 :tv 1500 :amt 2290}
+              {:name "Page D" :uv 2780 :pv 3908 :tv 1500 :amt 2000}
+              {:name "Page E" :uv 1890 :pv 4800 :tv 1500 :amt 2181}
+              {:name "Page F" :uv 2390 :pv 3800 :tv 1500 :amt 2500}
+              {:name "Page G" :uv 3490 :pv 4300 :tv 1500 :amt 2100}]})
+(def BAD-meta-tabular-data-bad-field
+  {:metadata {:type   :data/tabular
+              :id     :name
+              :title  "Tabular Data with Metadata"
+              :fields {:name :keyword}}
+   :data     [{:name "Page A" :uv 4000 :pv 2400 :tv 1500 :amt 2400}]})
 
 (spec/def :data/type #{:data/tabular :data/entity})
 (spec/def :data/id keyword?)
@@ -104,7 +122,24 @@
 
 (comment
   (spec/valid? :tabular-data/meta-data meta-tabular-data)
+  (spec/valid? :tabular-data/meta-data BAD-meta-tabular-data-missing-type)
 
+  (spec/explain :tabular-data/meta-data BAD-meta-tabular-data-missing-type)
+  (spec/explain :tabular-data/meta-data BAD-meta-tabular-data-bad-field)
+
+  (expound/expound-str :tabular-data/meta-data meta-tabular-data)
+  (expound/expound :tabular-data/meta-data BAD-meta-tabular-data-missing-type)
+  (expound/expound-str :tabular-data/meta-data BAD-meta-tabular-data-missing-type)
+
+  (expound/expound :tabular-data/meta-data BAD-meta-tabular-data-bad-field)
+  (def error (expound/expound-str :tabular-data/meta-data BAD-meta-tabular-data-bad-field))
+
+
+  ; we can use re-com/alert-list data structure to display spec failures in place of the
+  ; expected UI, using the "NEW" alert-list ui-component
+
+  (def alert-msg {:id 0 :alert-type :danger :heading "Parameter Error (Spec Failed)"
+                  :body error :padding "8px" :closeable? false})
 
   ())
 

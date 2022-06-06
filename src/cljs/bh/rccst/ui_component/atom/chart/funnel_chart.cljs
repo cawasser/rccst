@@ -20,7 +20,7 @@
 
 
 (defn local-config [data]
-  (log/info "local-config" data)
+  ;(log/info "local-config" data)
   (let [d      (get @data :data)
         fields (get-in @data [:metadata :fields])]
     ;(log/info "configgg : " @data)
@@ -50,7 +50,7 @@
 
 
 (defn config [component-id data]
-  (log/info "config" @data)
+  ;(log/info "config" @data)
   (merge
     ui-utils/default-pub-sub
     utils/default-config
@@ -84,7 +84,7 @@
 
 
 (defn config-panel [data component-id]
-  (log/info "config-panel")
+  ;(log/info "config-panel")
   [rc/v-box :src (rc/at)
    :gap "10px"
    :width "100%"
@@ -127,7 +127,7 @@
                              subscriptions isAnimationActive?]
                       :as   params}]
 
-  (log/info "funnel component*" params)
+  ;(log/info "funnel component*" params)
   (let [d (if (empty? data) [] (get data :data))
         included (included-cells d subscriptions)]
 
@@ -157,7 +157,7 @@
 (defn component [& {:keys [data config-data component-id container-id
                            data-panel config-panel] :as params}]
 
-  (log/info "component-2 funnel" params)
+  ;(log/info "component-2 funnel" params)
 
   [wrapper/base-chart
    :data data

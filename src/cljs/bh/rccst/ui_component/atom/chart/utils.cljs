@@ -583,6 +583,15 @@
     s))
 
 
+
+(defn chart-grid [component-id ui]
+  (let [grid?                (u/subscribe-local component-id [:grid :include])
+        grid-dash            (u/subscribe-local component-id [:grid :strokeDasharray :dash])
+        grid-space           (u/subscribe-local component-id [:grid :strokeDasharray :space])
+        grid-stroke          (u/subscribe-local component-id [:grid :stroke])]
+    (when (override @grid? ui :grid) [:> CartesianGrid {:strokeDasharray (strokeDasharray @grid-dash @grid-space)
+                                                        :stroke          @grid-stroke}])))
+
 (defn standard-chart-components [component-id ui]
 
   ;(log/info "standard-chart-components" component-id ui)

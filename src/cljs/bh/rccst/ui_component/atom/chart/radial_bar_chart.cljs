@@ -111,7 +111,7 @@
 
   (let [ret (->> data
               (map-indexed (fn [idx {:keys [name]}]
-                             (log/info "make-radial-bar-display (name)" name)
+                             ;(log/info "make-radial-bar-display (name)" name)
                              (if (ui-utils/resolve-sub subscriptions [name :include])
                                (make-cell name idx subscriptions)
                                [])))

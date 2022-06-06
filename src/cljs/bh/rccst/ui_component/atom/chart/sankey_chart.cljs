@@ -18,7 +18,7 @@
 
 
 (defn local-config [data]
-  (log/info "local-config" @data)
+  ;(log/info "local-config" @data)
 
   {:isAnimationActive true
    :tooltip           {:include true}
@@ -35,7 +35,7 @@
 
 
 (defn config-panel [data component-id]
-  (log/info "config-panel" data "//" component-id)
+  ;(log/info "config-panel" data "//" component-id)
 
   [rc/v-box :src (rc/at)
    :width "400px"
@@ -91,7 +91,7 @@
          {name "name" value "value"} "payload"} (js->clj props)
         isOut (< containerWidth (+ x width 30 6))]
 
-    (log/info "complex-node" containerWidth fill stroke props)
+    ;(log/info "complex-node" containerWidth fill stroke props)
 
     (r/as-element
       [:> Layer {:key (str "CustomNode$" index)}

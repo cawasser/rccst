@@ -190,8 +190,6 @@ any of the inputs change.
 > Is this really true? Need to do some investigation/experimentation to determine.
 "]]
 
-
-
     [layout/frame {:extra-classes :is-fluid}
      [layout/markdown-block
       "### Additional Links
