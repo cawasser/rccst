@@ -1,11 +1,11 @@
 (ns bh.rccst.ui-component.atom.chart.sankey-chart
-  (:require [bh.rccst.ui-component.atom.chart.wrapper-2 :as wrapper]
+  (:require [bh.rccst.ui-component.atom.chart.utils :as utils]
+            [bh.rccst.ui-component.atom.chart.wrapper-2 :as wrapper]
             [bh.rccst.ui-component.utils :as ui-utils]
             [bh.rccst.ui-component.utils.example-data :as data]
-            [bh.rccst.ui-component.atom.chart.utils :as utils]
-            ["recharts" :refer [ResponsiveContainer Sankey Tooltip Layer Rectangle]]
-            [reagent.core :as r]
+            ["recharts" :refer [ResponsiveContainer Sankey Tooltip Layer Rectangle Layer]]
             [re-com.core :as rc]
+            [reagent.core :as r]
             [taoensso.timbre :as log]))
 
 
@@ -15,6 +15,17 @@
 (def sample-data
   "the Sankey Chart works best with \"directed acyclic graph data\" so we return the dag-data from utils"
   data/dag-data)
+
+(def dummy-config-data {:nodes {"Visit"            {:include true :fill "#ff0000" :stroke "#ff0000"}
+                                "Direct-Favourite" {:include true :fill "#00ff00" :stroke "#00ff00"}
+                                "Page-Click"       {:include true :fill "#0000ff" :stroke "#0000ff"}
+                                "Detail-Favourite" {:include true :fill "#12a4a4" :stroke "#12a4a4"}
+                                "Lost"             {:include true :fill "#ba7b47" :stroke "#ba7b47"}}
+                        :links {"Visit"            {:fill "#ff000040"}
+                                "Direct-Favourite" {:fill "#00ff0040"}
+                                "Page-Click"       {:fill "#0000ff40"}
+                                "Detail-Favourite" {:fill "#12a4a440"}
+                                "Lost"             {:fill "#ba7b4740"}}})
 
 
 (defn local-config [data]
@@ -82,16 +93,20 @@
 > See [here](https://cljdoc.org/d/reagent/reagent/1.1.0/doc/tutorials/react-features#hooks)
 > for details on how the Reagent/React interop work for this
 "
-  [containerWidth fill stroke props]
+  [containerWidth props]
   (let [{x                           "x"
          y                           "y"
          width                       "width"
          height                      "height"
          index                       "index"
          {name "name" value "value"} "payload"} (js->clj props)
-        isOut (< containerWidth (+ x width 30 6))]
+        isOut  (< containerWidth (+ x width 30 6))
 
-    ;(log/info "complex-node" containerWidth fill stroke props)
+        c      (get (:nodes dummy-config-data) name)
+        fill   (:fill c)
+        stroke (:stroke c)]
+
+    (log/info "complex-node" name containerWidth fill stroke props)
 
     (r/as-element
       [:> Layer {:key (str "CustomNode$" index)}
@@ -111,6 +126,75 @@
         (str value "k")]])))
 
 
+
+(defn- make-svg-string [sourceX, targetX,
+                        sourceY, targetY,
+                        sourceControlX, targetControlX,
+                        linkWidth]
+  (str "M" sourceX ", " (+ sourceY (/ linkWidth 2))
+
+    "C" sourceControlX ", " (+ sourceY (/ linkWidth 2)) ", "
+    targetControlX ", " (+ targetY (/ linkWidth 2)) ", "
+    targetX ", " (+ targetY (/ linkWidth 2))
+
+    "L" targetX ", " (- targetY (/ linkWidth 2)) ", "
+
+    "C" targetControlX ", " (- targetY (/ linkWidth 2)) ", "
+    sourceControlX ", " (- sourceY (/ linkWidth 2)) ","
+    sourceX ", " (- sourceY (/ linkWidth 2))
+
+    "Z"))
+
+
+(defn- complex-link [props]
+  (let [{:keys [sourceX, targetX,
+                sourceY, targetY,
+                sourceControlX, targetControlX,
+                linkWidth,
+                index, payload]} (js->clj props :keywordize-keys true)
+
+        c (get (:links dummy-config-data) (get-in payload [:source :name]))]
+
+
+    ;(log/info "complex-link (props)" (js->clj props :keywordize-keys true))
+    ;(log/info "complex-link" sourceX, targetX,
+    ;  sourceY, targetY,
+    ;  sourceControlX, targetControlX,
+    ;  linkWidth,
+    ;  index)
+
+    (log/info "complex-link"
+      payload
+      ;"//" (make-svg-string
+      ;  sourceX, targetX,
+      ;  sourceY, targetY,
+      ;  sourceControlX, targetControlX,
+      ;  linkWidth)
+      "//" c)
+
+
+    (r/as-element
+      [:> Layer {:key (str "CustomLink$" index)}
+       [:path {:d           (make-svg-string
+                              sourceX, targetX,
+                              sourceY, targetY,
+                              sourceControlX, targetControlX,
+                              linkWidth)
+               :fill        (:fill c)
+               :strokeWidth 0}]])))
+
+(comment
+  (def payload {:source {:y 12.893286910217379, :sourceNodes [], :dx 10,
+                         :targetLinks [1 0], :name "Visit", :value 357898.3, :dy 272,
+                         :sourceLinks [], :targetNodes [1 2], :depth 0, :x 0},
+                :target {:y 389.16652020979143, :sourceNodes [0], :dx 10, :targetLinks [],
+                         :name "Direct-Favourite", :value 3728.3, :dy 2.8334797902085596,
+                         :sourceLinks [0], :targetNodes [], :depth 2, :x 1264},
+                :value 3728.3, :dy 2.8334797902085596, :sy 269.1665202097915, :ty 0})
+
+
+  ())
+
 (defn- component* [& {:keys [data component-id container-id
                              subscriptions]
                       :as   params}]
@@ -118,22 +202,22 @@
   ;(log/info "component-star" component-id "//" data "//" subscriptions)
 
   (let [tooltip?    (ui-utils/resolve-sub subscriptions [:tooltip :include])
-        node-fill   (ui-utils/resolve-sub subscriptions [:node :fill])
-        node-stroke (ui-utils/resolve-sub subscriptions [:node :stroke])
+        ;node-fill   (ui-utils/resolve-sub subscriptions [:node :fill])
+        ;node-stroke (ui-utils/resolve-sub subscriptions [:node :stroke])
         link-stroke (ui-utils/resolve-sub subscriptions [:link :stroke])
         curve       (ui-utils/resolve-sub subscriptions [:link :curve])]
 
     [:div "sankey chart"]
     [:> ResponsiveContainer
      [:> Sankey
-      {:node          (partial complex-node 500 node-fill node-stroke)
+      {:node          (partial complex-node 700)
        :data          data
        :margin        {:top 20 :bottom 20 :left 20 :right 20}
        :nodeWidth     10
        :nodePadding   60
        :linkCurvature curve
        :iterations    64
-       :link          {:stroke link-stroke}}
+       :link          complex-link}
       (when tooltip? [:> Tooltip])]]))
 
 

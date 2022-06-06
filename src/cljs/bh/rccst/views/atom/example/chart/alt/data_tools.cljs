@@ -1,7 +1,11 @@
 (ns bh.rccst.views.atom.example.chart.alt.data-tools
   (:require [bh.rccst.ui-component.utils :as ui-utils]
             [bh.rccst.ui-component.utils.helpers :as h]
-            [re-com.core :as rc]))
+            [re-com.core :as rc]
+            [taoensso.timbre :as log]))
+
+
+(log/info "bh.rccst.views.atom.example.chart.alt.data-tools")
 
 
 (defn meta-tabular-data-ratom-tools [data default-data]
@@ -80,7 +84,40 @@
    :style {:border     "1px solid" :border-radius "3px"
            :box-shadow "5px 5px 5px 2px"
            :margin     "5px" :padding "5px"}
-   :children [[:div "dag-data-ratom-tools"]]])
+   :children [[:label.h5 "Input Data:"]
+
+              [rc/button :label "Empty" :on-click #(reset! data [])]
+
+              [rc/button :label "Default" :on-click #(reset! data default-data)]
+
+              [rc/button :label "! Redirect" :on-click #(log/info "Add a 'Redirect' node and link to 'Detail-Favourite'")]
+
+              [rc/button :label "! Dummy->New-thing"
+               :on-click #(log/info "Add 'Dummy' & 'New-thing' nodes with link between")]
+
+              [rc/button :label "Change link value"
+               :on-click #(log/info "Change link value")]]])
+
+
+(defn dag-data-sub-tools [data default-data]
+  [rc/h-box :src (rc/at)
+   :gap "10px"
+   :style {:border     "1px solid" :border-radius "3px"
+           :box-shadow "5px 5px 5px 2px"
+           :margin     "5px" :padding "5px"}
+   :children [[:label.h5 "Input Data:"]
+
+              [rc/button :label "Empty" :on-click #(h/handle-change-path data [] [])]
+
+              [rc/button :label "Default" :on-click #(h/handle-change-path data [] default-data)]
+
+              [rc/button :label "! Redirect" :on-click #(log/info "Add a 'Redirect' node and link")]
+
+              [rc/button :label "! Dummy->New-thing"
+               :on-click #(log/info "Add 'Dummy' & 'New-thing' nodes with link between")]
+
+              [rc/button :label "Change link value"
+               :on-click #(log/info "Change link value")]]])
 
 
 
