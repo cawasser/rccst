@@ -8,13 +8,16 @@
             [bh.rccst.views.atom.example.chart.alt.data-sub-example :as data-sub-example]
             [bh.rccst.views.atom.example.chart.alt.config-ratom-example :as config-ratom-example]
             [bh.rccst.views.atom.example.chart.alt.config-structure-example :as config-structure-example]
-            [bh.rccst.views.atom.example.chart.alt.config-sub-example :as config-sub-example]))
+            [bh.rccst.views.atom.example.chart.alt.config-sub-example :as config-sub-example]
+            [bh.rccst.views.atom.example.multi-example :as me]))
+
 
 (def default-config-data {:brush false
                           :uv    {:include true, :fill "#ff0000", :stackId ""}
                           :pv    {:include true, :fill "#00ff00", :stackId ""}
                           :tv    {:include true, :fill "#0000ff", :stackId "a"}
                           :amt   {:include true, :fill "#745ea5", :stackId "a"}})
+
 
 (defn- data-ratom []
   [data-ratom-example/example
@@ -33,6 +36,7 @@
    :data-panel chart-utils/meta-tabular-data-panel
    :config-panel chart/config-panel])
 
+
 (defn- data-structure []
   [data-structure-example/example
    :container-id :area-chart-2-data-structure-demo
@@ -47,6 +51,7 @@
    :component chart/component
    :data-panel chart-utils/meta-tabular-data-panel
    :config-panel chart/config-panel])
+
 
 (defn data-sub []
   [data-sub-example/example
@@ -65,6 +70,7 @@
    :data-panel chart-utils/meta-tabular-data-panel
    :config-panel chart/config-panel])
 
+
 (defn- config-ratom []
   [config-ratom-example/example
    :container-id :area-chart-2-config-ratom-demo
@@ -82,6 +88,7 @@
    :component chart/component
    :default-config-data default-config-data])
 
+
 (defn- config-structure []
   [config-structure-example/example
    :container-id :area-chart-2-config-structure-demo
@@ -96,6 +103,7 @@
    :source-code chart/source-code
    :component chart/component
    :default-config-data default-config-data])
+
 
 (defn- config-sub []
   (let [container-id :area-chart-2-config-sub-demo]
@@ -115,11 +123,10 @@
 
 
 (defn examples []
-  [:div
-   [data-ratom]
-   [data-structure]
-   [data-sub]
-   [config-ratom]
-   [config-structure]
-   [config-sub]])
+  [me/examples {"data-ratom" [data-ratom]
+                "data-struct"  [data-structure]
+                "data-sub"  [data-sub]
+                "config-ratom"  [config-ratom]
+                "config-struct"  [config-structure]
+                "config-sub"  [config-sub]}])
 

@@ -5,7 +5,7 @@
             [bh.rccst.views.atom.buttons :as buttons-demo]
             [bh.rccst.views.atom.cards :as cards-demo]
 
-            [bh.rccst.views.atom.charts-2 :as charts-demo]
+            [bh.rccst.views.atom.charts :as charts-demo]
             [bh.rccst.views.atom.containers :as containers-demo]
             [bh.rccst.views.atom.diagrams :as diagrams-demo]
             [bh.rccst.views.atom.experimental :as experimental]

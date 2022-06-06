@@ -9,7 +9,8 @@
             [bh.rccst.views.atom.example.chart.alt.config-ratom-example :as config-ratom-example]
             [bh.rccst.views.atom.example.chart.alt.config-structure-example :as config-structure-example]
             [bh.rccst.views.atom.example.chart.alt.config-sub-example :as config-sub-example]
-            [taoensso.timbre :as log]))
+            [taoensso.timbre :as log]
+            [bh.rccst.views.atom.example.multi-example :as me]))
 
 
 (log/info "bh.rccst.views.atom.example.chart.sankey-chart-2")
@@ -22,7 +23,7 @@
 (defn- data-ratom []
   [data-ratom-example/example
    :container-id :sankey-chart-data-ratom-demo
-   :title "Sankey Chart (Live Data - ratom)"
+   :title "Sankey Chart (Live Data - ratom) - IN PROGRESS (not complete)"
    :description "A Sankey Chart built using [Recharts](https://recharts.org/en-US/api/SankeyChart). This example shows how
   charts can take [ratoms](http://reagent-project.github.io/docs/master/reagent.ratom.html) as input and re-render as the data changes.
 
@@ -40,7 +41,7 @@
 (defn- data-structure []
   [data-structure-example/example
    :container-id :sankey-chart-data-ratom-demo
-   :title "Sankey Chart (Live Data - structure)"
+   :title "Sankey Chart (Live Data - structure) - IN PROGRESS (not complete)"
    :description "A Sankey Chart built using [Recharts](https://recharts.org/en-US/api/SankeyChart) with colored Cells. This example shows how
   charts can take [ratoms](http://reagent-project.github.io/docs/master/reagent.ratom.html) as input and re-render as the data changes.
 
@@ -57,7 +58,7 @@
   (let [container-id :sankey-chart-data-ratom-demo]
     [data-sub-example/example
      :container-id container-id
-     :title "Sankey Chart (Live Data - subscription)"
+     :title "Sankey Chart (Live Data - subscription) - IN PROGRESS (not complete)"
      :description "A Sankey Chart built using [Recharts](https://recharts.org/en-US/api/SankeyChart) with colored Cells. This example shows how
      charts can take [subscriptions](https://day8.github.io/re-frame/subscriptions/) as input and re-render as the configuration changes.
 
@@ -75,7 +76,7 @@
 (defn- config-ratom []
   [config-ratom-example/example
    :container-id :sankey-chart-data-ratom-demo
-   :title "Sankey Chart (Live Configuration - ratom)"
+   :title "Sankey Chart (Live Configuration - ratom) - IN PROGRESS (not complete)"
    :description "A Sankey Chart built using [Recharts](https://recharts.org/en-US/api/SankeyChart) with colored Cells. This example shows how
      charts can take [ratoms](http://reagent-project.github.io/docs/master/reagent.ratom.html) as input and re-render as the configuration changes.
 
@@ -93,7 +94,7 @@
 (defn- config-structure []
   [config-structure-example/example
    :container-id :sankey-config-structure-demo
-   :title "Sankey Chart (Live Configuration - structure)"
+   :title "Sankey Chart (Live Configuration - structure) - IN PROGRESS (not complete)"
    :description "A Sankey Chart built using [Recharts](https://recharts.org/en-US/api/SankeyChart) with colored Cells. This example shows how
      charts can take [ratoms](http://reagent-project.github.io/docs/master/reagent.ratom.html) as input and re-render as the configuration changes.
 
@@ -110,7 +111,7 @@
   (let [container-id :sankey-config-sub-demo]
     [config-sub-example/example
      :container-id container-id
-     :title "Sankey Chart (Live Configuration - subscription)"
+     :title "Sankey Chart (Live Configuration - subscription) - IN PROGRESS (not complete)"
      :description "A Sankey Chart built using [Recharts](https://recharts.org/en-US/api/SankeyChart) with colored Cells. This example shows how
      charts can take [subscriptions](https://day8.github.io/re-frame/subscriptions/) as input and re-render as the configuration changes.
 
@@ -124,11 +125,9 @@
 
 
 (defn examples []
-  [:div
-   [data-ratom]
-   [data-structure]
-   [data-sub]
-   [config-ratom]
-   [config-structure]
-   [config-sub]])
-
+  [me/examples {"data-ratom" [data-ratom]
+                "data-struct"  [data-structure]
+                "data-sub"  [data-sub]
+                "config-ratom"  [config-ratom]
+                "config-struct"  [config-structure]
+                "config-sub"  [config-sub]}])

@@ -11,13 +11,15 @@
             [bh.rccst.views.atom.example.chart.alt.config-sub-example :as config-sub-example]
             [bh.rccst.views.atom.example.chart.alt.data-tools :as data-tools]
             [bh.rccst.views.atom.example.chart.alt.config-tools :as config-tools]
-            [taoensso.timbre :as log]))
+            [taoensso.timbre :as log]
+            [bh.rccst.views.atom.example.multi-example :as me]))
+
 
 (def default-config-data {:domain [0 150],
                           :A {:include true, :name :A, :fill "#8884d8",
                               :stroke "#8884d8", :fillOpacity 0.6},
                           :B {:include true, :name :B, :fill "#ffc107",
-                              :stroke "#ffc107", :fillOpacity 0.6}, })
+                              :stroke "#ffc107", :fillOpacity 0.6},})
                           ;:fullMark {:include true, :name :fullMark, :fill "#82ca9d",
                           ;           :stroke "#82ca9d", :fillOpacity 0.6}})
 
@@ -25,7 +27,7 @@
 (defn- data-ratom []
   [data-ratom-example/example
    :container-id :radar-chart-2-data-ratom-demo
-   :title "Radar Chart 2 (Live Data - ratom)"
+   :title "Radar Chart 2 (Live Data - ratom) - IN PROGRESS (not complete)"
    :description "A Radar Chart (2) built using [Recharts](https://recharts.org/en-US/api/RadarChart). This example shows how
   charts can take [ratoms](http://reagent-project.github.io/docs/master/reagent.ratom.html) as input and re-render as the data changes.
 
@@ -43,7 +45,7 @@
 (defn- data-structure []
   [data-structure-example/example
    :container-id :radar-chart-2-data-structure-demo
-   :title "Radar Chart 2 (Live Data - structure)"
+   :title "Radar Chart 2 (Live Data - structure) - IN PROGRESS (not complete)"
    :description "A Radar Chart (2) built using [Recharts](https://recharts.org/en-US/api/RadarChart). This example shows how
   charts can take [ratoms](http://reagent-project.github.io/docs/master/reagent.ratom.html) as input and re-render as the data changes.
 
@@ -59,7 +61,7 @@
 (defn data-sub []
   [data-sub-example/example
    :container-id :radar-chart-2-data-sub-demo
-   :title "Radar Chart 2 (Live Data - subscription)"
+   :title "Radar Chart 2 (Live Data - subscription) - IN PROGRESS (not complete)"
    :description "A Radar Chart (2) built using [Recharts](https://recharts.org/en-US/api/RadarChart). This example shows how
      charts can take [subscriptions](https://day8.github.io/re-frame/subscriptions/) as input and re-render as the configuration changes.
 
@@ -77,7 +79,7 @@
 (defn- config-ratom []
   [config-ratom-example/example
    :container-id :radar-chart-2-config-ratom-demo
-   :title "Radar Chart 2 (Live Configuration - ratom)"
+   :title "Radar Chart 2 (Live Configuration - ratom) - IN PROGRESS (not complete)"
    :description "A Radar Chart (2) built using [Recharts](https://recharts.org/en-US/api/RadarChart). This example shows how
      charts can take [ratoms](http://reagent-project.github.io/docs/master/reagent.ratom.html) as input and re-render as the configuration changes.
 
@@ -95,7 +97,7 @@
 (defn- config-structure []
   [config-structure-example/example
    :container-id :radar-chart-2-config-structure-demo
-   :title "Radar Chart 2 (Live Configuration - structure)"
+   :title "Radar Chart 2 (Live Configuration - structure) - IN PROGRESS (not complete)"
    :description "A Radar Chart (2) built using [Recharts](https://recharts.org/en-US/api/RadarChart). This example shows how
      charts can take [ratoms](http://reagent-project.github.io/docs/master/reagent.ratom.html) as input and re-render as the configuration changes.
 
@@ -112,7 +114,7 @@
   (let [container-id :radar-chart-2-config-sub-demo]
     [config-sub-example/example
      :container-id container-id
-     :title "Radar Chart 2 (Live Configuration - subscription)"
+     :title "Radar Chart 2 (Live Configuration - subscription) - IN PROGRESS (not complete)"
      :description "A Radar Chart (2) built using [Recharts](https://recharts.org/en-US/api/RadarChart). This example shows how
      charts can take [subscriptions](https://day8.github.io/re-frame/subscriptions/) as input and re-render as the configuration changes.
 
@@ -125,12 +127,10 @@
      :default-config-data default-config-data]))
 
 
-
 (defn examples []
-  [:div
-   [data-ratom]
-   [data-structure]
-   [data-sub]
-   [config-ratom]
-   [config-structure]
-   [config-sub]])
+  [me/examples {"data-ratom" [data-ratom]
+                "data-struct"  [data-structure]
+                "data-sub"  [data-sub]
+                "config-ratom"  [config-ratom]
+                "config-struct"  [config-structure]
+                "config-sub"  [config-sub]}])
