@@ -200,4 +200,21 @@ any of the inputs change.
 - [Dataflow programming (Wikipedia)](https://en.wikipedia.org/wiki/Dataflow_programming)
 - [Kahn process network (Wikipedia)](https://en.wikipedia.org/wiki/Kahn_process_networks)
 
+"]]
+
+    [layout/frame {:extra-classes :is-fluid}
+     [layout/markdown-block
+      "### Reactive Programming
+
+Another key part of our approach, and one which tied tightly with our Data-flow approach, is
+to use 'reactive programming' techniques. Specifically, our approach is 'reactive' in the sense that
+a change to the inputs automatically triggers a re-computation of the outputs. This is what drives
+our 'data flows _downhill_' analogy for our directed-graph visualization and mental model.
+
+Let's look at an example.
+
+
+See also [Reactive Programming](https://en.wikipedia.org/wiki/Reactive_programming)
 "]]]])
+
+
