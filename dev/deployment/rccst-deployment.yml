@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: C:\Users\j68916\Documents\octools\kompose.exe convert
+    kompose.version: 1.26.0 (40646f47)
+  creationTimestamp: null
+  labels:
+    app: rccst
+  name: rccst
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rccst
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: C:\Users\j68916\Documents\octools\kompose.exe convert
+        kompose.version: 1.26.0 (40646f47)
+      creationTimestamp: null
+      labels:
+        app: rccst
+    spec:
+      containers:
+        - name: rccst
+          image: docker-ng-staging.ms.northgrum.com/paas/customerbase/segs:rccst-1.0.1
+          env:
+            - name: RCCST_DATABASE_USER
+              value: "1001710000"
+            - name: RCCST_DATABASE_PASS
+              value: Password
+            - name: RCCST_DATABASE_HOST
+              value: rccst-postgres
+          ports:
+            - containerPort: 8280
+              protocol: TCP
+            - containerPort: 5432
+              protocol: TCP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          imagePullPolicy: IfNotPresent
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      securityContext: {}
+      schedulerName: default-scheduler
+    strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 25%
+  revisionHistoryLimit: 10
+  progressDeadlineSeconds: 600
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rccst
+  namespace: segs-sandbox
+  labels:
+    app: rccst
+spec:
+  selector:
+    app: rccst
+  ports:
+    - protocol: TCP
+      port: 8280
+      targetPort: 8280
+    - protocol: TCP
+      port: 5432
+      targetPort: 5432
