@@ -1,16 +1,21 @@
 (ns bh.rccst.ui-component.atom.chart.scatter-chart
   (:require [bh.rccst.ui-component.atom.chart.utils :as utils]
-            [bh.rccst.ui-component.utils.example-data :as data]
             [bh.rccst.ui-component.atom.chart.wrapper :as c]
             [bh.rccst.ui-component.utils :as ui-utils]
+            [bh.rccst.ui-component.utils.example-data :as data]
             [re-com.core :as rc]
             [reagent.core :as r]
-            ["recharts" :refer [ResponsiveContainer ScatterChart Scatter Brush]]))
+            [taoensso.timbre :as log]
+            ["recharts" :refer [ResponsiveContainer ScatterChart Scatter Brush
+                                XAxis YAxis ZAxis]]))
+
+
+(log/info "bh.rccst.ui-component.atom.chart.scatter-chart")
 
 
 (def sample-data
   "the Scatter Chart works best with \"triplet data\" so we return the triplet-data from utils"
-  (r/atom data/triplet-data))
+  (r/atom data/tabular-data))
 
 
 (defn config
@@ -86,22 +91,23 @@
         isAnimationActive? (ui-utils/subscribe-local component-id [:isAnimationActive])
         brush?             (ui-utils/subscribe-local component-id [:brush])]
 
-    (fn [data component-id container-id ui]
-      ;(log/info "configurable-Scatter-chart" @config @data)
+    (fn []
+      (log/info "configurable-Scatter-chart" @data)
 
       [:> ResponsiveContainer
        [:> ScatterChart
 
-        (utils/standard-chart-components component-id ui)
+        (utils/chart-grid component-id ui)
 
-        (when @brush? [:> Brush])
+        ;(when @brush? [:> Brush])
 
-        ;; TODO: looks like we need to add more attributes to x- & y-axis
-        ;;
-        ;(when @x-axis? [:> XAxis {:type "number" :dataKey @x-axis-dataKey :name "stature" :unit "cm"}])
-        ;(when @y-axis? [:> YAxis {:type "number" :dataKey @y-axis-dataKey :name "weight" :unit "kg"}])
+        [:> XAxis {:type "number" :dataKey "uv"}]
+        [:> YAxis {:type "number" :dataKey "pv"}]
+        [:> ZAxis {:type "number" :range [0 10000] :dataKey "amt"}]
 
-        [:> Scatter {:name              "tempScatter" :data @data
+        ; TODO: make a Scatter for each row in the data, labeled by the :name value
+        [:> Scatter {:name              "tempScatter"
+                     :data              @data
                      :isAnimationActive @isAnimationActive?
                      :fill              @scatter-dot-fill}]]])))
 
@@ -153,3 +159,12 @@
                 :pubs                   []
                 :subs                   []})
 
+(comment
+  (def data sample-data)
+
+  (->> @data
+    (map #(-> % (dissoc :name)))
+    (map #(->> % vals (zipmap [:x :y :z]))))
+
+
+  ())

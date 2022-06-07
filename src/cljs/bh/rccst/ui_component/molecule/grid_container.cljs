@@ -32,12 +32,14 @@
    :layout     (:grid-layout full-config)})
 
 
-(defn- wrap-component [[id component]]
+(defn- wrap-component [[id component label]]
 
-  ;(log/info "wrap-component" id "//" component)
+  ;(log/info "wrap-component" id "//" label "//" component)
 
   [:div.widget-parent {:key id}
-   [:div.grid-toolbar.title-wrapper.move-cursor (name id)]
+   [:div.grid-toolbar.title-wrapper.move-cursor
+    {:style {:height "1.5em"}}
+    (or label (name id))]
    [:div.widget.widget-content
     {:style         {;:width       "100%"
                      :height      "90%"
@@ -120,7 +122,6 @@
        :children [(when resizable [ct/configure-toggle open? #(locals/apply-local component-id
                                                                 [:layout] toggle-editable)])
                   [:div.grid-container {:style {:width "100%" :height "100%"}}
-                   ; TODO: convert to responsive-grid
                    [grid/grid
                     :id component-id
                     :class "layout"

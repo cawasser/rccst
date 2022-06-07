@@ -17,6 +17,7 @@
 		"bulma": "^0.9.3",
 		"cesium": "^1.90.0",
 		"dagre": "0.8.5",
+		"fixed-data-table-2": "^1.2.9",
 		"highlight.js": "11.1.0",
 		"react": "^17.0.2",
 		"react-colorful": "^5.5.1",

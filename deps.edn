@@ -2,39 +2,40 @@
 
  :deps      {org.clojure/clojure                           {:mvn/version "1.10.3"}
              org.clojure/core.async                        {:mvn/version "1.5.648"}
-             org.clojure/tools.logging                     {:mvn/version "1.2.3"}
+             org.clojure/tools.logging                     {:mvn/version "1.2.4"}
              org.clojure/tools.nrepl                       {:mvn/version "0.2.13"}
-             ch.qos.logback/logback-classic                {:mvn/version "1.2.10"}
-             compojure/compojure                           {:mvn/version "1.6.2"}
-             com.layerware/hugsql                          {:mvn/version "0.5.1"}
-             com.layerware/hugsql-adapter-next-jdbc        {:mvn/version "0.5.1"}
-             com.stuartsierra/component                    {:mvn/version "1.0.0"}
-             com.stuartsierra/component.repl               {:mvn/version "0.2.0"}
+             ch.qos.logback/logback-classic                {:mvn/version "1.2.11"}
+             compojure/compojure                           {:mvn/version "1.7.0"}
+             com.layerware/hugsql                          {:mvn/version "0.5.3"}
+             com.layerware/hugsql-adapter-next-jdbc        {:mvn/version "0.5.3"}
+             com.stuartsierra/component                    {:mvn/version "1.1.0"}
+             com.stuartsierra/component.repl               {:mvn/version "1.0.0"}
              com.taoensso/sente                            {:mvn/version "1.16.2"}
+             expound/expound                               {:mvn/version "0.9.0"}
              http-kit/http-kit                             {:mvn/version "2.5.3"}
              metosin/compojure-api                         {:mvn/version "2.0.0-alpha31"}
              metosin/ring-http-response                    {:mvn/version "0.9.3"}
-             org.postgresql/postgresql                     {:mvn/version "42.3.1"}
+             org.postgresql/postgresql                     {:mvn/version "42.3.6"}
              org.xerial/sqlite-jdbc                        {:mvn/version "3.36.0.3"}
-             prismatic/schema                              {:mvn/version "1.2.0"}
+             prismatic/schema                              {:mvn/version "1.2.1"}
              ring/ring-anti-forgery                        {:mvn/version "1.3.0"}
              ring/ring-defaults                            {:mvn/version "0.3.3"}
              ring-cors/ring-cors                           {:mvn/version "0.1.13"}
-             ring/ring                                     {:mvn/version "1.9.4"}
-             ring-middleware-format/ring-middleware-format {:mvn/version "0.7.4"}
-             com.github.seancorfield/next.jdbc             {:mvn/version "1.2.761"}
-             selmer/selmer                                 {:mvn/version "1.12.48"}
+             ring/ring                                     {:mvn/version "1.9.5"}
+             ring-middleware-format/ring-middleware-format {:mvn/version "0.7.5"}
+             com.github.seancorfield/next.jdbc             {:mvn/version "1.2.780"}
+             selmer/selmer                                 {:mvn/version "1.12.50"}
 
              ; clojurescript dependencies (needed by Cursive since it doesn't
              ; recognize shadow-cljs.edn)
-             reagent/reagent                               {:mvn/version "1.1.0"}
+             reagent/reagent                               {:mvn/version "1.1.1"}
              re-frame/re-frame                             {:mvn/version "1.2.0"}
-             binaryage/devtools                            {:mvn/version "1.0.4"}
+             binaryage/devtools                            {:mvn/version "1.0.6"}
              cljs-ajax/cljs-ajax                           {:mvn/version "0.8.4"}
-             com.taoensso/timbre                           {:mvn/version "5.1.2"}
-             com.rpl/specter                               {:mvn/version "1.1.3"}
-             day8.re-frame/http-fx                         {:mvn/version "0.2.3"}
-             day8.re-frame/re-frame-10x                    {:mvn/version "1.2.1"}
+             com.taoensso/timbre                           {:mvn/version "5.2.1"}
+             com.rpl/specter                               {:mvn/version "1.1.4"}
+             day8.re-frame/http-fx                         {:mvn/version "0.2.4"}
+             day8.re-frame/re-frame-10x                    {:mvn/version "1.3.0"}
              day8.re-frame/tracing                         {:mvn/version "0.6.2"}
              re-com/re-com                                 {:mvn/version "2.13.2"}
              org.clojars.ertucetin/re-frame-flow           {:mvn/version "0.1.4"}
@@ -42,8 +43,8 @@
              aysylu/loom                                   {:mvn/version "1.0.2"}
              thheller/shadow-cljs                          {:mvn/version "2.16.12"}
              io.github.kovasap/oz                          {:git/url "https://github.com/kovasap/oz"
-                                                            :git/sha     "d5d490d21ea8d42740b09def2abab7c334d52520"}}
-                                                            ;:git/tag "vega-import-fix" :git/sha "4bf14e7"}}
+                                                            :git/sha "d5d490d21ea8d42740b09def2abab7c334d52520"}}
+ ;:git/tag "vega-import-fix" :git/sha "4bf14e7"}}
  ;metasoarous/oz                                {:mvn/version "2.0.0-alpha5"}}
 
 
@@ -59,11 +60,11 @@
              ;;
              ;; clojure -M:test/runner
              :test/runner {:extra-paths ["test"]
-                           :extra-deps  {lambdaisland/kaocha {:mvn/version "1.60.977"}}
+                           :extra-deps  {lambdaisland/kaocha {:mvn/version "1.66.1034"}}
                            :main-opts   ["-m" "kaocha.runner"]}
 
 
-             :reveal      {:extra-deps {vlaaad/reveal {:mvn/version "1.3.263"}}
+             :reveal      {:extra-deps {vlaaad/reveal {:mvn/version "1.3.273"}}
                            :ns-default vlaaad.reveal
                            :exec-fn    repl
                            :exec-args  {:always-on-top true}}
@@ -75,8 +76,8 @@
              ; to check only:       clojure -M:outdated
              ; to upgrade:          clojure -M:outdated --upgrade
              ;
-             :outdated    {:extra-deps {org.clojure/tools.deps.alpha {:mvn/version "0.12.1104"}
-                                        com.github.liquidz/antq      {:mvn/version "1.3.1"}}
+             :outdated    {:extra-deps {org.clojure/tools.deps.alpha {:mvn/version "0.14.1178"}
+                                        com.github.liquidz/antq      {:mvn/version "1.6.774"}}
                            :main-opts  ["-m" "antq.core"]}
 
 
@@ -105,7 +106,7 @@
              ;
              ; and run it  via:
              ;
-             ; clojure -J-Dclojure.main.report=stderr -Tnvd nvd.task/check :classpath '"'"$(clojure -Spath -A:any:aliases)"'"'
+             ; clojure -J-Dclojure.main.report=stderr -Tnvd nvd.task/check :classpath '"'"$(clojure -Spath -A:run)"'"'
              ;
              ; be sure to put any aliases (if we develop any) in place of -A:any:aliases
              ;
@@ -140,6 +141,21 @@
                                         "--output-dir" "src/clj"
                                         "--namespace" "bh.rccst.version"
                                         "--formats" "clj"]}}
+
+ ;;
+ ;; Checking dependencies against National Vulnerability Database
+ ;; https://github.com/rm-hull/nvd-clojure
+ ;;
+ ;; Clojure CLI Tool
+ ;;
+ ;; If you have CLI version 1.10.3.933 or later, you can also install nvd-clojure as a "tool":
+ ;;
+ ;;    clojure -Ttools install nvd-clojure/nvd-clojure '{:mvn/version "RELEASE"}' :as nvd
+ ;;
+ ;; Then you can run:
+ ;;
+ ;;    clojure -J-Dclojure.main.report=stderr -Tnvd nvd.task/check :classpath '"'"$(clojure -Spath -A:run)"'"'}
+
 
 
  :mvn/repos {"confluent" {:url "https://packages.confluent.io/maven/"}

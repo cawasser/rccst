@@ -1,7 +1,13 @@
 (ns bh.rccst.ui-component.utils.example-data
-  (:require [re-frame.core :as re-frame]
-            [cljs-uuid-utils.core :as uuid]))
+  (:require [cljs-uuid-utils.core :as uuid]
+            [cljs.spec.alpha :as spec]
+            [expound.alpha :as expound]
+            [bh.rccst.subs :as subs]
+            [re-frame.core :as re-frame]
+            [taoensso.timbre :as log]))
 
+
+(log/info "bh.rccst.ui-component.utils.example-data")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -11,11 +17,40 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(def default-coc [{:step      :generated
-                   :by        "bh.rccst.ui-component.atom.bh.table"
-                   :version   (or @(re-frame/subscribe [:bh.rccst.subs/version]) "no version")
-                   :at        (str (js/Date.))
-                   :signature (uuid/uuid-string (uuid/make-random-uuid))}])
+(def default-coc [{:coc/step      :generated
+                   :coc/by        "bh.rccst.ui-component.atom.bh.table"
+                   :coc/version   (or @(re-frame/subscribe [::subs/version]) "no version")
+                   :coc/at        (str (js/Date.))
+                   :coc/signature (uuid/uuid-string (uuid/make-random-uuid))}])
+
+(spec/def :coc/step (spec/and #{:generated :updated :deleted}))
+(spec/def :coc/by string?)
+(spec/def :coc/version string?)
+(spec/def :coc/at string?)
+(spec/def :coc/signature string?)
+(spec/def :coc/entry (spec/keys :req [:coc/step :coc/by :coc/version
+                                      :coc/at :coc/signature]))
+(spec/def :coc/coc (spec/coll-of :coc/entry))
+
+(comment
+  (spec/valid? :coc/entry {:coc/step      :generated
+                           :coc/by        "bh.rccst.ui-component.atom.bh.table"
+                           :coc/version   (or @(re-frame/subscribe [:bh.rccst.subs/version]) "no version")
+                           :coc/at        (str (js/Date.))
+                           :coc/signature (uuid/uuid-string (uuid/make-random-uuid))})
+  (spec/valid? :coc/entry {:coc/step      :generated
+                           :coc/by        "bh.rccst.ui-component.atom.bh.table"
+                           :coc/version   "no version"
+                           :coc/at        (js/Date.)
+                           :coc/signature (uuid/make-random-uuid)})
+  (spec/explain :coc/entry {:coc/step      :generated
+                            :coc/by        "bh.rccst.ui-component.atom.bh.table"
+                            :coc/version   "no version"
+                            :coc/at        (js/Date.)
+                            :coc/signature (uuid/make-random-uuid)})
+  (spec/valid? :coc/coc default-coc)
+
+  ())
 
 
 (def tabular-data [{:name "Page A" :uv 4000 :pv 2400 :amt 2400}
@@ -25,6 +60,9 @@
                    {:name "Page E" :uv 1890 :pv 4800 :amt 2181}
                    {:name "Page F" :uv 2390 :pv 3800 :amt 2500}
                    {:name "Page G" :uv 3490 :pv 4300 :amt 2100}])
+
+(spec/def :tabular-data/entry map?)
+(spec/def :tabular-data/data (spec/coll-of :tabular-data/entry))
 
 
 (def tabular-data-org [{:name "Page A" :org "Alpha" :uv 4000 :pv 2400 :amt 2400}
@@ -36,9 +74,15 @@
                        {:name "Page G" :org "Gamma" :uv 3490 :pv 4300 :amt 2100}])
 
 
+(comment
+  (spec/valid? :tabular-data/data tabular-data)
+  (spec/valid? :tabular-data/data tabular-data-org)
+
+  ())
+
+
 (def meta-tabular-data
-  "docstring"
-  {:metadata {:type   :tabular
+  {:metadata {:type   :data/tabular
               :id     :name
               :title  "Tabular Data with Metadata"
               :fields {:name :string :uv :number :pv :number :tv :number :amt :number}}
@@ -49,6 +93,55 @@
               {:name "Page E" :uv 1890 :pv 4800 :tv 1500 :amt 2181}
               {:name "Page F" :uv 2390 :pv 3800 :tv 1500 :amt 2500}
               {:name "Page G" :uv 3490 :pv 4300 :tv 1500 :amt 2100}]})
+(def BAD-meta-tabular-data-missing-type
+  {:metadata {:id     :name
+              :title  "Tabular Data with Metadata"
+              :fields {:name :string :uv :number :pv :number :tv :number :amt :number}}
+   :data     [{:name "Page A" :uv 4000 :pv 2400 :tv 1500 :amt 2400}
+              {:name "Page B" :uv 3000 :pv 1398 :tv 1500 :amt 2210}
+              {:name "Page C" :uv 2000 :pv 9800 :tv 1500 :amt 2290}
+              {:name "Page D" :uv 2780 :pv 3908 :tv 1500 :amt 2000}
+              {:name "Page E" :uv 1890 :pv 4800 :tv 1500 :amt 2181}
+              {:name "Page F" :uv 2390 :pv 3800 :tv 1500 :amt 2500}
+              {:name "Page G" :uv 3490 :pv 4300 :tv 1500 :amt 2100}]})
+(def BAD-meta-tabular-data-bad-field
+  {:metadata {:type   :data/tabular
+              :id     :name
+              :title  "Tabular Data with Metadata"
+              :fields {:name :keyword}}
+   :data     [{:name "Page A" :uv 4000 :pv 2400 :tv 1500 :amt 2400}]})
+
+(spec/def :data/type #{:data/tabular :data/entity})
+(spec/def :data/id keyword?)
+(spec/def :data/title string?)
+(spec/def :data/fields (spec/map-of keyword? #{:string :number}))
+(spec/def :data/metadata (spec/keys :req-un [:data/type :data/fields] :opt-un [:data/id :data/title]))
+(spec/def :data/data :tabular-data/data)
+(spec/def :tabular-data/meta-data (spec/keys :req-un [:data/metadata :data/data]))
+
+
+(comment
+  (spec/valid? :tabular-data/meta-data meta-tabular-data)
+  (spec/valid? :tabular-data/meta-data BAD-meta-tabular-data-missing-type)
+
+  (spec/explain :tabular-data/meta-data BAD-meta-tabular-data-missing-type)
+  (spec/explain :tabular-data/meta-data BAD-meta-tabular-data-bad-field)
+
+  (expound/expound-str :tabular-data/meta-data meta-tabular-data)
+  (expound/expound :tabular-data/meta-data BAD-meta-tabular-data-missing-type)
+  (expound/expound-str :tabular-data/meta-data BAD-meta-tabular-data-missing-type)
+
+  (expound/expound :tabular-data/meta-data BAD-meta-tabular-data-bad-field)
+  (def error (expound/expound-str :tabular-data/meta-data BAD-meta-tabular-data-bad-field))
+
+
+  ; we can use re-com/alert-list data structure to display spec failures in place of the
+  ; expected UI, using the "NEW" alert-list ui-component
+
+  (def alert-msg {:id 0 :alert-type :danger :heading "Parameter Error (Spec Failed)"
+                  :body error :padding "8px" :closeable? false})
+
+  ())
 
 
 (def some-other-tabular [{:id "Page A" :a 4000 :b 2400 :c 2400}

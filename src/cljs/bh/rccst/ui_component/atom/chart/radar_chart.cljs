@@ -1,6 +1,10 @@
 (ns bh.rccst.ui-component.atom.chart.radar-chart
   (:require [bh.rccst.ui-component.atom.chart.utils :as utils]
             [bh.rccst.ui-component.utils.color :as color]
+            [bh.rccst.ui-component.utils.helpers :as h]
+            [bh.rccst.ui-component.utils.locals :as l]
+            [bh.rccst.ui-component.atom.chart.wrapper-2 :as wrapper]
+            [bh.rccst.ui-component.utils.example-data :as example-data]
             [bh.rccst.ui-component.atom.chart.wrapper :as c]
             [bh.rccst.ui-component.utils :as ui-utils]
             [re-com.core :as rc]
@@ -13,18 +17,41 @@
 
 (log/info "bh.rccst.ui-component.atom.chart.radar-chart")
 
+(def source-code '[:> RadarChart {:width 400 :height 400 :outerRadius "75%" :data @data}
+                   (utils/non-gridded-chart-components component-id)
 
-(def sample-data (r/atom {:metadata {:type   :tabular
-                                     :id     :subject
-                                     :domain :fullMark
-                                     :fields {:subject :string :A :number :B :number :fullMark :number}}
-                          :data     [{:subject "Math" :A 120 :B 110 :fullMark 150}
-                                     {:subject "Chinese" :A 98 :B 130 :fullMark 150}
-                                     {:subject "English" :A 100 :B 110 :fullMark 150}
-                                     {:subject "History" :A 77 :B 81 :fullMark 150}
-                                     {:subject "Economics" :A 99 :B 140 :fullMark 150}
-                                     {:subject "Literature" :A 98 :B 105 :fullMark 150}]}))
+                   [:> PolarGrid]
+                   [:> PolarAngleAxis {:dataKey :subject}]
+                   [:> PolarRadiusAxis {:angle "30" :domain [0, 150]}]
+                   [:> Radar {:name        "Mark"
+                              :dataKey     :A
+                              :fill        "#8884d8"
+                              :stroke      "#8884d8"
+                              :fillOpacity 0.5}]])
 
+(defn radar-data [data]
+  (let [d (:data data)
+        meta (:metadata data)
+        fields (get-in data [:metadata :fields])]
+    (merge
+      {:metadata (assoc meta :domain :fullMark
+                             :fields (assoc (dissoc fields :tv :amt) :fullMark :number))}
+      {:data (map #(assoc % :fullmark 10000) (map #(dissoc % :tv :amt) d))})))
+
+
+(def sample-data (radar-data example-data/meta-tabular-data))
+
+
+;(def sample-data {:metadata {:type   :tabular
+;                             :id     :subject
+;                             :domain :fullMark
+;                             :fields {:subject :string :A :number :B :number :fullMark :number}}
+;                  :data     [{:subject "Math" :A 120 :B 110 :fullMark 150}
+;                             {:subject "Chinese" :A 98 :B 130 :fullMark 150}
+;                             {:subject "English" :A 100 :B 110 :fullMark 150}
+;                             {:subject "History" :A 77 :B 81 :fullMark 150}
+;                             {:subject "Economics" :A 99 :B 140 :fullMark 150}
+;                             {:subject "Literature" :A 98 :B 105 :fullMark 150}]})
 
 (defn- get-range-across-fields [data]
   (let [source-data (get-in @data [:data])
@@ -72,30 +99,20 @@
 > [tabular-data]()
   "
   [data]
-  (merge (domain-range data)
-    (->> (get-in @data [:metadata :fields])
-      (filter (fn [[k v]] (= :number v)))
-      keys
-      (map-indexed (fn [idx a]
-                     {a {:include     true
-                         :name        a
-                         :fill        (color/get-color idx)
-                         :stroke      (color/get-color idx)
-                         :fillOpacity 0.6}}))
-      (into {}))))
-
-
-(def source-code '[:> RadarChart {:width 400 :height 400 :outerRadius "75%" :data @data}
-                   (utils/non-gridded-chart-components component-id)
-
-                   [:> PolarGrid]
-                   [:> PolarAngleAxis {:dataKey :subject}]
-                   [:> PolarRadiusAxis {:angle "30" :domain [0, 150]}]
-                   [:> Radar {:name        "Mark"
-                              :dataKey     :A
-                              :fill        "#8884d8"
-                              :stroke      "#8884d8"
-                              :fillOpacity 0.5}]])
+  ;(log/info "localconfig: " data)
+  (let [ret (merge (domain-range data)
+              (->> (get-in @data [:metadata :fields])
+                (filter (fn [[k v]] (= :number v)))
+                keys
+                (map-indexed (fn [idx a]
+                               {a {:include     true
+                                   :name        a
+                                   :fill        (color/get-color idx)
+                                   :stroke      (color/get-color idx)
+                                   :fillOpacity 0.6}}))
+                (into {})))]
+    ;(log/info "local-config" ret)
+    ret))
 
 
 (defn config
@@ -117,6 +134,7 @@
   - data : (atom) metadata wrapped data  to display
   "
   [component-id data]
+  ;(log/info "configgg : " @data)
   (-> ui-utils/default-pub-sub
     (merge
       utils/default-config
@@ -128,6 +146,7 @@
 
 
 (defn- radar-config [component-id label path position]
+  ;(log/info "radarr config")
   [rc/v-box :src (rc/at)
    :gap "5px"
    :children [[utils/boolean-config component-id label (conj path :include)]
@@ -137,6 +156,7 @@
 
 
 (defn- make-radar-config [component-id data]
+  ;(log/info "make radar config")
   (->> (get-in @data [:metadata :fields])
     (filter (fn [[k v]] (= :number v)))
     keys
@@ -153,6 +173,7 @@
   - data : (atom) data to display (may be used by the standard configuration components for thins like axes, etc.\n  - config : (atom) holds all the configuration settings made by the user
   "
   [data component-id]
+  ;(log/info "radar config panel")
 
   [rc/v-box :src (rc/at)
    :gap "10px"
@@ -169,23 +190,26 @@
                :children (make-radar-config component-id data)]]])
 
 
-(defn- make-radar-display [component-id data subscriptions]
-  (->> (get-in @data [:metadata :fields])
-    (filter (fn [[_ v]] (= :number v)))
-    keys
-    (map (fn [a]
-           (if (ui-utils/resolve-sub subscriptions [a :include])
-             [:> Radar {:name        (ui-utils/resolve-sub subscriptions [a :name])
-                        :dataKey     a
-                        :fill        (ui-utils/resolve-sub subscriptions [a :fill])
-                        :stroke      (ui-utils/resolve-sub subscriptions [a :stroke])
-                        :fillOpacity (ui-utils/resolve-sub subscriptions [a :fillOpacity])}]
-             [])))
-    (remove empty?)
-    (into [:<>])))
+(defn- make-radar-display [data subscriptions isAnimationActive?]
+  ;(log/info "make-radar-display: " subscriptions)
+  (let [ret (->> (get-in data [:metadata :fields])
+              (filter (fn [[_ v]] (= :number v)))
+              keys
+              (map (fn [a]
+                     (if (ui-utils/resolve-sub subscriptions [a :include])
+                       [:> Radar {:name        (ui-utils/resolve-sub subscriptions [a :name])
+                                  :dataKey     a
+                                  :fill        (ui-utils/resolve-sub subscriptions [a :fill])
+                                  :stroke      (ui-utils/resolve-sub subscriptions [a :stroke])
+                                  :fillOpacity (ui-utils/resolve-sub subscriptions [a :fillOpacity])}]
+                       [])))
+              (remove empty?)
+              (into [:<>]))]
+    ;(log/info "ret" ret)
+    ret))
 
 
-(defn- component-panel
+(defn- component*
   "the chart to draw, taking cues from the settings of the configuration panel
 
   ---
@@ -193,71 +217,43 @@
   - data : (atom) any data used by the component's ui
   - component-id : (string) unique identifier for this specific widget
   "
-  [data component-id container-id ui]
-  (let [container     (ui-utils/subscribe-local component-id [:container])
-        subscriptions (ui-utils/build-subs component-id (local-config data))]
+  [& {:keys [data component-id container-id
+             subscriptions isAnimationActive?]
+      :as params}]
 
-    (fn [data component-id container-id ui]
-      [:> ResponsiveContainer
-       [:> RadarChart {:data (get @data :data)}
-        [:> PolarGrid]
-        [:> PolarAngleAxis {:dataKey :subject}]
-        [:> PolarRadiusAxis {:angle "30" :domain (ui-utils/resolve-sub subscriptions [:domain])}]
+  ;(log/info "radar component* : " data " // " subscriptions)
+  (let [d (if (empty? data) [] (get data :data))]
 
-        (utils/non-gridded-chart-components component-id ui)
+    [:> ResponsiveContainer
+     [:> RadarChart {:data d}
+      [:> PolarGrid]
+      [:> PolarAngleAxis {:dataKey :name}]
+      [:> PolarRadiusAxis {:angle "30" :domain (ui-utils/resolve-sub subscriptions [:domain])}]
 
-        (make-radar-display component-id data subscriptions)]])))
+      (utils/non-gridded-chart-components component-id {})
 
+      (make-radar-display data subscriptions isAnimationActive?)]]))
 
-(defn configurable-component
-  "the chart to draw, taking cues from the settings of the configuration panel
+(defn component [& {:keys [data config-data component-id container-id
+                           data-panel config-panel] :as params}]
 
-  the component creates its own ID (a random-uuid) to hold the local state. This way multiple charts
-  can be placed inside the same outer container/composite
+  ;(log/info "Radar component-2" params)
 
-  ---
-
-  - data : (atom) any data shown by the component's ui
-  - :component-id : (string) name of this chart
-  - container-id : (string) name of the container this chart is inside of
-  "
-  [& {:keys [data component-id container-id ui]}]
-  [c/base-chart
+  [wrapper/base-chart
    :data data
-   :config (config component-id data)
+   :config-data config-data
    :component-id component-id
-   :container-id (or container-id "")
-   :data-panel utils/dummy-data-panel
+   :container-id container-id
+   :component* component*
+   :component-panel wrapper/component-panel
+   :data-panel data-panel
    :config-panel config-panel
-   :component-panel component-panel
-   :ui ui])
-
-
-(defn component
-  "the chart to draw. this variant does NOT provide a configuration panel
-
-  ---
-
-  - :data : (atom) any data shown by the component's ui
-  - :component-id : (string) name of this chart
-  - :container-id : (string) name of the container this chart is inside of
-  "
-  [& {:keys [data component-id container-id ui]}]
-  [c/base-chart
-   :data data
-   :config (config component-id data)
-   :component-id component-id
-   :container-id (or container-id "")
-   :component-panel component-panel
-   :ui ui])
-
+   :config config
+   :local-config local-config])
 
 (def meta-data {:component              component
-                :configurable-component configurable-component
-                :sources                {:data :source-type/meta-tabular}
-                :pubs                   []
-                :subs                   []})
-
+                :ports     {:data   :port/sink
+                            :config :port/sink}})
 
 
 
@@ -265,7 +261,7 @@
 ; explore the data fields
 (comment
   (def domainField :fullMark)
-  (def source-data (get-in @sample-data [:data]))
+  (def source-data (get-in sample-data [:data]))
   (reduce max (map #(domainField %) source-data))
   (let [source-data (get-in @sample-data [:data])])
 

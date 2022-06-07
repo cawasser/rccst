@@ -41,7 +41,6 @@
     ;(log/info "globe OUTER" shapes component-id)
     (fn []
       [:> Viewer {:style {:width "100%" :height "100%"}}
-       ; TODO: add another function that converts integer value to current real time
        [:> Globe {:enableLighting true}
         [:> Clock {:currentTime (.fromDate JulianDate (or @t (coerce/to-date (cljs-time/now))))}]
         (into [:<>]
@@ -55,9 +54,9 @@
 
 
 (comment
-  (def shapes example-shapes)
+  (def shapes sample-data)
 
-  (make-shape (first example-shapes))
+  (s/make-shape (first shapes))
 
 
   [:> Globe

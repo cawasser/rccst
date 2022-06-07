@@ -135,7 +135,6 @@
          [:div {:style {:width "100%" :min-height "400px"}}
           [data-config-update-example
            :widget [grid/component
-                    ; TODO: why is this a RATOM????
                     :data (r/atom widget/ui-definition)
                     :component-id component-id
                     :resizable true

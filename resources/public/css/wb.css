@@ -1289,8 +1289,6 @@ a.box:active {
   width: auto; }
   .container.is-fluid {
     max-width: none !important;
-    padding-left: 32px;
-    padding-right: 32px;
     width: 100%; }
   @media screen and (min-width: 1024px) {
     .container {
@@ -7908,8 +7906,6 @@ a.has-text-danger-dark:hover, a.has-text-danger-dark:focus {
 
 .wb-v-scroll-pane-overflow {
   overflow-y: auto;
-  border-left: 1px solid #b5b5b5;
-  border-bottom: 1px solid #b5b5b5;
   height: 100%; }
 
 .wb-errors .wb-error {

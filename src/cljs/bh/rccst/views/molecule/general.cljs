@@ -11,8 +11,10 @@
             [bh.rccst.views.molecule.example.composite.multi-chart-widget :as multi-chart-widget]))
 
 
-(defn catalog
-  []
+(log/info "bh.rccst.views.molecule.general")
+
+
+(defn catalog []
 
   [:div
    [chart-remote-data/example]

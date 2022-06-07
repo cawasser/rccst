@@ -8,7 +8,8 @@
             [bh.rccst.views.atom.example.chart.alt.config-structure-example :as config-structure-example]
             [bh.rccst.views.atom.example.chart.alt.config-sub-example :as config-sub-example]
             [bh.rccst.views.atom.example.chart.alt.data-tools :as data-tools]
-            [bh.rccst.views.atom.example.chart.alt.config-tools :as config-tools]))
+            [bh.rccst.views.atom.example.chart.alt.config-tools :as config-tools]
+            [bh.rccst.views.atom.example.multi-example :as me]))
 
 
 (def default-config-data {:brush false
@@ -121,14 +122,12 @@
      :default-config-data default-config-data]))
 
 
-
 (defn examples []
-  [:div
-   [data-ratom]
-   [data-structure]
-   [data-sub]
-   [config-ratom]
-   [config-structure]
-   [config-sub]])
+  [me/examples {"data-ratom" [data-ratom]
+                "data-struct"  [data-structure]
+                "data-sub"  [data-sub]
+                "config-ratom"  [config-ratom]
+                "config-struct"  [config-structure]
+                "config-sub"  [config-sub]}])
 
 

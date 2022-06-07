@@ -1,54 +1,54 @@
 (ns bh.rccst.ui-component.atom.chart.sankey-chart
   (:require [bh.rccst.ui-component.atom.chart.utils :as utils]
-            [bh.rccst.ui-component.utils.example-data :as data]
-            [bh.rccst.ui-component.atom.chart.wrapper :as c]
+            [bh.rccst.ui-component.atom.chart.wrapper-2 :as wrapper]
             [bh.rccst.ui-component.utils :as ui-utils]
-            ["recharts" :refer [ResponsiveContainer Sankey Tooltip Layer Rectangle]]
+            [bh.rccst.ui-component.utils.example-data :as data]
+            [bh.rccst.ui-component.utils.color :as c]
+            ["recharts" :refer [ResponsiveContainer Sankey Tooltip Layer Rectangle Layer]]
             [re-com.core :as rc]
-            [reagent.core :as r]))
+            [reagent.core :as r]
+            [taoensso.timbre :as log]))
+
+
+(log/info "bh.rccst.ui-component.atom.chart.sankey-chart-2")
 
 
 (def sample-data
   "the Sankey Chart works best with \"directed acyclic graph data\" so we return the dag-data from utils"
-  (r/atom data/dag-data))
+  data/dag-data)
+
+(def dummy-config-data {:nodes {"Visit"            {:include true :fill "#ff0000" :stroke "#ff0000"}
+                                "Direct-Favourite" {:include true :fill "#00ff00" :stroke "#00ff00"}
+                                "Page-Click"       {:include true :fill "#0000ff" :stroke "#0000ff"}
+                                "Detail-Favourite" {:include true :fill "#12a4a4" :stroke "#12a4a4"}
+                                "Lost"             {:include true :fill "#ba7b47" :stroke "#ba7b47"}}
+                        :links {"Visit"            {:fill "#ff000040"}
+                                "Direct-Favourite" {:fill "#00ff0040"}
+                                "Page-Click"       {:fill "#0000ff40"}
+                                "Detail-Favourite" {:fill "#12a4a440"}
+                                "Lost"             {:fill "#ba7b4740"}}})
 
 
-(defn config
-  "constructs the configuration panel for the chart's configurable properties. This is specific to
-  this being a line-chart component (see [[local-config]]).
+(defn local-config [data]
+  ;(log/info "local-config" @data)
 
-  Merges together the configuration needed for:
+  {:isAnimationActive true
+   :tooltip           {:include true}
+   :node              {:fill "#77c878" :stroke "#000000"}
+   :link              {:stroke "#77c878" :curve 0.5}})
 
-  1. line charts
-  2. pub/sub between components of a container
-  3. `default-config` for all Rechart-based types
-  4. the `tab-panel` for view/edit configuration properties and data
-  5. sets properties of the default-config (local config properties are just set inside [[local-config]])
-  6. sets meta-data for properties this component publishes (`:pub`) or subscribes (`:sub`)
 
-  ---
-
-  - component-id : (string) unique id of the chart
-  "
-  [component-id data]
+(defn config [component-id data]
   (merge
     ui-utils/default-pub-sub
+    (local-config data)
     {:tab-panel {:value     (keyword component-id "config")
-                 :data-path [:containers (keyword component-id) :tab-panel]}
-     :tooltip   {:include true}
-     :node      {:fill "#77c878" :stroke "#000000"}
-     :link      {:stroke "#77c878" :curve 0.5}}))
+                 :data-path [:containers (keyword component-id) :tab-panel]}}))
 
 
-(defn- config-panel
-  "the panel of configuration controls
+(defn config-panel [data component-id]
+  ;(log/info "config-panel" data "//" component-id)
 
-  ---
-
-  - _ : (ignored)
-  - component-id : (string) unique identifier for this chart instance
-  "
-  [_ component-id]
   [rc/v-box :src (rc/at)
    :width "400px"
    :height "500px"
@@ -94,14 +94,21 @@
 > See [here](https://cljdoc.org/d/reagent/reagent/1.1.0/doc/tutorials/react-features#hooks)
 > for details on how the Reagent/React interop work for this
 "
-  [containerWidth fill stroke props]
+  [containerWidth props]
   (let [{x                           "x"
          y                           "y"
          width                       "width"
          height                      "height"
          index                       "index"
          {name "name" value "value"} "payload"} (js->clj props)
-        isOut (< containerWidth (+ x width 30 6))]
+        isOut  (< containerWidth (+ x width 30 6))
+
+        c      (get (:nodes dummy-config-data) name)
+        fill   (:fill c)
+        stroke (:stroke c)]
+
+    (log/info "complex-node" name containerWidth fill stroke props)
+
     (r/as-element
       [:> Layer {:key (str "CustomNode$" index)}
        [:> Rectangle {:x x :y y :width width :height height :fill fill :stroke stroke}]
@@ -120,81 +127,116 @@
         (str value "k")]])))
 
 
-(defn- component-panel
-  "the chart to draw, taking cues from the settings of the configuration panel
 
-  ---
+(defn- make-svg-string [sourceX, targetX,
+                        sourceY, targetY,
+                        sourceControlX, targetControlX,
+                        linkWidth]
+  (str "M" sourceX ", " (+ sourceY (/ linkWidth 2))
 
-  - data : (atom) any data shown by the component's ui
-  - component-id : (string) unique identifier for this chart instance within this container
-  - container-id : (string) name of the container this chart is inside of
-  "
-  [data component-id container-ui ui]
-  (let [tooltip?    (ui-utils/subscribe-local component-id [:tooltip :include])
-        node-fill   (ui-utils/subscribe-local component-id [:node :fill])
-        node-stroke (ui-utils/subscribe-local component-id [:node :stroke])
-        link-stroke (ui-utils/subscribe-local component-id [:link :stroke])
-        curve       (ui-utils/subscribe-local component-id [:link :curve])]
+    "C" sourceControlX ", " (+ sourceY (/ linkWidth 2)) ", "
+    targetControlX ", " (+ targetY (/ linkWidth 2)) ", "
+    targetX ", " (+ targetY (/ linkWidth 2))
 
-    (fn [data component-id container-ui ui]
-      [:> ResponsiveContainer
-       [:> Sankey
-        {:node          (partial complex-node 500 @node-fill @node-stroke)
-         :data          @data
-         :margin        {:top 20 :bottom 20 :left 20 :right 20}
-         :nodeWidth     10
-         :nodePadding   60
-         :linkCurvature @curve
-         :iterations    64
-         :link          {:stroke @link-stroke}}
-        (when @tooltip? [:> Tooltip])]])))
+    "L" targetX ", " (- targetY (/ linkWidth 2)) ", "
+
+    "C" targetControlX ", " (- targetY (/ linkWidth 2)) ", "
+    sourceControlX ", " (- sourceY (/ linkWidth 2)) ","
+    sourceX ", " (- sourceY (/ linkWidth 2))
+
+    "Z"))
 
 
-(defn configurable-component
-  "the chart to draw, taking cues from the settings of the configuration panel
+(defn- complex-link [props]
+  (let [{:keys [sourceX, targetX,
+                sourceY, targetY,
+                sourceControlX, targetControlX,
+                linkWidth,
+                index, payload]} (js->clj props :keywordize-keys true)
+        color-from (:fill (get (:nodes dummy-config-data) (get-in payload [:source :name])))
+        color-to (:fill (get (:nodes dummy-config-data) (get-in payload [:target :name])))
+        c-from (-> color-from
+                 c/hex->rgba
+                 (assoc :a 0.5)
+                 c/rgba-map->js-function)
+        c-mid  (-> color-from
+                 c/hex->rgba
+                 (assoc :a 0.2)
+                 c/rgba-map->js-function)
+        c-to (-> color-to
+               c/hex->rgba
+               (assoc :a 0.3)
+               c/rgba-map->js-function)]
 
-  ---
+    ;(log/info "complex-link (props)" (js->clj props :keywordize-keys true))
 
-  - data : (atom) any data shown by the component's ui
-  - component-id : (string) unique identifier of this chart insatnce within this container
-  - container-id : (string) name of the container this chart is inside of
-  "
-  [& {:keys [data component-id container-id ui]}]
-  [c/base-chart
+    (r/as-element
+      [:> Layer {:key (str "CustomLink$" index)}
+
+       [:defs
+        [:linearGradient {:id (str "linkGradient$" index)}
+         [:stop {:offset "0%" :stopColor c-from}]
+         [:stop {:offset "30%" :stopColor c-mid}]
+         [:stop {:offset "100%" :stopColor c-to}]]]
+
+       [:path {:d           (make-svg-string
+                              sourceX, targetX,
+                              sourceY, targetY,
+                              sourceControlX, targetControlX,
+                              linkWidth)
+               ;:fill        c-from
+               :fill        (str "url(#linkGradient$" index ")")
+               :strokeWidth 0}]])))
+
+
+
+(comment
+  (-> "#ff00ff" c/hex->rgba (assoc :a 0.5) c/rgba-map->js-function)
+
+  ())
+
+(defn- component* [& {:keys [data component-id container-id
+                             subscriptions]
+                      :as   params}]
+
+  ;(log/info "component-star" component-id "//" data "//" subscriptions)
+
+  (let [tooltip?    (ui-utils/resolve-sub subscriptions [:tooltip :include])
+        curve       (ui-utils/resolve-sub subscriptions [:link :curve])]
+
+    [:div "sankey chart"]
+    [:> ResponsiveContainer
+     [:> Sankey
+      {:node          (partial complex-node 700)
+       :data          data
+       :margin        {:top 20 :bottom 20 :left 20 :right 20}
+       :nodeWidth     10
+       :nodePadding   60
+       :linkCurvature curve
+       :iterations    64
+       :link          complex-link}
+      (when tooltip? [:> Tooltip])]]))
+
+
+(defn component [& {:keys [data config-data component-id container-id
+                           data-panel config-panel] :as params}]
+  [wrapper/base-chart
    :data data
-   :config (config component-id data)
+   :config-data config-data
    :component-id component-id
-   :container-id (or container-id "")
-   :data-panel utils/dag-data-panel
+   :container-id container-id
+   :component* component*
+   :component-panel wrapper/component-panel
+   :data-panel data-panel
    :config-panel config-panel
-   :component-panel component-panel
-   :ui ui])
+   :config config
+   :local-config local-config])
 
 
-(defn component
-  "the chart to draw. this variant does NOT provide a configuration panel
-
-  ---
-
-  - data : (atom) any data shown by the component's ui
-  - component-id : (string) unique identifier of this chart instance within this container
-  - container-id : (string) name of the container this chart is inside of
-  "
-  [& {:keys [data component-id container-id ui]}]
-  [c/base-chart
-   :data data
-   :config (config component-id data)
-   :component-id component-id
-   :container-id (or container-id "")
-   :component-panel component-panel
-   :ui ui])
-
-
-(def meta-data {:component              component
-                :configurable-component configurable-component
-                :sources                {:data :source-type/meta-dag}
-                :pubs                   []
-                :subs                   []})
+(def meta-data {:component component
+                :sources   {:data :source-type/meta-dag}
+                :pubs      []
+                :subs      []})
 
 
 
