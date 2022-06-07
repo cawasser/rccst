@@ -3,6 +3,7 @@
             [bh.rccst.ui-component.atom.chart.wrapper-2 :as wrapper]
             [bh.rccst.ui-component.utils :as ui-utils]
             [bh.rccst.ui-component.utils.example-data :as data]
+            [bh.rccst.ui-component.utils.color :as c]
             ["recharts" :refer [ResponsiveContainer Sankey Tooltip Layer Rectangle Layer]]
             [re-com.core :as rc]
             [reagent.core :as r]
@@ -152,46 +153,45 @@
                 sourceControlX, targetControlX,
                 linkWidth,
                 index, payload]} (js->clj props :keywordize-keys true)
-
-        c (get (:links dummy-config-data) (get-in payload [:source :name]))]
-
+        color-from (:fill (get (:nodes dummy-config-data) (get-in payload [:source :name])))
+        color-to (:fill (get (:nodes dummy-config-data) (get-in payload [:target :name])))
+        c-from (-> color-from
+                 c/hex->rgba
+                 (assoc :a 0.5)
+                 c/rgba-map->js-function)
+        c-mid  (-> color-from
+                 c/hex->rgba
+                 (assoc :a 0.2)
+                 c/rgba-map->js-function)
+        c-to (-> color-to
+               c/hex->rgba
+               (assoc :a 0.3)
+               c/rgba-map->js-function)]
 
     ;(log/info "complex-link (props)" (js->clj props :keywordize-keys true))
-    ;(log/info "complex-link" sourceX, targetX,
-    ;  sourceY, targetY,
-    ;  sourceControlX, targetControlX,
-    ;  linkWidth,
-    ;  index)
-
-    (log/info "complex-link"
-      payload
-      ;"//" (make-svg-string
-      ;  sourceX, targetX,
-      ;  sourceY, targetY,
-      ;  sourceControlX, targetControlX,
-      ;  linkWidth)
-      "//" c)
-
 
     (r/as-element
       [:> Layer {:key (str "CustomLink$" index)}
+
+       [:defs
+        [:linearGradient {:id (str "linkGradient$" index)}
+         [:stop {:offset "0%" :stopColor c-from}]
+         [:stop {:offset "30%" :stopColor c-mid}]
+         [:stop {:offset "100%" :stopColor c-to}]]]
+
        [:path {:d           (make-svg-string
                               sourceX, targetX,
                               sourceY, targetY,
                               sourceControlX, targetControlX,
                               linkWidth)
-               :fill        (:fill c)
+               ;:fill        c-from
+               :fill        (str "url(#linkGradient$" index ")")
                :strokeWidth 0}]])))
 
-(comment
-  (def payload {:source {:y 12.893286910217379, :sourceNodes [], :dx 10,
-                         :targetLinks [1 0], :name "Visit", :value 357898.3, :dy 272,
-                         :sourceLinks [], :targetNodes [1 2], :depth 0, :x 0},
-                :target {:y 389.16652020979143, :sourceNodes [0], :dx 10, :targetLinks [],
-                         :name "Direct-Favourite", :value 3728.3, :dy 2.8334797902085596,
-                         :sourceLinks [0], :targetNodes [], :depth 2, :x 1264},
-                :value 3728.3, :dy 2.8334797902085596, :sy 269.1665202097915, :ty 0})
 
+
+(comment
+  (-> "#ff00ff" c/hex->rgba (assoc :a 0.5) c/rgba-map->js-function)
 
   ())
 
@@ -202,9 +202,6 @@
   ;(log/info "component-star" component-id "//" data "//" subscriptions)
 
   (let [tooltip?    (ui-utils/resolve-sub subscriptions [:tooltip :include])
-        ;node-fill   (ui-utils/resolve-sub subscriptions [:node :fill])
-        ;node-stroke (ui-utils/resolve-sub subscriptions [:node :stroke])
-        link-stroke (ui-utils/resolve-sub subscriptions [:link :stroke])
         curve       (ui-utils/resolve-sub subscriptions [:link :curve])]
 
     [:div "sankey chart"]
