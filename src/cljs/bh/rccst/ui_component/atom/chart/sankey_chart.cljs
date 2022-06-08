@@ -2,8 +2,8 @@
   (:require [bh.rccst.ui-component.atom.chart.utils :as utils]
             [bh.rccst.ui-component.atom.chart.wrapper-2 :as wrapper]
             [bh.rccst.ui-component.utils :as ui-utils]
-            [bh.rccst.ui-component.utils.example-data :as data]
             [bh.rccst.ui-component.utils.color :as c]
+            [bh.rccst.ui-component.utils.example-data :as data]
             ["recharts" :refer [ResponsiveContainer Sankey Tooltip Layer Rectangle Layer]]
             [re-com.core :as rc]
             [reagent.core :as r]
@@ -127,7 +127,6 @@
         (str value "k")]])))
 
 
-
 (defn- make-svg-string [sourceX, targetX,
                         sourceY, targetY,
                         sourceControlX, targetControlX,
@@ -147,37 +146,92 @@
     "Z"))
 
 
-(defn- complex-link [props]
+(defn color-source->white [index payload]
+  (let [color-from (:fill (get (:nodes dummy-config-data) (get-in payload [:source :name])))
+        c-from     (-> color-from
+                     c/hex->rgba
+                     (assoc :a 0.5)
+                     c/rgba-map->js-function)
+        c-to       (-> color-from
+                     c/hex->rgba
+                     (assoc :a 0.05)
+                     c/rgba-map->js-function)]
+    [:defs
+     [:linearGradient {:id (str "linkGradient$" index)}
+      [:stop {:offset "0%" :stopColor c-from}]
+      [:stop {:offset "100%" :stopColor c-to}]]]))
+
+
+(defn color-white->target [index payload]
+  (let [color-to (:fill (get (:nodes dummy-config-data) (get-in payload [:target :name])))
+        c-from     (-> color-to
+                     c/hex->rgba
+                     (assoc :a 0.05)
+                     c/rgba-map->js-function)
+        c-to       (-> color-to
+                     c/hex->rgba
+                     (assoc :a 0.5)
+                     c/rgba-map->js-function)]
+    [:defs
+     [:linearGradient {:id (str "linkGradient$" index)}
+      [:stop {:offset "0%" :stopColor c-from}]
+      [:stop {:offset "100%" :stopColor c-to}]]]))
+
+(defn color-source->target [index payload]
+  (let [color-from (:fill (get (:nodes dummy-config-data) (get-in payload [:source :name])))
+        color-to   (:fill (get (:nodes dummy-config-data) (get-in payload [:target :name])))
+        c-from     (-> color-from
+                     c/hex->rgba
+                     (assoc :a 0.5)
+                     c/rgba-map->js-function)
+        c-mid      (-> color-from
+                     c/hex->rgba
+                     (assoc :a 0.2)
+                     c/rgba-map->js-function)
+        c-to       (-> color-to
+                     c/hex->rgba
+                     (assoc :a 0.3)
+                     c/rgba-map->js-function)]
+    [:defs
+     [:linearGradient {:id (str "linkGradient$" index)}
+      [:stop {:offset "0%" :stopColor c-from}]
+      [:stop {:offset "30%" :stopColor c-mid}]
+      [:stop {:offset "100%" :stopColor c-to}]]]))
+
+
+(defn- complex-link [link-color-fn props]
   (let [{:keys [sourceX, targetX,
                 sourceY, targetY,
                 sourceControlX, targetControlX,
                 linkWidth,
-                index, payload]} (js->clj props :keywordize-keys true)
-        color-from (:fill (get (:nodes dummy-config-data) (get-in payload [:source :name])))
-        color-to (:fill (get (:nodes dummy-config-data) (get-in payload [:target :name])))
-        c-from (-> color-from
-                 c/hex->rgba
-                 (assoc :a 0.5)
-                 c/rgba-map->js-function)
-        c-mid  (-> color-from
-                 c/hex->rgba
-                 (assoc :a 0.2)
-                 c/rgba-map->js-function)
-        c-to (-> color-to
-               c/hex->rgba
-               (assoc :a 0.3)
-               c/rgba-map->js-function)]
+                index, payload]} (js->clj props :keywordize-keys true)]
+    ;color-from (:fill (get (:nodes dummy-config-data) (get-in payload [:source :name])))
+    ;color-to (:fill (get (:nodes dummy-config-data) (get-in payload [:target :name])))
+    ;c-from (-> color-from
+    ;         c/hex->rgba
+    ;         (assoc :a 0.5)
+    ;         c/rgba-map->js-function)
+    ;c-mid  (-> color-from
+    ;         c/hex->rgba
+    ;         (assoc :a 0.2)
+    ;         c/rgba-map->js-function)
+    ;c-to (-> color-to
+    ;       c/hex->rgba
+    ;       (assoc :a 0.3)
+    ;       c/rgba-map->js-function)]
 
     ;(log/info "complex-link (props)" (js->clj props :keywordize-keys true))
 
     (r/as-element
       [:> Layer {:key (str "CustomLink$" index)}
 
-       [:defs
-        [:linearGradient {:id (str "linkGradient$" index)}
-         [:stop {:offset "0%" :stopColor c-from}]
-         [:stop {:offset "30%" :stopColor c-mid}]
-         [:stop {:offset "100%" :stopColor c-to}]]]
+       (link-color-fn index payload)
+
+       ;[:defs
+       ; [:linearGradient {:id (str "linkGradient$" index)}
+       ;  [:stop {:offset "0%" :stopColor c-from}]
+       ;  [:stop {:offset "30%" :stopColor c-mid}]
+       ;  [:stop {:offset "100%" :stopColor c-to}]]]
 
        [:path {:d           (make-svg-string
                               sourceX, targetX,
@@ -189,20 +243,18 @@
                :strokeWidth 0}]])))
 
 
-
-(comment
-  (-> "#ff00ff" c/hex->rgba (assoc :a 0.5) c/rgba-map->js-function)
-
-  ())
-
 (defn- component* [& {:keys [data component-id container-id
+                             link-color-fn
                              subscriptions]
                       :as   params}]
 
-  ;(log/info "component-star" component-id "//" data "//" subscriptions)
+  (log/info "component-star" component-id
+    ;"//" data
+    ;"//" subscriptions
+    "//" link-color-fn)
 
-  (let [tooltip?    (ui-utils/resolve-sub subscriptions [:tooltip :include])
-        curve       (ui-utils/resolve-sub subscriptions [:link :curve])]
+  (let [tooltip? (ui-utils/resolve-sub subscriptions [:tooltip :include])
+        curve    (ui-utils/resolve-sub subscriptions [:link :curve])]
 
     [:div "sankey chart"]
     [:> ResponsiveContainer
@@ -214,12 +266,16 @@
        :nodePadding   60
        :linkCurvature curve
        :iterations    64
-       :link          complex-link}
+       :link          (partial complex-link (or link-color-fn color-white->target))}
       (when tooltip? [:> Tooltip])]]))
 
 
 (defn component [& {:keys [data config-data component-id container-id
+                           extra-params
                            data-panel config-panel] :as params}]
+
+  (log/info "component" params)
+
   [wrapper/base-chart
    :data data
    :config-data config-data
@@ -230,7 +286,8 @@
    :data-panel data-panel
    :config-panel config-panel
    :config config
-   :local-config local-config])
+   :local-config local-config
+   :extra-params extra-params])
 
 
 (def meta-data {:component component
