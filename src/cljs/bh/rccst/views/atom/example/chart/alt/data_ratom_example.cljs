@@ -41,21 +41,38 @@
                          title description
                          sample-data data-tools
                          source-code
-                         component data-panel config-panel]}]
+                         component data-panel config-panel] :as params}]
   (let [component-id (utils/path->keyword container-id "chart")
-        data         (r/atom sample-data)]
+        data         (r/atom sample-data)
+        input-params (assoc params
+                       :data data
+                       :component-id component-id
+                       :component (partial data-update-example component sample-data))
 
-    [example/component-example
-     :title title
-     :description description
-     :data data
-     :component (partial data-update-example component sample-data)
-     :extra-params {:data-tools data-tools
-                    :data-panel data-panel
-                    :config-panel config-panel}
-     :container-id container-id
-     :component-id component-id
-     :source-code source-code]))
+        ret (reduce into [example/component-example] (seq input-params))]
+
+    (log/info "example" ret)
+      ;"//////" params
+      ;"//////" input-params)
+
+    ret))
+    ;[example/component-example
+    ; :title title
+    ; :description description
+    ; :data data
+    ; :component (partial data-update-example component sample-data)
+    ; :extra-params {:data-tools data-tools
+    ;                :data-panel data-panel
+    ;                :config-panel config-panel}
+    ; :container-id container-id
+    ; :component-id component-id
+    ; :source-code source-code]))
+
+(comment
+  (def input-params {:dummy "dummy"})
+  (reduce into [example/component-example] (seq input-params))
+
+  ())
 
 
 
