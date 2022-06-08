@@ -36,7 +36,7 @@
    :component chart/component
    :data-panel chart-utils/dag-data-panel
    :config-panel chart/config-panel
-   :link-color-fn chart/color-source->target])
+   :link-color-fn chart/color-white->target])
 
 
 (defn- data-structure []
@@ -52,7 +52,8 @@
    :source-code chart/source-code
    :component chart/component
    :data-panel chart-utils/dag-data-panel
-   :config-panel chart/config-panel])
+   :config-panel chart/config-panel
+   :link-color-fn chart/color-source->white])
 
 
 (defn data-sub []

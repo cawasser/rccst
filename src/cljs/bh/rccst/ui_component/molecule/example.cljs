@@ -13,23 +13,28 @@
                                    source-code
                                    extra-classes] :as params}]
 
-  (log/info "component-example" params)
-
   (ui-utils/init-container component-id)
 
-  (acu/demo
-    title
-    description
-    [layout/centered (or extra-classes {})
-     ;;
-     ;; NOTE: the :height MUST be specified here since the ResponsiveContainer down in bowels of the chart needs a height
-     ;; in order to actually draw the Recharts components. just saying "100%" doesn't work, since the
-     ;; that really means "be as big as you need" and ResponsiveContainer then doesn't know what to do.
-     ;;
-     [:div.component-example {:style {:width "100%" :height "700px"}}
-      (reduce into [component] (seq params))]]
+  (let [input-params (dissoc params :title :sample-data :description :extra-classes :source-code :component)
+        paramed-component (reduce into [component] (seq input-params))]
 
-    source-code))
+    ;(log/info "component-example" params
+      ;"////" input-params
+      ;"////" paramed-component
+
+    (acu/demo
+      title
+      description
+      [layout/centered (or extra-classes {})
+       ;;
+       ;; NOTE: the :height MUST be specified here since the ResponsiveContainer down in bowels of the chart needs a height
+       ;; in order to actually draw the Recharts components. just saying "100%" doesn't work, since the
+       ;; that really means "be as big as you need" and ResponsiveContainer then doesn't know what to do.
+       ;;
+       [:div.component-example {:style {:width "100%" :height "700px"}}
+        paramed-component]]
+
+      source-code)))
 
 
 (defn example [& {:keys [title container-id description
@@ -81,3 +86,50 @@
 
 
   ())
+
+
+
+
+
+
+;(comment
+;  [#object[G__40345]
+;   :data-panel #object[bh$rccst$ui_component$atom$chart$utils$dag_data_panel]
+;   :component #object[G__40345]
+;   :link-color-fn #object[bh$rccst$ui_component$atom$chart$sankey_chart$color_source__GT_target]
+;   :container-id :sankey-chart-data-ratom-demo
+;   :component-id :sankey-chart-data-ratom-demo.chart
+;   :data-tools #object[bh$rccst$views$atom$example$chart$alt$data_tools$dag_data_ratom_tools]
+;   :config-panel #object[bh$rccst$ui_component$atom$chart$sankey_chart$config_panel]
+;   :data #object[reagent.ratom.RAtom {:val {:nodes [{:name "Visit"}
+;                                                    {:name "Direct-Favourite"}
+;                                                    {:name "Page-Click"}
+;                                                    {:name "Detail-Favourite"}
+;                                                    {:name "Lost"}],
+;                                            :links [{:source 0, :target 1, :value 3728.3}
+;                                                    {:source 0, :target 2, :value 354170}
+;                                                    {:source 2, :target 3, :value 62429}
+;                                                    {:source 2, :target 4, :value 291741}]}}]]
+;
+;
+;  (:data #object[reagent.ratom.RAtom {:val {:nodes [{:name "Visit"}
+;                                                    {:name "Direct-Favourite"}
+;                                                    {:name "Page-Click"}
+;                                                    {:name "Detail-Favourite"}
+;                                                    {:name "Lost"}],
+;                                            :links [{:source 0, :target 1, :value 3728.3}
+;                                                    {:source 0, :target 2, :value 354170}
+;                                                    {:source 2, :target 3, :value 62429}
+;                                                    {:source 2, :target 4, :value 291741}]}}]
+;    :config-data nil
+;    :component-id :sankey-chart-data-ratom-demo.chart
+;    :container-id :sankey-chart-data-ratom-demo
+;    :data-panel #object[bh$rccst$ui_component$atom$chart$utils$dag_data_panel]
+;    :config-panel #object[bh$rccst$ui_component$atom$chart$sankey_chart$config_panel])
+;
+;
+;  ())
+
+
+
+

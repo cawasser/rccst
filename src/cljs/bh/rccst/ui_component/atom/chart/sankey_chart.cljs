@@ -39,6 +39,7 @@
 
 
 (defn config [component-id data]
+  ;(log/info "config" component-id data)
   (merge
     ui-utils/default-pub-sub
     (local-config data)
@@ -107,7 +108,7 @@
         fill   (:fill c)
         stroke (:stroke c)]
 
-    (log/info "complex-node" name containerWidth fill stroke props)
+    ;(log/info "complex-node" name containerWidth fill stroke props)
 
     (r/as-element
       [:> Layer {:key (str "CustomNode$" index)}
@@ -164,18 +165,19 @@
 
 (defn color-white->target [index payload]
   (let [color-to (:fill (get (:nodes dummy-config-data) (get-in payload [:target :name])))
-        c-from     (-> color-to
-                     c/hex->rgba
-                     (assoc :a 0.05)
-                     c/rgba-map->js-function)
-        c-to       (-> color-to
-                     c/hex->rgba
-                     (assoc :a 0.5)
-                     c/rgba-map->js-function)]
+        c-from   (-> color-to
+                   c/hex->rgba
+                   (assoc :a 0.05)
+                   c/rgba-map->js-function)
+        c-to     (-> color-to
+                   c/hex->rgba
+                   (assoc :a 0.5)
+                   c/rgba-map->js-function)]
     [:defs
      [:linearGradient {:id (str "linkGradient$" index)}
       [:stop {:offset "0%" :stopColor c-from}]
       [:stop {:offset "100%" :stopColor c-to}]]]))
+
 
 (defn color-source->target [index payload]
   (let [color-from (:fill (get (:nodes dummy-config-data) (get-in payload [:source :name])))
@@ -205,20 +207,6 @@
                 sourceControlX, targetControlX,
                 linkWidth,
                 index, payload]} (js->clj props :keywordize-keys true)]
-    ;color-from (:fill (get (:nodes dummy-config-data) (get-in payload [:source :name])))
-    ;color-to (:fill (get (:nodes dummy-config-data) (get-in payload [:target :name])))
-    ;c-from (-> color-from
-    ;         c/hex->rgba
-    ;         (assoc :a 0.5)
-    ;         c/rgba-map->js-function)
-    ;c-mid  (-> color-from
-    ;         c/hex->rgba
-    ;         (assoc :a 0.2)
-    ;         c/rgba-map->js-function)
-    ;c-to (-> color-to
-    ;       c/hex->rgba
-    ;       (assoc :a 0.3)
-    ;       c/rgba-map->js-function)]
 
     ;(log/info "complex-link (props)" (js->clj props :keywordize-keys true))
 
@@ -226,12 +214,6 @@
       [:> Layer {:key (str "CustomLink$" index)}
 
        (link-color-fn index payload)
-
-       ;[:defs
-       ; [:linearGradient {:id (str "linkGradient$" index)}
-       ;  [:stop {:offset "0%" :stopColor c-from}]
-       ;  [:stop {:offset "30%" :stopColor c-mid}]
-       ;  [:stop {:offset "100%" :stopColor c-to}]]]
 
        [:path {:d           (make-svg-string
                               sourceX, targetX,
@@ -248,10 +230,10 @@
                              subscriptions]
                       :as   params}]
 
-  (log/info "component-star" component-id
+  ;(log/info "component-star" component-id
     ;"//" data
     ;"//" subscriptions
-    "//" link-color-fn)
+    ;"//" link-color-fn
 
   (let [tooltip? (ui-utils/resolve-sub subscriptions [:tooltip :include])
         curve    (ui-utils/resolve-sub subscriptions [:link :curve])]
@@ -270,24 +252,15 @@
       (when tooltip? [:> Tooltip])]]))
 
 
-(defn component [& {:keys [data config-data component-id container-id
-                           extra-params
-                           data-panel config-panel] :as params}]
+(defn component [& {:keys [component-id] :as params}]
 
-  (log/info "component" params)
+  ;(log/info "component" params)
 
-  [wrapper/base-chart
-   :data data
-   :config-data config-data
-   :component-id component-id
-   :container-id container-id
-   :component* component*
-   :component-panel wrapper/component-panel
-   :data-panel data-panel
-   :config-panel config-panel
-   :config config
-   :local-config local-config
-   :extra-params extra-params])
+  (let [input-params (assoc params :component-panel wrapper/component-panel
+                                   :config config
+                                   :local-config local-config
+                                   :component* component*)]
+    (reduce into [wrapper/base-chart] input-params)))
 
 
 (def meta-data {:component component

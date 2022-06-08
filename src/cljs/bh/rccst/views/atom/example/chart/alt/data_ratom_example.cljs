@@ -11,8 +11,7 @@
 
 
 (defn- data-update-example [component default-data
-                            & {:keys [data config-data container-id component-id
-                                      data-tools data-panel config-panel] :as params}]
+                            & {:keys [data data-tools] :as params}]
 
   ;(log/info "data-update-example (params)" params)
   ;(log/info "data-update-example" default-data)
@@ -23,13 +22,7 @@
    :width "100%"
    :height "100%"
    :children [[:div.chart-part {:style {:width "100%" :height "70%"}}
-               [component
-                :data data
-                :config-data config-data
-                :component-id component-id
-                :container-id container-id
-                :data-panel data-panel
-                :config-panel config-panel]]
+               (reduce into [component] params)]
               [rc/v-box
                :gap "5px"
                :style {:width "100%" :height "30%"}
@@ -51,30 +44,10 @@
 
         ret (reduce into [example/component-example] (seq input-params))]
 
-    (log/info "example" ret)
+    ;(log/info "example" ret)
       ;"//////" params
       ;"//////" input-params)
 
     ret))
-    ;[example/component-example
-    ; :title title
-    ; :description description
-    ; :data data
-    ; :component (partial data-update-example component sample-data)
-    ; :extra-params {:data-tools data-tools
-    ;                :data-panel data-panel
-    ;                :config-panel config-panel}
-    ; :container-id container-id
-    ; :component-id component-id
-    ; :source-code source-code]))
-
-(comment
-  (def input-params {:dummy "dummy"})
-  (reduce into [example/component-example] (seq input-params))
-
-  ())
-
-
-
 
 
