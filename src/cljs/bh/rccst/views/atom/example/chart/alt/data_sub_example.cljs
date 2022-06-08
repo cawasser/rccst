@@ -26,11 +26,7 @@
 
 
 
-(defn- data-update-example [& {:keys [data component
-                                      config-data data-panel
-                                      data-tools
-                                      config-panel default-data
-                                      container-id component-id] :as params}]
+(defn- data-update-example [& {:keys [data default-data component data-tools] :as params}]
   ;(log/info "data-update-example (params)" params)
   ;(log/info "data-update-example (component)" component "//" data-panel "//" config-panel "//" default-data)
 
@@ -39,13 +35,7 @@
    :width "100%"
    :height "100%"
    :children [[:div.chart-part {:style {:width "100%" :height "90%"}}
-               [component
-                :data data
-                :config-data config-data
-                :component-id component-id
-                :container-id container-id
-                :data-panel data-panel
-                :config-panel config-panel]]
+               (reduce into [component] (seq params))]
 
               [rc/v-box
                :gap "5px"
@@ -55,10 +45,12 @@
 
 
 (defn- dummy-container [component default-data
-                        & {:keys [data component-id container-id data-panel config-panel data-tools] :as params}]
-  (let [id (r/atom nil)]
+                        & {:keys [component-id container-id] :as params}]
+  (let [id           (r/atom nil)
+        input-params (assoc params :component-id (h/path->keyword component-id "chart")
+                                   :container-id component-id)]
 
-    ;(log/info "component" params)
+    (log/info "dummy-container" component "//" params)
 
     (fn []
       (when (nil? @id)
@@ -66,38 +58,22 @@
         (ui-utils/init-container-locals @id (config default-data))
         (ui-utils/dispatch-local @id [:container] container-id))
 
-      [data-update-example
-       :data data
-       :default-data default-data
-       :data-tools data-tools
-       :component component
-       :component-id (h/path->keyword component-id "chart")
-       :container-id component-id
-       :data-panel data-panel
-       :config-panel config-panel])))
+      (reduce into [component] (seq input-params)))))
 
 
 (defn example [& {:keys [container-id
-                         title description
                          sample-data default-data
-                         data-tools
-                         source-code
-                         component data-panel config-panel]}]
+                         component] :as params}]
 
-  ;(log/info "example" container-id)
+  (log/info "example" container-id params)
 
-  [e/component-example
-   :title title
-   :description description
-   :data sample-data
-   :component (partial dummy-container component default-data)
-   :container-id ""
-   :component-id container-id
-   :source-code source-code
-   :extra-params {:default-data default-data
-                  :data-tools data-tools
-                  :data-panel data-panel
-                  :config-panel config-panel}])
+  (let [input-params (assoc params :data sample-data
+                                   :component-id container-id
+                                   :container-id ""
+                                   :component (partial dummy-container component default-data)
+                                   :default-data default-data)]
+
+    (reduce into [e/component-example] (seq input-params))))
 
 
 
