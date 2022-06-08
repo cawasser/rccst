@@ -15,8 +15,7 @@
    :container  ""})
 
 
-(defn- config-update-example [& {:keys [data component config-data config-tools default-config-data
-                                        container-id component-id] :as params}]
+(defn- config-update-example [& {:keys [component config-data config-tools default-config-data] :as params}]
   ;(log/info "config-update-example (params)" params)
 
   [rc/v-box :src (rc/at)
@@ -24,11 +23,7 @@
    :width "100%"
    :height "100%"
    :children [[:div.chart-part {:style {:width "100%" :height "70%"}}
-               [component
-                :data data
-                :config-data config-data
-                :component-id component-id
-                :container-id container-id]]
+               (reduce into [component] (seq params))]
 
               [rc/v-box
                :gap "5px"
@@ -38,11 +33,12 @@
 
 
 (defn- dummy-container [component default-config-data
-                        & {:keys [data config-data config-tools component-id container-id] :as params}]
+                        & {:keys [component-id container-id] :as params}]
 
   ;(log/info "component" default-config-data "//" params)
 
-  (let [id (r/atom nil)]
+  (let [id (r/atom nil)
+        input-params (assoc params :component-id (h/path->keyword component-id "chart"))]
 
     (fn []
       (when (nil? @id)
@@ -50,35 +46,19 @@
         (ui-utils/init-container-locals @id (config default-config-data))
         (ui-utils/dispatch-local @id [:container] container-id))
 
-      [config-update-example
-       :data data
-       :component component
-       :config-data config-data
-       :config-tools config-tools
-       :default-config-data default-config-data
-       :component-id (h/path->keyword component-id "chart")
-       :container-id component-id])))
+      (reduce into [config-update-example :component component] (seq input-params)))))
 
 
 (defn example [& {:keys [container-id
-                         title description
-                         sample-data
-                         config-data default-config-data
-                         config-tools
-                         source-code
+                         sample-data default-config-data
                          component] :as params}]
 
   ;(log/info "example" params)
 
-  [e/component-example
-   :title title
-   :description description
-   :data (r/atom sample-data)
-   :extra-params {:config-data  config-data
-                  :config-tools config-tools}
-   :component (partial dummy-container component default-config-data)
-   :container-id ""
-   :component-id container-id
-   :source-code source-code])
+  (let [input-params (assoc params :data (r/atom sample-data)
+                                   :component (partial dummy-container component default-config-data)
+                                   :container-id ""
+                                   :component-id container-id)]
+    (reduce into [e/component-example] (seq input-params))))
 
 

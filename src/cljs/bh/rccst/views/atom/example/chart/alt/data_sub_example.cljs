@@ -50,7 +50,7 @@
         input-params (assoc params :component-id (h/path->keyword component-id "chart")
                                    :container-id component-id)]
 
-    (log/info "dummy-container" component "//" params)
+    ;(log/info "dummy-container" component "//" params)
 
     (fn []
       (when (nil? @id)
@@ -65,7 +65,7 @@
                          sample-data default-data
                          component] :as params}]
 
-  (log/info "example" container-id params)
+  ;(log/info "example" container-id params)
 
   (let [input-params (assoc params :data sample-data
                                    :component-id container-id

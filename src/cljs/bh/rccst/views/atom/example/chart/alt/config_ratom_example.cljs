@@ -12,7 +12,7 @@
 
 
 (defn- config-update-example [component default-config-data
-                              & {:keys [data config-data config-tools container-id component-id] :as params}]
+                              & {:keys [config-data config-tools] :as params}]
   ;(log/info "config-update-example (params)" params)
 
   [rc/v-box :src (rc/at)
@@ -20,11 +20,7 @@
    :width "100%"
    :height "100%"
    :children [[:div.chart-part {:style {:width "100%" :height "70%"}}
-               [component
-                :data data
-                :config-data config-data
-                :component-id component-id
-                :container-id container-id]]
+               (reduce into [component] (seq params))]
 
               [rc/v-box
                :gap "5px"
@@ -34,23 +30,16 @@
 
 
 (defn example [& {:keys [container-id
-                         title description
                          sample-data default-config-data
                          config-tools
                          source-code
-                         component]}]
+                         component] :as params}]
   (let [component-id (utils/path->keyword container-id "chart")
-        data (r/atom sample-data)]
+        data (r/atom sample-data)
+        input-params (assoc params :data data
+                                   :config-data (r/atom default-config-data)
+                                   :component (partial config-update-example component default-config-data))]
 
-    [example/component-example
-     :title title
-     :description description
-     :data data
-     :extra-params {:config-data (r/atom default-config-data)
-                    :config-tools config-tools}
-     :component (partial config-update-example component default-config-data)
-     :container-id container-id
-     :component-id component-id
-     :source-code source-code]))
+    (reduce into [example/component-example] (seq input-params))))
 
 

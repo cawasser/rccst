@@ -30,11 +30,7 @@
                           [data-tools data default-data]]]]])
 
 
-(defn example [& {:keys [container-id
-                         title description
-                         sample-data data-tools
-                         source-code
-                         component data-panel config-panel] :as params}]
+(defn example [& {:keys [container-id sample-data component] :as params}]
   (let [component-id (utils/path->keyword container-id "chart")
         data         (r/atom sample-data)
         input-params (assoc params
