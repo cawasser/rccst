@@ -1,8 +1,6 @@
 (ns bh.rccst.ui-component.atom.bh.data-table
   (:require [bh.rccst.ui-component.utils.example-data :as ex]
             [bh.rccst.ui-component.utils.helpers :as h]
-            [re-com.core :as rc]
-            [re-frame.core :as re-frame]
             [reagent.core :as r]
             [taoensso.timbre :as log]
 
@@ -10,25 +8,32 @@
 
 (log/info "bh.rccst.ui-component.atom.bh.data-table")
 
-(log/info "bh.rccst.ui-component.atom.bh.data-table" Table)
 
 (def sample-data ex/tabular-data)
-
 (def sample-data-2 ["string 1" "string 2" "string 3"])
+
+
+(defn- make-row-cell [data columnId]
+  ;(log/info "make-row-cell" data "//" columnId)
+
+  [:> Column {:header    (fn [] (r/as-element [:> DataCell (name columnId)]))
+              :columnKey (name columnId)
+              :cell      (fn [x]
+                           (let [{:keys [rowIndex] :as all} (js->clj x :keywordize-keys true)]
+                             (r/as-element [:> DataCell (columnId (nth data rowIndex))])))
+              :width     200}])
 
 
 (defn table [& {:keys [data config-data]}]
 
   (let [d (h/resolve-value data)
-        c (h/resolve-value config-data)]
+        c (h/resolve-value config-data)
+        columns (->> @d first keys)]
 
-    [:> Table {:rowHeight 50 :rowsCount (count sample-data-2) :width 500 :height 500 :headerHeight 50}
-     [:> Column {:header (fn [] (r/as-element [:> DataCell "Col 1"]))
-                 :cell (fn [] (r/as-element [:> DataCell "Column 1 static content"]))
-                 :width 200}]
-     [:> Column {:header (fn [] (r/as-element [:> DataCell "Col 2"]))
-                 :cell (fn [idx _]
-                        (let [{:keys [rowIndex]} (js->clj idx :keywordize-keys true)]
-                         (r/as-element [:> DataCell (nth sample-data-2 rowIndex)])))
-                 :width 200}]]))
+    ;(log/info "table " columns)
+
+    (into [:> Table {:rowHeight 30 :rowsCount (count @d) :width 500 :height 500 :headerHeight 50}]
+      (doall
+        (map #(make-row-cell @d %) columns)))))
+
 
