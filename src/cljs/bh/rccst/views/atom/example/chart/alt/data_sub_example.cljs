@@ -22,10 +22,6 @@
    :container  ""})
 
 
-
-
-
-
 (defn- data-update-example [& {:keys [data default-data component data-tools] :as params}]
   ;(log/info "data-update-example (params)" params)
   ;(log/info "data-update-example (component)" component "//" data-panel "//" config-panel "//" default-data)
@@ -58,7 +54,7 @@
         (ui-utils/init-container-locals @id (config default-data))
         (ui-utils/dispatch-local @id [:container] container-id))
 
-      (reduce into [component] (seq input-params)))))
+      (reduce into [data-update-example :component component] (seq input-params)))))
 
 
 (defn example [& {:keys [container-id

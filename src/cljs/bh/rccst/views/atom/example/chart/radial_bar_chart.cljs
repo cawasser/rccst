@@ -120,7 +120,7 @@
 > In _this_ case, we are using a subscription to handle the configuration for the chart."
      :sample-data chart/sample-data
      :source-code chart/source-code
-     :config-tools config-tools/meta-tabular-config-column-sub-tools
+     :config-tools config-tools/meta-tabular-config-row-sub-tools
      :component chart/component
      :config-data [container-id :blackboard :config-data]
      :default-config-data default-config-data]))

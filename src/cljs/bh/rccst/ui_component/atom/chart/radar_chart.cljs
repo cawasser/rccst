@@ -42,17 +42,6 @@
 (def sample-data (radar-data example-data/meta-tabular-data))
 
 
-;(def sample-data {:metadata {:type   :tabular
-;                             :id     :subject
-;                             :domain :fullMark
-;                             :fields {:subject :string :A :number :B :number :fullMark :number}}
-;                  :data     [{:subject "Math" :A 120 :B 110 :fullMark 150}
-;                             {:subject "Chinese" :A 98 :B 130 :fullMark 150}
-;                             {:subject "English" :A 100 :B 110 :fullMark 150}
-;                             {:subject "History" :A 77 :B 81 :fullMark 150}
-;                             {:subject "Economics" :A 99 :B 140 :fullMark 150}
-;                             {:subject "Literature" :A 98 :B 105 :fullMark 150}]})
-
 (defn- get-range-across-fields [data]
   (let [source-data (get-in @data [:data])
         all-values  (->> (get-in @data [:metadata :fields])
@@ -234,22 +223,18 @@
 
       (make-radar-display data subscriptions isAnimationActive?)]]))
 
-(defn component [& {:keys [data config-data component-id container-id
-                           data-panel config-panel] :as params}]
+
+(defn component [& {:keys [component-id] :as params}]
 
   ;(log/info "Radar component-2" params)
 
-  [wrapper/base-chart
-   :data data
-   :config-data config-data
-   :component-id component-id
-   :container-id container-id
-   :component* component*
-   :component-panel wrapper/component-panel
-   :data-panel data-panel
-   :config-panel config-panel
-   :config config
-   :local-config local-config])
+  (let [input-params (assoc params :component* component*
+                                   :component-panel wrapper/component-panel
+                                   :config config
+                                   :local-config local-config)]
+
+    (reduce into [wrapper/base-chart] (seq input-params))))
+
 
 (def meta-data {:component              component
                 :ports     {:data   :port/sink

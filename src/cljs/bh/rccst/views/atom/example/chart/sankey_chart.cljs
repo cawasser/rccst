@@ -23,7 +23,7 @@
 (defn- data-ratom []
   [data-ratom-example/example
    :container-id :sankey-chart-data-ratom-demo
-   :title "Sankey Chart (Live Data - ratom) - IN PROGRESS (not complete)"
+   :title "Sankey Chart (Live Data - ratom)"
    :description "A Sankey Chart built using [Recharts](https://recharts.org/en-US/api/SankeyChart). This example shows how
   charts can take [ratoms](http://reagent-project.github.io/docs/master/reagent.ratom.html) as input and re-render as the data changes.
 
@@ -42,7 +42,7 @@
 (defn- data-structure []
   [data-structure-example/example
    :container-id :sankey-chart-data-ratom-demo
-   :title "Sankey Chart (Live Data - structure) - IN PROGRESS (not complete)"
+   :title "Sankey Chart (Live Data - structure)"
    :description "A Sankey Chart built using [Recharts](https://recharts.org/en-US/api/SankeyChart) with colored Cells. This example shows how
   charts can take [ratoms](http://reagent-project.github.io/docs/master/reagent.ratom.html) as input and re-render as the data changes.
 
@@ -60,7 +60,7 @@
   (let [container-id :sankey-chart-data-ratom-demo]
     [data-sub-example/example
      :container-id container-id
-     :title "Sankey Chart (Live Data - subscription) - IN PROGRESS (not complete)"
+     :title "Sankey Chart (Live Data - subscription)"
      :description "A Sankey Chart built using [Recharts](https://recharts.org/en-US/api/SankeyChart) with colored Cells. This example shows how
      charts can take [subscriptions](https://day8.github.io/re-frame/subscriptions/) as input and re-render as the configuration changes.
 
@@ -79,7 +79,7 @@
 (defn- config-ratom []
   [config-ratom-example/example
    :container-id :sankey-chart-data-ratom-demo
-   :title "Sankey Chart (Live Configuration - ratom) - IN PROGRESS (not complete)"
+   :title "Sankey Chart (Live Configuration - ratom)"
    :description "A Sankey Chart built using [Recharts](https://recharts.org/en-US/api/SankeyChart) with colored Cells. This example shows how
      charts can take [ratoms](http://reagent-project.github.io/docs/master/reagent.ratom.html) as input and re-render as the configuration changes.
 
@@ -97,7 +97,7 @@
 (defn- config-structure []
   [config-structure-example/example
    :container-id :sankey-config-structure-demo
-   :title "Sankey Chart (Live Configuration - structure) - IN PROGRESS (not complete)"
+   :title "Sankey Chart (Live Configuration - structure)"
    :description "A Sankey Chart built using [Recharts](https://recharts.org/en-US/api/SankeyChart) with colored Cells. This example shows how
      charts can take [ratoms](http://reagent-project.github.io/docs/master/reagent.ratom.html) as input and re-render as the configuration changes.
 
@@ -114,7 +114,7 @@
   (let [container-id :sankey-config-sub-demo]
     [config-sub-example/example
      :container-id container-id
-     :title "Sankey Chart (Live Configuration - subscription) - IN PROGRESS (not complete)"
+     :title "Sankey Chart (Live Configuration - subscription)"
      :description "A Sankey Chart built using [Recharts](https://recharts.org/en-US/api/SankeyChart) with colored Cells. This example shows how
      charts can take [subscriptions](https://day8.github.io/re-frame/subscriptions/) as input and re-render as the configuration changes.
 

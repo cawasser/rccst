@@ -248,7 +248,7 @@
        :nodePadding   60
        :linkCurvature curve
        :iterations    64
-       :link          (partial complex-link (or link-color-fn color-white->target))}
+       :link          (partial complex-link (or link-color-fn color-source->white))}
       (when tooltip? [:> Tooltip])]]))
 
 

@@ -34,11 +34,15 @@
                          config-tools
                          source-code
                          component] :as params}]
+
+  ;(log/info "example" params)
+
   (let [component-id (utils/path->keyword container-id "chart")
         data (r/atom sample-data)
-        input-params (assoc params :data data
-                                   :config-data (r/atom default-config-data)
-                                   :component (partial config-update-example component default-config-data))]
+        input-params (assoc params :component-id component-id
+                                   :data data
+                                   :component (partial config-update-example component default-config-data)
+                                   :config-data (r/atom default-config-data))]
 
     (reduce into [example/component-example] (seq input-params))))
 
