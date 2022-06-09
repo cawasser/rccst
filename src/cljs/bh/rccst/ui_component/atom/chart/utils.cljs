@@ -211,9 +211,14 @@
 
 (defn slider-config
   ([component-id min max step path]
+
+   ;(log/info "slider-config" component-id min max step path)
+
    (let [model (u/subscribe-local component-id path)]
      (fn []
-       (if model
+       ;(log/info "slider-config (model)" model "//" (when model @model))
+
+       (if (and model @model) ; needed to cover possible race condition where the subscription initially returns nil
          [rc/slider :src (rc/at)
           :model @model
           :width "100px"

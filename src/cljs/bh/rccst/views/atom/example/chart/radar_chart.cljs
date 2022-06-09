@@ -15,13 +15,14 @@
             [bh.rccst.views.atom.example.multi-example :as me]))
 
 
-(def default-config-data {:domain [0 150],
-                          :A {:include true, :name :A, :fill "#8884d8",
-                              :stroke "#8884d8", :fillOpacity 0.6},
-                          :B {:include true, :name :B, :fill "#ffc107",
-                              :stroke "#ffc107", :fillOpacity 0.6},})
-                          ;:fullMark {:include true, :name :fullMark, :fill "#82ca9d",
-                          ;           :stroke "#82ca9d", :fillOpacity 0.6}})
+(def default-config-data {:uv {:include true :name :uv :fill "#8884d8"
+                               :stroke "#8884d8" :fillOpacity 0.6}
+                          :pv {:include true :name :pv :fill "#ffc107"
+                               :stroke "#ffc107" :fillOpacity 0.6}
+                          :tv {:include true :name :tv :fill "#82ca9d"
+                               :stroke "#82ca9d" :fillOpacity 0.6}
+                          :amt {:include true :name :amt :fill "#ff00ff" 
+                                :stroke "#ff00ff" :fillOpacity 0.6}})
 
 
 (defn- data-ratom []

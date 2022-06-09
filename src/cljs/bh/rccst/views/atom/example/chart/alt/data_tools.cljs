@@ -21,8 +21,8 @@
               [rc/button :label "Add 'Q'"
                :on-click #(swap! data assoc :data
                             (conj (-> @data :data)
-                              {:name "Page Q" :uv 1100
-                               :pv   1100 :tv 1100 :amt 1100}))]
+                              {:name "Page Q" :uv (rand-int 5000)
+                               :pv   (rand-int 5000) :tv (rand-int 5000) :amt (rand-int 5000)}))]
 
               [rc/button :label "Drop Last 2"
                :on-click #(swap! data assoc :data (into [] (drop-last 2 (:data @data))))]
@@ -61,8 +61,8 @@
                   [rc/button :label "Add 'Q'"
                    :on-click #(h/handle-change-path data [:data]
                                 (conj @old-data
-                                  {:name "Page Q" :uv 1100
-                                   :pv   1100 :tv 1100 :amt 1100}))]
+                                  {:name "Page Q" :uv (rand-int 5000)
+                                   :pv   (rand-int 5000) :tv (rand-int 5000) :amt (rand-int 5000)}))]
 
                   [rc/button :label "Drop Last 2"
                    :on-click #(h/handle-change-path data [:data]
