@@ -225,9 +225,21 @@
                :strokeWidth 0}]])))
 
 
-(defn- component* [& {:keys [data component-id container-id
-                             link-color-fn
-                             subscriptions]
+(defn- ->sankey [data]
+  (assoc data :links (map (fn [{:keys [source target] :as link}]
+                            (assoc link :source (->> data
+                                                  :nodes
+                                                  (filter #(= (:name %) source))
+                                                  first
+                                                  :index)
+                                        :target (->> data
+                                                  :nodes
+                                                  (filter #(= (:name %) target))
+                                                  first
+                                                  :index))) (:links data))))
+
+
+(defn- component* [& {:keys [data link-color-fn subscriptions]
                       :as   params}]
 
   ;(log/info "component-star" component-id
@@ -238,11 +250,10 @@
   (let [tooltip? (ui-utils/resolve-sub subscriptions [:tooltip :include])
         curve    (ui-utils/resolve-sub subscriptions [:link :curve])]
 
-    [:div "sankey chart"]
     [:> ResponsiveContainer
      [:> Sankey
       {:node          (partial complex-node 700)
-       :data          data
+       :data          (->sankey data)
        :margin        {:top 20 :bottom 20 :left 20 :right 20}
        :nodeWidth     10
        :nodePadding   60
