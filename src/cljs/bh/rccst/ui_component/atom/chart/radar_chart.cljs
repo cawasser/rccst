@@ -17,6 +17,7 @@
 
 (log/info "bh.rccst.ui-component.atom.chart.radar-chart")
 
+
 (def source-code '[:> RadarChart {:width 400 :height 400 :outerRadius "75%" :data @data}
                    (utils/non-gridded-chart-components component-id)
 
@@ -29,17 +30,8 @@
                               :stroke      "#8884d8"
                               :fillOpacity 0.5}]])
 
-(defn radar-data [data]
-  (let [d (:data data)
-        meta (:metadata data)
-        fields (get-in data [:metadata :fields])]
-    (merge
-      {:metadata (assoc meta :domain :fullMark
-                             :fields (assoc (dissoc fields :tv :amt) :fullMark :number))}
-      {:data (map #(assoc % :fullmark 10000) (map #(dissoc % :tv :amt) d))})))
 
-
-(def sample-data (radar-data example-data/meta-tabular-data))
+(def sample-data example-data/meta-tabular-data)
 
 
 (defn- get-range-across-fields [data]
