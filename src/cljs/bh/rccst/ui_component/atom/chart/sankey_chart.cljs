@@ -29,13 +29,13 @@
     {:link    {:curve 0.5}
      :tooltip {:include true}}
     (->> @data
-            :nodes
-            (map-indexed (fn [idx {:keys [name] :as all}]
-                           {name {:key     all
-                                  :include true
-                                  :fill    (color/get-color idx)
-                                  :stroke  (color/get-color idx)}}))
-            (into {}))))
+      :nodes
+      (map-indexed (fn [idx {:keys [name] :as all}]
+                     {name {:key     all
+                            :include true
+                            :fill    (color/get-color idx)
+                            :stroke  (color/get-color idx)}}))
+      (into {}))))
 
 
 (defn config [component-id data]
@@ -52,7 +52,7 @@
    :gap "5px"
    :children [[utils/boolean-config component-id label (conj path :include)]
               [utils/color-config component-id ":fill" (conj path :fill) position]
-              [utils/color-config component-id ":stroke" (conj path :stroke) :right-above]]])
+              [utils/color-config component-id ":stroke" (conj path :stroke) position]]])
 
 
 (defn- make-config [component-id data]
@@ -119,16 +119,15 @@
          height                      "height"
          index                       "index"
          {name "name" value "value"} "payload"} (js->clj props)
-        isOut  (< containerWidth (+ x width 30 6))
+        isOut  (< containerWidth (+ x width 30 6))]
 
-        fill   (ui-utils/resolve-sub subscriptions [name :fill])
-        stroke (ui-utils/resolve-sub subscriptions [name :stroke])]
-
-    ;(log/info "complex-node" name containerWidth fill stroke props)
+    ;(log/info "complex-node" name containerWidth props)
 
     (r/as-element
       [:> Layer {:key (str "CustomNode$" index)}
-       [:> Rectangle {:x x :y y :width width :height height :fill fill :stroke stroke}]
+       [:> Rectangle {:x      x :y y :width width :height height
+                      :fill   (ui-utils/resolve-sub subscriptions [name :fill])
+                      :stroke (ui-utils/resolve-sub subscriptions [name :stroke])}]
        [:text {:textAnchor (if isOut "end" "start")
                :x          (if isOut (- x 6) (+ x width 6))
                :y          (+ y (/ height 2))
@@ -259,7 +258,7 @@
                                           :index)))))))
 
 
-(defn- component* [& {:keys [data link-color-fn subscriptions]
+(defn- component* [& {:keys [data component-id link-color-fn subscriptions]
                       :as   params}]
 
   ;(log/info "component-star" component-id
@@ -267,20 +266,27 @@
   ;"//" subscriptions
   ;"//" link-color-fn
 
-  (let [tooltip? (ui-utils/resolve-sub subscriptions [:tooltip :include])
-        curve    (ui-utils/resolve-sub subscriptions [:link :curve])]
+  (let [tooltip?    (ui-utils/resolve-sub subscriptions [:tooltip :include])
+        curve       (ui-utils/resolve-sub subscriptions [:link :curve])]
 
-    [:> ResponsiveContainer
-     [:> Sankey
-      {:node          (partial complex-node subscriptions 700)
-       :data          (->sankey data)
-       :margin        {:top 20 :bottom 20 :left 20 :right 20}
-       :nodeWidth     10
-       :nodePadding   60
-       :linkCurvature curve
-       :iterations    64
-       :link          (partial complex-link subscriptions (or link-color-fn color-source->white))}
-      (when tooltip? [:> Tooltip])]]))
+    ; NOTE: super hack here!!! we need the config-data change to force a re-render
+    ; because the sankey only redraws the nodes and links when the cursor moves over them
+    ; otherwise
+    [:div {:class
+           (subs (str @(ui-utils/subscribe-local component-id [])) 0 10)
+           :style {:width "100%" :height "100%"}}
+
+     [:> ResponsiveContainer
+      [:> Sankey
+       {:node          (partial complex-node subscriptions 700)
+        :data          (->sankey data)
+        :margin        {:top 20 :bottom 20 :left 20 :right 20}
+        :nodeWidth     10
+        :nodePadding   60
+        :linkCurvature curve
+        :iterations    64
+        :link          (partial complex-link subscriptions (or link-color-fn color-source->white))}
+       (when tooltip? [:> Tooltip])]]]))
 
 
 (defn component [& {:keys [component-id] :as params}]
