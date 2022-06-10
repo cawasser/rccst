@@ -1,8 +1,8 @@
 (ns bh.rccst.ui-component.utils.example-data
-  (:require [cljs-uuid-utils.core :as uuid]
+  (:require [bh.rccst.subs :as subs]
+            [cljs-uuid-utils.core :as uuid]
             [cljs.spec.alpha :as spec]
             [expound.alpha :as expound]
-            [bh.rccst.subs :as subs]
             [re-frame.core :as re-frame]
             [taoensso.timbre :as log]))
 
@@ -138,7 +138,7 @@
   ; we can use re-com/alert-list data structure to display spec failures in place of the
   ; expected UI, using the "NEW" alert-list ui-component
 
-  (def alert-msg {:id 0 :alert-type :danger :heading "Parameter Error (Spec Failed)"
+  (def alert-msg {:id   0 :alert-type :danger :heading "Parameter Error (Spec Failed)"
                   :body error :padding "8px" :closeable? false})
 
   ())
@@ -253,14 +253,14 @@
                                  {:name "SortOperator" :size 2023}]}])
 
 
-(def dag-data {:nodes [{:name "Visit" :index 0}
-                       {:name "Direct-Favourite" :index 1}
-                       {:name "Page-Click" :index 2}
-                       {:name "Detail-Favourite" :index 3}
-                       {:name "Lost" :index 4}]
-               :links [{:source "Visit" :target "Direct-Favourite" :value 3728.3}
-                       {:source "Visit" :target "Page-Click" :value 354170}
-                       {:source "Page-Click" :target "Detail-Favourite" :value 62429}
-                       {:source "Page-Click" :target "Lost" :value 291741}]})
+(def dag-data {:nodes #{{:name "Visit" :index 0}
+                        {:name "Direct-Favourite" :index 1}
+                        {:name "Page-Click" :index 2}
+                        {:name "Detail-Favourite" :index 3}
+                        {:name "Lost" :index 4}}
+               :links #{{:source "Visit" :target "Direct-Favourite" :value 37283}
+                        {:source "Visit" :target "Page-Click" :value 354170}
+                        {:source "Page-Click" :target "Detail-Favourite" :value 62429}
+                        {:source "Page-Click" :target "Lost" :value 291741}}})
 
 

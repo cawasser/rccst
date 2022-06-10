@@ -17,16 +17,12 @@
   "the Sankey Chart works best with \"directed acyclic graph data\" so we return the dag-data from utils"
   data/dag-data)
 
+
 (def dummy-config-data {:nodes {"Visit"            {:include true :fill "#ff0000" :stroke "#ff0000"}
                                 "Direct-Favourite" {:include true :fill "#00ff00" :stroke "#00ff00"}
                                 "Page-Click"       {:include true :fill "#0000ff" :stroke "#0000ff"}
                                 "Detail-Favourite" {:include true :fill "#12a4a4" :stroke "#12a4a4"}
-                                "Lost"             {:include true :fill "#ba7b47" :stroke "#ba7b47"}}
-                        :links {"Visit"            {:fill "#ff000040"}
-                                "Direct-Favourite" {:fill "#00ff0040"}
-                                "Page-Click"       {:fill "#0000ff40"}
-                                "Detail-Favourite" {:fill "#12a4a440"}
-                                "Lost"             {:fill "#ba7b4740"}}})
+                                "Lost"             {:include true :fill "#ba7b47" :stroke "#ba7b47"}}})
 
 
 (defn local-config [data]
@@ -226,17 +222,21 @@
 
 
 (defn- ->sankey [data]
-  (assoc data :links (map (fn [{:keys [source target] :as link}]
-                            (assoc link :source (->> data
-                                                  :nodes
-                                                  (filter #(= (:name %) source))
-                                                  first
-                                                  :index)
-                                        :target (->> data
-                                                  :nodes
-                                                  (filter #(= (:name %) target))
-                                                  first
-                                                  :index))) (:links data))))
+  (assoc data
+    :nodes (->> data :nodes (sort-by :index) (into []))
+    :links (->> data
+             :links
+             (map (fn [{:keys [source target] :as link}]
+                    (assoc link :source (->> data
+                                          :nodes
+                                          (filter #(= (:name %) source))
+                                          first
+                                          :index)
+                                :target (->> data
+                                          :nodes
+                                          (filter #(= (:name %) target))
+                                          first
+                                          :index)))))))
 
 
 (defn- component* [& {:keys [data link-color-fn subscriptions]
