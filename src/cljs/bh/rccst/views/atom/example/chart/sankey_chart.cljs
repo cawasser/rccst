@@ -16,8 +16,11 @@
 (log/info "bh.rccst.views.atom.example.chart.sankey-chart-2")
 
 
-(def default-config-data {{:name "Visit" :color "#82ca9d"}
-                          {:name "Direct-Favourite" :color "#82ca9d"}})
+(def default-config-data {:Visit            {:include true :fill "#ff0000" :stroke "#ff0000"}
+                          :Direct-Favourite {:include true :fill "#00ff00" :stroke "#00ff00"}
+                          :Page-Click       {:include true :fill "#0000ff" :stroke "#0000ff"}
+                          :Detail-Favourite {:include true :fill "#12a4a4" :stroke "#12a4a4"}
+                          :Lost             {:include true :fill "#ba7b47" :stroke "#ba7b47"}})
 
 
 (defn- data-ratom []
