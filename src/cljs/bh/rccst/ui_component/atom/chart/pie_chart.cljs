@@ -67,8 +67,6 @@
 (defn config-panel [data component-id]
   [rc/v-box :src (rc/at)
    :gap "10px"
-   :width "100%"
-   :height "500px"
    :style {:padding          "15px"
            :border-top       "1px solid #DDD"
            :background-color "#f7f7f7"}
@@ -76,7 +74,7 @@
               [rc/line :src (rc/at) :size "2px"]
               [utils/option component-id ":name" [:name]]
               [rc/line :src (rc/at) :size "2px"]
-              [utils/option component-id ":value" [:value]]
+              [utils/column-picker data component-id ":value" [:value :chosen]]
               [utils/color-config-text component-id ":fill" [:fill] :above-right]
               [rc/v-box :src (rc/at)
                :gap "5px"

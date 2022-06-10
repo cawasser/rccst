@@ -215,7 +215,7 @@
      [:> RadarChart {:data d}
       [:> PolarGrid]
       [:> PolarAngleAxis {:dataKey :name}]
-      [:> PolarRadiusAxis {:angle "30" :domain (or domain [0 10000])}]
+      [:> PolarRadiusAxis {:angle 60 :domain (or domain [0 10000])}]
 
       ;(utils/non-gridded-chart-components component-id {})
 

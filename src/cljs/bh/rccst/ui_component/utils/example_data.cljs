@@ -253,14 +253,14 @@
                                  {:name "SortOperator" :size 2023}]}])
 
 
-(def dag-data {:nodes [{:name "Visit"}
-                       {:name "Direct-Favourite"}
-                       {:name "Page-Click"}
-                       {:name "Detail-Favourite"}
-                       {:name "Lost"}]
-               :links [{:source 0 :target 1 :value 3728.3}
-                       {:source 0 :target 2 :value 354170}
-                       {:source 2 :target 3 :value 62429}
-                       {:source 2 :target 4 :value 291741}]})
+(def dag-data {:nodes [{:name "Visit" :index 0}
+                       {:name "Direct-Favourite" :index 1}
+                       {:name "Page-Click" :index 2}
+                       {:name "Detail-Favourite" :index 3}
+                       {:name "Lost" :index 4}]
+               :links [{:source "Visit" :target "Direct-Favourite" :value 3728.3}
+                       {:source "Visit" :target "Page-Click" :value 354170}
+                       {:source "Page-Click" :target "Detail-Favourite" :value 62429}
+                       {:source "Page-Click" :target "Lost" :value 291741}]})
 
 
