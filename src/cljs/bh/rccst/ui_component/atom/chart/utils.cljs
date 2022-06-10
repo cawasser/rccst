@@ -186,6 +186,26 @@
         (subscription-error label path)))))
 
 
+(defn- multi-button [data component-id path item]
+  [:div item])
+
+
+(defn column-multi-picker [data component-id label path]
+  (let [model    (u/subscribe-local component-id path)]
+    (fn []
+      (if model
+        (let [headings (apply set (map keys (get @data :data)))
+              btns     (mapv (fn [h] {:id h :label h}) headings)]
+          (log/info "column-multi-picker" data "//" component-id "//" label "//" path)
+          [rc/h-box :src (rc/at)
+           :gap "5px"
+           :children [[rc/box :src (rc/at) :align :start :child [:code label]]
+                      [rc/h-box
+                       :src (rc/at)
+                       :children [(map #(multi-button data component-id path %) btns)]]]])
+        (subscription-error label path)))))
+
+
 (defn boolean-config
   "lets the user turn on/of some component of the Chart
 

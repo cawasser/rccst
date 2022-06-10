@@ -5,10 +5,9 @@
             [bh.rccst.ui-component.utils.color :as color]
             [bh.rccst.ui-component.utils.example-data :as data]
             [re-com.core :as rc]
-            [reagent.core :as r]
             [taoensso.timbre :as log]
             ["recharts" :refer [ResponsiveContainer ScatterChart Scatter Brush
-                                XAxis YAxis ZAxis]]))
+                                XAxis YAxis ZAxis Tooltip]]))
 
 
 (log/info "bh.rccst.ui-component.atom.chart.scatter-chart")
@@ -20,15 +19,28 @@
 
 
 (defn local-config [data]
-  (let [d (get @data :data)]
-       (->> d
-            (map-indexed (fn [idx entry]
-                           ;(log/info "local-config (:color loop)" entry)
-                           {(ui-utils/path->keyword (:name entry))
-                            {:name    (:name entry)
-                             :include true
-                             :color   (nth (cycle color/default-stroke-fill-colors) idx)}}))
-            (into {}))))
+  (let [d      (:data @data)
+        fields (get-in @data [:metadata :fields])]
+    (merge
+      (->> fields
+        (filter (fn [[k v]] (= :string v)))
+        keys
+        ((fn [m]
+           {:name {:keys m :chosen (first m)}})))
+
+      (->> fields
+        (filter (fn [[k v]] (= :number v)))
+        keys
+        ((fn [m]
+           {:values {:keys m :chosen (take 3 m)}})))
+
+      (->> d
+        (map-indexed (fn [idx entry]
+                       {(ui-utils/path->keyword (:name entry))
+                        {:name    (:name entry)
+                         :include true
+                         :color   (nth (cycle color/default-stroke-fill-colors) idx)}}))
+        (into {})))))
 
 
 (defn config
@@ -54,9 +66,7 @@
     ui-utils/default-pub-sub
     (merge
       utils/default-config
-      {:tab-panel {:value     (keyword component-id "config")
-                   :data-path [:containers (keyword component-id) :tab-panel]}
-       :brush     false}
+      (ui-utils/config-tab-panel component-id)
       (local-config data))))
 
 
@@ -71,9 +81,9 @@
 
 (defn- make-cell-config [component-id data]
   (->> (:data @data)
-       (map-indexed (fn [idx {:keys [name] :as item}]
-                      [cell-config component-id name [name] :above-right]))
-       (into [:<>])))
+    (map-indexed (fn [idx {:keys [name] :as item}]
+                   [cell-config component-id name [name] :above-right]))
+    (into [:<>])))
 
 
 (defn config-panel [data component-id]
@@ -87,6 +97,9 @@
            :background-color "#f7f7f7"}
    :children [[utils/non-gridded-chart-config @data component-id]
               [rc/line :src (rc/at) :size "2px"]
+              [utils/option component-id ":name" [:name]]
+              [rc/line :src (rc/at) :size "2px"]
+              [utils/column-multi-picker data component-id ":values" [:values :chosen]]
               [rc/v-box :src (rc/at)
                :gap "5px"
                :children [[rc/label :src (rc/at) :label "Colors"]
@@ -96,10 +109,31 @@
 (def source-code `[:> ScatterChart {:width 400 :height 400}])
 
 
-(defn- included-cells [data subscriptions]
-  (->> data
-       (filter (fn [{:keys [name]}] (ui-utils/resolve-sub subscriptions [name :include])))
-       (into [])))
+(defn- make-scatter [data subscriptions]
+  (let [ret    (->> data
+                 :data
+                 (map (fn [{:keys [name] :as item}]
+                        (if (ui-utils/resolve-sub subscriptions [name :include])
+                          [:> Scatter
+                           {:name name
+                            :fill (or (ui-utils/resolve-sub subscriptions [name :color])
+                                    (color/get-color 0))
+                            :data [item]}]
+                          [])))
+                 (remove empty?)
+                 (into [:<>]))]
+
+    ;(log/info "make-scatter" values "//" ret)
+    ret))
+
+
+(comment
+  (def item {:name "name" :uv "uv" :pv "pv" :tv "tv"})
+  (def values '(:uv :pv))
+
+  (select-keys item values)
+
+  ())
 
 
 (defn- component*
@@ -116,28 +150,19 @@
 
   ;(log/info "component*" data)
 
-  [:> ResponsiveContainer
-   [:> ScatterChart
+  (let [[x y z] (ui-utils/resolve-sub subscriptions [:values :chosen])]
 
-    (utils/chart-grid component-id {})
+    [:> ResponsiveContainer
+     [:> ScatterChart
 
-    ;(when @brush? [:> Brush])
+      (utils/chart-grid component-id {})
 
-    [:> XAxis {:type "number" :dataKey "uv"}]
-    [:> YAxis {:type "number" :dataKey "pv"}]
-    [:> ZAxis {:type "number" :range [0 10000] :dataKey "amt"}]
+      [:> Tooltip]
+      [:> XAxis {:type "number" :dataKey (name x)}]
+      [:> YAxis {:type "number" :dataKey (name y)}]
+      [:> ZAxis {:type "number" :dataKey (name z) :range [0 10000]}]
 
-    (into [:<>] (map (fn [{:keys [name uv pv amt]}]
-                       [:> Scatter
-                        {:name name
-                         :fill (or (ui-utils/resolve-sub subscriptions [name :color])
-                                   (color/get-color 0))
-                         :data [{:uv uv :pv pv :amt amt}]
-                         :included (included-cells (if (empty? data)
-                                                     [] (get data :data))
-                                     subscriptions)}])
-                  (:data data)))]])
-
+      (make-scatter data subscriptions)]]))
 
 (defn component [& {:keys [data config-data component-id container-id
                            data-panel config-panel] :as params}]
@@ -157,10 +182,10 @@
    :local-config local-config])
 
 
-(def meta-data {:component              component
-                :sources                {:data :source-type/meta-tabular}
-                :pubs                   []
-                :subs                   []})
+(def meta-data {:component component
+                :sources   {:data :source-type/meta-tabular}
+                :pubs      []
+                :subs      []})
 
 (comment
   (def data sample-data)
@@ -184,7 +209,7 @@
 
   (map (fn [{:keys [name]}] {:x name}) data)
 
-  (map (fn [{:keys [name fill]}] [:> Scatter {:name name :fill fill} ]) data)
+  (map (fn [{:keys [name fill]}] [:> Scatter {:name name :fill fill}]) data)
 
   (map (fn [{:keys [name fill uv pv amt]}] [:> Scatter {:name name :fill fill :data {:uv uv :pv pv :amt amt}}]) data)
 
