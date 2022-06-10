@@ -155,7 +155,7 @@
   (let [d        (if (empty? data) [] (get data :data))
         included (included-cells d subscriptions)]
 
-    (log/info "radial component* data: " d "//" included)
+    ;(log/info "radial component* data: " d "//" included)
 
     [:> ResponsiveContainer
      [:> RadialBarChart {:innerRadius "10%"

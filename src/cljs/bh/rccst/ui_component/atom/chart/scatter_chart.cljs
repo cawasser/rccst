@@ -31,7 +31,6 @@
             (into {}))))
 
 
-
 (defn config
   "constructs the configuration panel for the chart's configurable properties. This is specific to
   this being a line-chart component (see [[local-config]]).
@@ -50,7 +49,7 @@
   - component-id : (string) unique id of the chart
   "
   [component-id data]
-  (log/info "scatter config" data)
+  ;(log/info "scatter config" data)
   (->
     ui-utils/default-pub-sub
     (merge
@@ -78,7 +77,7 @@
 
 
 (defn config-panel [data component-id]
-  (log/info "scatter config-panel" component-id "//" data)
+  ;(log/info "scatter config-panel" component-id "//" data)
 
   [rc/v-box :src (rc/at)
    :gap "10px"
@@ -92,6 +91,7 @@
                :gap "5px"
                :children [[rc/label :src (rc/at) :label "Colors"]
                           (make-cell-config component-id data)]]]])
+
 
 (def source-code `[:> ScatterChart {:width 400 :height 400}])
 
@@ -114,7 +114,7 @@
              subscriptions isAnimationActive?]
       :as   params}]
 
-  (log/info "component scatter" data)
+  ;(log/info "component*" data)
 
   [:> ResponsiveContainer
    [:> ScatterChart
@@ -133,13 +133,16 @@
                          :fill (or (ui-utils/resolve-sub subscriptions [name :color])
                                    (color/get-color 0))
                          :data [{:uv uv :pv pv :amt amt}]
-                         :included (included-cells (if (empty? data) [] (get data :data)) subscriptions)}]) data))]])
+                         :included (included-cells (if (empty? data)
+                                                     [] (get data :data))
+                                     subscriptions)}])
+                  (:data data)))]])
 
 
 (defn component [& {:keys [data config-data component-id container-id
                            data-panel config-panel] :as params}]
 
-  (log/info "component-2 scatter" params)
+  ;(log/info "component" params)
 
   [wrapper/base-chart
    :data data
