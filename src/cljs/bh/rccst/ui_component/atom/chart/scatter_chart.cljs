@@ -113,28 +113,44 @@
 
 
 (defn- make-scatter [data subscriptions]
-  (let [ret    (->> data
-                 :data
-                 (map (fn [{:keys [name] :as item}]
-                        (if (ui-utils/resolve-sub subscriptions [name :include])
-                          [:> Scatter
-                           {:name name
-                            :fill (or (ui-utils/resolve-sub subscriptions [name :color])
-                                    (color/get-color 0))
-                            :data [item]}]
-                          [])))
-                 (remove empty?)
-                 (into [:<>]))]
+  (let [ret (->> data
+              :data
+              (map (fn [{:keys [name] :as item}]
+                     (if (ui-utils/resolve-sub subscriptions [name :include])
+                       [:> Scatter
+                        {:name name
+                         :fill (or (ui-utils/resolve-sub subscriptions [name :color])
+                                 (color/get-color 0))
+                         :data [item]}]
+                       [])))
+              (remove empty?)
+              (into [:<>]))]
 
     ;(log/info "make-scatter" values "//" ret)
     ret))
 
 
-(comment
-  (def item {:name "name" :uv "uv" :pv "pv" :tv "tv"})
-  (def values '(:uv :pv))
+(defn- get-range-across-fields [data column]
+  (let [all-values  (->> data
+                      :data
+                      (map #(get % column))
+                      (distinct))
+        domainMax   (apply max all-values)
+        domainMin   (apply min all-values)]
 
-  (select-keys item values)
+    ;(log/info "get-range-across-fields" column domainMin domainMax)
+
+    [domainMin domainMax]))
+
+
+(comment
+  (def data sample-data)
+  (def column :amt)
+
+  (->> data
+    :data
+    (map #(get % column))
+    (distinct))
 
   ())
 
@@ -153,9 +169,10 @@
 
   ;(log/info "component*" data)
 
-  (let [x (ui-utils/resolve-sub subscriptions [:values :x])
-        y (ui-utils/resolve-sub subscriptions [:values :y])
-        z (ui-utils/resolve-sub subscriptions [:values :z])]
+  (let [x      (ui-utils/resolve-sub subscriptions [:values :x])
+        y      (ui-utils/resolve-sub subscriptions [:values :y])
+        z      (ui-utils/resolve-sub subscriptions [:values :z])
+        domain ()]
 
     [:> ResponsiveContainer
      [:> ScatterChart
@@ -165,7 +182,8 @@
       [:> Tooltip]
       [:> XAxis {:type "number" :dataKey (name x)}]
       [:> YAxis {:type "number" :dataKey (name y)}]
-      [:> ZAxis {:type "number" :dataKey (name z) :range [0 10000]}]
+      [:> ZAxis {:type "number" :dataKey (name z)
+                 :range (get-range-across-fields data z)}]
 
       (make-scatter data subscriptions)]]))
 
@@ -223,3 +241,15 @@
 
 
   ())
+
+
+(comment
+  (def item {:name "name" :uv "uv" :pv "pv" :tv "tv"})
+  (def values '(:uv :pv))
+
+  (select-keys item values)
+
+  ())
+
+
+
