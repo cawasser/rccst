@@ -4,7 +4,10 @@
             [bh.rccst.ui-component.utils :as u]
             [bh.rccst.ui-component.utils.color :as color]
             [bh.rccst.ui-component.utils.helpers :as h]
+            [re-com.box :as rcb]
             [re-com.core :as rc]
+            [re-com.debug :as rc-dbg]
+            [re-com.util :as rcu]
             [re-frame.core :as re-frame]
             [reagent.core :as r]
             [taoensso.timbre :as log]
@@ -168,12 +171,12 @@
 
 
 (defn column-picker [data component-id label path]
-  (let [model    (u/subscribe-local component-id path)]
+  (let [model (u/subscribe-local component-id path)]
     (fn []
       (if model
         (let [headings (apply set (map keys (get @data :data)))
               btns     (mapv (fn [h] {:id h :label h}) headings)]
-        ;(log/info "column-picker" data "//" component-id "//" label "//" path)
+          ;(log/info "column-picker" data "//" component-id "//" label "//" path)
           [rc/h-box :src (rc/at)
            :gap "5px"
            :children [[rc/box :src (rc/at) :align :start :child [:code label]]
@@ -187,22 +190,75 @@
 
 
 (defn- multi-button [data component-id path item]
-  [:div item])
+  (log/info "multi-button" item)
+  [:div (str item)])
+
+
+(defn multi-bar-tabs
+  [& {:keys [model btns on-change id-fn label-fn tooltip-fn tooltip-position
+             vertical? class style attr parts validate?]
+      :or   {id-fn :id label-fn :label tooltip-fn :tooltip}
+      :as args}]
+  (let [showing (r/atom nil)]
+    (fn [& {:keys [model tabs]}]
+      (let [chosen (rcu/deref-or-value model)
+            btns   (rcu/deref-or-value btns)
+            _      (assert (or (not validate?) (not-empty (filter #(= chosen (id-fn %)) tabs))) "model not found in tabs vector")]
+
+        (log/info "multi-bar-tabs" model "//" chosen "//" btns)
+
+        (into [:div
+               (merge
+                 {:class (str "noselect btn-group" (if vertical? "-vertical") " rc-tabs " class)
+                  :style (merge (rcb/flex-child-style "none")
+                           (get-in parts [:wrapper :style]))}
+                 (rc-dbg/->attr args)
+                 attr)]
+          (for [t btns]
+            (let [id         (id-fn t)
+                  label      (label-fn t)
+                  tooltip    (when tooltip-fn (tooltip-fn t))
+                  selected?  (contains? chosen id)
+                  the-button [:button
+                              (merge
+                                {:type     "button"
+                                 :key      (str id)
+                                 :class    (str "btn btn-default " (if selected? "active ") "rc-tabs-btn " (get-in parts [:button :class]))
+                                 :style    style
+                                 :on-click (when on-change (rc/handler-fn (on-change id)))}
+                                (when tooltip
+                                  {:on-mouse-over (rc/handler-fn (reset! showing id))
+                                   :on-mouse-out  (rc/handler-fn (swap! showing #(when-not (= id %) %)))})
+                                (get-in parts [:button :attr]))
+                              label]]
+              (if tooltip
+                [rc/popover-tooltip
+                 :src (rc/at)
+                 :label tooltip
+                 :position (or tooltip-position :below-center)
+                 :showing? (r/track #(= id @showing))
+                 :anchor the-button
+                 :class (str "rc-tabs-tooltip " (get-in parts [:tooltip :class]))
+                 :style (get-in parts [:tooltip :style])
+                 :attr (get-in parts [:tooltip :attr])]
+                the-button))))))))
+
 
 
 (defn column-multi-picker [data component-id label path]
-  (let [model    (u/subscribe-local component-id path)]
+  (let [model (u/subscribe-local component-id path)]
     (fn []
       (if model
         (let [headings (apply set (map keys (get @data :data)))
-              btns     (mapv (fn [h] {:id h :label h}) headings)]
-          (log/info "column-multi-picker" data "//" component-id "//" label "//" path)
+              btns     (mapv (fn [h] {:id h :label h}) headings)
+              as-set   (set @model)]
+          ;(log/info "column-multi-picker" headings "//" as-set)
           [rc/h-box :src (rc/at)
-           :gap "5px"
-           :children [[rc/box :src (rc/at) :align :start :child [:code label]]
-                      [rc/h-box
-                       :src (rc/at)
-                       :children [(map #(multi-button data component-id path %) btns)]]]])
+            :gap "5px"
+            :children [[rc/box :src (rc/at) :align :start :child [:code label]]
+                       [multi-bar-tabs
+                        :model (r/atom as-set)
+                        :btns btns]]])
         (subscription-error label path)))))
 
 
@@ -238,7 +294,7 @@
      (fn []
        ;(log/info "slider-config (model)" model "//" (when model @model))
 
-       (if (and model @model) ; needed to cover possible race condition where the subscription initially returns nil
+       (if (and model @model)                               ; needed to cover possible race condition where the subscription initially returns nil
          [rc/slider :src (rc/at)
           :model @model
           :width "100px"
@@ -438,9 +494,9 @@
 
 
 (defn color-config [config-data label path & [position]]
-  (let [d                (h/resolve-value config-data)
-        showing?         (r/atom false)
-        p                (or position :right-center)]
+  (let [d        (h/resolve-value config-data)
+        showing? (r/atom false)
+        p        (or position :right-center)]
 
     ;(log/info "color-config" label "//" config-data "//" @d "//" path "//" @showing?)
 
@@ -457,7 +513,7 @@
        :popover [rc/popover-content-wrapper :src (rc/at)
                  :close-button? false
                  :no-clip? false
-                 :body [:> HexColorPicker {:color (get-in @d path)
+                 :body [:> HexColorPicker {:color     (get-in @d path)
                                            :on-change #(h/handle-change-path config-data path %)}]]])))
 
 
@@ -470,10 +526,10 @@
         [rc/h-box :src (rc/at)
          :gap "5px"
          :children [[color-config component-id label path position
-                      [rc/input-text :src (rc/at)
-                       :width "100px"
-                       :model @model
-                       :on-change #(u/dispatch-local component-id path %)]]]]
+                     [rc/input-text :src (rc/at)
+                      :width "100px"
+                      :model @model
+                      :on-change #(u/dispatch-local component-id path %)]]]]
         (subscription-error label path)))))
 
 
@@ -608,14 +664,14 @@
     s))
 
 
-
 (defn chart-grid [component-id ui]
-  (let [grid?                (u/subscribe-local component-id [:grid :include])
-        grid-dash            (u/subscribe-local component-id [:grid :strokeDasharray :dash])
-        grid-space           (u/subscribe-local component-id [:grid :strokeDasharray :space])
-        grid-stroke          (u/subscribe-local component-id [:grid :stroke])]
+  (let [grid?       (u/subscribe-local component-id [:grid :include])
+        grid-dash   (u/subscribe-local component-id [:grid :strokeDasharray :dash])
+        grid-space  (u/subscribe-local component-id [:grid :strokeDasharray :space])
+        grid-stroke (u/subscribe-local component-id [:grid :stroke])]
     (when (override @grid? ui :grid) [:> CartesianGrid {:strokeDasharray (strokeDasharray @grid-dash @grid-space)
                                                         :stroke          @grid-stroke}])))
+
 
 (defn standard-chart-components [component-id ui]
 

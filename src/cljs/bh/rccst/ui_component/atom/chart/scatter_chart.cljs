@@ -32,7 +32,7 @@
         (filter (fn [[k v]] (= :number v)))
         keys
         ((fn [m]
-           {:values {:keys m :chosen (take 3 m)}})))
+           {:values {:keys m :x (nth m 0) :y (nth m 1) :z (nth m 2)}})))
 
       (->> d
         (map-indexed (fn [idx entry]
@@ -99,7 +99,10 @@
               [rc/line :src (rc/at) :size "2px"]
               [utils/option component-id ":name" [:name]]
               [rc/line :src (rc/at) :size "2px"]
-              [utils/column-multi-picker data component-id ":values" [:values :chosen]]
+              [utils/column-picker data component-id ":x" [:values :x]]
+              [utils/column-picker data component-id ":y" [:values :y]]
+              [utils/column-picker data component-id ":z" [:values :z]]
+              [rc/line :src (rc/at) :size "2px"]
               [rc/v-box :src (rc/at)
                :gap "5px"
                :children [[rc/label :src (rc/at) :label "Colors"]
@@ -150,7 +153,9 @@
 
   ;(log/info "component*" data)
 
-  (let [[x y z] (ui-utils/resolve-sub subscriptions [:values :chosen])]
+  (let [x (ui-utils/resolve-sub subscriptions [:values :x])
+        y (ui-utils/resolve-sub subscriptions [:values :y])
+        z (ui-utils/resolve-sub subscriptions [:values :z])]
 
     [:> ResponsiveContainer
      [:> ScatterChart
