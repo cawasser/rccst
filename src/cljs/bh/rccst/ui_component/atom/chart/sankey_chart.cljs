@@ -4,6 +4,7 @@
             [bh.rccst.ui-component.utils :as ui-utils]
             [bh.rccst.ui-component.utils.color :as c]
             [bh.rccst.ui-component.utils.example-data :as data]
+            [bh.rccst.ui-component.utils.color :as color]
             ["recharts" :refer [ResponsiveContainer Sankey Tooltip Layer Rectangle Layer]]
             [re-com.core :as rc]
             [reagent.core :as r]
@@ -18,20 +19,24 @@
   data/dag-data)
 
 
-(def dummy-config-data {:nodes {"Visit"            {:include true :fill "#ff0000" :stroke "#ff0000"}
-                                "Direct-Favourite" {:include true :fill "#00ff00" :stroke "#00ff00"}
-                                "Page-Click"       {:include true :fill "#0000ff" :stroke "#0000ff"}
-                                "Detail-Favourite" {:include true :fill "#12a4a4" :stroke "#12a4a4"}
-                                "Lost"             {:include true :fill "#ba7b47" :stroke "#ba7b47"}}})
+(def default-config-data {:nodes {"Visit"          {:include true :fill "#ff0000" :stroke "#ff0000"}
+                                  "Direct-Favourite" {:include true :fill "#00ff00" :stroke "#00ff00"}
+                                  "Page-Click"       {:include true :fill "#0000ff" :stroke "#0000ff"}
+                                  "Detail-Favourite" {:include true :fill "#12a4a4" :stroke "#12a4a4"}
+                                  "Lost"             {:include true :fill "#ba7b47" :stroke "#ba7b47"}}})
 
 
 (defn local-config [data]
   ;(log/info "local-config" @data)
 
-  {:isAnimationActive true
-   :tooltip           {:include true}
-   :node              {:fill "#77c878" :stroke "#000000"}
-   :link              {:stroke "#77c878" :curve 0.5}})
+  {:nodes (->> @data
+            :nodes
+            (map-indexed (fn [idx {:keys [name] :as all}]
+                           {name {:key all
+                                  :include true
+                                  :fill    (color/get-color idx)
+                                  :stroke  (color/get-color idx)}}))
+            (into {}))})
 
 
 (defn config [component-id data]
@@ -100,7 +105,7 @@
          {name "name" value "value"} "payload"} (js->clj props)
         isOut  (< containerWidth (+ x width 30 6))
 
-        c      (get (:nodes dummy-config-data) name)
+        c      (get (:nodes default-config-data) name)
         fill   (:fill c)
         stroke (:stroke c)]
 
@@ -144,7 +149,7 @@
 
 
 (defn color-source->white [index payload]
-  (let [color-from (:fill (get (:nodes dummy-config-data) (get-in payload [:source :name])))
+  (let [color-from (:fill (get (:nodes default-config-data) (get-in payload [:source :name])))
         c-from     (-> color-from
                      c/hex->rgba
                      (assoc :a 0.5)
@@ -160,7 +165,7 @@
 
 
 (defn color-white->target [index payload]
-  (let [color-to (:fill (get (:nodes dummy-config-data) (get-in payload [:target :name])))
+  (let [color-to (:fill (get (:nodes default-config-data) (get-in payload [:target :name])))
         c-from   (-> color-to
                    c/hex->rgba
                    (assoc :a 0.05)
@@ -176,8 +181,8 @@
 
 
 (defn color-source->target [index payload]
-  (let [color-from (:fill (get (:nodes dummy-config-data) (get-in payload [:source :name])))
-        color-to   (:fill (get (:nodes dummy-config-data) (get-in payload [:target :name])))
+  (let [color-from (:fill (get (:nodes default-config-data) (get-in payload [:source :name])))
+        color-to   (:fill (get (:nodes default-config-data) (get-in payload [:target :name])))
         c-from     (-> color-from
                      c/hex->rgba
                      (assoc :a 0.5)
