@@ -71,7 +71,7 @@
 "
      :sample-data [container-id :blackboard :topic.sample-data]
      :default-data chart/sample-data
-     :data-tools data-tools/dag-data-ratom-tools
+     :data-tools data-tools/dag-data-sub-tools
      :source-code chart/source-code
      :component chart/component
      :data-panel chart-utils/dag-data-panel

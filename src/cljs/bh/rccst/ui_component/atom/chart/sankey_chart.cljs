@@ -19,9 +19,6 @@
   data/dag-data)
 
 
-
-
-
 (defn local-config [data]
   ;(log/info "local-config" @data)
 
