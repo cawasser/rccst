@@ -17,6 +17,7 @@
 (def sample-data
   "the Funnel Chart works best with \"paired data\" so we return the paired-data from utils"
   data/meta-tabular-data)
+(def sample-config-data data/tabular-row-config-data)
 
 
 (defn local-config [data]

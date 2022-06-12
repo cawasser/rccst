@@ -17,7 +17,10 @@
 
 
 (def source-code '[])
+
+
 (def sample-data example-data/meta-tabular-data)
+(def sample-config-data example-data/tabular-column-config-data)
 
 
 (defn local-config [data]

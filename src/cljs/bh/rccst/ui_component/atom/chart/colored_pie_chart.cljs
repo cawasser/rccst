@@ -15,6 +15,7 @@
 
 (def source-code '[])
 (def sample-data example-data/meta-tabular-data)
+(def sample-config-data example-data/tabular-row-config-data)
 
 
 (defn local-config [data]

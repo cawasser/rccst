@@ -65,6 +65,23 @@
 (spec/def :tabular-data/data (spec/coll-of :tabular-data/entry))
 
 
+(def tabular-column-config-data {:brush false
+                                 :uv    {:include true, :fill "#ff0000", :stackId ""}
+                                 :pv    {:include true, :fill "#00ff00", :stackId ""}
+                                 :tv    {:include true, :fill "#0000ff", :stackId "a"}
+                                 :amt   {:include true, :fill "#745ea5", :stackId "a"}})
+
+
+(def tabular-row-config-data {:Page-A {:name "Page A" :include true :color "#ff0000"} ;"#8884d8"}
+                              :Page-B {:name "Page B" :include true :color "#00ff00"} ;"#ffc107"}
+                              :Page-C {:name "Page C" :include true :color "#00ff00"} ;"#82ca9d"}
+                              :Page-D {:name "Page D" :include true :color "#ffff00"} ;"#ff00ff"}
+                              :Page-E {:name "Page E" :include true :color "#ff00ff"} ;"#00e5ff"}
+                              :Page-F {:name "Page F" :include true :color "#00ffff"} ;"#4db6ac"}
+                              :Page-G {:name "Page G" :include true :color "#888888"} ;"#83a6ed"}
+                              :value {:keys [:uv :pv :tv :amt] :chosen :uv}})
+
+
 (def tabular-data-org [{:name "Page A" :org "Alpha" :uv 4000 :pv 2400 :amt 2400}
                        {:name "Page B" :org "Bravo" :uv 3000 :pv 1398 :amt 2210}
                        {:name "Page C" :org "Charlie" :uv 2000 :pv 9800 :amt 2290}
