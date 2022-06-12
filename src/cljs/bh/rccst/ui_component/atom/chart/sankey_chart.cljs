@@ -19,6 +19,9 @@
   data/dag-data)
 
 
+(def sample-config-data data/dag-config-data)
+
+
 (defn local-config [data]
   ;(log/info "local-config" @data)
 

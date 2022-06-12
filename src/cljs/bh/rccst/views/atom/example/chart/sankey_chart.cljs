@@ -16,13 +16,6 @@
 (log/info "bh.rccst.views.atom.example.chart.sankey-chart-2")
 
 
-(def default-config-data {:Visit            {:include true :fill "#ff0000" :stroke "#ff0000"}
-                          :Direct-Favourite {:include true :fill "#00ff00" :stroke "#00ff00"}
-                          :Page-Click       {:include true :fill "#0000ff" :stroke "#0000ff"}
-                          :Detail-Favourite {:include true :fill "#12a4a4" :stroke "#12a4a4"}
-                          :Lost             {:include true :fill "#ba7b47" :stroke "#ba7b47"}})
-
-
 (defn- data-ratom []
   [data-ratom-example/example
    :container-id :sankey-chart-data-ratom-demo
@@ -94,7 +87,7 @@
    :config-tools config-tools/dag-data-config-ratom-tools
    :source-code chart/source-code
    :component chart/component
-   :default-config-data default-config-data])
+   :default-config-data chart/sample-config-data])
 
 
 (defn- config-structure []
@@ -110,7 +103,7 @@
    :sample-data chart/sample-data
    :source-code chart/source-code
    :component chart/component
-   :default-config-data default-config-data])
+   :default-config-data chart/sample-config-data])
 
 
 (defn- config-sub []
@@ -127,7 +120,7 @@
      :source-code chart/source-code
      :component chart/component
      :config-data [container-id :blackboard :config-data]
-     :default-config-data default-config-data]))
+     :default-config-data chart/sample-config-data]))
 
 
 (defn examples []

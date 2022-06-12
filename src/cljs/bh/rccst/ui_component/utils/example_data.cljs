@@ -264,3 +264,8 @@
                         {:source :Page-Click :target :Lost :value 291741}}})
 
 
+(def dag-config-data {:Visit            {:include true :fill "#ff0000" :stroke "#ff0000"}
+                      :Direct-Favourite {:include true :fill "#00ff00" :stroke "#00ff00"}
+                      :Page-Click       {:include true :fill "#0000ff" :stroke "#0000ff"}
+                      :Detail-Favourite {:include true :fill "#12a4a4" :stroke "#12a4a4"}
+                      :Lost             {:include true :fill "#ba7b47" :stroke "#ba7b47"}})
