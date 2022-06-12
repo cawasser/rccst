@@ -66,12 +66,17 @@
 
 
 (def tabular-column-config-data {:brush false
-                                 :uv    {:include true, :fill "#ff0000", :stackId ""}
-                                 :pv    {:include true, :fill "#00ff00", :stackId ""}
-                                 :tv    {:include true, :fill "#0000ff", :stackId "a"}
-                                 :amt   {:include true, :fill "#745ea5", :stackId "a"}})
+                                 :uv    {:include true :fill "#ff0000" :stroke "#ff0000"
+                                         :name :uv :stackId "" :fillOpacity 0.6}
+                                 :pv    {:include true :fill "#00ff00" :stroke "#00ff00"
+                                         :name :pv :stackId "" :fillOpacity 0.6}
+                                 :tv    {:include true :fill "#0000ff" :stroke "#0000ff"
+                                         :name :tv :stackId "a" :fillOpacity 0.6}
+                                 :amt   {:include true :fill "#ff00ff" :stroke "#ff00ff"
+                                         :name :amt :stackId "a" :fillOpacity 0.6}})
 
 
+; TODO: convert :color to :fill/:stroke throughout
 (def tabular-row-config-data {:Page-A {:name "Page A" :include true :color "#ff0000"} ;"#8884d8"}
                               :Page-B {:name "Page B" :include true :color "#00ff00"} ;"#ffc107"}
                               :Page-C {:name "Page C" :include true :color "#00ff00"} ;"#82ca9d"}
@@ -153,7 +158,7 @@
 
 
   ; we can use re-com/alert-list data structure to display spec failures in place of the
-  ; expected UI, using the "NEW" alert-list ui-component
+  ; expected UI using the "NEW" alert-list ui-component
 
   (def alert-msg {:id   0 :alert-type :danger :heading "Parameter Error (Spec Failed)"
                   :body error :padding "8px" :closeable? false})

@@ -22,7 +22,10 @@
                           :Page-D {:name "Page D" :include true :color "#ff00ff"}
                           :Page-E {:name "Page E" :include true :color "#00e5ff"}
                           :Page-F {:name "Page F" :include true :color "#4db6ac"}
-                          :Page-G {:name "Page G" :include true :color "#83a6ed"}})
+                          :Page-G {:name "Page G" :include true :color "#83a6ed"}
+                          :values {:keys [:Page-A :Page-B :Page-C
+                                          :Page-D :Page-E :Page-F :Page-G]
+                                   :x :uv :y :pv :z :amt}})
 
 
 (defn- data-ratom []
@@ -123,7 +126,7 @@
 
 > In _this_ case, we are using a subscription to handle the configuration for the chart."
      :sample-data chart/sample-data
-     :config-tools config-tools/meta-tabular-config-row-sub-tools
+     :config-tools config-tools/meta-tabular-config-row-sub-tools ; TODO: this tool panel does not have tools for the axes
      :source-code chart/source-code
      :component chart/component
      :config-data [container-id :blackboard :config-data]

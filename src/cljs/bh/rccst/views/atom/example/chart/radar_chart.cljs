@@ -15,16 +15,6 @@
             [bh.rccst.views.atom.example.multi-example :as me]))
 
 
-(def default-config-data {:uv {:include true :name :uv :fill "#8884d8"
-                               :stroke "#8884d8" :fillOpacity 0.6}
-                          :pv {:include true :name :pv :fill "#ffc107"
-                               :stroke "#ffc107" :fillOpacity 0.6}
-                          :tv {:include true :name :tv :fill "#82ca9d"
-                               :stroke "#82ca9d" :fillOpacity 0.6}
-                          :amt {:include true :name :amt :fill "#ff00ff" 
-                                :stroke "#ff00ff" :fillOpacity 0.6}})
-
-
 (defn- data-ratom []
   [data-ratom-example/example
    :container-id :radar-chart-2-data-ratom-demo
@@ -92,7 +82,7 @@
    :source-code chart/source-code
    :config-tools config-tools/meta-tabular-config-column-ratom-tools
    :component chart/component
-   :default-config-data default-config-data])
+   :default-config-data chart/sample-config-data])
 
 
 (defn- config-structure []
@@ -108,7 +98,7 @@
    :sample-data chart/sample-data
    :source-code chart/source-code
    :component chart/component
-   :default-config-data default-config-data])
+   :default-config-data chart/sample-config-data])
 
 
 (defn- config-sub []
@@ -125,7 +115,7 @@
      :config-tools config-tools/meta-tabular-config-column-sub-tools
      :component chart/component
      :config-data [container-id :blackboard :config-data]
-     :default-config-data default-config-data]))
+     :default-config-data chart/sample-config-data]))
 
 
 (defn examples []
