@@ -14,6 +14,9 @@
 
 (def source-code '[])
 (def sample-data example-data/meta-tabular-data)
+(def sample-config-data {:name  {:keys [:Page-A :Page-B :Page-C :Page-D :Page-E :Page-F :Page-G]}
+                         :fill "#888888"
+                         :value {:keys [:uv :pv :tv :amt] :chosen :uv}})
 
 
 (defn local-config [data]

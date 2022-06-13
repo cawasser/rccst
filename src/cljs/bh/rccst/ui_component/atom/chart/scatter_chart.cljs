@@ -16,6 +16,10 @@
 (def sample-data
   "the Scatter Chart works best with \"triplet data\" so we return the triplet-data from utils"
   data/meta-tabular-data)
+(def sample-config-data (merge data/tabular-row-config-data
+                          {:values {:keys [:Page-A :Page-B :Page-C
+                                           :Page-D :Page-E :Page-F :Page-G]
+                                    :x :uv :y :pv :z :amt}}))
 
 
 (defn local-config [data]

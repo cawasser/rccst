@@ -79,7 +79,7 @@
 ; TODO: convert :color to :fill/:stroke throughout
 (def tabular-row-config-data {:Page-A {:name "Page A" :include true :color "#ff0000"} ;"#8884d8"}
                               :Page-B {:name "Page B" :include true :color "#00ff00"} ;"#ffc107"}
-                              :Page-C {:name "Page C" :include true :color "#00ff00"} ;"#82ca9d"}
+                              :Page-C {:name "Page C" :include true :color "#0000ff"} ;"#82ca9d"}
                               :Page-D {:name "Page D" :include true :color "#ffff00"} ;"#ff00ff"}
                               :Page-E {:name "Page E" :include true :color "#ff00ff"} ;"#00e5ff"}
                               :Page-F {:name "Page F" :include true :color "#00ffff"} ;"#4db6ac"}
