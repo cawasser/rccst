@@ -16,14 +16,10 @@
 (log/info "bh.rccst.views.atom.example.chart.sankey-chart-2")
 
 
-(def default-config-data {{:name "Visit" :color "#82ca9d"}
-                          {:name "Direct-Favourite" :color "#82ca9d"}})
-
-
 (defn- data-ratom []
   [data-ratom-example/example
    :container-id :sankey-chart-data-ratom-demo
-   :title "Sankey Chart (Live Data - ratom) - IN PROGRESS (not complete)"
+   :title "Sankey Chart (Live Data - ratom)"
    :description "A Sankey Chart built using [Recharts](https://recharts.org/en-US/api/SankeyChart). This example shows how
   charts can take [ratoms](http://reagent-project.github.io/docs/master/reagent.ratom.html) as input and re-render as the data changes.
 
@@ -35,13 +31,14 @@
    :source-code chart/source-code
    :component chart/component
    :data-panel chart-utils/dag-data-panel
-   :config-panel chart/config-panel])
+   :config-panel chart/config-panel
+   :link-color-fn chart/color-white->target])
 
 
 (defn- data-structure []
   [data-structure-example/example
    :container-id :sankey-chart-data-ratom-demo
-   :title "Sankey Chart (Live Data - structure) - IN PROGRESS (not complete)"
+   :title "Sankey Chart (Live Data - structure)"
    :description "A Sankey Chart built using [Recharts](https://recharts.org/en-US/api/SankeyChart) with colored Cells. This example shows how
   charts can take [ratoms](http://reagent-project.github.io/docs/master/reagent.ratom.html) as input and re-render as the data changes.
 
@@ -51,14 +48,15 @@
    :source-code chart/source-code
    :component chart/component
    :data-panel chart-utils/dag-data-panel
-   :config-panel chart/config-panel])
+   :config-panel chart/config-panel
+   :link-color-fn chart/color-source->white])
 
 
 (defn data-sub []
   (let [container-id :sankey-chart-data-ratom-demo]
     [data-sub-example/example
      :container-id container-id
-     :title "Sankey Chart (Live Data - subscription) - IN PROGRESS (not complete)"
+     :title "Sankey Chart (Live Data - subscription)"
      :description "A Sankey Chart built using [Recharts](https://recharts.org/en-US/api/SankeyChart) with colored Cells. This example shows how
      charts can take [subscriptions](https://day8.github.io/re-frame/subscriptions/) as input and re-render as the configuration changes.
 
@@ -66,17 +64,18 @@
 "
      :sample-data [container-id :blackboard :topic.sample-data]
      :default-data chart/sample-data
-     :data-tools data-tools/dag-data-ratom-tools
+     :data-tools data-tools/dag-data-sub-tools
      :source-code chart/source-code
      :component chart/component
      :data-panel chart-utils/dag-data-panel
-     :config-panel chart/config-panel]))
+     :config-panel chart/config-panel
+     :link-color-fn chart/color-source->target]))
 
 
 (defn- config-ratom []
   [config-ratom-example/example
    :container-id :sankey-chart-data-ratom-demo
-   :title "Sankey Chart (Live Configuration - ratom) - IN PROGRESS (not complete)"
+   :title "Sankey Chart (Live Configuration - ratom)"
    :description "A Sankey Chart built using [Recharts](https://recharts.org/en-US/api/SankeyChart) with colored Cells. This example shows how
      charts can take [ratoms](http://reagent-project.github.io/docs/master/reagent.ratom.html) as input and re-render as the configuration changes.
 
@@ -88,13 +87,13 @@
    :config-tools config-tools/dag-data-config-ratom-tools
    :source-code chart/source-code
    :component chart/component
-   :default-config-data default-config-data])
+   :default-config-data chart/sample-config-data])
 
 
 (defn- config-structure []
   [config-structure-example/example
    :container-id :sankey-config-structure-demo
-   :title "Sankey Chart (Live Configuration - structure) - IN PROGRESS (not complete)"
+   :title "Sankey Chart (Live Configuration - structure)"
    :description "A Sankey Chart built using [Recharts](https://recharts.org/en-US/api/SankeyChart) with colored Cells. This example shows how
      charts can take [ratoms](http://reagent-project.github.io/docs/master/reagent.ratom.html) as input and re-render as the configuration changes.
 
@@ -104,14 +103,14 @@
    :sample-data chart/sample-data
    :source-code chart/source-code
    :component chart/component
-   :default-config-data default-config-data])
+   :default-config-data chart/sample-config-data])
 
 
 (defn- config-sub []
   (let [container-id :sankey-config-sub-demo]
     [config-sub-example/example
      :container-id container-id
-     :title "Sankey Chart (Live Configuration - subscription) - IN PROGRESS (not complete)"
+     :title "Sankey Chart (Live Configuration - subscription)"
      :description "A Sankey Chart built using [Recharts](https://recharts.org/en-US/api/SankeyChart) with colored Cells. This example shows how
      charts can take [subscriptions](https://day8.github.io/re-frame/subscriptions/) as input and re-render as the configuration changes.
 
@@ -121,7 +120,7 @@
      :source-code chart/source-code
      :component chart/component
      :config-data [container-id :blackboard :config-data]
-     :default-config-data default-config-data]))
+     :default-config-data chart/sample-config-data]))
 
 
 (defn examples []

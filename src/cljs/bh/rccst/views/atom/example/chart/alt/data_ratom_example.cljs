@@ -11,8 +11,7 @@
 
 
 (defn- data-update-example [component default-data
-                            & {:keys [data config-data container-id component-id
-                                      data-tools data-panel config-panel] :as params}]
+                            & {:keys [data data-tools] :as params}]
 
   ;(log/info "data-update-example (params)" params)
   ;(log/info "data-update-example" default-data)
@@ -23,13 +22,7 @@
    :width "100%"
    :height "100%"
    :children [[:div.chart-part {:style {:width "100%" :height "70%"}}
-               [component
-                :data data
-                :config-data config-data
-                :component-id component-id
-                :container-id container-id
-                :data-panel data-panel
-                :config-panel config-panel]]
+               (reduce into [component] params)]
               [rc/v-box
                :gap "5px"
                :style {:width "100%" :height "30%"}
@@ -37,27 +30,20 @@
                           [data-tools data default-data]]]]])
 
 
-(defn example [& {:keys [container-id
-                         title description
-                         sample-data data-tools
-                         source-code
-                         component data-panel config-panel]}]
+(defn example [& {:keys [container-id sample-data component] :as params}]
   (let [component-id (utils/path->keyword container-id "chart")
-        data         (r/atom sample-data)]
+        data         (r/atom sample-data)
+        input-params (assoc params
+                       :data data
+                       :component-id component-id
+                       :component (partial data-update-example component sample-data))
 
-    [example/component-example
-     :title title
-     :description description
-     :data data
-     :component (partial data-update-example component sample-data)
-     :extra-params {:data-tools data-tools
-                    :data-panel data-panel
-                    :config-panel config-panel}
-     :container-id container-id
-     :component-id component-id
-     :source-code source-code]))
+        ret (reduce into [example/component-example] (seq input-params))]
 
+    ;(log/info "example" ret)
+      ;"//////" params
+      ;"//////" input-params)
 
-
+    ret))
 
 

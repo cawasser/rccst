@@ -12,11 +12,6 @@
             [bh.rccst.views.atom.example.multi-example :as me]))
 
 
-(def default-config-data {:name  {:keys [:Page-A :Page-B :Page-C :Page-D :Page-E :Page-F :Page-G]}
-                          :fill "#938ae5"
-                          :value {:keys [:uv :pv :tv :amt] :chosen :uv}})
-
-
 (defn- data-ratom []
   [data-ratom-example/example
    :container-id :pie-chart-data-ratom-demo
@@ -84,7 +79,7 @@
    :config-tools config-tools/meta-tabular-config-pie-row-ratom-tools
    :source-code chart/source-code
    :component chart/component
-   :default-config-data default-config-data])
+   :default-config-data chart/sample-config-data])
 
 
 (defn- config-structure []
@@ -100,7 +95,7 @@
    :sample-data chart/sample-data
    :source-code chart/source-code
    :component chart/component
-   :default-config-data default-config-data])
+   :default-config-data chart/sample-config-data])
 
 
 (defn- config-sub []
@@ -117,7 +112,7 @@
      :source-code chart/source-code
      :component chart/component
      :config-data [container-id :blackboard :config-data]
-     :default-config-data default-config-data]))
+     :default-config-data chart/sample-config-data]))
 
 
 (defn examples []

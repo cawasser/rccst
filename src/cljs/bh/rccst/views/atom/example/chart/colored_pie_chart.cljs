@@ -12,17 +12,6 @@
             [bh.rccst.views.atom.example.multi-example :as me]))
 
 
-
-(def default-config-data {:Page-A {:name "Page A" :include true :color "#8884d8"}
-                          :Page-B {:name "Page B" :include true :color "#ffc107"}
-                          :Page-C {:name "Page C" :include true :color "#82ca9d"}
-                          :Page-D {:name "Page D" :include true :color "#ff00ff"}
-                          :Page-E {:name "Page E" :include true :color "#00e5ff"}
-                          :Page-F {:name "Page F" :include true :color "#4db6ac"}
-                          :Page-G {:name "Page G" :include true :color "#83a6ed"}
-                          :value {:keys [:uv :pv :tv :amt] :chosen :uv}})
-
-
 (defn- data-ratom []
   [data-ratom-example/example
    :container-id :colored-pie-chart-data-ratom-demo
@@ -91,7 +80,7 @@
    :config-tools config-tools/meta-tabular-config-row-ratom-tools
    :source-code chart/source-code
    :component chart/component
-   :default-config-data default-config-data])
+   :default-config-data chart/sample-config-data])
 
 
 (defn- config-structure []
@@ -107,7 +96,7 @@
    :sample-data chart/sample-data
    :source-code chart/source-code
    :component chart/component
-   :default-config-data default-config-data])
+   :default-config-data chart/sample-config-data])
 
 
 (defn- config-sub []
@@ -124,7 +113,7 @@
      :source-code chart/source-code
      :component chart/component
      :config-data [container-id :blackboard :config-data]
-     :default-config-data default-config-data]))
+     :default-config-data chart/sample-config-data]))
 
 
 (defn examples []

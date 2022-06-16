@@ -15,6 +15,7 @@
 
 (def source-code '[])
 (def sample-data example-data/meta-tabular-data)
+(def sample-config-data example-data/tabular-row-config-data)
 
 
 (defn local-config [data]
@@ -165,23 +166,16 @@
       [:> Tooltip {:content custom-tooltip}]]]))
 
 
-
-(defn component [& {:keys [data config-data component-id container-id
-                           data-panel config-panel] :as params}]
+(defn component [& {:keys [component-id] :as params}]
 
   ;(log/info "component-2" params)
 
-  [wrapper/base-chart
-   :data data
-   :config-data config-data
-   :component-id component-id
-   :container-id container-id
-   :component* component*
-   :component-panel wrapper/component-panel
-   :data-panel data-panel
-   :config-panel config-panel
-   :config config
-   :local-config local-config])
+  (let [input-params (assoc params :component* component*
+                                   :component-panel wrapper/component-panel
+                                   :config config
+                                   :local-config local-config)]
+
+    (reduce into [wrapper/base-chart] (seq input-params))))
 
 
 (def meta-data {:rechart/colored-pie-2 {:component component

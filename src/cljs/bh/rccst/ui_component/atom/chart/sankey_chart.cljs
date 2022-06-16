@@ -2,8 +2,9 @@
   (:require [bh.rccst.ui-component.atom.chart.utils :as utils]
             [bh.rccst.ui-component.atom.chart.wrapper-2 :as wrapper]
             [bh.rccst.ui-component.utils :as ui-utils]
-            [bh.rccst.ui-component.utils.example-data :as data]
             [bh.rccst.ui-component.utils.color :as c]
+            [bh.rccst.ui-component.utils.color :as color]
+            [bh.rccst.ui-component.utils.example-data :as data]
             ["recharts" :refer [ResponsiveContainer Sankey Tooltip Layer Rectangle Layer]]
             [re-com.core :as rc]
             [reagent.core :as r]
@@ -17,28 +18,28 @@
   "the Sankey Chart works best with \"directed acyclic graph data\" so we return the dag-data from utils"
   data/dag-data)
 
-(def dummy-config-data {:nodes {"Visit"            {:include true :fill "#ff0000" :stroke "#ff0000"}
-                                "Direct-Favourite" {:include true :fill "#00ff00" :stroke "#00ff00"}
-                                "Page-Click"       {:include true :fill "#0000ff" :stroke "#0000ff"}
-                                "Detail-Favourite" {:include true :fill "#12a4a4" :stroke "#12a4a4"}
-                                "Lost"             {:include true :fill "#ba7b47" :stroke "#ba7b47"}}
-                        :links {"Visit"            {:fill "#ff000040"}
-                                "Direct-Favourite" {:fill "#00ff0040"}
-                                "Page-Click"       {:fill "#0000ff40"}
-                                "Detail-Favourite" {:fill "#12a4a440"}
-                                "Lost"             {:fill "#ba7b4740"}}})
+
+(def sample-config-data data/dag-config-data)
 
 
 (defn local-config [data]
   ;(log/info "local-config" @data)
 
-  {:isAnimationActive true
-   :tooltip           {:include true}
-   :node              {:fill "#77c878" :stroke "#000000"}
-   :link              {:stroke "#77c878" :curve 0.5}})
+  (merge
+    {:link    {:curve 0.5}
+     :tooltip {:include true}}
+    (->> @data
+      :nodes
+      (map-indexed (fn [idx {:keys [name] :as all}]
+                     {name {:key     all
+                            :include true
+                            :fill    (color/get-color idx)
+                            :stroke  (color/get-color idx)}}))
+      (into {}))))
 
 
 (defn config [component-id data]
+  ;(log/info "config" component-id data)
   (merge
     ui-utils/default-pub-sub
     (local-config data)
@@ -46,25 +47,42 @@
                  :data-path [:containers (keyword component-id) :tab-panel]}}))
 
 
+(defn- color-config [component-id label path position]
+  [rc/v-box :src (rc/at)
+   :gap "5px"
+   :children [[utils/boolean-config component-id label (conj path :include)]
+              [utils/color-config component-id ":fill" (conj path :fill) position]
+              [utils/color-config component-id ":stroke" (conj path :stroke) position]]])
+
+
+(defn- make-config [component-id data]
+  ;(log/info "make-config" component-id "//" @data)
+
+  (->> @data
+    :nodes
+    (map-indexed (fn [idx {:keys [name]}]
+                   [color-config component-id name [name] :below-right]))
+    (into [])))
+
+
 (defn config-panel [data component-id]
   ;(log/info "config-panel" data "//" component-id)
 
   [rc/v-box :src (rc/at)
-   :width "400px"
-   :height "500px"
    :gap "5px"
    :children [[utils/tooltip component-id]
               [rc/line :size "2px"]
-              [rc/v-box :src (rc/at)
-               :gap "5px"
-               :children [[utils/color-config-text component-id "node fill" [:node :fill] :right-below]
-                          [utils/color-config-text component-id "node stroke" [:node :stroke] :right-below]]]
-              [rc/line :size "2px"]
-              [utils/color-config-text component-id "link stroke" [:link :stroke] :right-below]
               [rc/h-box :src (rc/at)
                :gap "5px"
                :children [[utils/text-config component-id ":curve" [:link :curve]]
-                          [utils/slider-config component-id 0 1 0.1 [:link :curve]]]]]])
+                          [utils/slider-config component-id 0 1 0.1 [:link :curve]]]]
+              [rc/line :size "2px"]
+              [rc/h-box :src (rc/at)
+               :width "100%"
+               :height "100%"
+               :style ui-utils/h-wrap
+               :gap "10px"
+               :children (make-config component-id data)]]])
 
 
 (def source-code '[:> Sankey
@@ -94,24 +112,22 @@
 > See [here](https://cljdoc.org/d/reagent/reagent/1.1.0/doc/tutorials/react-features#hooks)
 > for details on how the Reagent/React interop work for this
 "
-  [containerWidth props]
+  [subscriptions containerWidth props]
   (let [{x                           "x"
          y                           "y"
          width                       "width"
          height                      "height"
          index                       "index"
          {name "name" value "value"} "payload"} (js->clj props)
-        isOut  (< containerWidth (+ x width 30 6))
+        isOut  (< containerWidth (+ x width 30 6))]
 
-        c      (get (:nodes dummy-config-data) name)
-        fill   (:fill c)
-        stroke (:stroke c)]
-
-    (log/info "complex-node" name containerWidth fill stroke props)
+    ;(log/info "complex-node" name containerWidth props)
 
     (r/as-element
       [:> Layer {:key (str "CustomNode$" index)}
-       [:> Rectangle {:x x :y y :width width :height height :fill fill :stroke stroke}]
+       [:> Rectangle {:x      x :y y :width width :height height
+                      :fill   (ui-utils/resolve-sub subscriptions [name :fill])
+                      :stroke (ui-utils/resolve-sub subscriptions [name :stroke])}]
        [:text {:textAnchor (if isOut "end" "start")
                :x          (if isOut (- x 6) (+ x width 6))
                :y          (+ y (/ height 2))
@@ -125,7 +141,6 @@
                :stroke        "#333"
                :strokeOpacity 0.5}
         (str value "k")]])))
-
 
 
 (defn- make-svg-string [sourceX, targetX,
@@ -147,37 +162,73 @@
     "Z"))
 
 
-(defn- complex-link [props]
+(defn color-source->white [subscriptions index payload]
+  (let [color-from (ui-utils/resolve-sub subscriptions [(get-in payload [:source :name]) :fill])
+        c-from     (-> color-from
+                     c/hex->rgba
+                     (assoc :a 0.5)
+                     c/rgba-map->js-function)
+        c-to       (-> color-from
+                     c/hex->rgba
+                     (assoc :a 0.05)
+                     c/rgba-map->js-function)]
+    [:defs
+     [:linearGradient {:id (str "linkGradient$" index)}
+      [:stop {:offset "0%" :stopColor c-from}]
+      [:stop {:offset "100%" :stopColor c-to}]]]))
+
+
+(defn color-white->target [subscriptions index payload]
+  (let [color-to (ui-utils/resolve-sub subscriptions [(get-in payload [:target :name]) :fill])
+        c-from   (-> color-to
+                   c/hex->rgba
+                   (assoc :a 0.05)
+                   c/rgba-map->js-function)
+        c-to     (-> color-to
+                   c/hex->rgba
+                   (assoc :a 0.5)
+                   c/rgba-map->js-function)]
+    [:defs
+     [:linearGradient {:id (str "linkGradient$" index)}
+      [:stop {:offset "0%" :stopColor c-from}]
+      [:stop {:offset "100%" :stopColor c-to}]]]))
+
+
+(defn color-source->target [subscriptions index payload]
+  (let [color-from (ui-utils/resolve-sub subscriptions [(get-in payload [:source :name]) :fill])
+        color-to   (ui-utils/resolve-sub subscriptions [(get-in payload [:target :name]) :fill])
+        c-from     (-> color-from
+                     c/hex->rgba
+                     (assoc :a 0.5)
+                     c/rgba-map->js-function)
+        c-mid      (-> color-from
+                     c/hex->rgba
+                     (assoc :a 0.2)
+                     c/rgba-map->js-function)
+        c-to       (-> color-to
+                     c/hex->rgba
+                     (assoc :a 0.3)
+                     c/rgba-map->js-function)]
+    [:defs
+     [:linearGradient {:id (str "linkGradient$" index)}
+      [:stop {:offset "0%" :stopColor c-from}]
+      [:stop {:offset "30%" :stopColor c-mid}]
+      [:stop {:offset "100%" :stopColor c-to}]]]))
+
+
+(defn- complex-link [subscriptions link-color-fn props]
   (let [{:keys [sourceX, targetX,
                 sourceY, targetY,
                 sourceControlX, targetControlX,
                 linkWidth,
-                index, payload]} (js->clj props :keywordize-keys true)
-        color-from (:fill (get (:nodes dummy-config-data) (get-in payload [:source :name])))
-        color-to (:fill (get (:nodes dummy-config-data) (get-in payload [:target :name])))
-        c-from (-> color-from
-                 c/hex->rgba
-                 (assoc :a 0.5)
-                 c/rgba-map->js-function)
-        c-mid  (-> color-from
-                 c/hex->rgba
-                 (assoc :a 0.2)
-                 c/rgba-map->js-function)
-        c-to (-> color-to
-               c/hex->rgba
-               (assoc :a 0.3)
-               c/rgba-map->js-function)]
+                index, payload]} (js->clj props :keywordize-keys true)]
 
     ;(log/info "complex-link (props)" (js->clj props :keywordize-keys true))
 
     (r/as-element
       [:> Layer {:key (str "CustomLink$" index)}
 
-       [:defs
-        [:linearGradient {:id (str "linkGradient$" index)}
-         [:stop {:offset "0%" :stopColor c-from}]
-         [:stop {:offset "30%" :stopColor c-mid}]
-         [:stop {:offset "100%" :stopColor c-to}]]]
+       (link-color-fn subscriptions index payload)
 
        [:path {:d           (make-svg-string
                               sourceX, targetX,
@@ -189,48 +240,64 @@
                :strokeWidth 0}]])))
 
 
+(defn- ->sankey [data]
+  (assoc data
+    :nodes (->> data :nodes (sort-by :index) (into []))
+    :links (->> data
+             :links
+             (map (fn [{:keys [source target] :as link}]
+                    (assoc link :source (->> data
+                                          :nodes
+                                          (filter #(= (:name %) source))
+                                          first
+                                          :index)
+                                :target (->> data
+                                          :nodes
+                                          (filter #(= (:name %) target))
+                                          first
+                                          :index)))))))
 
-(comment
-  (-> "#ff00ff" c/hex->rgba (assoc :a 0.5) c/rgba-map->js-function)
 
-  ())
-
-(defn- component* [& {:keys [data component-id container-id
-                             subscriptions]
+(defn- component* [& {:keys [data component-id link-color-fn subscriptions]
                       :as   params}]
 
-  ;(log/info "component-star" component-id "//" data "//" subscriptions)
+  ;(log/info "component-star" component-id
+  ;"//" data
+  ;"//" subscriptions
+  ;"//" link-color-fn
 
   (let [tooltip?    (ui-utils/resolve-sub subscriptions [:tooltip :include])
         curve       (ui-utils/resolve-sub subscriptions [:link :curve])]
 
-    [:div "sankey chart"]
-    [:> ResponsiveContainer
-     [:> Sankey
-      {:node          (partial complex-node 700)
-       :data          data
-       :margin        {:top 20 :bottom 20 :left 20 :right 20}
-       :nodeWidth     10
-       :nodePadding   60
-       :linkCurvature curve
-       :iterations    64
-       :link          complex-link}
-      (when tooltip? [:> Tooltip])]]))
+    ; NOTE: super hack here!!! we need the config-data change to force a re-render
+    ; because the sankey only redraws the nodes and links when the cursor moves over them
+    ; otherwise
+    [:div {:class
+           (subs (str @(ui-utils/subscribe-local component-id [])) 0 10)
+           :style {:width "100%" :height "100%"}}
+
+     [:> ResponsiveContainer
+      [:> Sankey
+       {:node          (partial complex-node subscriptions 700)
+        :data          (->sankey data)
+        :margin        {:top 20 :bottom 20 :left 20 :right 20}
+        :nodeWidth     10
+        :nodePadding   60
+        :linkCurvature curve
+        :iterations    64
+        :link          (partial complex-link subscriptions (or link-color-fn color-source->white))}
+       (when tooltip? [:> Tooltip])]]]))
 
 
-(defn component [& {:keys [data config-data component-id container-id
-                           data-panel config-panel] :as params}]
-  [wrapper/base-chart
-   :data data
-   :config-data config-data
-   :component-id component-id
-   :container-id container-id
-   :component* component*
-   :component-panel wrapper/component-panel
-   :data-panel data-panel
-   :config-panel config-panel
-   :config config
-   :local-config local-config])
+(defn component [& {:keys [component-id] :as params}]
+
+  ;(log/info "component" params)
+
+  (let [input-params (assoc params :component-panel wrapper/component-panel
+                                   :config config
+                                   :local-config local-config
+                                   :component* component*)]
+    (reduce into [wrapper/base-chart] input-params)))
 
 
 (def meta-data {:component component

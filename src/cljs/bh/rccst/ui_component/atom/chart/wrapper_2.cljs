@@ -11,7 +11,7 @@
 (log/info "bh.rccst.ui-component.atom.chart.wrapper-2")
 
 
-(defn component-panel [& {:keys [data config-data component-id container-id component* local-config] :as params}]
+(defn component-panel [& {:keys [data config-data component-id component* local-config] :as params}]
   ;(log/info "component-panel" params)
 
   (let [d                  (h/resolve-value data)
@@ -33,7 +33,10 @@
             override-subs (when config-data (l/process-locals [] nil @c))
             subscriptions (if config-data
                             (ui-utils/override-subs @c local-subs override-subs)
-                            local-subs)]
+                            local-subs)
+            input-params (assoc params :data @d
+                                       :isAnimationActive? isAnimationActive?
+                                       :subscriptions subscriptions)]
 
         ;(log/info "component-panel (render)" @c
           ;"// (local-config)" l-c
@@ -47,18 +50,14 @@
            :style {:width "100%" :height "100%"}
            :heading "Waiting for data"]
 
-          [component*
-           :data @d
-           :component-id component-id
-           :container-id container-id
-           :subscriptions subscriptions
-           :isAnimationActive? isAnimationActive?])))))
+          (reduce into [component*] (seq input-params)))))))
 
 
-(defn configurable-component-panel [& {:keys [data component-id container-id
-                                              component*
+(defn configurable-component-panel [& {:keys [data component-id
                                               config local-config
-                                              config-panel data-panel]}]
+                                              config-panel data-panel] :as params}]
+
+  ;(log/info "configurable-component-panel" params)
 
   (let [open?        (r/atom false)
         config-key   (keyword component-id "config")
@@ -67,7 +66,7 @@
         selected-tab (ui-utils/path->keyword component-id "tab-panel.value")
         chart-events [config-key data-key tab-panel selected-tab]]
 
-    ;(log/info "configurable-component" component-id "//" data "//" @d)
+    ;(log/info "configurable-component" component-id "//" data)
 
     (ui-utils/init-container-locals component-id (config component-id (h/resolve-value data)))
 
@@ -99,27 +98,14 @@
                                     [data-panel d]
                                     [config-panel d component-id]]]
                                   [:div.chart-content {:style {:width "60%" :height "100%"}}
-                                   [component-panel
-                                    :component* component*
-                                    :local-config local-config
-                                    :data data
-                                    :component-id component-id
-                                    :container-id container-id]]]
+                                   (reduce into [component-panel] (seq params))]]
 
                                  [[:div.chart-content {:style {:width "100%" :height "100%"}}
-                                   [component-panel
-                                    :component* component*
-                                    :local-config local-config
-                                    :data data
-                                    :component-id component-id
-                                    :container-id container-id]]])]]]))))
+                                   (reduce into [component-panel] (seq params))]])]]]))))
 
 
-(defn base-chart [& {:keys [data config-data
-                            component-id container-id
-                            component*
-                            config local-config
-                            data-panel config-panel] :as params}]
+(defn base-chart [& {:keys [data component-id container-id
+                            config config-panel] :as params}]
 
   ;(log/info "base-chart" params)
 
@@ -128,7 +114,7 @@
         d                 (h/resolve-value data)
         c                 (config component-id d)]
 
-    ;(log/info "base-chart"
+    ;(log/info "base-chart (let)"
     ;  component-id container-id
     ;  "//" data "//" @d
     ;  "//" not-configurable?)
@@ -142,23 +128,9 @@
 
       [:div.base-chart {:style {:width "100%" :height "100%"}}
        (if not-configurable?
-         [component-panel
-          :data data
-          :config-data config-data
-          :config config
-          :local-config local-config
-          :component-id @id
-          :container-id container-id
-          :component* component*]
+         (reduce into [component-panel] (seq params))
 
-         [configurable-component-panel
-          :data data
-          :config config
-          :local-config local-config
-          :component-id @id
-          :container-id container-id
-          :data-panel data-panel
-          :config-panel config-panel
-          :component* component*])])))
+         (reduce into [configurable-component-panel] (seq params)))])))
+
 
 

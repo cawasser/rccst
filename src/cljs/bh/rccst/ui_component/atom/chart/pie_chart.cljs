@@ -14,6 +14,9 @@
 
 (def source-code '[])
 (def sample-data example-data/meta-tabular-data)
+(def sample-config-data {:name  {:keys [:Page-A :Page-B :Page-C :Page-D :Page-E :Page-F :Page-G]}
+                         :fill "#888888"
+                         :value {:keys [:uv :pv :tv :amt] :chosen :uv}})
 
 
 (defn local-config [data]
@@ -67,8 +70,6 @@
 (defn config-panel [data component-id]
   [rc/v-box :src (rc/at)
    :gap "10px"
-   :width "100%"
-   :height "500px"
    :style {:padding          "15px"
            :border-top       "1px solid #DDD"
            :background-color "#f7f7f7"}
@@ -76,7 +77,7 @@
               [rc/line :src (rc/at) :size "2px"]
               [utils/option component-id ":name" [:name]]
               [rc/line :src (rc/at) :size "2px"]
-              [utils/option component-id ":value" [:value]]
+              [utils/column-picker data component-id ":value" [:value :chosen]]
               [utils/color-config-text component-id ":fill" [:fill] :above-right]
               [rc/v-box :src (rc/at)
                :gap "5px"
@@ -113,22 +114,16 @@
                :isAnimationActive @isAnimationActive?}]]]))
 
 
-(defn component [& {:keys [data config-data component-id container-id
-                           data-panel config-panel] :as params}]
+(defn component [& {:keys [component-id] :as params}]
 
   ;(log/info "component-2" params)
 
-  [wrapper/base-chart
-   :data data
-   :config-data config-data
-   :component-id component-id
-   :container-id container-id
-   :component* component*
-   :component-panel wrapper/component-panel
-   :data-panel data-panel
-   :config-panel config-panel
-   :config config
-   :local-config local-config])
+  (let [input-params (assoc params :component* component*
+                                   :component-panel wrapper/component-panel
+                                   :config config
+                                   :local-config local-config)]
+
+    (reduce into [wrapper/base-chart] (seq input-params))))
 
 
 (def meta-data {:component component
