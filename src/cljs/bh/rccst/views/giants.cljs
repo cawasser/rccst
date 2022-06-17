@@ -187,7 +187,10 @@
             :align :center
             :justify :center
             :children [[:figure.image {:style {:width "200px" :height "200px"}}
-                        [:img.is-rounded {:src (or (if (empty? image) nil image) "imgs/hammer-icon-16x16.png")}]]
+                        [:img {:style {:border-top-left-radius "5rem"
+                                       :border-bottom-right-radius "5rem"}
+                               :src (or (if (empty? image) nil image)
+                                      "imgs/hammer-icon-16x16.png")}]]
                        [rc/gap :size "15px"]
                        [:p.title.is-1.has-text-centered name]]]]
    :back [:div {:style flippable/default-style}
