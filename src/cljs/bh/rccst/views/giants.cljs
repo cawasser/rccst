@@ -187,6 +187,7 @@
             :align :center
             :justify :center
             :children [[:figure.image {:style {:width "200px" :height "200px"}}
+                        ; see https://www.youtube.com/watch?v=4ALLynsZ0u0
                         [:img {:style {:border-top-left-radius "5rem"
                                        :border-bottom-right-radius "5rem"
                                        :background "#808080"}
