@@ -149,8 +149,8 @@
 [All I needed for FP I learned in High School Algebra](https://www.youtube.com/watch?v=epT1xgxSpFU) (2017)"}
 
              {:name        "Will Byrd"
-              :image       "imgs/giants/wil-byrd.png"
-              :description "Wil is a programming language researcher, and co-author of the [Reasoned Schemer](https://mitpress.mit.edu/books/reasoned-schemer) and
+              :image       "imgs/giants/will-byrd.png"
+              :description "Will is a programming language researcher, and co-author of the [Reasoned Schemer](https://mitpress.mit.edu/books/reasoned-schemer) and
               [miniKanren](http://minikanren.org).
 
 [Barliman: trying the halting problem backwards, blindfolded](https://www.youtube.com/watch?v=er_lLvkklsk) (2016)
