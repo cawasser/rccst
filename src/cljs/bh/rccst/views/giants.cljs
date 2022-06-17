@@ -188,7 +188,8 @@
             :justify :center
             :children [[:figure.image {:style {:width "200px" :height "200px"}}
                         [:img {:style {:border-top-left-radius "5rem"
-                                       :border-bottom-right-radius "5rem"}
+                                       :border-bottom-right-radius "5rem"
+                                       :background "#808080"}
                                :src (or (if (empty? image) nil image)
                                       "imgs/hammer-icon-16x16.png")}]]
                        [rc/gap :size "15px"]
