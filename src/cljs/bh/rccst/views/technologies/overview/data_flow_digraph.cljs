@@ -127,37 +127,77 @@ Let's walk through an example.
 The very simplest example is to take a single source and connect it directly to a UI component without
 any additional processing, so:
 
-![Figure 4. Simplest possible UI example visualized as a directed graph.](/imgs/data-flow/simplest-digraph-model.png)
+![Figure 4a. Simplest possible UI example visualized as a directed graph.](/imgs/data-flow/simplest-digraph-model.png)
+![Figure 4b. A UI can also be visualized as an Event Model.](/imgs/data-flow/simplest-event-model.png)
 
-_Figure 4. Simplest possible UI example visualized as a directed graph._
+_Figure 4. Simplest possible UI example visualized as a Directed Graph or as an Event Model._
 
-As you can see, we have a single `:source/remote`, which we will call `:topic/data` and a single UI
-components, which we will call `:ui/data-table`. By design, we give each element of the model a
-name (`:topic/data` and `:ui/data-table`) so we can refer to them throughout the definition.
+As you can see, we have a single `:source/remote`, which we will call `:source/data` and a single UI
+components, which we will call `:ui/table`. By design, we give each element of the model a
+name (`:source/data` and `:ui/table`) so we can refer to them throughout the definition.
 
-It is also possible to visualize the same UI as an Event Model, as shown in Figure 5. As you can see, the Event Model shows the
+It is also possible to visualize the same UI as an Event Model. As you can see, the Event Model shows the
 UI element, called the 'View' in EM-speak, with the data source at the bottom, represented as line, showing the data as an 'Event',
 hence the Orange color
-
-![Figure 5. A UI can also be visualized as an Event Model](/imgs/data-flow/simplest-event-model.png)
-
-_Figure 5. A UI can also be visualized as an Event Model._
-
 
 Each element also has a _type_ which tells the processing logic how to actually implement the required logic.
 Our toolkit provides dozens of pre-built data and UI components, and you can always develop your own.
 
 
+In Our system, UI element are described like this:
 
 ```
 (def ui-definition
   {:components   {:topic/measurements {:type :source/remote :name :source/measurements}
-                  :ui/bar-chart       {:type :ui/component :name :rechart/bar-2}}
+                  :ui/bar-chart       {:type :ui/component :name :rechart/bar}}
 
    :links        {:topic/measurements {:data {:ui/bar-chart :data}}}
 
    :grid-layout  [{:i :ui/bar-chart :x 0 :y 0 :w 20 :h 11 :static true}]})
 ```
+
+While Microservices (which are based upon [Willa](https://github.com/DaveWM/willa)), look like this:
+
+```
+(def sudoku-service
+  {:entities {:topic/event-in        (assoc rpl-puzzle-topic ::w/entity-type :topic)
+              :stream/solve-puzzle   {::w/entity-type :kstream
+                                      ::w/xform       sudoku-pipeline}
+              :topic/answer-out      (assoc rpl-solution-topic ::w/entity-type :topic)}
+   :workflow [[:topic/event-in :stream/solve-puzzle]
+              [:stream/solve-puzzle :topic/answer-out]]})
+```
+It's easy to see the relative similarities between these two description. Let's look at each part individually.
+
+
+#### Components / Entities
+
+Whether it's called `:component` or `:entities`, this section describes the individual building block (think LEGO)
+that make up the working part of the flow. These are the things that do the work: draw the UI, compute values, represent
+data fetched (subscribed really) from servers, etc.
+
+The actual software element that implements these component, for example :rechart/bar,
+
+
+#### Links / Workflow
+
+`:links` or `:workflow` describe how the different parts connect to each other, turning a picture of 'blocks' into
+a directed graph.
+
+In the case of the UI `:links`, each component can be designed with multiple input and multiple outputs. This
+is further described by metadata stored in a run-time registry.
+
+
+##### :workflow
+
+Each connect is describe by a tuple: `[ <source item> <target item>]`.
+
+
+#### Grid Layout
+
+`:grid-layout` is only needed for the UI, and it describe how the various UI-components, that tables, charts, diagrams,
+etc. are to be arranged on the display. We use a user-customizable graph component (built in ReactJS)
+
 "]]
 
 
@@ -181,7 +221,8 @@ Our toolkit provides dozens of pre-built data and UI components, and you can alw
      [layout/markdown-block
       "### Differences from Dataflow programming
 
-Dataflow programming (see [here]()), is often implemented (defined?) such that the processing steps
+Dataflow programming (see [here](https://en.wikipedia.org/wiki/Dataflow_programming)), is often implemented (defined?)
+such that the processing steps
 execute as soon as their inputs all become available. In contrast, in our implementation, there are
 circumstances where the process will trigger when _any_ of the inputs are available (the other inputs are
 assumed to have default values). Our approach assures that transformation updates will be computed whenever
@@ -212,7 +253,12 @@ our 'data flows _downhill_' analogy for our directed-graph visualization and men
 Let's look at an example.
 
 
-See also [Reactive Programming](https://en.wikipedia.org/wiki/Reactive_programming)
+See also
+
+- [Reactive Programming](https://en.wikipedia.org/wiki/Reactive_programming)
+- [Functional Reactive Programming](https://en.wikipedia.org/wiki/Functional_reactive_programming)
+- [Stream Processing](https://en.wikipedia.org/wiki/Stream_processing)
+
 "]]]])
 
 
