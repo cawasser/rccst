@@ -11,6 +11,7 @@
              com.stuartsierra/component                    {:mvn/version "1.1.0"}
              com.stuartsierra/component.repl               {:mvn/version "1.0.0"}
              com.taoensso/sente                            {:mvn/version "1.16.2"}
+             expound/expound                               {:mvn/version "0.9.0"}
              http-kit/http-kit                             {:mvn/version "2.5.3"}
              metosin/compojure-api                         {:mvn/version "2.0.0-alpha31"}
              metosin/ring-http-response                    {:mvn/version "0.9.3"}
@@ -40,9 +41,9 @@
              org.clojars.ertucetin/re-frame-flow           {:mvn/version "0.1.4"}
              com.lucasbradstreet/cljs-uuid-utils           {:mvn/version "1.0.2"}
              aysylu/loom                                   {:mvn/version "1.0.2"}
-             thheller/shadow-cljs                          {:mvn/version "2.19.0"}
+             thheller/shadow-cljs                          {:mvn/version "2.16.12"}
              io.github.kovasap/oz                          {:git/url "https://github.com/kovasap/oz"
-                                                            :git/sha "d5d490d21ea8d42740b09def2abab7c334d52520"}}
+                                                            :sha "d5d490d21ea8d42740b09def2abab7c334d52520"}}
  ;:git/tag "vega-import-fix" :git/sha "4bf14e7"}}
  ;metasoarous/oz                                {:mvn/version "2.0.0-alpha5"}}
 
@@ -105,11 +106,15 @@
              ;
              ; and run it  via:
              ;
-             ; clojure -J-Dclojure.main.report=stderr -Tnvd nvd.task/check :classpath '"'"$(clojure -Spath -A:any:aliases)"'"'
+             ; clojure -J-Dclojure.main.report=stderr -Tnvd nvd.task/check :classpath '"'"$(clojure -Spath -A:run)"'"'
              ;
              ; be sure to put any aliases (if we develop any) in place of -A:any:aliases
              ;
 
+
+             :artifact-name {:extra-deps {jgrodziski/metav {:git/url "https://github.com/jgrodziski/metav.git"
+                                                            :sha "e8bffd9b2a5c27f552eec96ad6c72ce9b5dcc372"}}
+                             :main-opts ["-m" "metav.display"]}
 
              ; add a git tag to mark version "releases"
              ; see https://github.com/jgrodziski/metav#release

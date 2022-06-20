@@ -2,7 +2,11 @@
   (:require [re-com.core :as rc]
             [bh.rccst.ui-component.atom.chart.utils :as chart-utils]
             [bh.rccst.ui-component.utils :as ui-utils]
-            [bh.rccst.ui-component.utils.helpers :as h]))
+            [bh.rccst.ui-component.utils.helpers :as h]
+            [taoensso.timbre :as log]))
+
+
+(log/info "bh.rccst.views.atom.example.chart.alt.config-tools")
 
 
 (defn meta-tabular-config-column-ratom-tools [config-data default-config-data]
@@ -142,3 +146,25 @@
                   [rc/button :on-click #(h/handle-change-path config-data [:value :chosen] :tv) :label ":tv"]
                   [rc/button :on-click #(h/handle-change-path config-data [:value :chosen] :amt) :label ":amt"]]])))
 
+
+(defn dag-data-config-ratom-tools [config-data default-config-data]
+  [rc/h-box :src (rc/at)
+   :gap "10px"
+   :style {:border     "1px solid" :border-radius "3px"
+           :box-shadow "5px 5px 5px 2px"
+           :margin     "5px" :padding "5px"}
+   :children [[:label.h5 "Config:"]
+              [rc/button :on-click #(reset! config-data default-config-data) :label "Default"]
+              [rc/button :on-click #(swap! config-data update-in [:Page-A :include] not) :label "! Visit"]]])
+
+
+
+(defn dag-data-config-sub-tools [config-data default-config-data]
+  [rc/h-box :src (rc/at)
+   :gap "10px"
+   :style {:border     "1px solid" :border-radius "3px"
+           :box-shadow "5px 5px 5px 2px"
+           :margin     "5px" :padding "5px"}
+   :children [[:label.h5 "Config:"]
+              [rc/button :on-click #(h/handle-change-path config-data [] default-config-data) :label "Default"]
+              [rc/button :on-click #(log/info "do something") :label "! Visit"]]])

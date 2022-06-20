@@ -98,14 +98,7 @@
 
 
 (defn process-components [configuration node-type registry container-id]
-
-  (let [components (->> configuration
-                     :components
-                     (filter (fn [[_ meta-data]]
-                               (= node-type (:type meta-data)))))
-        all-exist (map (fn [{:keys [name]}] (get registry name)) components)]
-
-    ;(log/info "process-components" container-id node-type
+   ;(log/info "process-components" container-id node-type
     ;  "//" components "//" all-exist)
 
     (doall
@@ -121,5 +114,5 @@
                                :configuration configuration
                                :registry      registry
                                :component-id  (ui-utils/path->keyword container-id node)
-                               :container-id  container-id})))))))
+                               :container-id  container-id}))))))
 

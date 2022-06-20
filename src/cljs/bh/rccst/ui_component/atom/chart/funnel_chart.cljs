@@ -17,10 +17,11 @@
 (def sample-data
   "the Funnel Chart works best with \"paired data\" so we return the paired-data from utils"
   data/meta-tabular-data)
+(def sample-config-data data/tabular-row-config-data)
 
 
 (defn local-config [data]
-  (log/info "local-config" data)
+  ;(log/info "local-config" data)
   (let [d      (get @data :data)
         fields (get-in @data [:metadata :fields])]
     ;(log/info "configgg : " @data)
@@ -50,7 +51,7 @@
 
 
 (defn config [component-id data]
-  (log/info "config" @data)
+  ;(log/info "config" @data)
   (merge
     ui-utils/default-pub-sub
     utils/default-config
@@ -84,7 +85,7 @@
 
 
 (defn config-panel [data component-id]
-  (log/info "config-panel")
+  ;(log/info "config-panel")
   [rc/v-box :src (rc/at)
    :gap "10px"
    :width "100%"
@@ -127,7 +128,7 @@
                              subscriptions isAnimationActive?]
                       :as   params}]
 
-  (log/info "funnel component*" params)
+  ;(log/info "funnel component*" params)
   (let [d (if (empty? data) [] (get data :data))
         included (included-cells d subscriptions)]
 
@@ -154,28 +155,25 @@
                                :isAnimationActive @isAnimationActive?}]])
 
 
-(defn component [& {:keys [data config-data component-id container-id
-                           data-panel config-panel] :as params}]
+(defn component [& {:keys [component-id] :as params}]
 
-  (log/info "component-2 funnel" params)
+  ;(log/info "component-2 funnel" params)
 
-  [wrapper/base-chart
-   :data data
-   :config-data config-data
-   :component-id component-id
-   :container-id container-id
-   :component* component*
-   :component-panel wrapper/component-panel
-   :data-panel data-panel
-   :config-panel config-panel
-   :config config
-   :local-config local-config])
+  (let [input-params (assoc params :component* component*
+                                   :component-panel wrapper/component-panel
+                                   :config config
+                                   :local-config local-config)]
+
+    (reduce into [wrapper/base-chart] (seq input-params))))
 
 
 (def meta-data {:component component
                 :sources   {:data :source-type/meta-tabular}
                 :pubs      []
                 :subs      []})
+
+
+
 
 (comment
 

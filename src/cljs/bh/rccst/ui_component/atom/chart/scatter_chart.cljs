@@ -1,16 +1,50 @@
 (ns bh.rccst.ui-component.atom.chart.scatter-chart
   (:require [bh.rccst.ui-component.atom.chart.utils :as utils]
-            [bh.rccst.ui-component.utils.example-data :as data]
-            [bh.rccst.ui-component.atom.chart.wrapper :as c]
+            [bh.rccst.ui-component.atom.chart.wrapper-2 :as wrapper]
             [bh.rccst.ui-component.utils :as ui-utils]
+            [bh.rccst.ui-component.utils.color :as color]
+            [bh.rccst.ui-component.utils.example-data :as data]
             [re-com.core :as rc]
-            [reagent.core :as r]
-            ["recharts" :refer [ResponsiveContainer ScatterChart Scatter Brush]]))
+            [taoensso.timbre :as log]
+            ["recharts" :refer [ResponsiveContainer ScatterChart Scatter Brush
+                                XAxis YAxis ZAxis Tooltip]]))
+
+
+(log/info "bh.rccst.ui-component.atom.chart.scatter-chart")
 
 
 (def sample-data
   "the Scatter Chart works best with \"triplet data\" so we return the triplet-data from utils"
-  (r/atom data/triplet-data))
+  data/meta-tabular-data)
+(def sample-config-data (merge data/tabular-row-config-data
+                          {:values {:keys [:Page-A :Page-B :Page-C
+                                           :Page-D :Page-E :Page-F :Page-G]
+                                    :x :uv :y :pv :z :amt}}))
+
+
+(defn local-config [data]
+  (let [d      (:data @data)
+        fields (get-in @data [:metadata :fields])]
+    (merge
+      (->> fields
+        (filter (fn [[k v]] (= :string v)))
+        keys
+        ((fn [m]
+           {:name {:keys m :chosen (first m)}})))
+
+      (->> fields
+        (filter (fn [[k v]] (= :number v)))
+        keys
+        ((fn [m]
+           {:values {:keys m :x (nth m 0) :y (nth m 1) :z (nth m 2)}})))
+
+      (->> d
+        (map-indexed (fn [idx entry]
+                       {(ui-utils/path->keyword (:name entry))
+                        {:name    (:name entry)
+                         :include true
+                         :color   (nth (cycle color/default-stroke-fill-colors) idx)}}))
+        (into {})))))
 
 
 (defn config
@@ -31,45 +65,101 @@
   - component-id : (string) unique id of the chart
   "
   [component-id data]
+  ;(log/info "scatter config" data)
   (->
     ui-utils/default-pub-sub
     (merge
       utils/default-config
-      {:tab-panel {:value     (keyword component-id "config")
-                   :data-path [:containers (keyword component-id) :tab-panel]}
-       :brush     false})
-    (assoc-in [:x-axis :dataKey] :x)
-    (assoc-in [:y-axis :dataKey] :y)
-    (assoc-in [:fill :color] "#8884d8")))
+      (ui-utils/config-tab-panel component-id)
+      (local-config data))))
 
 
-(defn config-panel
-  "the panel of configuration controls
+(defn- cell-config [component-id label path position]
+  (let [p (ui-utils/path->keyword path)]
+    ;(log/info "cell-config" component-id "//" label "//" p)
+    [rc/h-box
+     :gap "5px"
+     :children [[utils/boolean-config component-id "" (conj [p] :include)]
+                [utils/color-config-text component-id label (conj [p] :color) :right-above]]]))
 
-  ---
 
-  - data : (atom) data to display (may be used by the standard configuration components for thins like axes, etc.
-  - config : (atom) holds all the configuration settings made by the user
-  "
-  [data component-id]
+(defn- make-cell-config [component-id data]
+  (->> (:data @data)
+    (map-indexed (fn [idx {:keys [name] :as item}]
+                   [cell-config component-id name [name] :above-right]))
+    (into [:<>])))
+
+
+(defn config-panel [data component-id]
+  ;(log/info "scatter config-panel" component-id "//" data)
 
   [rc/v-box :src (rc/at)
    :gap "10px"
-   :width "100%"
+   :width "400px"
    :style {:padding          "15px"
            :border-top       "1px solid #DDD"
            :background-color "#f7f7f7"}
-   :children [[utils/standard-chart-config data component-id]
-              [rc/line :size "2px"]
-              [utils/boolean-config component-id ":brush" [:brush]]
-              [rc/line :size "2px"]
-              [utils/color-config-text component-id ":fill" [:fill :color] :above-right]]])
+   :children [[utils/non-gridded-chart-config @data component-id]
+              [rc/line :src (rc/at) :size "2px"]
+              [utils/option component-id ":name" [:name]]
+              [rc/line :src (rc/at) :size "2px"]
+              [utils/column-picker data component-id ":x" [:values :x]]
+              [utils/column-picker data component-id ":y" [:values :y]]
+              [utils/column-picker data component-id ":z" [:values :z]]
+              [rc/line :src (rc/at) :size "2px"]
+              [rc/v-box :src (rc/at)
+               :gap "5px"
+               :children [[rc/label :src (rc/at) :label "Colors"]
+                          (make-cell-config component-id data)]]]])
 
 
 (def source-code `[:> ScatterChart {:width 400 :height 400}])
 
 
-(defn- component-panel
+(defn- make-scatter [data subscriptions]
+  (let [ret (->> data
+              :data
+              (map (fn [{:keys [name] :as item}]
+                     (if (ui-utils/resolve-sub subscriptions [name :include])
+                       [:> Scatter
+                        {:name name
+                         :fill (or (ui-utils/resolve-sub subscriptions [name :color])
+                                 (color/get-color 0))
+                         :data [item]}]
+                       [])))
+              (remove empty?)
+              (into [:<>]))]
+
+    ;(log/info "make-scatter" values "//" ret)
+    ret))
+
+
+(defn- get-range-across-fields [data column]
+  (let [all-values  (->> data
+                      :data
+                      (map #(get % column))
+                      (distinct))
+        domainMax   (apply max all-values)
+        domainMin   (apply min all-values)]
+
+    ;(log/info "get-range-across-fields" column domainMin domainMax)
+
+    [domainMin domainMax]))
+
+
+(comment
+  (def data sample-data)
+  (def column :amt)
+
+  (->> data
+    :data
+    (map #(get % column))
+    (distinct))
+
+  ())
+
+
+(defn- component*
   "the chart to draw, taking cues from the settings of the configuration panel
 
   ---
@@ -77,79 +167,93 @@
   - data : (atom) any data shown by the component's ui
   - component-id : (string) unique identifier for this specific widget instance
   "
-  [data component-id container-id ui]
-  (let [scatter-dot-fill   (ui-utils/subscribe-local component-id [:fill :color])
-        x-axis?            (ui-utils/subscribe-local component-id [:x-axis :include])
-        x-axis-dataKey     (ui-utils/subscribe-local component-id [:x-axis :dataKey])
-        y-axis?            (ui-utils/subscribe-local component-id [:y-axis :include])
-        y-axis-dataKey     (ui-utils/subscribe-local component-id [:y-axis :dataKey])
-        isAnimationActive? (ui-utils/subscribe-local component-id [:isAnimationActive])
-        brush?             (ui-utils/subscribe-local component-id [:brush])]
+  [& {:keys [data component-id container-id
+             subscriptions isAnimationActive?]
+      :as   params}]
 
-    (fn [data component-id container-id ui]
-      ;(log/info "configurable-Scatter-chart" @config @data)
+  ;(log/info "component*" data)
 
-      [:> ResponsiveContainer
-       [:> ScatterChart
+  (let [x      (ui-utils/resolve-sub subscriptions [:values :x])
+        y      (ui-utils/resolve-sub subscriptions [:values :y])
+        z      (ui-utils/resolve-sub subscriptions [:values :z])
+        domain ()]
 
-        (utils/standard-chart-components component-id ui)
+    [:> ResponsiveContainer
+     [:> ScatterChart
 
-        (when @brush? [:> Brush])
+      (utils/chart-grid component-id {})
 
-        ;; TODO: looks like we need to add more attributes to x- & y-axis
-        ;;
-        ;(when @x-axis? [:> XAxis {:type "number" :dataKey @x-axis-dataKey :name "stature" :unit "cm"}])
-        ;(when @y-axis? [:> YAxis {:type "number" :dataKey @y-axis-dataKey :name "weight" :unit "kg"}])
+      [:> Tooltip]
+      [:> XAxis {:type "number" :dataKey (name x)}]
+      [:> YAxis {:type "number" :dataKey (name y)}]
+      [:> ZAxis {:type "number" :dataKey (name z)
+                 :range (get-range-across-fields data z)}]
 
-        [:> Scatter {:name              "tempScatter" :data @data
-                     :isAnimationActive @isAnimationActive?
-                     :fill              @scatter-dot-fill}]]])))
+      (make-scatter data subscriptions)]]))
 
+(defn component [& {:keys [data config-data component-id container-id
+                           data-panel config-panel] :as params}]
 
-(defn configurable-component
-  "the chart to draw, taking cues from the settings of the configuration panel
+  ;(log/info "component" params)
 
-  the component creates its own ID (a random-uuid) to hold the local state. This way multiple charts
-  can be placed inside the same outer container/composite
-
-  ---
-
-  - :data : (atom) any data shown by the component's ui
-  - :component -id : (string) name of this chart
-  - :container-id : (string) name of the container this chart is inside of
-  "
-  ([& {:keys [data component-id container-id]}]
-   [c/base-chart
-    :data data
-    :config (config component-id data)
-    :component-id component-id
-    :container-id (or container-id "")
-    :data-panel utils/tabular-data-panel
-    :config-panel config-panel
-    :component-panel component-panel]))
+  [wrapper/base-chart
+   :data data
+   :config-data config-data
+   :component-id component-id
+   :container-id container-id
+   :component* component*
+   :component-panel wrapper/component-panel
+   :data-panel data-panel
+   :config-panel config-panel
+   :config config
+   :local-config local-config])
 
 
-(defn component
-  "the chart to draw. this variant does NOT provide a configuration panel
+(def meta-data {:component component
+                :sources   {:data :source-type/meta-tabular}
+                :pubs      []
+                :subs      []})
 
-  ---
+(comment
+  (def data sample-data)
 
-  - :data : (atom) any data shown by the component's ui
-  - :component -id : (string) name of this chart
-  - :container-id : (string) name of the container this chart is inside of
-  "
-  ([& {:keys [data component-id container-id]}]
-   [c/base-chart
-    :data data
-    :config (config component-id data)
-    :component-id component-id
-    :container-id (or container-id "")
-    :component-panel component-panel]))
+  (->> @data
+    (map #(-> % (dissoc :name)))
+    (map #(->> % vals (zipmap [:x :y :z]))))
 
 
-(def meta-data {:component              component
-                :configurable-component configurable-component
-                :sources                {:data :source-type/meta-tabular}
-                :pubs                   []
-                :subs                   []})
+  ())
+
+
+(comment
+  (def data [{:name "page-1" :fill "#ffffff" :uv 4000 :pv 2400 :amt 2400}
+             {:name "page-2" :fill "#00ff00" :uv 3000 :pv 1398 :amt 2210}])
+
+  (first data)
+
+
+  (map (fn [{:keys [x]}] {:x x}) data)
+
+  (map (fn [{:keys [name]}] {:x name}) data)
+
+  (map (fn [{:keys [name fill]}] [:> Scatter {:name name :fill fill}]) data)
+
+  (map (fn [{:keys [name fill uv pv amt]}] [:> Scatter {:name name :fill fill :data {:uv uv :pv pv :amt amt}}]) data)
+
+
+  (into [:<>] (map (fn [{:keys [name fill uv pv amt]}] [:> Scatter {:name name :fill fill :data {:uv uv :pv pv :amt amt}}]) data))
+
+
+  ())
+
+
+(comment
+  (def item {:name "name" :uv "uv" :pv "pv" :tv "tv"})
+  (def values '(:uv :pv))
+
+  (select-keys item values)
+
+  ())
+
+
 

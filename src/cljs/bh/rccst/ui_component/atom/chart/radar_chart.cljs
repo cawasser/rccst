@@ -17,6 +17,7 @@
 
 (log/info "bh.rccst.ui-component.atom.chart.radar-chart")
 
+
 (def source-code '[:> RadarChart {:width 400 :height 400 :outerRadius "75%" :data @data}
                    (utils/non-gridded-chart-components component-id)
 
@@ -29,29 +30,10 @@
                               :stroke      "#8884d8"
                               :fillOpacity 0.5}]])
 
-(defn radar-data [data]
-  (let [d (:data data)
-        meta (:metadata data)
-        fields (get-in data [:metadata :fields])]
-    (merge
-      {:metadata (assoc meta :domain :fullMark
-                             :fields (assoc (dissoc fields :tv :amt) :fullMark :number))}
-      {:data (map #(assoc % :fullmark 10000) (map #(dissoc % :tv :amt) d))})))
 
+(def sample-data example-data/meta-tabular-data)
+(def sample-config-data example-data/tabular-column-config-data)
 
-(def sample-data (radar-data example-data/meta-tabular-data))
-
-
-;(def sample-data {:metadata {:type   :tabular
-;                             :id     :subject
-;                             :domain :fullMark
-;                             :fields {:subject :string :A :number :B :number :fullMark :number}}
-;                  :data     [{:subject "Math" :A 120 :B 110 :fullMark 150}
-;                             {:subject "Chinese" :A 98 :B 130 :fullMark 150}
-;                             {:subject "English" :A 100 :B 110 :fullMark 150}
-;                             {:subject "History" :A 77 :B 81 :fullMark 150}
-;                             {:subject "Economics" :A 99 :B 140 :fullMark 150}
-;                             {:subject "Literature" :A 98 :B 105 :fullMark 150}]})
 
 (defn- get-range-across-fields [data]
   (let [source-data (get-in @data [:data])
@@ -61,12 +43,10 @@
                       (map-indexed (fn [idx a] (map #(a %) source-data)))
                       (reduce into)
                       (distinct))
-        domainMin   (apply min all-values)
         domainMax   (apply max all-values)]
-    ;(log/info "domain min = " domainMin, "domain max = " domainMax)
-    (if (= domainMin domainMax)
-      {:domain [0 domainMax]}
-      {:domain [domainMin domainMax]})))
+    ;(log/info "domain max = " domainMax)
+
+    {:domain [0 domainMax]}))
 
 
 (defn- get-field-range [field data]
@@ -99,7 +79,7 @@
 > [tabular-data]()
   "
   [data]
-  ;(log/info "localconfig: " data)
+  ;(log/info "local-config" data)
   (let [ret (merge (domain-range data)
               (->> (get-in @data [:metadata :fields])
                 (filter (fn [[k v]] (= :number v)))
@@ -111,7 +91,7 @@
                                    :stroke      (color/get-color idx)
                                    :fillOpacity 0.6}}))
                 (into {})))]
-    (log/info "local-config" ret)
+    ;(log/info "local-config" ret)
     ret))
 
 
@@ -146,7 +126,7 @@
 
 
 (defn- radar-config [component-id label path position]
-  ;(log/info "radarr config")
+  ;(log/info "radar-config" component-id label path position)
   [rc/v-box :src (rc/at)
    :gap "5px"
    :children [[utils/boolean-config component-id label (conj path :include)]
@@ -156,13 +136,17 @@
 
 
 (defn- make-radar-config [component-id data]
-  ;(log/info "make radar config")
-  (->> (get-in @data [:metadata :fields])
-    (filter (fn [[k v]] (= :number v)))
-    keys
-    (map-indexed (fn [idx a]
-                   [radar-config component-id a [a] :above-right]))
-    (into [])))
+  ;(log/info "make-radar-config" @data)
+  (let [ret (->> (get-in @data [:metadata :fields])
+              (filter (fn [[k v]] (= :number v)))
+              keys
+              (map-indexed (fn [idx a]
+                             ^{:key (str "radar-config-" a)}
+                             [radar-config component-id a [a] :below-right]))
+              (into []))]
+
+    ;(log/info "make-radar-config" ret)
+    ret))
 
 
 (defn config-panel
@@ -177,21 +161,23 @@
 
   [rc/v-box :src (rc/at)
    :gap "10px"
-   :width "400px"
+   :width "100%"
+   :height "100%"
    :style {:padding          "15px"
            :border-top       "1px solid #DDD"
            :background-color "#f7f7f7"}
-   :children [[utils/non-gridded-chart-config component-id]
-              [rc/line :src (rc/at) :size "2px"]
+   :children [;[utils/non-gridded-chart-config component-id]
+              ;[rc/line :src (rc/at) :size "2px"]
               [rc/h-box :src (rc/at)
-               :width "400px"
+               :width "100%"
+               :height "100%"
                :style ui-utils/h-wrap
                :gap "10px"
                :children (make-radar-config component-id data)]]])
 
 
 (defn- make-radar-display [data subscriptions isAnimationActive?]
-  ;(log/info "make-radar-display: " subscriptions)
+  ;(log/info "make-radar-display" data "//" subscriptions)
   (let [ret (->> (get-in data [:metadata :fields])
               (filter (fn [[_ v]] (= :number v)))
               keys
@@ -205,7 +191,7 @@
                        [])))
               (remove empty?)
               (into [:<>]))]
-    ;(log/info "ret" ret)
+    ;(log/info "make-radar-display (ret)" ret)
     ret))
 
 
@@ -221,35 +207,33 @@
              subscriptions isAnimationActive?]
       :as params}]
 
-  ;(log/info "radar component* : " data " // " subscriptions)
-  (let [d (if (empty? data) [] (get data :data))]
+  ;(log/info "radar component*" data " // " subscriptions)
+
+  (let [d (if (empty? data) [] (get data :data))
+        domain (ui-utils/resolve-sub subscriptions [:domain])]
 
     [:> ResponsiveContainer
      [:> RadarChart {:data d}
       [:> PolarGrid]
       [:> PolarAngleAxis {:dataKey :name}]
-      [:> PolarRadiusAxis {:angle "30" :domain (ui-utils/resolve-sub subscriptions [:domain])}]
+      [:> PolarRadiusAxis {:angle 60 :domain (or domain [0 10000])}]
 
-      (utils/non-gridded-chart-components component-id {})
+      ;(utils/non-gridded-chart-components component-id {})
 
       (make-radar-display data subscriptions isAnimationActive?)]]))
 
-(defn component [& {:keys [data config-data component-id container-id
-                           data-panel config-panel] :as params}]
+
+(defn component [& {:keys [component-id] :as params}]
 
   ;(log/info "Radar component-2" params)
 
-  [wrapper/base-chart
-   :data data
-   :config-data config-data
-   :component-id component-id
-   :container-id container-id
-   :component* component*
-   :component-panel wrapper/component-panel
-   :data-panel data-panel
-   :config-panel config-panel
-   :config config
-   :local-config local-config])
+  (let [input-params (assoc params :component* component*
+                                   :component-panel wrapper/component-panel
+                                   :config config
+                                   :local-config local-config)]
+
+    (reduce into [wrapper/base-chart] (seq input-params))))
+
 
 (def meta-data {:component              component
                 :ports     {:data   :port/sink

@@ -8,12 +8,8 @@
             [bh.rccst.views.atom.example.chart.alt.data-ratom-example :as data-ratom-example]
             [bh.rccst.views.atom.example.chart.alt.data-structure-example :as data-structure-example]
             [bh.rccst.views.atom.example.chart.alt.data-sub-example :as data-sub-example]
-            [bh.rccst.views.atom.example.chart.alt.data-tools :as data-tools]))
-
-
-(def default-config-data {:name  {:keys [:Page-A :Page-B :Page-C :Page-D :Page-E :Page-F :Page-G]}
-                          :fill "#938ae5"
-                          :value {:keys [:uv :pv :tv :amt] :chosen :uv}})
+            [bh.rccst.views.atom.example.chart.alt.data-tools :as data-tools]
+            [bh.rccst.views.atom.example.multi-example :as me]))
 
 
 (defn- data-ratom []
@@ -83,7 +79,7 @@
    :config-tools config-tools/meta-tabular-config-pie-row-ratom-tools
    :source-code chart/source-code
    :component chart/component
-   :default-config-data default-config-data])
+   :default-config-data chart/sample-config-data])
 
 
 (defn- config-structure []
@@ -99,7 +95,7 @@
    :sample-data chart/sample-data
    :source-code chart/source-code
    :component chart/component
-   :default-config-data default-config-data])
+   :default-config-data chart/sample-config-data])
 
 
 (defn- config-sub []
@@ -116,16 +112,14 @@
      :source-code chart/source-code
      :component chart/component
      :config-data [container-id :blackboard :config-data]
-     :default-config-data default-config-data]))
-
+     :default-config-data chart/sample-config-data]))
 
 
 (defn examples []
-  [:div
-   [data-ratom]
-   [data-structure]
-   [data-sub]
-   [config-ratom]
-   [config-structure]
-   [config-sub]])
+  [me/examples {"data-ratom" [data-ratom]
+                "data-struct"  [data-structure]
+                "data-sub"  [data-sub]
+                "config-ratom"  [config-ratom]
+                "config-struct"  [config-structure]
+                "config-sub"  [config-sub]}])
 

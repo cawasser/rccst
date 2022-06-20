@@ -8,14 +8,8 @@
             [bh.rccst.views.atom.example.chart.alt.data-structure-example :as data-structure-example]
             [bh.rccst.views.atom.example.chart.alt.data-sub-example :as data-sub-example]
             [bh.rccst.views.atom.example.chart.alt.data-tools :as data-tools]
-            [bh.rccst.views.atom.example.chart.alt.config-tools :as config-tools]))
-
-
-(def default-config-data {:brush false
-                          :uv    {:include true, :fill "#ff0000", :stackId ""}
-                          :pv    {:include true, :fill "#00ff00", :stackId ""}
-                          :tv    {:include true, :fill "#0000ff", :stackId "a"}
-                          :amt   {:include true, :fill "#745ea5", :stackId "a"}})
+            [bh.rccst.views.atom.example.chart.alt.config-tools :as config-tools]
+            [bh.rccst.views.atom.example.multi-example :as me]))
 
 
 (defn- data-ratom []
@@ -88,7 +82,7 @@
    :config-tools config-tools/meta-tabular-config-column-ratom-tools
    :source-code chart/source-code
    :component chart/component
-   :default-config-data default-config-data])
+   :default-config-data chart/sample-config-data])
 
 
 (defn- config-structure []
@@ -104,7 +98,7 @@
    :sample-data chart/sample-data
    :source-code chart/source-code
    :component chart/component
-   :default-config-data default-config-data])
+   :default-config-data chart/sample-config-data])
 
 
 (defn- config-sub []
@@ -123,14 +117,13 @@
      :source-code chart/source-code
      :component chart/component
      :config-data [container-id :blackboard :config-data]
-     :default-config-data default-config-data]))
+     :default-config-data chart/sample-config-data]))
 
 
 (defn examples []
-  [:div
-   [data-ratom]
-   [data-structure]
-   [data-sub]
-   [config-ratom]
-   [config-structure]
-   [config-sub]])
+  [me/examples {"data-ratom" [data-ratom]
+                "data-struct"  [data-structure]
+                "data-sub"  [data-sub]
+                "config-ratom"  [config-ratom]
+                "config-struct"  [config-structure]
+                "config-sub"  [config-sub]}])

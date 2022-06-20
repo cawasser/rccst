@@ -1,9 +1,7 @@
 (ns bh.rccst.views.atom.example.misc.bh.data-table
   (:require [bh.rccst.ui-component.atom.bh.data-table :as table]
-            [bh.rccst.ui-component.utils :as ui-utils]
-            [bh.rccst.ui-component.utils.helpers :as h]
-            [reagent.core :as r]
             [re-com.core :as rc]
+            [reagent.core :as r]
             [taoensso.timbre :as log]
             [woolybear.ad.catalog.utils :as acu]
             [woolybear.ad.layout :as layout]))
@@ -30,8 +28,8 @@
               [rc/button :on-click #(reset! data (into [] (drop-last 2 @data)))
                :label "Drop Last 2"]
               [rc/button :on-click #(reset! data (into []
-                                                  (map (fn [x]
-                                                         (assoc x :new-item 1750)) @data)))
+                                                   (map (fn [x]
+                                                          (assoc x :new-item 1750)) @data)))
                :label "Add :new-item"]]])
 
 
@@ -51,14 +49,15 @@
 
 (defn example []
   (let [component-id "data-table-demo"]
-    (acu/demo "Data Table"
-              "Table using [fixed-data-table](https://github.com/schrodinger/fixed-data-table-2)  tags. data comes from a ratom
+    (acu/demo
+      "Data Table"
+      "Table using [fixed-data-table](https://github.com/schrodinger/fixed-data-table-2)  tags. data comes from a ratom
 
-        > No meta-data. Feel free to use the controls at the bottom to change the data and see how the Table responds."
-              [layout/centered {:extra-classes :width-50}
-               [data-update-example
-                :data data
-                :config-data (r/atom {:config "data"})]]
+> No meta-data. Feel free to use the controls at the bottom to change the data and see how the Table responds."
+      [layout/centered {:extra-classes :width-50}
+       [data-update-example
+        :data data
+        :config-data (r/atom {:config "data"})]]
 
-              '[table/table :data table/sample-data])))
+      '[table/table :data table/sample-data])))
 

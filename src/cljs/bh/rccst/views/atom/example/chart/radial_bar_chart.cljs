@@ -8,18 +8,9 @@
             [bh.rccst.views.atom.example.chart.alt.config-structure-example :as config-structure-example]
             [bh.rccst.views.atom.example.chart.alt.config-sub-example :as config-sub-example]
             [bh.rccst.views.atom.example.chart.alt.data-tools :as data-tools]
-            [bh.rccst.views.atom.example.chart.alt.config-tools :as config-tools]))
+            [bh.rccst.views.atom.example.chart.alt.config-tools :as config-tools]
+            [bh.rccst.views.atom.example.multi-example :as me]))
 
-
-
-(def default-config-data {:Page-A {:name "Page A" :include true :color "#8884d8"}
-                          :Page-B {:name "Page B" :include true :color "#ffc107"}
-                          :Page-C {:name "Page C" :include true :color "#82ca9d"}
-                          :Page-D {:name "Page D" :include true :color "#ff00ff"}
-                          :Page-E {:name "Page E" :include true :color "#00e5ff"}
-                          :Page-F {:name "Page F" :include true :color "#4db6ac"}
-                          :Page-G {:name "Page G" :include true :color "#83a6ed"}
-                          :value {:keys [:uv :pv :tv :amt] :chosen :uv}})
 
 
 (defn- data-ratom []
@@ -89,7 +80,7 @@
    :source-code chart/source-code
    :config-tools config-tools/meta-tabular-config-row-ratom-tools
    :component chart/component
-   :default-config-data default-config-data])
+   :default-config-data chart/sample-config-data])
 
 
 (defn- config-structure []
@@ -105,7 +96,7 @@
    :sample-data chart/sample-data
    :source-code chart/source-code
    :component chart/component
-   :default-config-data default-config-data])
+   :default-config-data chart/sample-config-data])
 
 
 (defn- config-sub []
@@ -119,18 +110,16 @@
 > In _this_ case, we are using a subscription to handle the configuration for the chart."
      :sample-data chart/sample-data
      :source-code chart/source-code
-     :config-tools config-tools/meta-tabular-config-column-sub-tools
+     :config-tools config-tools/meta-tabular-config-row-sub-tools
      :component chart/component
      :config-data [container-id :blackboard :config-data]
-     :default-config-data default-config-data]))
-
+     :default-config-data chart/sample-config-data]))
 
 
 (defn examples []
-  [:div
-   [data-ratom]
-   [data-structure]
-   [data-sub]
-   [config-ratom]
-   [config-structure]
-   [config-sub]])
+  [me/examples {"data-ratom" [data-ratom]
+                "data-struct"  [data-structure]
+                "data-sub"  [data-sub]
+                "config-ratom"  [config-ratom]
+                "config-struct"  [config-structure]
+                "config-sub"  [config-sub]}])

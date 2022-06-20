@@ -1,7 +1,8 @@
 (ns bh.rccst.ui-component.utils.example-data
-  (:require [cljs-uuid-utils.core :as uuid]
+  (:require [bh.rccst.subs :as subs]
+            [cljs-uuid-utils.core :as uuid]
             [cljs.spec.alpha :as spec]
-            [bh.rccst.subs :as subs]
+            [expound.alpha :as expound]
             [re-frame.core :as re-frame]
             [taoensso.timbre :as log]))
 
@@ -60,8 +61,41 @@
                    {:name "Page F" :uv 2390 :pv 3800 :amt 2500}
                    {:name "Page G" :uv 3490 :pv 4300 :amt 2100}])
 
+(def grouped-tabular-data [{:name "Page-A" :values [{:uv 4000 :pv 2400 :amt 400}
+                                                    {:uv 1000 :pv 400 :amt 2300}
+                                                    {:uv 2000 :pv 3400 :amt 5400}
+                                                    {:uv 3000 :pv 2498 :amt 5400}]}])
+                                                    ;{:name "Page B" :uv 3000 :pv 1398 :amt 2210}
+                                                    ;{:name "Page C" :uv 2000 :pv 9800 :amt 2290}
+                                                    ;{:name "Page D" :uv 2780 :pv 3908 :amt 2000}
+                                                    ;{:name "Page E" :uv 1890 :pv 4800 :amt 2181}
+                                                    ;{:name "Page F" :uv 2390 :pv 3800 :amt 2500}
+                                                    ;{:name "Page G" :uv 3490 :pv 4300 :amt 2100}}])
+
 (spec/def :tabular-data/entry map?)
 (spec/def :tabular-data/data (spec/coll-of :tabular-data/entry))
+
+
+(def tabular-column-config-data {:brush false
+                                 :uv    {:include true :fill "#ff0000" :stroke "#ff0000"
+                                         :name :uv :stackId "" :fillOpacity 0.6}
+                                 :pv    {:include true :fill "#00ff00" :stroke "#00ff00"
+                                         :name :pv :stackId "" :fillOpacity 0.6}
+                                 :tv    {:include true :fill "#0000ff" :stroke "#0000ff"
+                                         :name :tv :stackId "a" :fillOpacity 0.6}
+                                 :amt   {:include true :fill "#ff00ff" :stroke "#ff00ff"
+                                         :name :amt :stackId "a" :fillOpacity 0.6}})
+
+
+; TODO: convert :color to :fill/:stroke throughout
+(def tabular-row-config-data {:Page-A {:name "Page A" :include true :color "#ff0000"} ;"#8884d8"}
+                              :Page-B {:name "Page B" :include true :color "#00ff00"} ;"#ffc107"}
+                              :Page-C {:name "Page C" :include true :color "#0000ff"} ;"#82ca9d"}
+                              :Page-D {:name "Page D" :include true :color "#ffff00"} ;"#ff00ff"}
+                              :Page-E {:name "Page E" :include true :color "#ff00ff"} ;"#00e5ff"}
+                              :Page-F {:name "Page F" :include true :color "#00ffff"} ;"#4db6ac"}
+                              :Page-G {:name "Page G" :include true :color "#888888"} ;"#83a6ed"}
+                              :value {:keys [:uv :pv :tv :amt] :chosen :uv}})
 
 
 (def tabular-data-org [{:name "Page A" :org "Alpha" :uv 4000 :pv 2400 :amt 2400}
@@ -92,6 +126,23 @@
               {:name "Page E" :uv 1890 :pv 4800 :tv 1500 :amt 2181}
               {:name "Page F" :uv 2390 :pv 3800 :tv 1500 :amt 2500}
               {:name "Page G" :uv 3490 :pv 4300 :tv 1500 :amt 2100}]})
+(def BAD-meta-tabular-data-missing-type
+  {:metadata {:id     :name
+              :title  "Tabular Data with Metadata"
+              :fields {:name :string :uv :number :pv :number :tv :number :amt :number}}
+   :data     [{:name "Page A" :uv 4000 :pv 2400 :tv 1500 :amt 2400}
+              {:name "Page B" :uv 3000 :pv 1398 :tv 1500 :amt 2210}
+              {:name "Page C" :uv 2000 :pv 9800 :tv 1500 :amt 2290}
+              {:name "Page D" :uv 2780 :pv 3908 :tv 1500 :amt 2000}
+              {:name "Page E" :uv 1890 :pv 4800 :tv 1500 :amt 2181}
+              {:name "Page F" :uv 2390 :pv 3800 :tv 1500 :amt 2500}
+              {:name "Page G" :uv 3490 :pv 4300 :tv 1500 :amt 2100}]})
+(def BAD-meta-tabular-data-bad-field
+  {:metadata {:type   :data/tabular
+              :id     :name
+              :title  "Tabular Data with Metadata"
+              :fields {:name :keyword}}
+   :data     [{:name "Page A" :uv 4000 :pv 2400 :tv 1500 :amt 2400}]})
 
 (spec/def :data/type #{:data/tabular :data/entity})
 (spec/def :data/id keyword?)
@@ -104,7 +155,24 @@
 
 (comment
   (spec/valid? :tabular-data/meta-data meta-tabular-data)
+  (spec/valid? :tabular-data/meta-data BAD-meta-tabular-data-missing-type)
 
+  (spec/explain :tabular-data/meta-data BAD-meta-tabular-data-missing-type)
+  (spec/explain :tabular-data/meta-data BAD-meta-tabular-data-bad-field)
+
+  (expound/expound-str :tabular-data/meta-data meta-tabular-data)
+  (expound/expound :tabular-data/meta-data BAD-meta-tabular-data-missing-type)
+  (expound/expound-str :tabular-data/meta-data BAD-meta-tabular-data-missing-type)
+
+  (expound/expound :tabular-data/meta-data BAD-meta-tabular-data-bad-field)
+  (def error (expound/expound-str :tabular-data/meta-data BAD-meta-tabular-data-bad-field))
+
+
+  ; we can use re-com/alert-list data structure to display spec failures in place of the
+  ; expected UI using the "NEW" alert-list ui-component
+
+  (def alert-msg {:id   0 :alert-type :danger :heading "Parameter Error (Spec Failed)"
+                  :body error :padding "8px" :closeable? false})
 
   ())
 
@@ -218,14 +286,19 @@
                                  {:name "SortOperator" :size 2023}]}])
 
 
-(def dag-data {:nodes [{:name "Visit"}
-                       {:name "Direct-Favourite"}
-                       {:name "Page-Click"}
-                       {:name "Detail-Favourite"}
-                       {:name "Lost"}]
-               :links [{:source 0 :target 1 :value 3728.3}
-                       {:source 0 :target 2 :value 354170}
-                       {:source 2 :target 3 :value 62429}
-                       {:source 2 :target 4 :value 291741}]})
+(def dag-data {:nodes #{{:name :Visit :index 0}
+                        {:name :Direct-Favourite :index 1}
+                        {:name :Page-Click :index 2}
+                        {:name :Detail-Favourite :index 3}
+                        {:name :Lost :index 4}}
+               :links #{{:source :Visit :target :Direct-Favourite :value 37283}
+                        {:source :Visit :target :Page-Click :value 354170}
+                        {:source :Page-Click :target :Detail-Favourite :value 62429}
+                        {:source :Page-Click :target :Lost :value 291741}}})
 
 
+(def dag-config-data {:Visit            {:include true :fill "#ff0000" :stroke "#ff0000"}
+                      :Direct-Favourite {:include true :fill "#00ff00" :stroke "#00ff00"}
+                      :Page-Click       {:include true :fill "#0000ff" :stroke "#0000ff"}
+                      :Detail-Favourite {:include true :fill "#12a4a4" :stroke "#12a4a4"}
+                      :Lost             {:include true :fill "#ba7b47" :stroke "#ba7b47"}})
