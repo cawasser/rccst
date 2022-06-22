@@ -120,9 +120,8 @@ the data flows _down hill_.
 
 _Figure 3. A simplified directed graph of a UI._
 
-Let's walk through an example.
 
-#### Example
+#### Breaking It Down
 
 The very simplest example is to take a single source and connect it directly to a UI component without
 any additional processing, so:
@@ -250,7 +249,8 @@ to use 'reactive programming' techniques. Specifically, our approach is 'reactiv
 a change to the inputs automatically triggers a re-computation of the outputs. This is what drives
 our 'data flows _downhill_' analogy for our directed-graph visualization and mental model.
 
-Let's look at an example.
+An easy way to see this in action is to look at what happens behind the scenes in any dataflow-based UI
+that includes a `:source/remote`.
 
 
 See also
