@@ -47,10 +47,10 @@
 
 
 (def ui-definition
-  {:components  {:ui/bar-chart   {:type        :ui/component :name :rechart/bar-2
-                                  :config-data []}
+  {:components  {:ui/pie-chart   {:type        :ui/component :name :rechart/colored-pie-2
+                                  :config-data {}}
                  :ui/line-chart  {:type        :ui/component :name :rechart/line-2
-                                  :config-data []}
+                                  :config-data {}}
                  :topic/data     {:type :source/local :name :topic/data :default sample-data}
                  :topic/computed {:type :source/local :name :topic/computed}
                  :fn/data-fn     {:type  :source/fn :name compute-new-data
@@ -58,7 +58,7 @@
    :links       {:topic/data      {:data {:ui/line-chart :data
                                           :fn/data-fn    :data}}
                  :fn/data-fn      {:computed {:topic/computed :data}}
-                 :topic/computed {:data {:ui/bar-chart :data}}}
+                 :topic/computed {:data {:ui/pie-chart :data}}}
    :grid-layout [{:i :ui/line-chart :x 0 :y 0 :w 10 :h 11 :static true}
-                 {:i :ui/bar-chart :x 10 :y 0 :w 10 :h 11 :static true}]})
+                 {:i :ui/pie-chart :x 10 :y 0 :w 10 :h 11 :static true}]})
 

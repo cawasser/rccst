@@ -82,8 +82,7 @@
         "This example provides a 'widget' (collection of UI Components) organized into a digraph (Event Model) that
           describes the flow of data from sources (remote or local) into and out-of the UI.
 
-Here, we show the original data in the line chart, but the bar chart shows the result of `(:uv * :pv) / 1000`
-and `(:tv * :amt) / 1000`
+Here, we show the original data in the line chart while the pie chart shows the result of `(:uv * :pv) / 1000`
 
 "
         [layout/frame
