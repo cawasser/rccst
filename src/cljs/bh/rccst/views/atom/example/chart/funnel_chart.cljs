@@ -67,7 +67,7 @@
 
 (defn- config-ratom []
   [config-ratom-example/example
-   :container-id :funnel-config-ratom-demo
+   :container-id :funnel-chart-config-ratom-demo
    :title "Funnel Chart (Live Configuration - ratom)"
    :description "A Funnel Chart built using [Recharts](https://recharts.org/en-US/api/FunnelChart) with colored Cells. This example shows how
      charts can take [ratoms](http://reagent-project.github.io/docs/master/reagent.ratom.html) as input and re-render as the configuration changes.
@@ -85,7 +85,7 @@
 
 (defn- config-structure []
   [config-structure-example/example
-   :container-id :funnel-config-structure-demo
+   :container-id :funnel-chart-config-structure-demo
    :title "Funnel Chart (Live Configuration - structure)"
    :description "A Funnel Chart built using [Recharts](https://recharts.org/en-US/api/FunnelChart) with colored Cells. This example shows how
      charts can take [ratoms](http://reagent-project.github.io/docs/master/reagent.ratom.html) as input and re-render as the configuration changes.
@@ -100,7 +100,7 @@
 
 
 (defn- config-sub []
-  (let [container-id :funnel-config-sub-demo]
+  (let [container-id :funnel-chart-config-sub-demo]
     [config-sub-example/example
      :container-id container-id
      :title "Funnel Chart (Live Configuration - subscription)"

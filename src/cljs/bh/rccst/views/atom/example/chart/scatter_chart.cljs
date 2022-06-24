@@ -9,7 +9,11 @@
             [bh.rccst.views.atom.example.chart.alt.config-ratom-example :as config-ratom-example]
             [bh.rccst.views.atom.example.chart.alt.config-structure-example :as config-structure-example]
             [bh.rccst.views.atom.example.chart.alt.config-sub-example :as config-sub-example]
+            [bh.rccst.ui-component.utils :as ui-utils]
+            [bh.rccst.ui-component.utils.helpers :as h]
+            [bh.rccst.ui-component.utils :as u]
             [taoensso.timbre :as log]
+            [re-com.core :as rc]
             [bh.rccst.views.atom.example.multi-example :as me]))
 
 
@@ -18,7 +22,7 @@
 
 (defn- data-ratom []
   [data-ratom-example/example
-   :container-id :scatter-chart-data-ratom-demo
+   :container-id    :scatter-chart-data-ratom-demo
    :title "Scatter Chart (Live Data - ratom) - IN PROGRESS (not complete)"
    :description "A Scatter Chart built using [Recharts](https://recharts.org/en-US/api/ScatterChart). This example shows how
   charts can take [ratoms](http://reagent-project.github.io/docs/master/reagent.ratom.html) as input and re-render as the data changes.
@@ -37,7 +41,7 @@
 
 (defn- data-structure []
   [data-structure-example/example
-   :container-id :scatter-chart-data-ratom-demo
+   :container-id :scatter-chart-data-structure-demo
    :title "Scatter Chart (Live Data - structure) - IN PROGRESS (not complete)"
    :description "A Scatter Chart built using [Recharts](https://recharts.org/en-US/api/ScatterChart) with colored Cells. This example shows how
   charts can take [ratoms](http://reagent-project.github.io/docs/master/reagent.ratom.html) as input and re-render as the data changes.
@@ -52,7 +56,7 @@
 
 
 (defn data-sub []
-  (let [container-id :scatter-chart-data-ratom-demo]
+  (let [container-id :scatter-chart-data-sub-demo]
     [data-sub-example/example
      :container-id container-id
      :title "Scatter Chart (Live Data - subscription) - IN PROGRESS (not complete)"
@@ -70,9 +74,50 @@
      :config-panel chart/config-panel]))
 
 
+(defn- subscription-error [label path]
+  (log/info (str label " : " path " - error"))
+  [:div])
+
+
+(defn- column-picker [data component-id label path]
+  (let [model (u/subscribe-local component-id path)]
+    (fn []
+      (if model
+        (let [headings (apply set (map keys (get @data :data)))
+              btns     (mapv (fn [h] {:id h :label h}) headings)]
+          (log/info "column-picker" data "//" component-id "//" label "//" path)
+          [rc/h-box :src (rc/at)
+           :gap "5px"
+           :children [[rc/box :src (rc/at) :align :start :child [:code label]]
+                      [rc/horizontal-bar-tabs
+                       :src (rc/at)
+                       :model @model
+                       :tabs btns
+                       ;:style btns-style
+                       :on-change #(u/dispatch-local component-id path %)]]])
+        (subscription-error label path)))))
+
+
+(defn- meta-tabular-config-row-ratom-tools [config-data default-config-data data component-id]
+  (log/info "meta-tabular" component-id)
+  [rc/h-box :src (rc/at)
+   :gap "10px"
+   :style {:border     "1px solid" :border-radius "3px"
+           :box-shadow "5px 5px 5px 2px"
+           :margin     "5px" :padding "5px"}
+   :children [[:label.h5 "Config:"]
+              [rc/button :on-click #(reset! config-data default-config-data) :label "Default"]
+              [rc/button :on-click #(swap! config-data update-in [:Page-A :include] not) :label "! Page A"]
+              [rc/button :on-click #(swap! config-data update-in [:Page-C :include] not) :label "! Page C"]
+              [chart-utils/color-config config-data ":Page-D :color" [:Page-D :color] :above-center]
+              [column-picker data component-id ":x" [:values :x]]]])
+              ;[column-picker data component-id ":x" [:values :x] :label ":x"]
+              ;[column-picker data component-id ":x" [:values :x] :label ":x"]]])
+
+
 (defn- config-ratom []
   [config-ratom-example/example
-   :container-id :scatter-chart-data-ratom-demo
+   :container-id :scatter-chart-config-ratom-demo
    :title "Scatter Chart (Live Configuration - ratom) - IN PROGRESS (not complete)"
    :description "A Scatter Chart built using [Recharts](https://recharts.org/en-US/api/ScatterChart) with colored Cells. This example shows how
      charts can take [ratoms](http://reagent-project.github.io/docs/master/reagent.ratom.html) as input and re-render as the configuration changes.
@@ -82,7 +127,7 @@
 > You can use the buttons in the bottom-most panel to change some of the chart configuration options and see
 > how that affects the data (shown in the gray panel) and how the chart responds."
    :sample-data chart/sample-data
-   :config-tools config-tools/meta-tabular-config-row-ratom-tools
+   :config-tools meta-tabular-config-row-ratom-tools
    :source-code chart/source-code
    :component chart/component
    :default-config-data chart/sample-config-data])
@@ -90,7 +135,7 @@
 
 (defn- config-structure []
   [config-structure-example/example
-   :container-id :scatter-config-structure-demo
+   :container-id :scatter-chart-config-structure-demo
    :title "Scatter Chart (Live Configuration - structure) - IN PROGRESS (not complete)"
    :description "A Scatter Chart built using [Recharts](https://recharts.org/en-US/api/ScatterChart) with colored Cells. This example shows how
      charts can take [ratoms](http://reagent-project.github.io/docs/master/reagent.ratom.html) as input and re-render as the configuration changes.
@@ -104,8 +149,29 @@
    :default-config-data chart/sample-config-data])
 
 
+(defn meta-tabular-config-row-sub-tools [config-data default-config-data]
+  (let [page-a (ui-utils/subscribe-local config-data [:Page-A :include])
+        page-c (ui-utils/subscribe-local config-data [:Page-C :include])
+        tv? (ui-utils/subscribe-local config-data [:tv :include])]
+
+    (fn []
+      [rc/h-box :src (rc/at)
+       :gap "10px"
+       :style {:border     "1px solid" :border-radius "3px"
+               :box-shadow "5px 5px 5px 2px"
+               :margin     "5px" :padding "5px"}
+       :children [[:label.h5 "Config:"]
+                  [rc/button :on-click #(h/handle-change-path config-data [] default-config-data) :label "Default"]
+                  [rc/button :on-click #(h/handle-change-path config-data [:Page-A :include] (not @page-a)) :label "! Page A"]
+                  [rc/button :on-click #(h/handle-change-path config-data [:Page-C :include] (not @page-c)) :label "! Page C"]
+                  [chart-utils/color-config config-data ":Page-D :color" [:Page-D :color] :above-center]
+                  [rc/button :on-click #(h/handle-change-path config-data [:value :chosen] :uv) :label ":uv"]
+                  [rc/button :on-click #(h/handle-change-path config-data [:value :chosen] :tv) :label ":tv"]
+                  [rc/button :on-click #(h/handle-change-path config-data [:value :chosen] :amt) :label ":amt"]]])))
+
+
 (defn- config-sub []
-  (let [container-id :scatter-config-sub-demo]
+  (let [container-id :scatter-chart-config-sub-demo]
     [config-sub-example/example
      :container-id container-id
      :title "Scatter Chart (Live Configuration - subscription) - IN PROGRESS (not complete)"

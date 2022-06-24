@@ -32,7 +32,7 @@
 
 (defn- data-structure []
   [data-structure-example/example
-   :container-id :colored-pie-data-structure-demo
+   :container-id :colored-pie-chart-data-structure-demo
    :title "Colored Pie Chart (Live Data - structure)"
    :description "A Pie Chart built using [Recharts](https://recharts.org/en-US/api/PieChart) with colored Cells. This example shows how
   charts can take [ratoms](http://reagent-project.github.io/docs/master/reagent.ratom.html) as input and re-render as the data changes.
@@ -67,7 +67,7 @@
 
 (defn- config-ratom []
   [config-ratom-example/example
-   :container-id :colored-pie-config-ratom-demo
+   :container-id :colored-pie-chart-config-ratom-demo
    :title "Colored Pie Chart (Live Configuration - ratom)"
    :description "A Pie Chart built using [Recharts](https://recharts.org/en-US/api/PieChart) with colored Cells. This example shows how
      charts can take [ratoms](http://reagent-project.github.io/docs/master/reagent.ratom.html) as input and re-render as the configuration changes.
@@ -85,7 +85,7 @@
 
 (defn- config-structure []
   [config-structure-example/example
-   :container-id :colored-pie-config-structure-demo
+   :container-id :colored-pie-chart-config-structure-demo
    :title "Colored Pie Chart (Live Configuration - structure)"
    :description "A Pie Chart built using [Recharts](https://recharts.org/en-US/api/PieChart) with colored Cells. This example shows how
      charts can take [ratoms](http://reagent-project.github.io/docs/master/reagent.ratom.html) as input and re-render as the configuration changes.
@@ -100,7 +100,7 @@
 
 
 (defn- config-sub []
-  (let [container-id :colored-pie-config-sub-demo]
+  (let [container-id :colored-pie-chart-config-sub-demo]
     [config-sub-example/example
      :container-id container-id
      :title "Colored Pie Chart (Live Configuration - subscription)"
