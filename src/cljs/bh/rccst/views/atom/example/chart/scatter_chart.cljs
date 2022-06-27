@@ -14,6 +14,7 @@
             [bh.rccst.ui-component.utils :as u]
             [taoensso.timbre :as log]
             [re-com.core :as rc]
+            [reagent.core :as r]
             [bh.rccst.views.atom.example.multi-example :as me]))
 
 
@@ -22,7 +23,7 @@
 
 (defn- data-ratom []
   [data-ratom-example/example
-   :container-id    :scatter-chart-data-ratom-demo
+   :container-id :scatter-chart-data-ratom-demo
    :title "Scatter Chart (Live Data - ratom) - IN PROGRESS (not complete)"
    :description "A Scatter Chart built using [Recharts](https://recharts.org/en-US/api/ScatterChart). This example shows how
   charts can take [ratoms](http://reagent-project.github.io/docs/master/reagent.ratom.html) as input and re-render as the data changes.
@@ -78,8 +79,31 @@
   (log/info (str label " : " path " - error"))
   [:div])
 
+(def btns-style {:font-size   "12px"
+                 :line-height "20px"
+                 :padding     "6px 8px"})
 
-(defn- column-picker [data component-id label path]
+
+(defn- column-picker-atom [config-data label path]
+  (log/info "config-data of scatter" @config-data  "//" path)
+  (let [model (r/atom (get-in @config-data path))]
+    (fn []
+      (if model
+        (let [headings (into #{} (get-in @config-data [:value :keys]))
+              btns     (mapv (fn [h] {:id h :label h}) headings)]
+          (log/info "column-picker" headings)
+          [rc/h-box :src (rc/at)
+           :gap "5px"
+           :children [[rc/box :src (rc/at) :align :start :child [:code label]]
+                      [rc/horizontal-bar-tabs
+                       :src (rc/at)
+                       :model @model
+                       :tabs btns
+                       :style btns-style
+                       :on-change #(swap! config-data assoc-in path %)]]])
+        (subscription-error label path)))))
+
+(defn- column-picker-sub [data component-id label path]
   (let [model (u/subscribe-local component-id path)]
     (fn []
       (if model
@@ -93,7 +117,7 @@
                        :src (rc/at)
                        :model @model
                        :tabs btns
-                       ;:style btns-style
+                       :style btns-style
                        :on-change #(u/dispatch-local component-id path %)]]])
         (subscription-error label path)))))
 
@@ -110,9 +134,29 @@
               [rc/button :on-click #(swap! config-data update-in [:Page-A :include] not) :label "! Page A"]
               [rc/button :on-click #(swap! config-data update-in [:Page-C :include] not) :label "! Page C"]
               [chart-utils/color-config config-data ":Page-D :color" [:Page-D :color] :above-center]
-              [column-picker data component-id ":x" [:values :x]]]])
-              ;[column-picker data component-id ":x" [:values :x] :label ":x"]
-              ;[column-picker data component-id ":x" [:values :x] :label ":x"]]])
+              [column-picker-atom config-data ":x" [:values :x]]
+              [column-picker-atom config-data ":y" [:values :y]]
+              [column-picker-atom config-data ":z" [:values :z]]]])
+
+
+(defn meta-tabular-config-row-sub-tools [config-data default-config-data data component-id]
+  (let [page-a (ui-utils/subscribe-local config-data [:Page-A :include])
+        page-c (ui-utils/subscribe-local config-data [:Page-C :include])
+        tv? (ui-utils/subscribe-local config-data [:tv :include])]
+
+    (fn []
+      [rc/h-box :src (rc/at)
+       :gap "10px"
+       :style {:border     "1px solid" :border-radius "3px"
+               :box-shadow "5px 5px 5px 2px"
+               :margin     "5px" :padding "5px"}
+       :children [[:label.h5 "Config:"]
+                  [rc/button :on-click #(h/handle-change-path config-data [] default-config-data) :label "Default"]
+                  [rc/button :on-click #(h/handle-change-path config-data [:Page-A :include] (not @page-a)) :label "! Page A"]
+                  [rc/button :on-click #(h/handle-change-path config-data [:Page-C :include] (not @page-c)) :label "! Page C"]
+                  [chart-utils/color-config config-data ":Page-D :color" [:Page-D :color] :above-center]
+                  [column-picker-sub data component-id ":x" [:values :x]]]])))
+
 
 
 (defn- config-ratom []
@@ -149,27 +193,6 @@
    :default-config-data chart/sample-config-data])
 
 
-(defn meta-tabular-config-row-sub-tools [config-data default-config-data]
-  (let [page-a (ui-utils/subscribe-local config-data [:Page-A :include])
-        page-c (ui-utils/subscribe-local config-data [:Page-C :include])
-        tv? (ui-utils/subscribe-local config-data [:tv :include])]
-
-    (fn []
-      [rc/h-box :src (rc/at)
-       :gap "10px"
-       :style {:border     "1px solid" :border-radius "3px"
-               :box-shadow "5px 5px 5px 2px"
-               :margin     "5px" :padding "5px"}
-       :children [[:label.h5 "Config:"]
-                  [rc/button :on-click #(h/handle-change-path config-data [] default-config-data) :label "Default"]
-                  [rc/button :on-click #(h/handle-change-path config-data [:Page-A :include] (not @page-a)) :label "! Page A"]
-                  [rc/button :on-click #(h/handle-change-path config-data [:Page-C :include] (not @page-c)) :label "! Page C"]
-                  [chart-utils/color-config config-data ":Page-D :color" [:Page-D :color] :above-center]
-                  [rc/button :on-click #(h/handle-change-path config-data [:value :chosen] :uv) :label ":uv"]
-                  [rc/button :on-click #(h/handle-change-path config-data [:value :chosen] :tv) :label ":tv"]
-                  [rc/button :on-click #(h/handle-change-path config-data [:value :chosen] :amt) :label ":amt"]]])))
-
-
 (defn- config-sub []
   (let [container-id :scatter-chart-config-sub-demo]
     [config-sub-example/example
@@ -194,3 +217,4 @@
                 "config-ratom"  [config-ratom]
                 "config-struct"  [config-structure]
                 "config-sub"  [config-sub]}])
+
