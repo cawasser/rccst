@@ -21,6 +21,82 @@
 (log/info "bh.rccst.views.atom.example.chart.scatter-chart")
 
 
+(def btns-style {:font-size   "12px"
+                 :line-height "20px"
+                 :padding     "6px 8px"})
+
+
+(defn- column-picker-ratom [config-data label path]
+  ;(log/info "column-picker-ratom" @config-data  "//" path)
+  (fn []
+    (let [headings (into #{} (get-in @config-data [:value :keys]))
+          btns     (mapv (fn [h] {:id h :label h}) headings)]
+      (log/info "column-picker" headings)
+      [rc/h-box :src (rc/at)
+       :gap "5px"
+       :children [[rc/box :src (rc/at) :align :start :child [:code label]]
+                  [rc/horizontal-bar-tabs
+                   :src (rc/at)
+                   :model (get-in @config-data path)
+                   :tabs btns
+                   :style btns-style
+                   :on-change #(swap! config-data assoc-in path %)]]])))
+
+
+(defn- column-picker-sub [config-data label path]
+  ;(log/info "column-picker-sub" config-data  "//" path)
+  (let [cd (h/resolve-value config-data)]
+    (fn []
+      (let [headings (into #{} (get-in @cd [:value :keys]))
+            btns     (mapv (fn [h] {:id h :label h}) headings)]
+        [rc/h-box :src (rc/at)
+         :gap "5px"
+         :children [[rc/box :src (rc/at) :align :start :child [:code label]]
+                    [rc/horizontal-bar-tabs
+                     :src (rc/at)
+                     :model (get-in @cd path)
+                     :tabs btns
+                     :style btns-style
+                     :on-change #(h/handle-change-path config-data path %)]]]))))
+
+
+(defn- meta-tabular-config-row-ratom-tools [config-data default-config-data data component-id]
+  (log/info "meta-tabular" component-id)
+  [rc/h-box :src (rc/at)
+   :gap "10px"
+   :style {:border     "1px solid" :border-radius "3px"
+           :box-shadow "5px 5px 5px 2px"
+           :margin     "5px" :padding "5px"}
+   :children [[:label.h5 "Config:"]
+              [rc/button :on-click #(reset! config-data default-config-data) :label "Default"]
+              [rc/button :on-click #(swap! config-data update-in [:Page-A :include] not) :label "! Page A"]
+              [rc/button :on-click #(swap! config-data update-in [:Page-C :include] not) :label "! Page C"]
+              [chart-utils/color-config config-data ":Page-D :color" [:Page-D :color] :above-center]
+              [column-picker-ratom config-data ":x" [:values :x]]
+              [column-picker-ratom config-data ":y" [:values :y]]
+              [column-picker-ratom config-data ":z" [:values :z]]]])
+
+
+(defn- meta-tabular-config-row-sub-tools [config-data default-config-data data component-id]
+  (let [page-a (ui-utils/subscribe-local config-data [:Page-A :include])
+        page-c (ui-utils/subscribe-local config-data [:Page-C :include])]
+
+    (fn []
+      [rc/h-box :src (rc/at)
+       :gap "10px"
+       :style {:border     "1px solid" :border-radius "3px"
+               :box-shadow "5px 5px 5px 2px"
+               :margin     "5px" :padding "5px"}
+       :children [[:label.h5 "Config:"]
+                  [rc/button :on-click #(h/handle-change-path config-data [] default-config-data) :label "Default"]
+                  [rc/button :on-click #(h/handle-change-path config-data [:Page-A :include] (not @page-a)) :label "! Page A"]
+                  [rc/button :on-click #(h/handle-change-path config-data [:Page-C :include] (not @page-c)) :label "! Page C"]
+                  [chart-utils/color-config config-data ":Page-D :color" [:Page-D :color] :above-center]
+                  [column-picker-sub config-data ":x" [:values :x]]
+                  [column-picker-sub config-data ":y" [:values :y]]
+                  [column-picker-sub config-data ":z" [:values :z]]]])))
+
+
 (defn- data-ratom []
   [data-ratom-example/example
    :container-id :scatter-chart-data-ratom-demo
@@ -73,93 +149,6 @@
      :component chart/component
      :data-panel chart-utils/meta-tabular-data-panel
      :config-panel chart/config-panel]))
-
-
-(defn- subscription-error [label path]
-  (log/info (str label " : " path " - error"))
-  [:div])
-
-(def btns-style {:font-size   "12px"
-                 :line-height "20px"
-                 :padding     "6px 8px"})
-
-
-(defn- column-picker-atom [config-data label path]
-  (log/info "config-data of scatter" @config-data  "//" path)
-  (let [model (r/atom (get-in @config-data path))]
-    (fn []
-      (if model
-        (let [headings (into #{} (get-in @config-data [:value :keys]))
-              btns     (mapv (fn [h] {:id h :label h}) headings)]
-          (log/info "column-picker" headings)
-          [rc/h-box :src (rc/at)
-           :gap "5px"
-           :children [[rc/box :src (rc/at) :align :start :child [:code label]]
-                      [rc/horizontal-bar-tabs
-                       :src (rc/at)
-                       :model @model
-                       :tabs btns
-                       :style btns-style
-                       :on-change #(swap! config-data assoc-in path %)]]])
-        (subscription-error label path)))))
-
-
-(defn- column-picker-sub [config-data label path]
-  (log/info "config-data of scatter" config-data  "//" path)
-  (let [model (h/resolve-value config-data path)
-        cd (h/resolve-value config-data)]
-    (fn []
-      (if model
-        (let [headings (into #{} (get-in @cd [:value :keys]))
-              btns     (mapv (fn [h] {:id h :label h}) headings)]
-          [rc/h-box :src (rc/at)
-           :gap "5px"
-           :children [[rc/box :src (rc/at) :align :start :child [:code label]]
-                      [rc/horizontal-bar-tabs
-                       :src (rc/at)
-                       :model @model
-                       :tabs btns
-                       :style btns-style
-                       :on-change #(h/handle-change-path config-data path %)]]])
-        (subscription-error label path)))))
-
-
-(defn- meta-tabular-config-row-ratom-tools [config-data default-config-data data component-id]
-  (log/info "meta-tabular" component-id)
-  [rc/h-box :src (rc/at)
-   :gap "10px"
-   :style {:border     "1px solid" :border-radius "3px"
-           :box-shadow "5px 5px 5px 2px"
-           :margin     "5px" :padding "5px"}
-   :children [[:label.h5 "Config:"]
-              [rc/button :on-click #(reset! config-data default-config-data) :label "Default"]
-              [rc/button :on-click #(swap! config-data update-in [:Page-A :include] not) :label "! Page A"]
-              [rc/button :on-click #(swap! config-data update-in [:Page-C :include] not) :label "! Page C"]
-              [chart-utils/color-config config-data ":Page-D :color" [:Page-D :color] :above-center]
-              [column-picker-atom config-data ":x" [:values :x]]
-              [column-picker-atom config-data ":y" [:values :y]]
-              [column-picker-atom config-data ":z" [:values :z]]]])
-
-
-(defn meta-tabular-config-row-sub-tools [config-data default-config-data data component-id]
-  (let [page-a (ui-utils/subscribe-local config-data [:Page-A :include])
-        page-c (ui-utils/subscribe-local config-data [:Page-C :include])]
-
-    (fn []
-     [rc/h-box :src (rc/at)
-      :gap "10px"
-      :style {:border     "1px solid" :border-radius "3px"
-              :box-shadow "5px 5px 5px 2px"
-              :margin     "5px" :padding "5px"}
-      :children [[:label.h5 "Config:"]
-                 [rc/button :on-click #(h/handle-change-path config-data [] default-config-data) :label "Default"]
-                 [rc/button :on-click #(h/handle-change-path config-data [:Page-A :include] (not @page-a)) :label "! Page A"]
-                 [rc/button :on-click #(h/handle-change-path config-data [:Page-C :include] (not @page-c)) :label "! Page C"]
-                 [chart-utils/color-config config-data ":Page-D :color" [:Page-D :color] :above-center]
-                 [column-picker-sub config-data ":x" [:values :x]]
-                 [column-picker-sub config-data ":y" [:values :y]]
-                 [column-picker-sub config-data ":z" [:values :z]]]])))
-
 
 
 (defn- config-ratom []
