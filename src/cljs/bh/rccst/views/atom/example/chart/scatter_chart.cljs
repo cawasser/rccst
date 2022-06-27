@@ -103,13 +103,15 @@
                        :on-change #(swap! config-data assoc-in path %)]]])
         (subscription-error label path)))))
 
-(defn- column-picker-sub [data component-id label path]
-  (let [model (u/subscribe-local component-id path)]
+
+(defn- column-picker-sub [config-data label path]
+  (log/info "config-data of scatter" config-data  "//" path)
+  (let [model (h/resolve-value config-data path)
+        cd (h/resolve-value config-data)]
     (fn []
       (if model
-        (let [headings (apply set (map keys (get @data :data)))
+        (let [headings (into #{} (get-in @cd [:value :keys]))
               btns     (mapv (fn [h] {:id h :label h}) headings)]
-          (log/info "column-picker" data "//" component-id "//" label "//" path)
           [rc/h-box :src (rc/at)
            :gap "5px"
            :children [[rc/box :src (rc/at) :align :start :child [:code label]]
@@ -118,7 +120,7 @@
                        :model @model
                        :tabs btns
                        :style btns-style
-                       :on-change #(u/dispatch-local component-id path %)]]])
+                       :on-change #(h/handle-change-path config-data path %)]]])
         (subscription-error label path)))))
 
 
@@ -141,21 +143,22 @@
 
 (defn meta-tabular-config-row-sub-tools [config-data default-config-data data component-id]
   (let [page-a (ui-utils/subscribe-local config-data [:Page-A :include])
-        page-c (ui-utils/subscribe-local config-data [:Page-C :include])
-        tv? (ui-utils/subscribe-local config-data [:tv :include])]
+        page-c (ui-utils/subscribe-local config-data [:Page-C :include])]
 
     (fn []
-      [rc/h-box :src (rc/at)
-       :gap "10px"
-       :style {:border     "1px solid" :border-radius "3px"
-               :box-shadow "5px 5px 5px 2px"
-               :margin     "5px" :padding "5px"}
-       :children [[:label.h5 "Config:"]
-                  [rc/button :on-click #(h/handle-change-path config-data [] default-config-data) :label "Default"]
-                  [rc/button :on-click #(h/handle-change-path config-data [:Page-A :include] (not @page-a)) :label "! Page A"]
-                  [rc/button :on-click #(h/handle-change-path config-data [:Page-C :include] (not @page-c)) :label "! Page C"]
-                  [chart-utils/color-config config-data ":Page-D :color" [:Page-D :color] :above-center]
-                  [column-picker-sub data component-id ":x" [:values :x]]]])))
+     [rc/h-box :src (rc/at)
+      :gap "10px"
+      :style {:border     "1px solid" :border-radius "3px"
+              :box-shadow "5px 5px 5px 2px"
+              :margin     "5px" :padding "5px"}
+      :children [[:label.h5 "Config:"]
+                 [rc/button :on-click #(h/handle-change-path config-data [] default-config-data) :label "Default"]
+                 [rc/button :on-click #(h/handle-change-path config-data [:Page-A :include] (not @page-a)) :label "! Page A"]
+                 [rc/button :on-click #(h/handle-change-path config-data [:Page-C :include] (not @page-c)) :label "! Page C"]
+                 [chart-utils/color-config config-data ":Page-D :color" [:Page-D :color] :above-center]
+                 [column-picker-sub config-data ":x" [:values :x]]
+                 [column-picker-sub config-data ":y" [:values :y]]
+                 [column-picker-sub config-data ":z" [:values :z]]]])))
 
 
 
@@ -203,7 +206,7 @@
 
 > In _this_ case, we are using a subscription to handle the configuration for the chart."
      :sample-data chart/sample-data
-     :config-tools config-tools/meta-tabular-config-row-sub-tools ; TODO: this tool panel does not have tools for the axes
+     :config-tools meta-tabular-config-row-sub-tools ; TODO: this tool panel does not have tools for the axes
      :source-code chart/source-code
      :component chart/component
      :config-data [container-id :blackboard :config-data]
