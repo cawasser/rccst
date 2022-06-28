@@ -50,7 +50,8 @@
 (defn- color-config [component-id label path position]
   [rc/v-box :src (rc/at)
    :gap "5px"
-   :children [[utils/boolean-config component-id label (conj path :include)]
+   :children [[:code label]
+              [rc/line :size "2px"]
               [utils/color-config component-id ":fill" (conj path :fill) position]
               [utils/color-config component-id ":stroke" (conj path :stroke) position]]])
 

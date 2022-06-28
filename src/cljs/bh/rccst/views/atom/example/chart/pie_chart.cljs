@@ -31,9 +31,9 @@
 
 (defn- data-structure []
   [data-structure-example/example
-   :container-id :pie-chart-2-data-structure-demo
-   :title "Pie Chart 2 (Live Data - structure)"
-   :description "Pie Chart (2) built using [Recharts](https://recharts.org/en-US/api/pieChart). This example shows how
+   :container-id :pie-chart-data-structure-demo
+   :title "Pie Chart (Live Data - structure)"
+   :description "Pie Chart built using [Recharts](https://recharts.org/en-US/api/pieChart). This example shows how
   charts can take [ratoms](http://reagent-project.github.io/docs/master/reagent.ratom.html) as input and re-render as the data changes.
 
   > In _this_ case, we are using a plain data structure for the data, so there is no way to update it (it lives
@@ -48,14 +48,14 @@
 
 (defn data-sub []
   [data-sub-example/example
-   :container-id :pie-chart-2-data-sub-demo
-   :title "Pie Chart 2 (Live Data - subscription)"
-   :description "Pie Chart (2) built using [Recharts](https://recharts.org/en-US/api/pieChart). This example shows how
+   :container-id :pie-chart-data-sub-demo
+   :title "Pie Chart (Live Data - subscription)"
+   :description "Pie Chart built using [Recharts](https://recharts.org/en-US/api/pieChart). This example shows how
      charts can take [subscriptions](https://day8.github.io/re-frame/subscriptions/) as input and re-render as the configuration changes.
 
 > In _this_ case, we are using a subscription to handle the data for the chart.
 "
-   :sample-data [:pie-chart-2-data-sub-demo :blackboard :topic.sample-data]
+   :sample-data [:pie-chart-data-sub-demo :blackboard :topic.sample-data]
    :default-data chart/sample-data
    :data-tools data-tools/meta-tabular-data-sub-tools
    :source-code chart/source-code
@@ -66,9 +66,9 @@
 
 (defn- config-ratom []
   [config-ratom-example/example
-   :container-id :pie-chart-2-config-ratom-demo
-   :title "Pie Chart 2 (Live Configuration - ratom)"
-   :description "Pie Chart (2) built using [Recharts](https://recharts.org/en-US/api/pieChart). This example shows how
+   :container-id :pie-chart-config-ratom-demo
+   :title "Pie Chart (Live Configuration - ratom)"
+   :description "Pie Chart built using [Recharts](https://recharts.org/en-US/api/pieChart). This example shows how
      charts can take [ratoms](http://reagent-project.github.io/docs/master/reagent.ratom.html) as input and re-render as the configuration changes.
 
 > In _this_ case, we are using a ratom to hold the configuration for the chart.
@@ -84,9 +84,9 @@
 
 (defn- config-structure []
   [config-structure-example/example
-   :container-id :pie-chart-2-config-structure-demo
-   :title "Pie Chart 2 (Live Configuration - structure)"
-   :description "Pie Chart (2) built using [Recharts](https://recharts.org/en-US/api/pieChart). This example shows how
+   :container-id :pie-chart-config-structure-demo
+   :title "Pie Chart (Live Configuration - structure)"
+   :description "Pie Chart built using [Recharts](https://recharts.org/en-US/api/pieChart). This example shows how
      charts can take [ratoms](http://reagent-project.github.io/docs/master/reagent.ratom.html) as input and re-render as the configuration changes.
 
 > In _this_ case, we are using a plain data structure to hold the configuration for the chart.
@@ -99,11 +99,11 @@
 
 
 (defn- config-sub []
-  (let [container-id :pie-chart-2-config-sub-demo]
+  (let [container-id :pie-chart-config-sub-demo]
     [config-sub-example/example
      :container-id container-id
-     :title "Pie Chart 2 (Live Configuration - subscription)"
-     :description " Pie Chart (2) built using [Recharts](https://recharts.org/en-US/api/pieChart). This example shows how
+     :title "Pie Chart (Live Configuration - subscription)"
+     :description " Pie Chart built using [Recharts](https://recharts.org/en-US/api/pieChart). This example shows how
      charts can take [subscriptions](https://day8.github.io/re-frame/subscriptions/) as input and re-render as the configuration changes.
 
 > In _this_ case, we are using a subscription to handle the configuration for the chart."

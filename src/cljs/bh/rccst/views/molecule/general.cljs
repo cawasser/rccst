@@ -8,6 +8,7 @@
             [bh.rccst.views.molecule.example.composite.chart-remote-data :as chart-remote-data]
             [bh.rccst.views.molecule.example.composite.simple-multi-chart :as simple-multi-chart]
             [bh.rccst.views.molecule.example.composite.simple-multi-chart-2 :as simple-multi-chart-2]
+            [bh.rccst.views.molecule.example.composite.with-fn-example :as with-fn]
             [bh.rccst.views.molecule.example.composite.multi-chart-widget :as multi-chart-widget]))
 
 
@@ -21,6 +22,7 @@
    [simple-multi-chart/example]
    [simple-multi-chart-2/example]
    [multi-chart-widget/example]
+   [with-fn/example]
    [coverage-plan/ww-example]
    [coverage-plan/r-example]
    [header-bar/example]

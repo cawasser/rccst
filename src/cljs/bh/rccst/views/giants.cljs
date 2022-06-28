@@ -149,8 +149,8 @@
 [All I needed for FP I learned in High School Algebra](https://www.youtube.com/watch?v=epT1xgxSpFU) (2017)"}
 
              {:name        "Will Byrd"
-              :image       "imgs/giants/wil-byrd.png"
-              :description "Wil is a programming language researcher, and co-author of the [Reasoned Schemer](https://mitpress.mit.edu/books/reasoned-schemer) and
+              :image       "imgs/giants/will-byrd.png"
+              :description "Will is a programming language researcher, and co-author of the [Reasoned Schemer](https://mitpress.mit.edu/books/reasoned-schemer) and
               [miniKanren](http://minikanren.org).
 
 [Barliman: trying the halting problem backwards, blindfolded](https://www.youtube.com/watch?v=er_lLvkklsk) (2016)
@@ -187,7 +187,12 @@
             :align :center
             :justify :center
             :children [[:figure.image {:style {:width "200px" :height "200px"}}
-                        [:img.is-rounded {:src (or (if (empty? image) nil image) "imgs/hammer-icon-16x16.png")}]]
+                        ; see https://www.youtube.com/watch?v=4ALLynsZ0u0
+                        [:img {:style {:border-top-left-radius "5rem"
+                                       :border-bottom-right-radius "5rem"
+                                       :background "#808080"}
+                               :src (or (if (empty? image) nil image)
+                                      "imgs/hammer-icon-16x16.png")}]]
                        [rc/gap :size "15px"]
                        [:p.title.is-1.has-text-centered name]]]]
    :back [:div {:style flippable/default-style}
