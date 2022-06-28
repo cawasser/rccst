@@ -21,25 +21,20 @@
 (log/info "bh.rccst.views.atom.example.chart.scatter-chart")
 
 
-(def btns-style {:font-size   "12px"
-                 :line-height "20px"
-                 :padding     "6px 8px"})
-
-
 (defn- column-picker-ratom [config-data label path]
   ;(log/info "column-picker-ratom" @config-data  "//" path)
   (fn []
     (let [headings (into #{} (get-in @config-data [:value :keys]))
-          btns     (mapv (fn [h] {:id h :label h}) headings)]
-      (log/info "column-picker" headings)
+          buttons  (mapv (fn [h] {:id h :label h}) headings)]
+      ;(log/info "column-picker" headings)
       [rc/h-box :src (rc/at)
        :gap "5px"
        :children [[rc/box :src (rc/at) :align :start :child [:code label]]
                   [rc/horizontal-bar-tabs
                    :src (rc/at)
                    :model (get-in @config-data path)
-                   :tabs btns
-                   :style btns-style
+                   :tabs buttons
+                   :style chart-utils/btns-style
                    :on-change #(swap! config-data assoc-in path %)]]])))
 
 
@@ -48,15 +43,15 @@
   (let [cd (h/resolve-value config-data)]
     (fn []
       (let [headings (into #{} (get-in @cd [:value :keys]))
-            btns     (mapv (fn [h] {:id h :label h}) headings)]
+            buttons  (mapv (fn [h] {:id h :label h}) headings)]
         [rc/h-box :src (rc/at)
          :gap "5px"
          :children [[rc/box :src (rc/at) :align :start :child [:code label]]
                     [rc/horizontal-bar-tabs
                      :src (rc/at)
                      :model (get-in @cd path)
-                     :tabs btns
-                     :style btns-style
+                     :tabs buttons
+                     :style chart-utils/btns-style
                      :on-change #(h/handle-change-path config-data path %)]]]))))
 
 
