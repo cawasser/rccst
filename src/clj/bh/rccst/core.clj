@@ -19,9 +19,9 @@
   "postgresql database connection spec."
   {:dbtype   "postgresql"
    :dbname   "rccst"
-   :user     "postgres"
-   :password "Password"
-   :host     "localhost"
+   :user     (or (System/getenv "RCCST_DATABASE_USER") "postgres")
+   :password (or (System/getenv "RCCST_DATABASE_PASS") "Password")
+   :host     (or (System/getenv "RCCST_DATABASE_HOST") "localhost")
    :port     "5432"})
 
 
@@ -122,14 +122,22 @@
   "
 
   [args _]
+  (log/info "System Map Args: " args)
 
-  (component/system-map
-    :database (db/map->Database args)
-    :server (component/using (server/map->HTTPServer args) [:socket :database :pub-sub])
-    :nrepl (repl/map->nRepl args)
-    :socket (socket/map->WebSocketServer args)
-    :pub-sub (component/using (pub-sub/map->PubSub args) [:socket :data-sources])
-    :data-sources (data-sources/map->DataSources args)))
+  (if (:nrepl args)
+    (component/system-map
+      :database (db/map->Database args)
+      :server (component/using (server/map->HTTPServer args) [:socket :database :pub-sub])
+      :nrepl (repl/map->nRepl args)
+      :socket (socket/map->WebSocketServer args)
+      :pub-sub (component/using (pub-sub/map->PubSub args) [:socket :data-sources])
+      :data-sources (data-sources/map->DataSources args))
+    (component/system-map
+      :database (db/map->Database args)
+      :server (component/using (server/map->HTTPServer args) [:socket :database :pub-sub])
+      :socket (socket/map->WebSocketServer args)
+      :pub-sub (component/using (pub-sub/map->PubSub args) [:socket :data-sources])
+      :data-sources (data-sources/map->DataSources args))))
 
 
 (defn start!
@@ -151,13 +159,12 @@
   > [Component](https://github.com/stuartsierra/component)
   "
 
-  [db-type]
-  (log/info "SYSTEM START!")
+  [db-type dev-arg]
   (reset! system/system
     (component/start
       (new-system {:host              "localhost"
                    :port              default/http-port
-                   :nrepl             default/nRepl-port
+                   :nrepl             (if (clojure.core/read-string dev-arg) default/nRepl-port nil)
                    :dev-mode          false
                    :db-spec           db-type
                    :socket-params     {:user-id-fn    user-fn
@@ -179,7 +186,10 @@
   "
   [& args]
   (log/info "................. RCCST Starting up...")
-  (start! rccst-postgres)
+  (if (seq args)
+    (doseq [arg args]
+      (start! rccst-postgres arg))
+    (start! rccst-postgres "true"))
   (log/info ">>>>>>>>>>>>>>>>> RCCST Server READY!"))
 
 
