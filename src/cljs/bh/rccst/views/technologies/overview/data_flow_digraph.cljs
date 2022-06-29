@@ -38,7 +38,7 @@ in chemistry classes are physically modeled using balls and sticks, as show in F
 _Figure 1. Molecule Modeling Kit_
 
 Combined with Clojure's, and most other functional programming languages', idiomatic approach promoting system composition from
-transformations of data (using map, filter, and reduce), and the Re-frame notion of the
+transformations of data (using map, :topic/target-filter, and reduce), and the Re-frame notion of the
 [_signal graph_](https://day8.github.io/re-frame/subscriptions/)
 we saw that by placing the Signal Graph center of the design, rather than being a by product of a more typical approach, we
 could unlock the power of the directed graph, simplifying both design and implementation.
@@ -83,7 +83,7 @@ beginning (the original source) and the end of the flow (typically the UI or the
 of a microservice)"]]
 
     [layout/frame {:extra-classes :is-fluid}
-     [layout/markdown-block "### Our Implementation
+     [layout/markdown-block "### Designing a UI with Data-flow
 
 Since we are working in Clojure, and, on the UI side, using Re-frame, we take advantage of the Signal Graph
 and take advantage of the [Layer 2 'Extractors' and Layer 3 'Materialized Views'](https://day8.github.io/re-frame/subscriptions/#the-four-layers)
@@ -121,7 +121,7 @@ the data flows _down hill_.
 _Figure 3. A simplified directed graph of a UI._
 
 
-#### Breaking It Down
+#### Designing a UI _Widget_
 
 The very simplest example is to take a single source and connect it directly to a UI component without
 any additional processing, so:
@@ -155,7 +155,67 @@ In Our system, UI element are described like this:
    :grid-layout  [{:i :ui/bar-chart :x 0 :y 0 :w 20 :h 11 :static true}]})
 ```
 
-While Microservices (which are based upon [Willa](https://github.com/DaveWM/willa)), look like this:
+#### Components
+
+The `:component` section describes the individual building block (think LEGO) that make up the working part of the UI
+data-flow. These are the things that do the work: draw the UI, compute values, represent data fetched (subscribed really)
+from servers, etc.
+
+##### `:ui/component`
+
+identifies the UI elements that your Users works with to view and interact with data in the system.
+
+##### `:source/remote` and `:source/local`
+
+are components that both represent data available to use
+within your system, and the represent the software mechanisms necessary to access and manage
+such data.
+
+##### `:source/fn`
+
+is a _function_, literally a function in the source code, that provides any type of
+manipulation or transformation of the various data items within the system. For example, if you have some data that
+represents some organization that you will want to display on a 3D map, your User might like to control the color and perhaps
+shape to draw for each, making it easy to visually distinguish each item. The original data, perhaps the `:source/remote`
+should ***NOT*** contains this kind of _visual-only_ data, it should be _mixed-in_ just before your user wants to view it. The
+actual enhancement of the original data with the visually-oriented data should happen in a `:source/fn`.
+
+Typically, you'll want to start by defining either the `:ui/components` or the `:source/remote` data elements, since these tend to
+drive the purpose of the overall UI _widget_. They identify what you User wants to see (`:source/remote`) and how they will be able
+to see it (`:ui/component`).
+
+Next, you might start to wire your remote data to your UI elements (see _Links_). Quickly, you'll find that you need to introduce
+some `:source/locals` or `:source/fns` (or more likely both) for one of the following reasons:
+
+1. You want to move data from one `:ui/component` to another
+2. You want to add (`assoc`), remove (`filter`), or transform (`map` or `reduce`) some data so it is fit for some other purpose
+
+Now wou can start to _invent_ these components, since they only exist within the scope of the UI _widget_ you are designing.
+
+
+#### Links
+
+`:links` describe how the different parts of the _widget_ connect to and communicate with each other, turning a picture of
+'blocks' into a directed graph. In the case of the UI, each component can be designed with multiple input and multiple outputs.
+
+This is further described by metadata stored in a run-time registry.
+
+#### Grid Layout
+
+`:grid-layout` describe how the various UI-components, the tables, charts, diagrams,
+etc. are to be arranged visually on the display. We use a user-customizable graph component (built in ReactJS) for doing
+the actual presentation on the display.
+
+
+#### More Detail
+
+The actual software element that implements these component, for example :rechart/bar.
+
+"]]
+
+    [layout/frame {:extra-classes :is-fluid}
+      [layout/markdown-block "### Building Microservices
+Microservices (which are based upon [Willa](https://github.com/DaveWM/willa)), look like this:
 
 ```
 (def sudoku-service
@@ -166,36 +226,8 @@ While Microservices (which are based upon [Willa](https://github.com/DaveWM/will
    :workflow [[:topic/event-in :stream/solve-puzzle]
               [:stream/solve-puzzle :topic/answer-out]]})
 ```
+
 It's easy to see the relative similarities between these two description. Let's look at each part individually.
-
-
-#### Components / Entities
-
-Whether it's called `:component` or `:entities`, this section describes the individual building block (think LEGO)
-that make up the working part of the flow. These are the things that do the work: draw the UI, compute values, represent
-data fetched (subscribed really) from servers, etc.
-
-The actual software element that implements these component, for example :rechart/bar,
-
-
-#### Links / Workflow
-
-`:links` or `:workflow` describe how the different parts connect to each other, turning a picture of 'blocks' into
-a directed graph.
-
-In the case of the UI `:links`, each component can be designed with multiple input and multiple outputs. This
-is further described by metadata stored in a run-time registry.
-
-
-##### :workflow
-
-Each connect is describe by a tuple: `[ <source item> <target item>]`.
-
-
-#### Grid Layout
-
-`:grid-layout` is only needed for the UI, and it describe how the various UI-components, that tables, charts, diagrams,
-etc. are to be arranged on the display. We use a user-customizable graph component (built in ReactJS)
 
 "]]
 
