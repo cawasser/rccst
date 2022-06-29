@@ -81,30 +81,30 @@ Some additional cleanup work and error resolution was performed along with imple
 I found the following links to be helpful while delving into this.
 They are in no particular order:
 
-[](https://code.thheller.com/blog/shadow-cljs/2020/05/08/how-about-webpack-now.html#option-2-js-provider-external)
+[How about webpack now](https://code.thheller.com/blog/shadow-cljs/2020/05/08/how-about-webpack-now.html#option-2-js-provider-external)
 
-https://webpack.js.org/guides/getting-started/
+[webpack getting started](https://webpack.js.org/guides/getting-started/)
 
-https://webpack.js.org/concepts/
+[webpack concepts](https://webpack.js.org/concepts/)
 
-https://marko.euptera.com/posts/ionic-clojure-todo-example.html
+[Ionic clojure TODO example](https://marko.euptera.com/posts/ionic-clojure-todo-example.html)
 
-https://stackoverflow.com/questions/64557638/how-to-polyfill-node-core-modules-in-webpack-5
+[polyfill core modules in webpack](https://stackoverflow.com/questions/64557638/how-to-polyfill-node-core-modules-in-webpack-5)
 
-https://cesium.com/learn/cesiumjs-learn/cesiumjs-webpack/#add-cesiumjs-to-a-webpack-app
+[Add Cesium to webpack](https://cesium.com/learn/cesiumjs-learn/cesiumjs-webpack/#add-cesiumjs-to-a-webpack-app)
 
-https://github.com/CesiumGS/cesium-webpack-example/blob/main/TUTORIAL.md
+[Cesium webpack tutorial](https://github.com/CesiumGS/cesium-webpack-example/blob/main/TUTORIAL.md)
 
-https://github.com/srothst1/cesiumjs-webpack-starter-tutorial/blob/master/webpack.config.js
+[cesium webpack starter tutorial](https://github.com/srothst1/cesiumjs-webpack-starter-tutorial/blob/master/webpack.config.js)
 
-https://cesium.com/blog/2016/01/26/cesium-and-webpack/#ive-already-got-webpack-set-up-just-tell-me-how-to-use-cesium
+[cesium and webpack](https://cesium.com/blog/2016/01/26/cesium-and-webpack/#ive-already-got-webpack-set-up-just-tell-me-how-to-use-cesium)
 
-https://github.com/mmacaula/cesium-webpack
+[cesium-webpack](https://github.com/mmacaula/cesium-webpack)
 
-https://github.com/CesiumGS/cesium-webpack-example
+[cesium-webpack example](https://github.com/CesiumGS/cesium-webpack-example)
 
-https://codeburst.io/use-webpack-with-dirname-correctly-4cad3b265a92
+[webpack with dirname](https://codeburst.io/use-webpack-with-dirname-correctly-4cad3b265a92)
 
-https://webpack.js.org/guides/development/
+[webpack dev guide](https://webpack.js.org/guides/development/)
 
 
