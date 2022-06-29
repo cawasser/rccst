@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    kompose.cmd: C:\Users\j68916\Documents\octools\kompose.exe convert
+    kompose.cmd: kompose.exe convert
     kompose.version: 1.26.0 (40646f47)
   creationTimestamp: null
   labels:
@@ -16,7 +16,7 @@ spec:
   template:
     metadata:
       annotations:
-        kompose.cmd: C:\Users\j68916\Documents\octools\kompose.exe convert
+        kompose.cmd: kompose.exe convert
         kompose.version: 1.26.0 (40646f47)
       creationTimestamp: null
       labels:
@@ -24,7 +24,7 @@ spec:
     spec:
       containers:
         - name: rccst
-          image: docker-ng-staging.ms.northgrum.com/paas/customerbase/segs:rccst-1.0.1
+          image: path/to/container/location/in/nexus/segs:rccst-1.0.1
           env:
             - name: RCCST_DATABASE_USER
               value: "1001710000"
