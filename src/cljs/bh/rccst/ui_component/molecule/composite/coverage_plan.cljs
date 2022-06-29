@@ -128,13 +128,14 @@
 
 
 (defn fn-color-targets [{:keys [data colored]}]
-  ; (log/info "fn-color-targets" data "//" colored)
   (let [next-target-color (atom -1)
         [component topic] (-> colored
                             first
                             name
                             (clojure.string/split #".blackboard."))
         path              [(keyword (str component ".blackboard"))]]
+
+    ;(log/info "fn-color-targets" data "//" colored "//" path)
 
     (re-frame/reg-sub
       (first colored)
@@ -161,6 +162,8 @@
 
           ;(log/info "fn-color-targets (ret)" ret)
 
+          ; need to store this in the app-db because this fn is STATEFUL, we don't
+          ; want to change a target if it has already been assigned a color
           (h/handle-change-path path [topic] ret)
 
           ret)))))
@@ -197,6 +200,9 @@
                                 (:data d)))]
 
           ;(log/info "fn-color-satellites (ret)" ret )
+
+          ; need to store this in the app-db because this fn is STATEFUL, we don't
+          ; want to change a satellite/sensor if it has already been assigned a color
           (h/handle-change-path path [topic] ret)
 
           ret)))))

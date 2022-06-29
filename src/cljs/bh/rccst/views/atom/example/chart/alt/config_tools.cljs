@@ -155,7 +155,10 @@
            :margin     "5px" :padding "5px"}
    :children [[:label.h5 "Config:"]
               [rc/button :on-click #(reset! config-data default-config-data) :label "Default"]
-              [rc/button :on-click #(swap! config-data update-in [:Page-A :include] not) :label "! Visit"]]])
+              [chart-utils/color-config config-data "Visit Fill" [:Visit :fill] :above-center]
+              [chart-utils/color-config config-data "Visit Stroke" [:Visit :stroke] :above-center]
+              [chart-utils/color-config config-data "Lost Fill" [:Lost :fill] :above-center]
+              [chart-utils/color-config config-data "Lost Stroke" [:Lost :stroke] :above-center]]])
 
 
 
@@ -167,4 +170,8 @@
            :margin     "5px" :padding "5px"}
    :children [[:label.h5 "Config:"]
               [rc/button :on-click #(h/handle-change-path config-data [] default-config-data) :label "Default"]
-              [rc/button :on-click #(log/info "do something") :label "! Visit"]]])
+              [chart-utils/color-config config-data "Visit Fill" [:Visit :fill] :above-center]
+              [chart-utils/color-config config-data "Visit Stroke" [:Visit :stroke] :above-center]
+              [chart-utils/color-config config-data "Lost Fill" [:Lost :fill] :above-center]
+              [chart-utils/color-config config-data "Lost Stroke" [:Lost :stroke] :above-center]]])
+

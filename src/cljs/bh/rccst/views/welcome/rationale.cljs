@@ -26,7 +26,7 @@ different markets, approaches, and technologies:
 - [Astro UXDS](https://www.astrouxds.com)
 - [Devcards](https://github.com/bhauman/devcards)
 - [Workspaces](https://github.com/nubank/workspaces)
-- [Storybook](https://storybook.js.org)
+- [Storybook](https://storybook.js.org), also [Storybook in 100 seconds](https://www.youtube.com/watch?v=gdlTFPebzAU)
 - [Carbon Design System](https://www.carbondesignsystem.com)
 
 "])

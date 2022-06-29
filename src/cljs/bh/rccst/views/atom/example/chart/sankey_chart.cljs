@@ -37,7 +37,7 @@
 
 (defn- data-structure []
   [data-structure-example/example
-   :container-id :sankey-chart-data-ratom-demo
+   :container-id :sankey-chart-data-structure-demo
    :title "Sankey Chart (Live Data - structure)"
    :description "A Sankey Chart built using [Recharts](https://recharts.org/en-US/api/SankeyChart) with colored Cells. This example shows how
   charts can take [ratoms](http://reagent-project.github.io/docs/master/reagent.ratom.html) as input and re-render as the data changes.
@@ -53,7 +53,7 @@
 
 
 (defn data-sub []
-  (let [container-id :sankey-chart-data-ratom-demo]
+  (let [container-id :sankey-chart-data-sub-demo]
     [data-sub-example/example
      :container-id container-id
      :title "Sankey Chart (Live Data - subscription)"
@@ -74,7 +74,7 @@
 
 (defn- config-ratom []
   [config-ratom-example/example
-   :container-id :sankey-chart-data-ratom-demo
+   :container-id :sankey-chart-config-ratom-demo
    :title "Sankey Chart (Live Configuration - ratom)"
    :description "A Sankey Chart built using [Recharts](https://recharts.org/en-US/api/SankeyChart) with colored Cells. This example shows how
      charts can take [ratoms](http://reagent-project.github.io/docs/master/reagent.ratom.html) as input and re-render as the configuration changes.
@@ -92,7 +92,7 @@
 
 (defn- config-structure []
   [config-structure-example/example
-   :container-id :sankey-config-structure-demo
+   :container-id :sankey-chart-config-structure-demo
    :title "Sankey Chart (Live Configuration - structure)"
    :description "A Sankey Chart built using [Recharts](https://recharts.org/en-US/api/SankeyChart) with colored Cells. This example shows how
      charts can take [ratoms](http://reagent-project.github.io/docs/master/reagent.ratom.html) as input and re-render as the configuration changes.
@@ -107,7 +107,7 @@
 
 
 (defn- config-sub []
-  (let [container-id :sankey-config-sub-demo]
+  (let [container-id :sankey-chart-config-sub-demo]
     [config-sub-example/example
      :container-id container-id
      :title "Sankey Chart (Live Configuration - subscription)"

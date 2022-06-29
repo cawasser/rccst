@@ -17,9 +17,9 @@
 
 (defn- data-ratom []
   [data-ratom-example/example
-   :container-id :radar-chart-2-data-ratom-demo
-   :title "Radar Chart 2 (Live Data - ratom) - IN PROGRESS (not complete)"
-   :description "A Radar Chart (2) built using [Recharts](https://recharts.org/en-US/api/RadarChart). This example shows how
+   :container-id :radar-chart-data-ratom-demo
+   :title "Radar Chart (Live Data - ratom) - IN PROGRESS (not complete)"
+   :description "A Radar Chart built using [Recharts](https://recharts.org/en-US/api/RadarChart). This example shows how
   charts can take [ratoms](http://reagent-project.github.io/docs/master/reagent.ratom.html) as input and re-render as the data changes.
 
   > In _this_ case, we are using a ratom for the data.
@@ -35,9 +35,9 @@
 
 (defn- data-structure []
   [data-structure-example/example
-   :container-id :radar-chart-2-data-structure-demo
-   :title "Radar Chart 2 (Live Data - structure) - IN PROGRESS (not complete)"
-   :description "A Radar Chart (2) built using [Recharts](https://recharts.org/en-US/api/RadarChart). This example shows how
+   :container-id :radar-chart-data-structure-demo
+   :title "Radar Chart (Live Data - structure) - IN PROGRESS (not complete)"
+   :description "A Radar Chart built using [Recharts](https://recharts.org/en-US/api/RadarChart). This example shows how
   charts can take [ratoms](http://reagent-project.github.io/docs/master/reagent.ratom.html) as input and re-render as the data changes.
 
   > In _this_ case, we are using a plain data structure for the data, so there is no way to update it (it lives
@@ -51,14 +51,14 @@
 
 (defn data-sub []
   [data-sub-example/example
-   :container-id :radar-chart-2-data-sub-demo
-   :title "Radar Chart 2 (Live Data - subscription) - IN PROGRESS (not complete)"
-   :description "A Radar Chart (2) built using [Recharts](https://recharts.org/en-US/api/RadarChart). This example shows how
+   :container-id :radar-chart-data-sub-demo
+   :title "Radar Chart (Live Data - subscription) - IN PROGRESS (not complete)"
+   :description "A Radar Chart built using [Recharts](https://recharts.org/en-US/api/RadarChart). This example shows how
      charts can take [subscriptions](https://day8.github.io/re-frame/subscriptions/) as input and re-render as the configuration changes.
 
 > In _this_ case, we are using a subscription to handle the data for the chart.
 "
-   :sample-data [:radar-chart-2-data-sub-demo :blackboard :topic.sample-data]
+   :sample-data [:radar-chart-data-sub-demo :blackboard :topic.sample-data]
    :default-data chart/sample-data
    :data-tools data-tools/meta-tabular-data-sub-tools
    :source-code chart/source-code
@@ -69,9 +69,9 @@
 
 (defn- config-ratom []
   [config-ratom-example/example
-   :container-id :radar-chart-2-config-ratom-demo
-   :title "Radar Chart 2 (Live Configuration - ratom) - IN PROGRESS (not complete)"
-   :description "A Radar Chart (2) built using [Recharts](https://recharts.org/en-US/api/RadarChart). This example shows how
+   :container-id :radar-chart-config-ratom-demo
+   :title "Radar Chart (Live Configuration - ratom) - IN PROGRESS (not complete)"
+   :description "A Radar Chart built using [Recharts](https://recharts.org/en-US/api/RadarChart). This example shows how
      charts can take [ratoms](http://reagent-project.github.io/docs/master/reagent.ratom.html) as input and re-render as the configuration changes.
 
 > In _this_ case, we are using a ratom to hold the configuration for the chart.
@@ -87,9 +87,9 @@
 
 (defn- config-structure []
   [config-structure-example/example
-   :container-id :radar-chart-2-config-structure-demo
-   :title "Radar Chart 2 (Live Configuration - structure) - IN PROGRESS (not complete)"
-   :description "A Radar Chart (2) built using [Recharts](https://recharts.org/en-US/api/RadarChart). This example shows how
+   :container-id :radar-chart-config-structure-demo
+   :title "Radar Chart (Live Configuration - structure) - IN PROGRESS (not complete)"
+   :description "A Radar Chart built using [Recharts](https://recharts.org/en-US/api/RadarChart). This example shows how
      charts can take [ratoms](http://reagent-project.github.io/docs/master/reagent.ratom.html) as input and re-render as the configuration changes.
 
 > In _this_ case, we are using a plain data structure to hold the configuration for the chart.
@@ -102,11 +102,11 @@
 
 
 (defn- config-sub []
-  (let [container-id :radar-chart-2-config-sub-demo]
+  (let [container-id :radar-chart-config-sub-demo]
     [config-sub-example/example
      :container-id container-id
-     :title "Radar Chart 2 (Live Configuration - subscription) - IN PROGRESS (not complete)"
-     :description "A Radar Chart (2) built using [Recharts](https://recharts.org/en-US/api/RadarChart). This example shows how
+     :title "Radar Chart (Live Configuration - subscription) - IN PROGRESS (not complete)"
+     :description "A Radar Chart built using [Recharts](https://recharts.org/en-US/api/RadarChart). This example shows how
      charts can take [subscriptions](https://day8.github.io/re-frame/subscriptions/) as input and re-render as the configuration changes.
 
 > In _this_ case, we are using a subscription to handle the configuration for the chart."
