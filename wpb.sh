@@ -27,6 +27,9 @@ if [ $# -eq 2 ]
 then
   echo "==>> Using npm to install package:" $2
   npm install $2
+else
+  echo "===>> Using npm to update packages"
+  npm install
 fi
 
 echo "==>> Compiling ClojureScript with shadow-cljs"
@@ -34,4 +37,4 @@ npx shadow-cljs compile app
 
 configFile="webpack-${1}-config.js"
 echo "==>> Running webpack using the" $configFile "configuration file"
-npx webpack -c webpack-dev-config.js
+npx webpack -c $configFile
