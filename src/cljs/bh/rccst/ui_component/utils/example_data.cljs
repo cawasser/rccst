@@ -2,14 +2,14 @@
   (:require [bh.rccst.subs :as subs]
             [cljs-uuid-utils.core :as uuid]
             [cljs.spec.alpha :as spec]
+            [clojure.test.check.generators :as gen]
             [expound.alpha :as expound]
             [malli.core :as m]
             [malli.error :as me]
             [malli.generator :as mg]
             [malli.provider :as mp]
             [re-frame.core :as re-frame]
-            [taoensso.timbre :as log]
-            [clojure.test.check.generators :as gen]))
+            [taoensso.timbre :as log]))
 
 
 (log/info "bh.rccst.ui-component.utils.example-data")
@@ -119,13 +119,13 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; region
-(def tabular-data [{:name "Page A" :uv 4000 :pv 2400 :amt 2400}
-                   {:name "Page B" :uv 3000 :pv 1398 :amt 2210}
-                   {:name "Page C" :uv 2000 :pv 9800 :amt 2290}
-                   {:name "Page D" :uv 2780 :pv 3908 :amt 2000}
-                   {:name "Page E" :uv 1890 :pv 4800 :amt 2181}
-                   {:name "Page F" :uv 2390 :pv 3800 :amt 2500}
-                   {:name "Page G" :uv 3490 :pv 4300 :amt 2100}])
+(def tabular-data [{:name "Page A" :uv 4000 :pv 2400 :tv 1500 :amt 2400}
+                   {:name "Page B" :uv 3000 :pv 1398 :tv 1500 :amt 2210}
+                   {:name "Page C" :uv 2000 :pv 9800 :tv 1500 :amt 2290}
+                   {:name "Page D" :uv 2780 :pv 3908 :tv 1500 :amt 2000}
+                   {:name "Page E" :uv 1890 :pv 4800 :tv 1500 :amt 2181}
+                   {:name "Page F" :uv 2390 :pv 3800 :tv 1500 :amt 2500}
+                   {:name "Page G" :uv 3490 :pv 4300 :tv 1500 :amt 2100}])
 
 
 (def grouped-tabular-data [{:name "Page-A" :values [{:uv 4000 :pv 2400 :amt 400}
@@ -185,8 +185,8 @@
 (def tabular-data-data [:sequential tabular-data-entry])
 
 (def example-tabular-data-entry [:map
-                                 [:name string?][:uv int?]
-                                 [:pv int?] [:amt int?]])
+                                 [:name string?] [:uv int?]
+                                 [:pv int?] [:tv int?] [:amt int?]])
 (def example-tabular-data-data [:sequential example-tabular-data-entry])
 
 (comment
@@ -218,32 +218,22 @@
               :id     :name
               :title  "Tabular Data with Metadata"
               :fields {:name :string :uv :number :pv :number :tv :number :amt :number}}
-   :data     [{:name "Page A" :uv 4000 :pv 2400 :tv 1500 :amt 2400}
-              {:name "Page B" :uv 3000 :pv 1398 :tv 1500 :amt 2210}
-              {:name "Page C" :uv 2000 :pv 9800 :tv 1500 :amt 2290}
-              {:name "Page D" :uv 2780 :pv 3908 :tv 1500 :amt 2000}
-              {:name "Page E" :uv 1890 :pv 4800 :tv 1500 :amt 2181}
-              {:name "Page F" :uv 2390 :pv 3800 :tv 1500 :amt 2500}
-              {:name "Page G" :uv 3490 :pv 4300 :tv 1500 :amt 2100}]})
+   :data     tabular-data})
+
 (def BAD-meta-tabular-data-missing-type
   {:metadata {:id     :name
               :title  "Tabular Data with Metadata"
               :fields {:name :string :uv :number :pv :number :tv :number :amt :number}}
-   :data     [{:name "Page A" :uv 4000 :pv 2400 :tv 1500 :amt 2400}
-              {:name "Page B" :uv 3000 :pv 1398 :tv 1500 :amt 2210}
-              {:name "Page C" :uv 2000 :pv 9800 :tv 1500 :amt 2290}
-              {:name "Page D" :uv 2780 :pv 3908 :tv 1500 :amt 2000}
-              {:name "Page E" :uv 1890 :pv 4800 :tv 1500 :amt 2181}
-              {:name "Page F" :uv 2390 :pv 3800 :tv 1500 :amt 2500}
-              {:name "Page G" :uv 3490 :pv 4300 :tv 1500 :amt 2100}]})
+   :data     tabular-data})
 (def BAD-meta-tabular-data-bad-field
   {:metadata {:type   :data/tabular
               :id     :name
               :title  "Tabular Data with Metadata"
               :fields {:name :keyword}}
-   :data     [{:name "Page A" :uv 4000 :pv 2400 :tv 1500 :amt 2400}]})
+   :data     tabular-data})
 
 ; in clojure.spec (2)
+; TODO: spec needs to include the actual "example" data format so we can generate random values
 (spec/def :data/type #{:data/tabular :data/entity})
 (spec/def :data/id keyword?)
 (spec/def :data/title string?)
@@ -291,6 +281,16 @@
                              [:data tabular-data-data]])
 
 
+(def example-data-fields [:map [:name [:enum :string]] [:uv [:enum :number]]
+                          [:pv [:enum :number]] [:tv [:enum :number]] [:amt [:enum :number]]])
+(def example-data-metadata [:map
+                            [:type [:enum :data/tabular]] [:fields example-data-fields]
+                            [:id [:enum :name]] [:title {:optional true} data-title]])
+(def example-tabular-data-meta-data [:map
+                                     [:metadata example-data-metadata]
+                                     [:data example-tabular-data-data]])
+
+
 (comment
   (m/validate tabular-data-meta-data meta-tabular-data)
   (m/validate tabular-data-meta-data BAD-meta-tabular-data-missing-type)
@@ -301,11 +301,16 @@
     (m/explain tabular-data-meta-data)
     (me/humanize))
 
+  (m/validate example-tabular-data-meta-data meta-tabular-data)
+
+  (mg/generate example-tabular-data-meta-data)
 
 
   ())
 
 
+(defn random-meta-tabular-data []
+  (mg/generate example-tabular-data-meta-data))
 
 
 ;; endregion
