@@ -3,8 +3,13 @@
             [cljs-uuid-utils.core :as uuid]
             [cljs.spec.alpha :as spec]
             [expound.alpha :as expound]
+            [malli.core :as m]
+            [malli.error :as me]
+            [malli.generator :as mg]
+            [malli.provider :as mp]
             [re-frame.core :as re-frame]
-            [taoensso.timbre :as log]))
+            [taoensso.timbre :as log]
+            [clojure.test.check.generators :as gen]))
 
 
 (log/info "bh.rccst.ui-component.utils.example-data")
@@ -17,12 +22,22 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;
+; Chain-of-Custody data
+;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; region
 (def default-coc [{:coc/step      :generated
                    :coc/by        "bh.rccst.ui-component.atom.bh.table"
                    :coc/version   (or @(re-frame/subscribe [::subs/version]) "no version")
                    :coc/at        (str (js/Date.))
                    :coc/signature (uuid/uuid-string (uuid/make-random-uuid))}])
 
+; in clojure.spec (2)
 (spec/def :coc/step (spec/and #{:generated :updated :deleted}))
 (spec/def :coc/by string?)
 (spec/def :coc/version string?)
@@ -53,6 +68,57 @@
   ())
 
 
+; in Malli
+(def coc-step [:enum :generated :updated :deleted])
+(def coc-step-map [:map [:coc/step coc-step]])
+(def coc-by string?)
+(def coc-version string?)
+(def coc-at string?)
+(def coc-signature string?)
+(def coc-entry [:map
+                [:coc/step coc-step]
+                [:coc/by coc-by]
+                [:coc/version coc-version]
+                [:coc/at coc-at]
+                [:coc/signature coc-signature]])
+
+
+(comment
+  (m/validate coc-step :generated)
+  (m/validate coc-step :dummy)
+
+  (def entry {:coc/step      :generated
+              :coc/by        "bh.rccst.ui-component.atom.bh.table"
+              :coc/version   (or @(re-frame/subscribe [:bh.rccst.subs/version]) "no version")
+              :coc/at        (str (js/Date.))
+              :coc/signature (uuid/uuid-string (uuid/make-random-uuid))})
+
+
+  (m/validate coc-entry entry)
+  (m/explain coc-entry entry)
+
+
+  ; generate some data
+  (mg/generate coc-step)
+  (mg/generate coc-version)
+  (mg/generate coc-entry {:size 64})
+
+  (mg/sample coc-entry {:size 25})
+
+  (gen/sample (mg/generator pos-int?))
+
+
+  ())
+;; endregion
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;
+; Tabular Data examples
+;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; region
 (def tabular-data [{:name "Page A" :uv 4000 :pv 2400 :amt 2400}
                    {:name "Page B" :uv 3000 :pv 1398 :amt 2210}
                    {:name "Page C" :uv 2000 :pv 9800 :amt 2290}
@@ -61,30 +127,22 @@
                    {:name "Page F" :uv 2390 :pv 3800 :amt 2500}
                    {:name "Page G" :uv 3490 :pv 4300 :amt 2100}])
 
+
 (def grouped-tabular-data [{:name "Page-A" :values [{:uv 4000 :pv 2400 :amt 400}
                                                     {:uv 1000 :pv 400 :amt 2300}
                                                     {:uv 2000 :pv 3400 :amt 5400}
                                                     {:uv 3000 :pv 2498 :amt 5400}]}])
-                                                    ;{:name "Page B" :uv 3000 :pv 1398 :amt 2210}
-                                                    ;{:name "Page C" :uv 2000 :pv 9800 :amt 2290}
-                                                    ;{:name "Page D" :uv 2780 :pv 3908 :amt 2000}
-                                                    ;{:name "Page E" :uv 1890 :pv 4800 :amt 2181}
-                                                    ;{:name "Page F" :uv 2390 :pv 3800 :amt 2500}
-                                                    ;{:name "Page G" :uv 3490 :pv 4300 :amt 2100}}])
-
-(spec/def :tabular-data/entry map?)
-(spec/def :tabular-data/data (spec/coll-of :tabular-data/entry))
 
 
 (def tabular-column-config-data {:brush false
                                  :uv    {:include true :fill "#ff0000" :stroke "#ff0000"
-                                         :name :uv :stackId "" :fillOpacity 0.6}
+                                         :name    :uv :stackId "" :fillOpacity 0.6}
                                  :pv    {:include true :fill "#00ff00" :stroke "#00ff00"
-                                         :name :pv :stackId "" :fillOpacity 0.6}
+                                         :name    :pv :stackId "" :fillOpacity 0.6}
                                  :tv    {:include true :fill "#0000ff" :stroke "#0000ff"
-                                         :name :tv :stackId "a" :fillOpacity 0.6}
+                                         :name    :tv :stackId "a" :fillOpacity 0.6}
                                  :amt   {:include true :fill "#ff00ff" :stroke "#ff00ff"
-                                         :name :amt :stackId "a" :fillOpacity 0.6}})
+                                         :name    :amt :stackId "a" :fillOpacity 0.6}})
 
 
 ; TODO: convert :color to :fill/:stroke throughout
@@ -95,7 +153,7 @@
                               :Page-E {:name "Page E" :include true :color "#ff00ff"} ;"#00e5ff"}
                               :Page-F {:name "Page F" :include true :color "#00ffff"} ;"#4db6ac"}
                               :Page-G {:name "Page G" :include true :color "#888888"} ;"#83a6ed"}
-                              :value {:keys [:uv :pv :tv :amt] :chosen :uv}})
+                              :value  {:keys [:uv :pv :tv :amt] :chosen :uv}})
 
 
 (def tabular-data-org [{:name "Page A" :org "Alpha" :uv 4000 :pv 2400 :amt 2400}
@@ -107,12 +165,53 @@
                        {:name "Page G" :org "Gamma" :uv 3490 :pv 4300 :amt 2100}])
 
 
+; in clojure.spec (2)
+(spec/def :tabular-data/entry map?)
+(spec/def :tabular-data/data (spec/coll-of :tabular-data/entry))
+
+
 (comment
   (spec/valid? :tabular-data/data tabular-data)
   (spec/valid? :tabular-data/data tabular-data-org)
 
   ())
 
+
+; in Malli
+
+;(def tabular-data-entry map?)
+(def field-name [:keyword])
+(def tabular-data-entry [:map-of field-name any?])
+(def tabular-data-data [:sequential tabular-data-entry])
+
+(def example-tabular-data-entry [:map
+                                 [:name string?][:uv int?]
+                                 [:pv int?] [:amt int?]])
+(def example-tabular-data-data [:sequential example-tabular-data-entry])
+
+(comment
+  (m/validate tabular-data-data tabular-data)
+  (m/validate tabular-data-data tabular-data-org)
+
+  (mg/generate tabular-data-data)
+
+
+  (m/validate example-tabular-data-data tabular-data)
+  (mg/generate example-tabular-data-data)
+
+  ())
+
+;; endregion
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;
+; Tabular Data with Meta-data examples
+;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; region
 
 (def meta-tabular-data
   {:metadata {:type   :data/tabular
@@ -144,6 +243,7 @@
               :fields {:name :keyword}}
    :data     [{:name "Page A" :uv 4000 :pv 2400 :tv 1500 :amt 2400}]})
 
+; in clojure.spec (2)
 (spec/def :data/type #{:data/tabular :data/entity})
 (spec/def :data/id keyword?)
 (spec/def :data/title string?)
@@ -176,6 +276,49 @@
 
   ())
 
+
+; in Malli
+(def data-type [:enum :data/tabular :data/entity])
+(def data-id keyword?)
+(def data-title string?)
+(def data-fields [:map-of keyword? [:enum {:error/message "should be: :string OR :number"}
+                                    :string :number]])
+(def data-metadata [:map
+                    [:type data-type] [:fields data-fields]
+                    [:id {:optional true} data-id] [:title {:optional true} data-title]])
+(def tabular-data-meta-data [:map
+                             [:metadata data-metadata]
+                             [:data tabular-data-data]])
+
+
+(comment
+  (m/validate tabular-data-meta-data meta-tabular-data)
+  (m/validate tabular-data-meta-data BAD-meta-tabular-data-missing-type)
+  (m/explain tabular-data-meta-data BAD-meta-tabular-data-missing-type)
+
+  (m/validate tabular-data-meta-data BAD-meta-tabular-data-bad-field)
+  (->> BAD-meta-tabular-data-bad-field
+    (m/explain tabular-data-meta-data)
+    (me/humanize))
+
+
+
+  ())
+
+
+
+
+;; endregion
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;
+; Other data structures
+;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; region
 
 (def some-other-tabular [{:id "Page A" :a 4000 :b 2400 :c 2400}
                          {:id "Page B" :a 3000 :b 1398 :c 2210}
@@ -297,8 +440,43 @@
                         {:source :Page-Click :target :Lost :value 291741}}})
 
 
+; these Malli specs were built (inferred) using "provide"
+(def m-dag-data-spec [:map
+                      [:nodes [:set [:map [:name keyword?] [:index int?]]]]
+                      [:links [:set [:map [:source keyword?]
+                                     [:target keyword?] [:value int?]]]]])
+(def m-hierarchy-data-spec [:vector
+                            [:map
+                             [:name string?]
+                             [:children
+                              [:vector
+                               [:map
+                                [:name string?]
+                                [:size {:optional true} int?]
+                                [:children {:optional true} [:vector [:map [:name string?] [:size int?]]]]]]]]])
+
+
+; create Malli from the data itself!
+(comment
+  (mp/provide [dag-data dag-data dag-data])
+
+  (m/validate m-dag-data-spec dag-data)
+
+
+  (m/validate (mp/provide [hierarchy-data]) hierarchy-data)
+  (m/validate m-hierarchy-data-spec hierarchy-data)
+
+  ())
+
+
 (def dag-config-data {:Visit            {:include true :fill "#ff0000" :stroke "#ff0000"}
                       :Direct-Favourite {:include true :fill "#00ff00" :stroke "#00ff00"}
                       :Page-Click       {:include true :fill "#0000ff" :stroke "#0000ff"}
                       :Detail-Favourite {:include true :fill "#12a4a4" :stroke "#12a4a4"}
                       :Lost             {:include true :fill "#ba7b47" :stroke "#ba7b47"}})
+
+
+
+
+;; endregion
+
