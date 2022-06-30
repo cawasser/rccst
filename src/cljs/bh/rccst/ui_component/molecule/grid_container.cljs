@@ -145,7 +145,10 @@
         comp-or-dag?  (r/atom :component)
         partial-config   (assoc configuration
                            :denorm (dig/denorm-components graph (:links configuration) (lg/nodes graph))
-                           :nodes (lg/nodes graph)
+                           :nodes (-> configuration
+                                    :components
+                                    keys
+                                    set)
                            :edges (into [] (lg/edges graph)))
         full-config (assoc partial-config :graph graph)]
 

@@ -74,7 +74,7 @@
       ;  "// (selected-targets)" s-t
       ;  "// (selected-satellites)" s-s)
       ;  "// (cooked)" (s/cook-coverages c ct)
-      ;  "// (filter)" (filter #(contains? s (get-in % [:coverage :sensor]))
+      ;  "// (:topic/target-filter)" (:topic/target-filter #(contains? s (get-in % [:coverage :sensor]))
       ;                  (s/cook-coverages c ct)))
 
       (let [filtered-coverages (filter #(contains?
@@ -208,6 +208,16 @@
           ret)))))
 
 
+(defn fn-filtered-targets [{:keys [targets filter-value filtered-targets] :as params}]
+  (re-frame/reg-sub
+    (first filtered-targets)
+    :<- targets
+    :<- filter-value
+    (fn [[t f] _]
+      (->> t
+        (filter #(re-find (re-pattern (str "(?i)" f)) (:name %)))))))
+
+
 ;; endregion
 
 
@@ -256,13 +266,13 @@
      [:span.icon.has-text-success.is-small [:i.far.fa-square]])])
 
 
-(defn- display-symbol [data name [_ _ _ _ color]]
+(defn- display-symbol [data update-colors name [_ _ _ _ color]]
   (let [showing? (r/atom false)
         d        (h/resolve-value data)]
 
-    ;(log/info "display-symbol" name "//" @showing?)
+    ;(log/info "display-symbol" data "//" name "//" @showing?)
 
-    (fn [data name [_ _ _ _ color]]
+    (fn [data update-colors name [_ _ _ _ color]]
 
       ;(log/info "display-symbol (inner)" name
       ;"//" color "//" @d
@@ -286,7 +296,7 @@
                   :body [picker/hex-color-picker
                          :color color
                          :on-change (fn [x]
-                                      (update-color data name :name :hex (js->clj x)))]]]])))
+                                      (update-color update-colors name :name :hex (js->clj x)))]]]])))
 
 
 (defn- display-edit-control [name]
@@ -378,7 +388,8 @@
   ^{:key (str (:column/label column) "-" (rand-int 1000))} [:th (:column/label column)])
 
 
-(defn- target-table [& {:keys [data selection component-id container-id]}]
+(defn- target-table [& {:keys [data selection colors component-id container-id] :as params}]
+  ;(log/info "target-table" params)
   (let [d (h/resolve-value data)
         s (h/resolve-value selection)]
 
@@ -405,7 +416,7 @@
                [:tr
                 [display-checkbox name name @s #(toggle-selection @s selection name)]
 
-                [display-symbol data name color]
+                [display-symbol data colors name color]
 
                 [display-text name]
 
@@ -448,6 +459,23 @@
                 [display-text platform_id]])))]]])))
 
 
+(defn- target-filter-input [& {:keys [value component-id container-id] :as params}]
+  (let [v (h/resolve-value value)]
+    (fn []
+      [rc/h-box :src (rc/at)
+       :align :center
+       :children [[rc/input-text :src (rc/at)
+                   :model @v
+                   :placeholder "enter text to filter targets"
+                   :change-on-blur? false
+                   :on-change #(h/handle-change-path value [] %)]
+                  [rc/md-circle-icon-button :src (rc/at)
+                   :md-icon-name "zmdi-close-circle-o"
+                   :tooltip "Click to clear"
+                   :size :smaller
+                   :on-click #(h/handle-change-path value [] "")]]])))
+
+
 ;; endregion
 
 
@@ -467,6 +495,7 @@
                                    :ui/globe                  {:type :ui/component :name :ww/globe}
                                    :ui/time-slider            {:type :ui/component :name :rc/slider}
                                    :ui/current-time           {:type :ui/component :name :rc/label-md}
+                                   :ui/target-filter          {:type :ui/component :name target-filter-input :label "Filter:"}
 
                                    ; remote data sources
                                    :topic/target-data         {:type :source/remote :name :source/targets}
@@ -485,6 +514,8 @@
                                    :topic/shapes              {:type :source/local :name :shapes}
                                    :topic/time-range          {:type :source/local :name :time-range}
                                    :topic/current-slider      {:type :source/local :name :current-slider :default 0}
+                                   :topic/target-filter       {:type :source/local :name :target-filter :default ""}
+                                   :topic/filtered-targets    {:type :source/local :name :filtered-targets}
 
                                    ; transformation functions
                                    :fn/coverage               {:type  :source/fn :name fn-coverage
@@ -499,13 +530,19 @@
                                    :fn/color-targets          {:type  :source/fn :name fn-color-targets
                                                                :ports {:data :port/sink :colored :port/source}}
                                    :fn/color-satellites       {:type  :source/fn :name fn-color-satellites
-                                                               :ports {:data :port/sink :colored :port/source}}}
+                                                               :ports {:data :port/sink :colored :port/source}}
+                                   :fn/filtered-targets       {:type  :source/fn :name fn-filtered-targets
+                                                               :ports {:targets          :port/sink
+                                                                       :filter-value     :port/sink
+                                                                       :filtered-targets :port/source}}}
 
                     :links        {:ui/targets                {;:data      {:topic/target-data :data}
-                                                               :selection {:topic/selected-targets :data}}
+                                                               :selection {:topic/selected-targets :data}
+                                                               :colors    {:topic/colored-targets :data}}
                                    :ui/satellites             {;:data      {:topic/satellite-data :data}
                                                                :selection {:topic/selected-satellites :data}}
                                    :ui/time-slider            {:value {:topic/current-slider :data}}
+                                   :ui/target-filter          {:value {:topic/target-filter :data}}
 
                                    ; transformation functions publish to what?
                                    :fn/coverage               {:shapes {:topic/shapes :data}}
@@ -513,11 +550,11 @@
                                    :fn/current-time           {:current-time {:topic/current-time :data}}
                                    :fn/color-targets          {:colored {:topic/colored-targets :data}}
                                    :fn/color-satellites       {:colored {:topic/colored-satellites :data}}
+                                   :fn/filtered-targets       {:filtered-targets {:topic/filtered-targets :data}}
 
                                    ; topics are inputs into what?
                                    :topic/target-data         {:data {:fn/color-targets :data}}
-                                   :topic/colored-targets     {:data {:ui/targets  :data
-                                                                      :fn/coverage :targets}}
+                                   :topic/colored-targets     {:data {:fn/filtered-targets :targets}}
                                    :topic/selected-targets    {:data {:ui/targets  :selection
                                                                       :fn/coverage :selected-targets}}
 
@@ -536,13 +573,18 @@
                                    :topic/current-slider      {:data {:fn/current-time :value
                                                                       :ui/time-slider  :value
                                                                       :fn/coverage     :current-time}}
-                                   :topic/time-range          {:data {:ui/time-slider :range}}}
+                                   :topic/time-range          {:data {:ui/time-slider :range}}
+                                   :topic/target-filter       {:data {:ui/target-filter    :value
+                                                                      :fn/filtered-targets :filter-value}}
+                                   :topic/filtered-targets    {:data {:ui/targets  :data
+                                                                      :fn/coverage :targets}}}
 
-                    :grid-layout  [{:i :ui/targets :x 0 :y 0 :w 9 :h 7 :static true}
-                                   {:i :ui/satellites :x 0 :y 7 :w 9 :h 8 :static true}
-                                   {:i :ui/time-slider :x 2 :y 15 :w 6 :h 2 :static true}
-                                   {:i :ui/globe :x 9 :y 0 :w 11 :h 15 :static true}
-                                   {:i :ui/current-time :x 9 :y 15 :w 8 :h 2 :static true}]})
+                    :grid-layout  [{:i :ui/target-filter :x 5 :y 0 :w 4 :h 2 :static true}
+                                   {:i :ui/targets :x 0 :y 2 :w 9 :h 7 :static true}
+                                   {:i :ui/satellites :x 0 :y 9 :w 9 :h 8 :static true}
+                                   {:i :ui/time-slider :x 2 :y 17 :w 6 :h 2 :static true}
+                                   {:i :ui/globe :x 9 :y 0 :w 11 :h 17 :static true}
+                                   {:i :ui/current-time :x 9 :y 17 :w 8 :h 2 :static true}]})
 
 
 
