@@ -3,7 +3,7 @@
             [bh.rccst.ui-component.atom.chart.wrapper-2 :as wrapper]
             [bh.rccst.ui-component.utils :as ui-utils]
             [bh.rccst.ui-component.utils.color :as color]
-            [bh.rccst.ui-component.utils.example-data :as data]
+            [bh.rccst.ui-component.utils.example-data :as example-data]
             [re-com.core :as rc]
             [taoensso.timbre :as log]
             ["recharts" :refer [ResponsiveContainer ScatterChart Scatter Brush
@@ -13,13 +13,12 @@
 (log/info "bh.rccst.ui-component.atom.chart.scatter-chart")
 
 
-(def sample-data
-  "the Scatter Chart works best with \"triplet data\" so we return the triplet-data from utils"
-  data/meta-tabular-data)
-(def sample-config-data (merge data/tabular-row-config-data
+(def sample-data example-data/meta-tabular-data)
+(def sample-config-data (merge example-data/tabular-row-config-data
                           {:values {:keys [:Page-A :Page-B :Page-C
                                            :Page-D :Page-E :Page-F :Page-G]
                                     :x :uv :y :pv :z :amt}}))
+(def random-data example-data/random-meta-positive-tabular-data)
 
 
 (defn local-config [data]

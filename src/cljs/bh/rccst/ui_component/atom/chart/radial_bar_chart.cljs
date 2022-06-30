@@ -14,6 +14,7 @@
 (def source-code '[])
 (def sample-data example-data/meta-tabular-data)
 (def sample-config-data example-data/tabular-row-config-data)
+(def random-data example-data/random-meta-positive-tabular-data)
 
 
 (defn local-config [data]

@@ -22,7 +22,7 @@
    :container  ""})
 
 
-(defn- data-update-example [& {:keys [data default-data component data-tools] :as params}]
+(defn- data-update-example [& {:keys [data default-data random-data component data-tools] :as params}]
   ;(log/info "data-update-example (params)" params)
   ;(log/info "data-update-example (component)" component "//" data-panel "//" config-panel "//" default-data)
 
@@ -37,10 +37,10 @@
                :gap "5px"
                :style {:width "100%" :height "30%"}
                :children [[sd/show-data data]
-                          [data-tools data default-data]]]]])
+                          [data-tools data default-data random-data]]]]])
 
 
-(defn- dummy-container [component default-data
+(defn- dummy-container [component default-data random-data
                         & {:keys [component-id container-id] :as params}]
   (let [id           (r/atom nil)
         input-params (assoc params :component-id (h/path->keyword component-id "chart")
@@ -58,7 +58,7 @@
 
 
 (defn example [& {:keys [container-id
-                         sample-data default-data
+                         sample-data default-data random-data
                          component] :as params}]
 
   ;(log/info "example" container-id params)
@@ -66,8 +66,8 @@
   (let [input-params (assoc params :data sample-data
                                    :component-id container-id
                                    :container-id ""
-                                   :component (partial dummy-container component default-data)
-                                   :default-data default-data)]
+                                   :component (partial dummy-container component default-data random-data))]
+                                   ;:default-data default-data)]
 
     (reduce into [e/component-example] (seq input-params))))
 

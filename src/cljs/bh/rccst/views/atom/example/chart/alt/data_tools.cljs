@@ -9,7 +9,7 @@
 (log/info "bh.rccst.views.atom.example.chart.alt.data-tools")
 
 
-(defn meta-tabular-data-ratom-tools [data default-data]
+(defn meta-tabular-data-ratom-tools [data default-data random-data]
   [rc/h-box :src (rc/at)
    :gap "10px"
    :style {:border     "1px solid" :border-radius "3px"
@@ -19,7 +19,7 @@
               [rc/button :label "Empty" :on-click #(reset! data []) :label "Empty"]
               [rc/button :label "Default" :on-click #(reset! data default-data)]
               ; TODO: need to pass a "meaningful" random-data-set builder function into the tools
-              [rc/button :label "Random" :on-click #(reset! data (ex/random-meta-tabular-data))]
+              [rc/button :label "Random" :on-click #(reset! data (random-data))]
               [rc/button :label "A(uv) -> 10,000" :on-click #(swap! data assoc-in [:data 0 :uv] 10000)]
               [rc/button :label "Add 'Q'"
                :on-click #(swap! data assoc :data
@@ -39,7 +39,7 @@
                                                           (:data @data))))))]]])
 
 
-(defn meta-tabular-data-sub-tools [data default-data]
+(defn meta-tabular-data-sub-tools [data default-data random-data]
 
   (let [old-data (ui-utils/subscribe-local data [:data])
         old-meta (ui-utils/subscribe-local data [])]
@@ -57,7 +57,7 @@
                   [rc/button :label "Default"
                    :on-click #(h/handle-change-path data [] default-data)]
 
-                  [rc/button :label "Random" :on-click #(h/handle-change-path data [] (ex/random-meta-tabular-data))]
+                  [rc/button :label "Random" :on-click #(h/handle-change-path data [] (random-data))]
 
                   [rc/button :label "A(uv) -> 10000"
                    :on-click #(h/handle-change-path data [:data]

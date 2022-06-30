@@ -10,7 +10,7 @@
 (log/info "bh.rccst.views.atom.example.chart.alt.data-ratom-example")
 
 
-(defn- data-update-example [component default-data
+(defn- data-update-example [component default-data random-data
                             & {:keys [data data-tools] :as params}]
 
   ;(log/info "data-update-example (params)" params)
@@ -27,16 +27,16 @@
                :gap "5px"
                :style {:width "100%" :height "30%"}
                :children [[sd/show-data data]
-                          [data-tools data default-data]]]]])
+                          [data-tools data default-data random-data]]]]])
 
 
-(defn example [& {:keys [container-id sample-data component] :as params}]
+(defn example [& {:keys [container-id sample-data random-data component] :as params}]
   (let [component-id (utils/path->keyword container-id "chart")
         data         (r/atom sample-data)
         input-params (assoc params
                        :data data
                        :component-id component-id
-                       :component (partial data-update-example component sample-data))
+                       :component (partial data-update-example component sample-data random-data))
 
         ret (reduce into [example/component-example] (seq input-params))]
 

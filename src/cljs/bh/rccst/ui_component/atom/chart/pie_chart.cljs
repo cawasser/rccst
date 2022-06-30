@@ -17,6 +17,7 @@
 (def sample-config-data {:name  {:keys [:Page-A :Page-B :Page-C :Page-D :Page-E :Page-F :Page-G]}
                          :fill "#888888"
                          :value {:keys [:uv :pv :tv :amt] :chosen :uv}})
+(def random-data example-data/random-meta-positive-tabular-data)
 
 
 (defn local-config [data]

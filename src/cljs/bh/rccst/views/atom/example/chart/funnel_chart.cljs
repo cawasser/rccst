@@ -23,6 +23,7 @@
   >
   > You can use the buttons below to change some of the data and see how the chart responds."
    :sample-data chart/sample-data
+   :random-data chart/random-data
    :source-code chart/source-code
    :data-tools data-tools/meta-tabular-data-ratom-tools
    :component chart/component
@@ -40,6 +41,7 @@
   > In _this_ case, we are using a plain data structure for the data, so there is no way to update it (it lives
   > only inside the chart, with no way to get at it from outside)."
    :sample-data chart/sample-data
+   :random-data chart/random-data
    :source-code chart/source-code
    :component chart/component
    :data-panel chart-utils/meta-tabular-data-panel
@@ -58,6 +60,7 @@
 "
      :sample-data [container-id :blackboard :topic.sample-data]
      :default-data chart/sample-data
+     :random-data chart/random-data
      :data-tools data-tools/meta-tabular-data-sub-tools
      :source-code chart/source-code
      :component chart/component

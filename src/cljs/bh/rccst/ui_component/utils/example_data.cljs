@@ -185,8 +185,8 @@
 (def tabular-data-data [:sequential tabular-data-entry])
 
 (def example-tabular-data-entry [:map
-                                 [:name string?] [:uv int?]
-                                 [:pv int?] [:tv int?] [:amt int?]])
+                                 [:name string?] [:uv number?]
+                                 [:pv number?] [:tv number?] [:amt number?]])
 (def example-tabular-data-data [:sequential example-tabular-data-entry])
 
 (comment
@@ -290,6 +290,15 @@
                                      [:metadata example-data-metadata]
                                      [:data example-tabular-data-data]])
 
+(def pos-int-limit [:any {:gen/schema [:int {:min 500, :max 8000}]}])
+(def example-positive-tabular-data-entry [:map
+                                          [:name string?] [:uv pos-int-limit]
+                                          [:pv pos-int-limit] [:tv pos-int-limit] [:amt pos-int-limit]])
+(def example-positive-tabular-data-data [:sequential example-positive-tabular-data-entry])
+(def example-positive-tabular-data-meta-data [:map
+                                              [:metadata example-data-metadata]
+                                              [:data example-positive-tabular-data-data]])
+
 
 (comment
   (m/validate tabular-data-meta-data meta-tabular-data)
@@ -305,6 +314,10 @@
 
   (mg/generate example-tabular-data-meta-data)
 
+  (mg/generate [:any {:gen/schema [:int {:min 500, :max 8000}]}])
+
+  (mg/generate example-positive-tabular-data-meta-data)
+
 
   ())
 
@@ -316,6 +329,9 @@
 (defn random-meta-tabular-data []
   (mg/generate example-tabular-data-meta-data))
 
+
+(defn random-meta-positive-tabular-data []
+  (mg/generate example-positive-tabular-data-meta-data))
 
 ;; endregion
 

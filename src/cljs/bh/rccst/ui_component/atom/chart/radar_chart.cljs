@@ -33,6 +33,7 @@
 
 (def sample-data example-data/meta-tabular-data)
 (def sample-config-data example-data/tabular-column-config-data)
+(def random-data example-data/random-meta-positive-tabular-data)
 
 
 (defn- get-range-across-fields [data]

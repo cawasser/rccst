@@ -3,7 +3,7 @@
             [bh.rccst.ui-component.atom.chart.wrapper-2 :as wrapper]
             [bh.rccst.ui-component.utils :as ui-utils]
             [bh.rccst.ui-component.utils.color :as color]
-            [bh.rccst.ui-component.utils.example-data :as data]
+            [bh.rccst.ui-component.utils.example-data :as example-data]
             [re-com.core :as rc]
             [taoensso.timbre :as log]
 
@@ -14,10 +14,9 @@
 (log/info "bh.rccst.ui-component.atom.chart.funnel-chart")
 
 
-(def sample-data
-  "the Funnel Chart works best with \"paired data\" so we return the paired-data from utils"
-  data/meta-tabular-data)
-(def sample-config-data data/tabular-row-config-data)
+(def sample-data example-data/meta-tabular-data)
+(def sample-config-data example-data/tabular-row-config-data)
+(def random-data example-data/random-meta-positive-tabular-data)
 
 
 (defn local-config [data]
