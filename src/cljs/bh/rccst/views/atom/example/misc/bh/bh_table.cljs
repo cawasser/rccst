@@ -24,6 +24,7 @@
    :children [[:label.h5 "Input Data:"]
               [rc/button :on-click #(reset! data []) :label "Empty"]
               [rc/button :on-click #(reset! data table/sample-data) :label "Default"]
+              [rc/button :on-click #(reset! data (table/random-data)) :label "Random"]
               [rc/button :on-click #(swap! data assoc-in [0 :uv] 10000) :label "A -> 10,000"]
               [rc/button :on-click #(swap! data conj {:name "Page Q" :uv 1100
                                                       :pv   1100 :tv 1100 :amt 1100})

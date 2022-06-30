@@ -309,6 +309,10 @@
   ())
 
 
+(defn random-tabular-data []
+  (mg/generate example-tabular-data-data))
+
+
 (defn random-meta-tabular-data []
   (mg/generate example-tabular-data-meta-data))
 

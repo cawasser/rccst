@@ -11,6 +11,8 @@
 (def sample-meta-data ex/meta-tabular-data)
 (def sample-meta-coc-data (assoc ex/meta-tabular-data
                             :c-o-c ex/default-coc))
+(def random-data ex/random-tabular-data)
+(def random-data-meta ex/random-meta-tabular-data)
 
 
 (defn- table* [& {:keys [data max-rows width height cell-style-fn
