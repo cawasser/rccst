@@ -19,7 +19,8 @@
                :background "#808080"
                :box-shadow "5px 5px 5px 2px"
                :margin     "5px" :padding "5px"}
-       :children [[:p {:style {:color "white"}}
+       :children [[:p {:style {:color "white" :overflow :auto
+                               :max-height "100px" :min-height "100px"}}
                    (str @d)]]])))
 
 
