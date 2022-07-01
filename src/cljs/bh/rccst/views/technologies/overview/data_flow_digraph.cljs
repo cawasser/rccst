@@ -99,9 +99,10 @@ of some custom UI.
 The 'magic' is that our implementation build the Layer 3 subscriptions programmatically, based upon the structure of the data
 you define for the intermediary, what we call a `:source/local`. In those cases where you must perform some custom logic,
 you also inject a `:source/fn` or 'source function' to produce the data, and the output can then be fed into other Layer 3 or
-even Layer 4 subscriptions, depending upon how you wire everything together in the graph.
+even Layer 4 subscriptions, depending upon how you wire everything together in the graph."]
 
-#### Development Process
+     [layout/frame {:extra-classes :is-fluid}
+      [layout/markdown-block "#### Development Process
 
 Overall, the approach to developing using this technique is:
 
@@ -118,10 +119,11 @@ the data flows _down hill_.
 
 ![Figure 3. A simplified directed graph of a UI.]()
 
-_Figure 3. A simplified directed graph of a UI._
+_Figure 3. A simplified directed graph of a UI._"]]
 
 
-#### Designing a UI _Widget_
+     [layout/frame {:extra-classes :is-fluid}
+      [layout/markdown-block "#### Designing a UI _Widget_
 
 The very simplest example is to take a single source and connect it directly to a UI component without
 any additional processing, so:
@@ -153,9 +155,10 @@ In Our system, UI element are described like this:
    :links        {:topic/measurements {:data {:ui/bar-chart :data}}}
 
    :grid-layout  [{:i :ui/bar-chart :x 0 :y 0 :w 20 :h 11 :static true}]})
-```
+```"]]
 
-#### Components
+     [layout/frame {:extra-classes :is-fluid}
+      [layout/markdown-block "#### Components
 
 The `:component` section describes the individual building block (think LEGO) that make up the working part of the UI
 data-flow. These are the things that do the work: draw the UI, compute values, represent data fetched (subscribed really)
@@ -191,9 +194,10 @@ some `:source/locals` or `:source/fns` (or more likely both) for one of the foll
 2. You want to add (`assoc`), remove (`filter`), or transform (`map` or `reduce`) some data so it is fit for some other purpose
 
 Now wou can start to _invent_ these components, since they only exist within the scope of the UI _widget_ you are designing.
+"]]
 
-
-#### Links
+     [layout/frame {:extra-classes :is-fluid}
+      [layout/markdown-block "#### Links
 
 `:links` describe how the different parts of the _widget_ connect to and communicate with each other, turning a picture of
 'blocks' into a directed graph. In the case of the UI, each component can be designed with multiple input and multiple outputs.
@@ -204,14 +208,15 @@ This is further described by metadata stored in a run-time registry.
 
 `:grid-layout` describe how the various UI-components, the tables, charts, diagrams,
 etc. are to be arranged visually on the display. We use a user-customizable graph component (built in ReactJS) for doing
-the actual presentation on the display.
+the actual presentation on the display."]]
 
 
-#### More Detail
+     [layout/frame {:extra-classes :is-fluid}
+      [layout/markdown-block "#### More Detail
 
 The actual software element that implements these component, for example :rechart/bar.
 
-"]]
+"]]]
 
     [layout/frame {:extra-classes :is-fluid}
       [layout/markdown-block "### Building Microservices
