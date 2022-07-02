@@ -1,5 +1,6 @@
 (ns bh.rccst.views.technologies.overview.data-flow-digraph
-  (:require [woolybear.ad.layout :as layout]))
+  (:require [woolybear.ad.layout :as layout]
+            [bh.rccst.views.technologies.overview.data-flow.ui-tutorial :as tutorial]))
 
 
 (defn- intro []
@@ -27,9 +28,9 @@ often called the 'back-end', but we have determined that this approach is perfec
 
 (defn- history []
   [layout/frame {:extra-classes :is-fluid}
-   [layout/markdown-block "### How we got here
-
-The breakthrough came when we recognized that 'molecules', as introduced by Brad Frost as part of his [Atomic Design](),
+   [:h2.has-text-info "How we got here"]
+   [layout/markdown-block "The breakthrough came when we recognized that 'molecules', as introduced by Brad Frost as
+   part of his [Atomic Design](),
 in chemistry classes are physically modeled using balls and sticks, as show in Figure 1.
 
 ![Figure 1. Molecule Modeling Kit](/imgs/data-flow/chemical-modeling-kit.jpeg)
@@ -58,9 +59,8 @@ HTML and 'deposited' on the User's display!
 
 (defn- transforming-data []
   [layout/frame {:extra-classes :is-fluid}
-   [layout/markdown-block "### Transforming Data
-
-Sticking with our chemistry analogy, chemical processes also perform transformations on the molecules, as
+   [:h2.has-text-info "Transforming Data"]
+   [layout/markdown-block "Sticking with our chemistry analogy, chemical processes also perform transformations on the molecules, as
 shown in Figure 2.
 
 ![Figure 2. Chemical outputs from the combustion of Ethanol_](/imgs/data-flow/combustion-reaction-model.jpeg)
@@ -90,9 +90,8 @@ of a microservice)"]])
 ;; region ; Designing a UI with Data-flow
 (defn- dev-process []
   [layout/frame {:extra-classes :is-fluid}
-   [layout/markdown-block "#### Development Process
-
-Overall, the approach to developing using this technique is:
+   [:h3 "Development Process"]
+   [layout/markdown-block "Overall, the approach to developing using this technique is:
 
 1. Identify the original source(s) of data, typically of 'type' `:source/remote`
 2. Identify the UI components (i.e., `:ui/component`) to visualize the data
@@ -112,9 +111,8 @@ _Figure 3. A simplified directed graph of a UI._"]])
 
 (defn- ui-design []
   [layout/frame {:extra-classes :is-fluid}
-   [layout/markdown-block "#### Designing a UI _Widget_
-
-The very simplest example is to take a single source and connect it directly to a UI component without
+   [:h3 "Designing a UI _Widget_"]
+   [layout/markdown-block "The very simplest example is to take a single source and connect it directly to a UI component without
 any additional processing, so:
 
 ![Figure 4a. Simplest possible UI example visualized as a directed graph.](/imgs/data-flow/simplest-digraph-model.png)
@@ -149,9 +147,9 @@ In Our system, UI element are described like this:
 
 (defn- components []
   [layout/frame {:extra-classes :is-fluid}
-   [layout/markdown-block "#### Components
-
-The `:component` section describes the individual building block (think LEGO) that make up the working part of the UI
+   [:h3 "Components"]
+   [layout/markdown-block "The `:component` section describes the individual building block (think LEGO) that make up the
+working part of the UI
 data-flow. These are the things that do the work: draw the UI, compute values, represent data fetched (subscribed really)
 from servers, etc.
 
@@ -190,9 +188,9 @@ Now wou can start to _invent_ these components, since they only exist within the
 
 (defn- links []
   [layout/frame {:extra-classes :is-fluid}
-   [layout/markdown-block "#### Links
-
-`:links` describe how the different parts of the _widget_ connect to and communicate with each other, turning a picture of
+   [:h3 "Links"]
+   [layout/markdown-block "`:links` describe how the different parts of the _widget_ connect to
+and communicate with each other, turning a picture of
 'blocks' into a directed graph. In the case of the UI, each component can be designed with multiple input and multiple outputs.
 
 This is further described by metadata stored in a run-time registry.
@@ -206,18 +204,15 @@ the actual presentation on the display."]])
 
 (defn- more-details []
   [layout/frame {:extra-classes :is-fluid}
-   [layout/markdown-block "#### More Detail
-
-The actual software element that implements these component, for example :rechart/bar.
-
-"]])
+   [:h3 "More Details"]
+   [layout/markdown-block "The actual software element that implements these component,
+for example :rechart/bar."]])
 
 
 (defn- data-flow-ui []
   [layout/frame {:extra-classes :is-fluid}
-   [layout/markdown-block "### Designing a UI with Data-flow
-
-Since we are working in Clojure, and, on the UI side, using Re-frame, we take advantage of the Signal Graph
+   [:h2.has-text-info "Designing a UI with Data-flow"]
+   [layout/markdown-block "Since we are working in Clojure, and, on the UI side, using Re-frame, we take advantage of the Signal Graph
 and take advantage of the [Layer 2 'Extractors' and Layer 3 'Materialized Views'](https://day8.github.io/re-frame/subscriptions/#the-four-layers)
 as the primary mechanisms for the various data transformations needed to support the UI.
 
@@ -252,8 +247,8 @@ even Layer 4 subscriptions, depending upon how you wire everything together in t
 
 (defn- microservices []
   [layout/frame {:extra-classes :is-fluid}
-   [layout/markdown-block "### Building Microservices
-Microservices (which are based upon [Willa](https://github.com/DaveWM/willa)), look like this:
+   [:h2.has-text-info "Building Microservices"]
+   [layout/markdown-block "Microservices (which are based upon [Willa](https://github.com/DaveWM/willa)), look like this:
 
 ```
 (def sudoku-service
@@ -275,9 +270,9 @@ It's easy to see the relative similarities between these two description. Let's 
 
 (defn- other-approaches []
   [layout/frame {:extra-classes :is-fluid}
+   [:h2.has-text-info "Other Similar Approaches"]
    [layout/markdown-block
-    "### Other Similar Approaches
-
+    "
 - [Event Modeling](https://eventmodeling.org)
 - [Stream processing](https://en.wikipedia.org/wiki/Stream_processing)
 - [Reactive programming](https://en.wikipedia.org/wiki/Reactive_programming)
@@ -291,10 +286,9 @@ It's easy to see the relative similarities between these two description. Let's 
 
 (defn- differences []
   [layout/frame {:extra-classes :is-fluid}
+   [:h2.has-text-info "Differences from Dataflow programming"]
    [layout/markdown-block
-    "### Differences from Dataflow programming
-
-Dataflow programming (see [here](https://en.wikipedia.org/wiki/Dataflow_programming)), is often implemented (defined?)
+    "Dataflow programming (see [here](https://en.wikipedia.org/wiki/Dataflow_programming)), is often implemented (defined?)
 such that the processing steps
 execute as soon as their inputs all become available. In contrast, in our implementation, there are
 circumstances where the process will trigger when _any_ of the inputs are available (the other inputs are
@@ -305,39 +299,23 @@ any of the inputs change.
 "]])
 
 
-(defn page []
-  [layout/page {:extra-classes :is-fluid}
-   [:div.is-fluid
-    [intro]
-
-    [history]
-
-    [transforming-data]
-
-    [data-flow-ui]
-
-    [microservices]
-
-    [other-approaches]
-
-    [differences]
-
-
-    [layout/frame {:extra-classes :is-fluid}
-     [layout/markdown-block
-      "### Additional Links
-
+(defn- additional-links []
+  [layout/frame {:extra-classes :is-fluid}
+   [:h2.has-text-info "Additional Links"]
+   [layout/markdown-block
+    "
 - [Data Flow (Wikipedia)](https://en.wikipedia.org/wiki/Dataflow)
 - [Dataflow programming (Wikipedia)](https://en.wikipedia.org/wiki/Dataflow_programming)
 - [Kahn process network (Wikipedia)](https://en.wikipedia.org/wiki/Kahn_process_networks)
 
-"]]
+"]])
 
-    [layout/frame {:extra-classes :is-fluid}
-     [layout/markdown-block
-      "### Reactive Programming
 
-Another key part of our approach, and one which tied tightly with our Data-flow approach, is
+(defn- reactive-programming []
+  [layout/frame {:extra-classes :is-fluid}
+   [:h2.has-text-info "Reactive Programming"]
+   [layout/markdown-block
+    "Another key part of our approach, and one which tied tightly with our Data-flow approach, is
 to use 'reactive programming' techniques. Specifically, our approach is 'reactive' in the sense that
 a change to the inputs automatically triggers a re-computation of the outputs. This is what drives
 our 'data flows _downhill_' analogy for our directed-graph visualization and mental model.
@@ -352,6 +330,34 @@ See also
 - [Functional Reactive Programming](https://en.wikipedia.org/wiki/Functional_reactive_programming)
 - [Stream Processing](https://en.wikipedia.org/wiki/Stream_processing)
 
-"]]]])
+"]])
+
+
+
+(defn page []
+  [layout/page {:extra-classes :is-fluid}
+   [:div.is-fluid
+    [intro]
+
+    [history]
+
+    [transforming-data]
+
+    [data-flow-ui]
+
+    [tutorial/tutorial]
+
+    [microservices]
+
+    [other-approaches]
+
+    [differences]
+
+    [additional-links]
+
+    [reactive-programming]]])
+
+
+
 
 
