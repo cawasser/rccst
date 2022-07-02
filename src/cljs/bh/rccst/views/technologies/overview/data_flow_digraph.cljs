@@ -2,13 +2,11 @@
   (:require [woolybear.ad.layout :as layout]))
 
 
-(defn page []
-  [layout/page {:extra-classes :is-fluid}
-   [:div.is-fluid
-    [layout/frame {:extra-classes :is-fluid}
-     [:h2.has-text-info "Data-flow Oriented Design"]
-     [layout/markdown-block
-      "> _a system design approach where data is transformed across a collection of 'processes',
+(defn- intro []
+  [layout/frame {:extra-classes :is-fluid}
+   [:h2.has-text-info "Data-flow Oriented Design"]
+   [layout/markdown-block
+    "> _a system design approach where data is transformed across a collection of 'processes',
 > sometimes called 'automata' (nodes) that are connected (edges) via 'channels' (pub/sub, topics,
 > queues, function calls, etc.)_
 
@@ -24,11 +22,12 @@ strongly promotes the use of queue as a system implementation mechanism (see [he
 As can be seen through a survey of dataflow system approaches, this model is often applied only to the 'services' portion,
 often called the 'back-end', but we have determined that this approach is perfectly amenable to developing User Interfaces
 (UIs), or 'front-ends'. This is a significant shift from how UI development is typically taught and practiced.
-"]]
+"]])
 
 
-    [layout/frame {:extra-classes :is-fluid}
-     [layout/markdown-block "### How we got here
+(defn- history []
+  [layout/frame {:extra-classes :is-fluid}
+   [layout/markdown-block "### How we got here
 
 The breakthrough came when we recognized that 'molecules', as introduced by Brad Frost as part of his [Atomic Design](),
 in chemistry classes are physically modeled using balls and sticks, as show in Figure 1.
@@ -54,10 +53,12 @@ HTML and 'deposited' on the User's display!
 
 > ***Note:*** Although we've developed this sophisticated graph-based capability, ad we encourage you to use it,
 > all the UI components are still available for use in developing more 'typical' ad-hoc UIs. The Data-flow approach
-> is build _on top_ of the basic components. Developers get the best of both worlds!"]]
+> is build _on top_ of the basic components. Developers get the best of both worlds!"]])
 
-    [layout/frame {:extra-classes :is-fluid}
-     [layout/markdown-block "### Transforming Data
+
+(defn- transforming-data []
+  [layout/frame {:extra-classes :is-fluid}
+   [layout/markdown-block "### Transforming Data
 
 Sticking with our chemistry analogy, chemical processes also perform transformations on the molecules, as
 shown in Figure 2.
@@ -80,29 +81,16 @@ The flow can be defined and visualized as a directed graph (digraph)
 
 One of the keys to designing software using data-flow is to focus on that data at the
 beginning (the original source) and the end of the flow (typically the UI or the output)
-of a microservice)"]]
+of a microservice)"]])
 
-    [layout/frame {:extra-classes :is-fluid}
-     [layout/markdown-block "### Designing a UI with Data-flow
 
-Since we are working in Clojure, and, on the UI side, using Re-frame, we take advantage of the Signal Graph
-and take advantage of the [Layer 2 'Extractors' and Layer 3 'Materialized Views'](https://day8.github.io/re-frame/subscriptions/#the-four-layers)
-as the primary mechanisms for the various data transformations needed to support the UI.
 
-Layer 2 extractors are used for remote sources (`:source/remote`), while Layer 3 materialized views provide
-the computational logic to produce the values for use with `:source/local`.
-
-Layer 4, the View Functions, are provided by the various UI Components we have developed. The Catalog
-show them and how they can be used, but within the Data-flow implementation, or more 'manually' as part
-of some custom UI.
-
-The 'magic' is that our implementation build the Layer 3 subscriptions programmatically, based upon the structure of the data
-you define for the intermediary, what we call a `:source/local`. In those cases where you must perform some custom logic,
-you also inject a `:source/fn` or 'source function' to produce the data, and the output can then be fed into other Layer 3 or
-even Layer 4 subscriptions, depending upon how you wire everything together in the graph."]
-
-     [layout/frame {:extra-classes :is-fluid}
-      [layout/markdown-block "#### Development Process
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; region ; Designing a UI with Data-flow
+(defn- dev-process []
+  [layout/frame {:extra-classes :is-fluid}
+   [layout/markdown-block "#### Development Process
 
 Overall, the approach to developing using this technique is:
 
@@ -119,11 +107,12 @@ the data flows _down hill_.
 
 ![Figure 3. A simplified directed graph of a UI.]()
 
-_Figure 3. A simplified directed graph of a UI._"]]
+_Figure 3. A simplified directed graph of a UI._"]])
 
 
-     [layout/frame {:extra-classes :is-fluid}
-      [layout/markdown-block "#### Designing a UI _Widget_
+(defn- ui-design []
+  [layout/frame {:extra-classes :is-fluid}
+   [layout/markdown-block "#### Designing a UI _Widget_
 
 The very simplest example is to take a single source and connect it directly to a UI component without
 any additional processing, so:
@@ -155,10 +144,12 @@ In Our system, UI element are described like this:
    :links        {:topic/measurements {:data {:ui/bar-chart :data}}}
 
    :grid-layout  [{:i :ui/bar-chart :x 0 :y 0 :w 20 :h 11 :static true}]})
-```"]]
+```"]])
 
-     [layout/frame {:extra-classes :is-fluid}
-      [layout/markdown-block "#### Components
+
+(defn- components []
+  [layout/frame {:extra-classes :is-fluid}
+   [layout/markdown-block "#### Components
 
 The `:component` section describes the individual building block (think LEGO) that make up the working part of the UI
 data-flow. These are the things that do the work: draw the UI, compute values, represent data fetched (subscribed really)
@@ -194,10 +185,12 @@ some `:source/locals` or `:source/fns` (or more likely both) for one of the foll
 2. You want to add (`assoc`), remove (`filter`), or transform (`map` or `reduce`) some data so it is fit for some other purpose
 
 Now wou can start to _invent_ these components, since they only exist within the scope of the UI _widget_ you are designing.
-"]]
+"]])
 
-     [layout/frame {:extra-classes :is-fluid}
-      [layout/markdown-block "#### Links
+
+(defn- links []
+  [layout/frame {:extra-classes :is-fluid}
+   [layout/markdown-block "#### Links
 
 `:links` describe how the different parts of the _widget_ connect to and communicate with each other, turning a picture of
 'blocks' into a directed graph. In the case of the UI, each component can be designed with multiple input and multiple outputs.
@@ -208,18 +201,58 @@ This is further described by metadata stored in a run-time registry.
 
 `:grid-layout` describe how the various UI-components, the tables, charts, diagrams,
 etc. are to be arranged visually on the display. We use a user-customizable graph component (built in ReactJS) for doing
-the actual presentation on the display."]]
+the actual presentation on the display."]])
 
 
-     [layout/frame {:extra-classes :is-fluid}
-      [layout/markdown-block "#### More Detail
+(defn- more-details []
+  [layout/frame {:extra-classes :is-fluid}
+   [layout/markdown-block "#### More Detail
 
 The actual software element that implements these component, for example :rechart/bar.
 
-"]]]
+"]])
 
-    [layout/frame {:extra-classes :is-fluid}
-      [layout/markdown-block "### Building Microservices
+
+(defn- data-flow-ui []
+  [layout/frame {:extra-classes :is-fluid}
+   [layout/markdown-block "### Designing a UI with Data-flow
+
+Since we are working in Clojure, and, on the UI side, using Re-frame, we take advantage of the Signal Graph
+and take advantage of the [Layer 2 'Extractors' and Layer 3 'Materialized Views'](https://day8.github.io/re-frame/subscriptions/#the-four-layers)
+as the primary mechanisms for the various data transformations needed to support the UI.
+
+Layer 2 extractors are used for remote sources (`:source/remote`), while Layer 3 materialized views provide
+the computational logic to produce the values for use with `:source/local`.
+
+Layer 4, the View Functions, are provided by the various UI Components we have developed. The Catalog
+show them and how they can be used, but within the Data-flow implementation, or more 'manually' as part
+of some custom UI.
+
+The 'magic' is that our implementation build the Layer 3 subscriptions programmatically, based upon the structure of the data
+you define for the intermediary, what we call a `:source/local`. In those cases where you must perform some custom logic,
+you also inject a `:source/fn` or 'source function' to produce the data, and the output can then be fed into other Layer 3 or
+even Layer 4 subscriptions, depending upon how you wire everything together in the graph."]
+
+   [dev-process]
+
+   [ui-design]
+
+   [components]
+
+   [links]
+
+   [more-details]])
+
+;; endregion
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; region ; Microservices
+
+(defn- microservices []
+  [layout/frame {:extra-classes :is-fluid}
+   [layout/markdown-block "### Building Microservices
 Microservices (which are based upon [Willa](https://github.com/DaveWM/willa)), look like this:
 
 ```
@@ -234,12 +267,16 @@ Microservices (which are based upon [Willa](https://github.com/DaveWM/willa)), l
 
 It's easy to see the relative similarities between these two description. Let's look at each part individually.
 
-"]]
+"]])
 
 
-    [layout/frame {:extra-classes :is-fluid}
-     [layout/markdown-block
-      "### Other Similar Approaches
+;; endregion
+
+
+(defn- other-approaches []
+  [layout/frame {:extra-classes :is-fluid}
+   [layout/markdown-block
+    "### Other Similar Approaches
 
 - [Event Modeling](https://eventmodeling.org)
 - [Stream processing](https://en.wikipedia.org/wiki/Stream_processing)
@@ -249,13 +286,13 @@ It's easy to see the relative similarities between these two description. Let's 
 - [Lucid programming language](https://en.wikipedia.org/wiki/Lucid_(programming_language))
 - [Petri Nets](https://en.wikipedia.org/wiki/Petri_net)
 - [React](https://reactjs.org/)
-- [Re-frame](https://day8.github.io/re-frame/re-frame/)"]]
+- [Re-frame](https://day8.github.io/re-frame/re-frame/)"]])
 
 
-
-    [layout/frame {:extra-classes :is-fluid}
-     [layout/markdown-block
-      "### Differences from Dataflow programming
+(defn- differences []
+  [layout/frame {:extra-classes :is-fluid}
+   [layout/markdown-block
+    "### Differences from Dataflow programming
 
 Dataflow programming (see [here](https://en.wikipedia.org/wiki/Dataflow_programming)), is often implemented (defined?)
 such that the processing steps
@@ -265,7 +302,26 @@ assumed to have default values). Our approach assures that transformation update
 any of the inputs change.
 
 > Is this really true? Need to do some investigation/experimentation to determine.
-"]]
+"]])
+
+
+(defn page []
+  [layout/page {:extra-classes :is-fluid}
+   [:div.is-fluid
+    [intro]
+
+    [history]
+
+    [transforming-data]
+
+    [data-flow-ui]
+
+    [microservices]
+
+    [other-approaches]
+
+    [differences]
+
 
     [layout/frame {:extra-classes :is-fluid}
      [layout/markdown-block
