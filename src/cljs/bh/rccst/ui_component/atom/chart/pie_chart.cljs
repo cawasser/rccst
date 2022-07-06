@@ -12,7 +12,18 @@
 (log/info "bh.rccst.views.atom.example.chart.pie-chart-2")
 
 
-(def source-code '[])
+(def source-code '[:> PieChart {:label (utils/override true {} :label)}
+
+                   (utils/non-gridded-chart-components component-id {})
+
+                   [:> Pie {:dataKey           (ui-utils/resolve-sub subscriptions [:value :chosen])
+                            :nameKey           (ui-utils/resolve-sub subscriptions [:name :chosen])
+                            :data              included
+                            :fill              (ui-utils/resolve-sub subscriptions [:fill])
+                            :label             (utils/override true {} :label)
+                            :isAnimationActive @isAnimationActive?}]])
+
+
 (def sample-data example-data/meta-tabular-data)
 (def sample-config-data {:name  {:keys [:Page-A :Page-B :Page-C :Page-D :Page-E :Page-F :Page-G]}
                          :fill "#888888"

@@ -11,7 +11,21 @@
 
 (log/info "bh.rccst.ui-component.atom.chart.radial-bar-chart")
 
-(def source-code '[])
+(def source-code '[:> RadialBarChart {:innerRadius "10%"
+                                      :outerRadius "80%"
+                                      :data        included
+                                      :startAngle  180
+                                      :endAngle    0}
+
+                   [:> RadialBar {:minAngle   15
+                                  :background {:clockWise true}
+                                  :dataKey    (ui-utils/resolve-sub subscriptions [:value :chosen])}
+                    (make-radial-bar-display included subscriptions isAnimationActive?)]
+
+                   [:> Legend]
+                   [:> Tooltip {:content custom-tooltip}]])
+
+
 (def sample-data example-data/meta-tabular-data)
 (def sample-config-data example-data/tabular-row-config-data)
 (def random-data example-data/random-meta-positive-tabular-data)

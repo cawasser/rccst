@@ -13,7 +13,17 @@
 (log/info "bh.rccst.views.atom.example.chart.bar-chart-2")
 
 
-(def source-code '[])
+(def source-code '[:> PieChart {:label true} (utils/override true {} :label)
+                   [:> Pie {:dataKey           (ui-utils/resolve-sub subscriptions [:value :chosen])
+                            :nameKey           (ui-utils/resolve-sub subscriptions [:name :chosen])
+                            :data              included
+                            :label             (utils/override true {} :label)
+                            :isAnimationActive @isAnimationActive?}
+                    (make-cells d subscriptions)]
+                   [:> Legend]
+                   [:> Tooltip {:content custom-tooltip}]])
+
+
 (def sample-data example-data/meta-tabular-data)
 (def sample-config-data example-data/tabular-row-config-data)
 (def random-data example-data/random-meta-positive-tabular-data)
