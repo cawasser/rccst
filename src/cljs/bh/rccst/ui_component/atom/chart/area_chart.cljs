@@ -16,7 +16,14 @@
 (log/info "bh.rccst.views.atom.example.chart.area-chart")
 
 
-(def source-code '[])
+(def source-code '[:> AreaChart {:data d}
+                   (utils/standard-chart-components component-id {})
+                   [:> Area (merge {:type              "monotone" :dataKey a
+                                    :isAnimationActive @isAnimationActive?
+                                    :stroke            (ui-utils/resolve-sub subscriptions [a :stroke])
+                                    :fill              (ui-utils/resolve-sub subscriptions [a :fill])}
+                                   (when (seq (ui-utils/resolve-sub subscriptions [a :stackId]))
+                                     {:stackId (ui-utils/resolve-sub subscriptions [a :stackId])}))]])
 
 
 (def sample-data example-data/meta-tabular-data)

@@ -14,7 +14,16 @@
             ["recharts" :refer [ResponsiveContainer LineChart Line Brush]]))
 
 
-(def source-code '[])
+(def source-code '[:> LineChart {:data d}
+                   (utils/standard-chart-components component-id {})
+                   [:> Line (merge {:type              "monotone" :dataKey a
+                                    :isAnimationActive @isAnimationActive?
+                                    :stroke            (ui-utils/resolve-sub subscriptions [a :stroke])
+                                    :fill              (ui-utils/resolve-sub subscriptions [a :fill])}
+                                   (when (seq (ui-utils/resolve-sub subscriptions [a :stackId]))
+                                     {:stackId (ui-utils/resolve-sub subscriptions [a :stackId])}))]])
+
+
 (def sample-data example-data/meta-tabular-data)
 (def sample-config-data example-data/tabular-column-config-data)
 (def random-data example-data/random-meta-tabular-data)

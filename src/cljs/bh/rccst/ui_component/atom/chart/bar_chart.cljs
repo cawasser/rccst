@@ -18,7 +18,14 @@
 (log/info "bh.rccst.views.atom.example.chart.bar-chart-2")
 
 
-(def source-code '[])
+(def source-code '[:> BarChart {:data d}
+                   (utils/standard-chart-components component-id {})
+                   [:> Bar (merge {:type              "monotone" :dataKey a
+                                   :isAnimationActive @isAnimationActive?
+                                   :stroke            (ui-utils/resolve-sub subscriptions [a :stroke])
+                                   :fill              (ui-utils/resolve-sub subscriptions [a :fill])}
+                                  (when (seq (ui-utils/resolve-sub subscriptions [a :stackId]))
+                                    {:stackId (ui-utils/resolve-sub subscriptions [a :stackId])}))]])
 
 
 (def sample-data example-data/meta-tabular-data)

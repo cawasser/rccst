@@ -112,7 +112,21 @@
                           (make-cell-config component-id data)]]]])
 
 
-(def source-code `[:> ScatterChart {:width 400 :height 400}])
+(def source-code `[:> ScatterChart
+
+                   (utils/chart-grid component-id {})
+
+                   [:> Tooltip]
+                   [:> XAxis {:type "number" :dataKey (name x)}]
+                   [:> YAxis {:type "number" :dataKey (name y)}]
+                   [:> ZAxis {:type "number" :dataKey (name z)
+                              :range (get-range-across-fields data z)}
+
+                    [:> Scatter
+                     {:name name
+                      :fill (or (ui-utils/resolve-sub subscriptions [name :color])
+                              (color/get-color 0))
+                      :data [item]}]]])
 
 
 (defn- make-scatter [data subscriptions]
