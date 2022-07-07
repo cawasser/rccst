@@ -111,7 +111,7 @@ _Figure 3. A simplified directed graph of a UI._"]])
 
 (defn- ui-design []
   [layout/frame {:extra-classes :is-fluid}
-   [:h3 "Designing a UI _Widget_"]
+   [:h3 "Designing a UI " [:span [:i "Widget"]]]
    [layout/markdown-block "The very simplest example is to take a single source and connect it directly to a UI component without
 any additional processing, so:
 
