@@ -2,7 +2,7 @@
 
   "some components that act as stand-ins for 'real' ui-components"
 
-  (:require [bh.rccst.ui-component.labeled-field :as lf]
+  (:require [bh.rccst.ui-component.atom.re-com.labeled-field :as lf]
             [bh.rccst.ui-component.utils.helpers :as h]
             [re-com.core :as rc]
             [re-frame.core :as re-frame]

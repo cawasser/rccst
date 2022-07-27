@@ -2,7 +2,7 @@
   (:require [woolybear.ad.catalog.utils :as acu]
             [woolybear.ad.layout :as layout]
 
-            [bh.rccst.ui-component.login :as login]))
+            [bh.rccst.ui-component.atom.re-com.login :as login]))
 
 
 (defn example []

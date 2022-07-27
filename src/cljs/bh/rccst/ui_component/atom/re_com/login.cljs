@@ -1,10 +1,10 @@
-(ns bh.rccst.ui-component.login
+(ns bh.rccst.ui-component.atom.re-com.login
   (:require [taoensso.timbre :as log]
             [reagent.core :as r]
             [re-com.core :as rc]
             [re-frame.core :as re-frame]
 
-            [bh.rccst.ui-component.button :as button]))
+            [bh.rccst.ui-component.atom.re-com.button :as button]))
 
 
 (defn login

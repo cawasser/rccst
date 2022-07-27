@@ -16,7 +16,7 @@
 (def people [{:name  "Rich Hickey"
               :image "imgs/giants/rich-hickey.jpeg"
               :description
-              "Discuss various works and presentations
+              "Rich is the creator of Clojure and the Datomic database. His deep thinking about programming and programing languages helps guide us.
 
 [Are We There Yet?]() (2009)
 

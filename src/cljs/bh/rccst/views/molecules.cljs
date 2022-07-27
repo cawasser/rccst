@@ -1,9 +1,9 @@
 (ns bh.rccst.views.molecules
   (:require [bh.rccst.ui-component.tabbed-pane.utils :as tab-utils]
-            [bh.rccst.ui-component.navbar :as navbar]
+            [bh.rccst.ui-component.atom.bh.navbar :as navbar]
             [bh.rccst.views.molecule.general :as general]
             [bh.rccst.views.molecule.all :as all]
-            [bh.rccst.ui-component.tabbed-panel :as tabbed-panel]
+            [bh.rccst.ui-component.atom.bh.tabbed-panel :as tabbed-panel]
             [woolybear.ad.layout :as layout]))
 
 

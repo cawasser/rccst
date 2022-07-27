@@ -1,4 +1,4 @@
-(ns bh.rccst.ui-component.navbar
+(ns bh.rccst.ui-component.atom.bh.navbar
   (:require [taoensso.timbre :as log]
             [re-frame.core :as re-frame]
             [woolybear.packs.tab-panel :as tab-panel]

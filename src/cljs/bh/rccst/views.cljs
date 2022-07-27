@@ -1,5 +1,5 @@
 (ns bh.rccst.views
-  (:require [bh.rccst.ui-component.tabbed-panel :as tabbed-panel]
+  (:require [bh.rccst.ui-component.atom.bh.tabbed-panel :as tabbed-panel]
             [bh.rccst.views.atoms :as atoms]
             [bh.rccst.views.giants :as giants]
             [bh.rccst.views.molecules :as molecules]

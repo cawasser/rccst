@@ -1,10 +1,10 @@
-(ns bh.rccst.ui-component.header-bar
+(ns bh.rccst.ui-component.atom.re-com.header-bar
   (:require [re-frame.core :as re-frame]
             [re-com.core :as rc]
 
             [bh.rccst.subs :as subs]
             [bh.rccst.events :as events]
-            [bh.rccst.ui-component.button :as button]))
+            [bh.rccst.ui-component.atom.re-com.button :as button]))
 
 
 

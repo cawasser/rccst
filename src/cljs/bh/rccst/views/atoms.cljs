@@ -1,5 +1,5 @@
 (ns bh.rccst.views.atoms
-  (:require [bh.rccst.ui-component.tabbed-panel :as tabbed-panel]
+  (:require [bh.rccst.ui-component.atom.bh.tabbed-panel :as tabbed-panel]
             [bh.rccst.views.atom.all :as all-demo]
             [bh.rccst.views.atom.astrouxds :as astro-demo]
             [bh.rccst.views.atom.buttons :as buttons-demo]

@@ -1,5 +1,5 @@
 (ns bh.rccst.views.atom.example.icons.simple-image
-  (:require [bh.rccst.ui-component.markdown :as markdown]
+  (:require [bh.rccst.ui-component.atom.bh.markdown :as markdown]
             [re-com.core :as rc]
             [woolybear.ad.catalog.utils :as acu]
             [woolybear.ad.images :as images]

@@ -2,7 +2,7 @@
   (:require [woolybear.ad.catalog.utils :as acu]
             [woolybear.ad.layout :as layout]
 
-            [bh.rccst.ui-component.header-bar :as header-bar]))
+            [bh.rccst.ui-component.atom.re-com.header-bar :as header-bar]))
 
 
 (defn example []

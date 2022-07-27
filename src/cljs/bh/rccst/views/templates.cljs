@@ -1,7 +1,7 @@
 (ns bh.rccst.views.templates
   (:require [taoensso.timbre :as log]
             [woolybear.ad.layout :as layout]
-            [bh.rccst.ui-component.tabbed-panel :as tabbed-panel]))
+            [bh.rccst.ui-component.atom.bh.tabbed-panel :as tabbed-panel]))
 
 
 (log/info "bh.rccst.views.templates")

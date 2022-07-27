@@ -1,4 +1,4 @@
-(ns bh.rccst.ui-component.labeled-field
+(ns bh.rccst.ui-component.atom.re-com.labeled-field
   (:require [taoensso.timbre :as log]
             [re-com.core :as rc]))
 

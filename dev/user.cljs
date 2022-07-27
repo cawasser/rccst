@@ -7,10 +7,17 @@
     [clojure.pprint :refer (pprint)]
     [clojure.string :as str]
     [re-frame.core :as re-frame]
-    [bh.rccst.events :as events]))
+    [bh.rccst.events :as events]
+
+    [nextjournal.clerk :as clerk]))
 
 
 (re-frame/dispatch [::events/login-success
                     {:logged-in true
                      :user-id "testing"
                      :uuid "testing-uuid"}])
+
+
+(clerk/serve! {:watch-paths ["src"]})
+
+

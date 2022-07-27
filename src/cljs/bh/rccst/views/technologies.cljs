@@ -1,5 +1,5 @@
 (ns bh.rccst.views.technologies
-  (:require [bh.rccst.ui-component.tabbed-panel :as tabbed-panel]
+  (:require [bh.rccst.ui-component.atom.bh.tabbed-panel :as tabbed-panel]
             [woolybear.ad.layout :as layout]
             [bh.rccst.views.technologies.overview.data-flow-digraph :as data-flow]
             [bh.rccst.views.technologies.clojure :as tech-clj]

@@ -1,5 +1,5 @@
 (ns bh.rccst.views.atom.example.re-com.alert-box
-  (:require [bh.rccst.ui-component.markdown :as markdown]
+  (:require [bh.rccst.ui-component.atom.bh.markdown :as markdown]
             [re-com.core :as rc]
             [reagent.core :as r]
             [woolybear.ad.catalog.utils :as acu]

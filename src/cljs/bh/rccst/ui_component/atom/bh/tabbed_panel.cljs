@@ -1,11 +1,11 @@
-(ns bh.rccst.ui-component.tabbed-panel
+(ns bh.rccst.ui-component.atom.bh.tabbed-panel
   (:require [taoensso.timbre :as log]
 
             [woolybear.ad.layout :as layout]
             [woolybear.packs.flex-panel :as flex]
             [woolybear.packs.tab-panel :as tab-panel]
 
-            [bh.rccst.ui-component.navbar :as navbar]
+            [bh.rccst.ui-component.atom.bh.navbar :as navbar]
             [bh.rccst.ui-component.tabbed-pane.utils :as tab-utils]))
 
 

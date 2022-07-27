@@ -1,4 +1,4 @@
-(ns bh.rccst.ui-component.markdown
+(ns bh.rccst.ui-component.atom.bh.markdown
   (:require ["react-markdown" :as ReactMarkdown]))
 
 

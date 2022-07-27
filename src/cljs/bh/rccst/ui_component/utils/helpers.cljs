@@ -1,5 +1,5 @@
 (ns bh.rccst.ui-component.utils.helpers
-  (:require [bh.rccst.ui-component.navbar :as navbar]
+  (:require [bh.rccst.ui-component.atom.bh.navbar :as navbar]
             [cljs-uuid-utils.core :as uuid]
             [day8.re-frame.tracing :refer-macros [fn-traced]]
             [re-com.core :as rc]

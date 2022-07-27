@@ -12,7 +12,7 @@
             ["react-markdown" :as ReactMarkdown]
             [re-com.core :as rc]
 
-            [bh.rccst.ui-component.navbar :as navbar]))
+            [bh.rccst.ui-component.atom.bh.navbar :as navbar]))
 
 
 (defn- chart-config [[config data panel tab] data-panel config-panel]

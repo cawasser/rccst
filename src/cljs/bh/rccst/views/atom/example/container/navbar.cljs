@@ -5,7 +5,7 @@
             [re-frame.core :as re-frame]
 
             [bh.rccst.events :as events]
-            [bh.rccst.ui-component.navbar :as navbar]))
+            [bh.rccst.ui-component.atom.bh.navbar :as navbar]))
 
 
 (def data-path [:navbar-example :tab-panel])

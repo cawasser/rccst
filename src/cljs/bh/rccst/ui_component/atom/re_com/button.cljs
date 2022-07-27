@@ -1,4 +1,4 @@
-(ns bh.rccst.ui-component.button
+(ns bh.rccst.ui-component.atom.re-com.button
   (:require [taoensso.timbre :as log]
             [reagent.core :as r]
             [re-com.core :as rc]))
