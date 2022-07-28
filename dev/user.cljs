@@ -7,7 +7,7 @@
     [clojure.pprint :refer (pprint)]
     [clojure.string :as str]
     [re-frame.core :as re-frame]
-    [bh.rccst.events :as events]
+    [rccst.events :as events]
 
     [nextjournal.clerk :as clerk]))
 

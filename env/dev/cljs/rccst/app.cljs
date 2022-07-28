@@ -3,7 +3,7 @@
             [expound.alpha :as expound]
             [devtools.core :as devtools]
             [taoensso.timbre :as log]
-            [bh.rccst.core :as core]))
+            [rccst.core :as core]))
 
 (extend-protocol IPrintWithWriter
   js/Symbol

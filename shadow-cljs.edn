@@ -9,7 +9,7 @@
                  :asset-path   "/js/compiled"
                  :source-map   true,
                  :pretty-print true,
-                 :modules      {:app {:init-fn bh.rccst.core/init}}
+                 :modules      {:app {:init-fn rccst.core/init}}
                  :devtools     {:preloads [re-frame-flow.preload
                                            day8.re-frame-10x.preload]}
                  :js-options {:entry-keys ["browser" "module" "main"]
