@@ -5,7 +5,7 @@
 
 (def lib 'blackHammer/rccst)
 (def version (format "1.0.%s" (b/git-count-revs nil)))
-(def main 'bh.rccst.core)
+(def main 'rccst.core)
 
 
 (defn uber "Build the uberjar." [opts]

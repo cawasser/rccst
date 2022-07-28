@@ -1,9 +1,9 @@
-(ns clj.bh.rccst.data-source.lookup-test
+(ns clj.rccst.data-source.lookup-test
   (:require [clojure.test :refer :all]
             [schema.core :as schema]
 
-            [bh.rccst.data-source.lookup :as sut]
-            [bh.rccst.data-source.lookup.schema :as s]))
+            [rccst.data-source.lookup :as sut]
+            [rccst.data-source.lookup.schema :as s]))
 
 
 (deftest lookup

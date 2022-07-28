@@ -1,10 +1,10 @@
-(ns clj.bh.rccst.components.database.users-test
+(ns clj.rccst.components.database.users-test
   (:require [clojure.tools.logging :as log]
             [clojure.test :refer [deftest is testing use-fixtures]]
             [schema.core :as schema]
             [next.jdbc :as jdbc]
 
-            [bh.rccst.components.database.users :as sut]))
+            [rccst.components.database.users :as sut]))
 
 
 (defonce database (atom nil))

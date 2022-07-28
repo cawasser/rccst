@@ -53,7 +53,7 @@
  ;metasoarous/oz                                {:mvn/version "2.0.0-alpha5"}}
 
 
- :aliases   {:run           {:main-opts ["-m" "bh.rccst.core"]}
+ :aliases   {:run           {:main-opts ["-m" "rccst.core"]}
 
 
              ;; Test watcher using kaocha - stays open and re-runs test as necessary
@@ -148,7 +148,7 @@
                                                        :sha     "e8bffd9b2a5c27f552eec96ad6c72ce9b5dcc372"}}
                              :main-opts  ["-m" "metav.spit"
                                           "--output-dir" "src/clj"
-                                          "--namespace" "bh.rccst.version"
+                                          "--namespace" "rccst.version"
                                           "--formats" "clj"]}}
 
  ;;
