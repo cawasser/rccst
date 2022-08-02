@@ -4,7 +4,7 @@
             [woolybear.packs.tab-panel :as tab-panel]
             [re-frame.core :as re-frame]
 
-            [rccst.events :as events]
+            [bh.events :as events]
             [bh.ui-component.atom.bh.navbar :as navbar]))
 
 

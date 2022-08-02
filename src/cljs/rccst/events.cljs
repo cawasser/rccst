@@ -23,19 +23,6 @@
 
 
 (re-frame/reg-event-db
-  ::init-locals
-  (fn-traced [db [_ container init-vals]]
-    ;(log/info "::init-locals" container init-vals)
-    (if (get db container)
-      (do
-        ;(log/info "::init-locals // already exists")
-        db)
-      (do
-        ;(log/info "::init-locals // adding")
-        (assoc db container init-vals)))))
-
-
-(re-frame/reg-event-db
   ::track-slow-request
   (fn [db [_ my-id xhrio]]
     (assoc-in db [:requests my-id] xhrio)))

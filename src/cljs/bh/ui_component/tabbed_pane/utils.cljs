@@ -3,7 +3,7 @@
             [re-frame.core :as re-frame]
             [woolybear.packs.tab-panel :as tab-panel]
 
-            [rccst.events :as events]))
+            [bh.events :as events]))
 
 
 (defn init-tabbed-panel [base-id initial-value]
