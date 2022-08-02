@@ -9,7 +9,7 @@
             ["recharts" :refer [ResponsiveContainer PieChart Pie Cell]]))
 
 
-(log/info "rccst.views.atom.example.chart.pie-chart-2")
+(log/info "bh.ui-component.atom.chart.pie-chart")
 
 
 (def source-code '[:> PieChart {:label (utils/override true {} :label)}

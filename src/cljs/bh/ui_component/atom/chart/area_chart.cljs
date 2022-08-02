@@ -13,7 +13,7 @@
             [woolybear.ad.layout :as layout]
             ["recharts" :refer [ResponsiveContainer AreaChart Area Brush]]))
 
-(log/info "rccst.views.atom.example.chart.area-chart")
+(log/info "bh.ui-component.atom.chart.area-chart")
 
 
 (def source-code '[:> AreaChart {:data d}

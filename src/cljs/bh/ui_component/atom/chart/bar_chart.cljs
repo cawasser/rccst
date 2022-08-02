@@ -15,7 +15,7 @@
                                 XAxis YAxis CartesianGrid Tooltip Legend]]))
 
 
-(log/info "rccst.views.atom.example.chart.bar-chart-2")
+(log/info "bh.ui-component.atom.chart.bar-chart")
 
 
 (def source-code '[:> BarChart {:data d}

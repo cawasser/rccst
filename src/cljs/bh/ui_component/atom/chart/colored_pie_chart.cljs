@@ -10,7 +10,7 @@
             ["recharts" :refer [ResponsiveContainer PieChart Pie Cell Tooltip Legend]]))
 
 
-(log/info "rccst.views.atom.example.chart.bar-chart-2")
+(log/info "bh.ui-component.atom.chart.colored-pie-chart")
 
 
 (def source-code '[:> PieChart {:label true} (utils/override true {} :label)
