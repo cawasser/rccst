@@ -1,6 +1,6 @@
 (ns rccst.views.atom.example.diagram.flow
   (:require [bh.ui-component.atom.diagram.flow :as flow]
-            [bh.ui-component.molecule.example :as example]
+            [rccst.views.atom.utils :as example]
             [bh.ui-component.utils :as utils]
             [taoensso.timbre :as log]))
 

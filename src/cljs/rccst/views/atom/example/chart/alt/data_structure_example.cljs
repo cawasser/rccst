@@ -1,5 +1,5 @@
 (ns rccst.views.atom.example.chart.alt.data-structure-example
-  (:require [bh.ui-component.molecule.example :as example]
+  (:require [rccst.views.atom.utils :as example]
             [bh.ui-component.utils :as utils]
             [reagent.core :as r]
             [taoensso.timbre :as log]))

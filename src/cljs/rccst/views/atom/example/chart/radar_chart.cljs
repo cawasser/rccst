@@ -1,6 +1,6 @@
 (ns rccst.views.atom.example.chart.radar-chart
   (:require [bh.ui-component.atom.chart.radar-chart :as chart]
-            [bh.ui-component.molecule.example :as example]
+            [rccst.views.atom.utils :as example]
             [bh.ui-component.utils :as utils]
             [bh.ui-component.atom.chart.utils :as chart-utils]
             [rccst.views.atom.example.chart.alt.data-ratom-example :as data-ratom-example]

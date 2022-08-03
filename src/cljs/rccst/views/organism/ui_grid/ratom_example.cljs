@@ -1,6 +1,5 @@
 (ns rccst.views.organism.ui-grid.ratom-example
-  (:require [rccst.subs :as subs]
-            [bh.ui-component.organism.ui-grid :as grid]
+  (:require [bh.ui-component.organism.ui-grid :as grid]
             [bh.ui-component.molecule.composite.chart-remote-data :as chart-remote-data]
             [bh.ui-component.molecule.composite.coverage-plan :as coverage-plan]
             [bh.ui-component.molecule.composite.simple-multi-chart :as simple-multi-chart]
@@ -99,8 +98,8 @@
 
 
 (defn example []
-  (let [logged-in?       (re-frame/subscribe [::subs/logged-in?])
-        pub-sub-started? (re-frame/subscribe [::subs/pub-sub-started?])]
+  (let [logged-in?       (re-frame/subscribe [:rccst.subs/logged-in?])
+        pub-sub-started? (re-frame/subscribe [:bh.subs/pub-sub-started?])]
 
     (if (not @logged-in?)
       (re-frame/dispatch [:rccst.events/login "test-user" "test-pwd"]))

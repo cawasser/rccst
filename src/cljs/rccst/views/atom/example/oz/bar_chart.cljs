@@ -1,7 +1,7 @@
 (ns rccst.views.atom.example.oz.bar-chart
   (:require [bh.ui-component.atom.oz.bar-chart :as chart]
             [bh.ui-component.utils :as utils]
-            [bh.ui-component.molecule.example :as example]
+            [rccst.views.atom.utils :as example]
             [taoensso.timbre :as log]))
 
 

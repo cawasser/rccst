@@ -125,8 +125,8 @@
 
 
 (defn example []
-  (let [logged-in?       (re-frame/subscribe [::subs/logged-in?])
-        pub-sub-started? (re-frame/subscribe [::subs/pub-sub-started?])
+  (let [logged-in?       (re-frame/subscribe [:rccst.subs/logged-in?])
+        pub-sub-started? (re-frame/subscribe [:bh.subs/pub-sub-started?])
         widgets          [container-id :widgets]
         layout           [container-id :layout]]
 

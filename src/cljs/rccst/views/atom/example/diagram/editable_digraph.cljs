@@ -1,7 +1,7 @@
 (ns rccst.views.atom.example.diagram.editable-digraph
   (:require [bh.ui-component.atom.diagram.diagram.composite-dag-support :as support]
             [bh.ui-component.atom.diagram.editable-digraph :as digraph]
-            [bh.ui-component.molecule.example :as example]
+            [rccst.views.atom.utils :as example]
             [bh.ui-component.utils :as utils]
             [reagent.core :as r]))
 

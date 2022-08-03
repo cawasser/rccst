@@ -1,5 +1,5 @@
 (ns rccst.views.atom.example.chart.alt.data-sub-example
-  (:require [bh.ui-component.molecule.example :as e]
+  (:require [rccst.views.atom.utils :as e]
             [bh.ui-component.utils :as ui-utils]
             [bh.ui-component.utils.helpers :as h]
             [rccst.views.atom.example.chart.alt.show-data :as sd]
