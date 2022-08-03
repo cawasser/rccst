@@ -1,5 +1,5 @@
 (ns rccst.views.molecule.example.two-d-three-d-globe
-  (:require [bh.ui-component.molecule.example :as example]
+  (:require [rccst.views.atom.utils :as example]
             [bh.ui-component.molecule.two-d-three-d-globe :as globe]
             [bh.ui-component.utils :as utils]))
 

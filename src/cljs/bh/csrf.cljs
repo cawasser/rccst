@@ -1,4 +1,4 @@
-(ns rccst.csrf)
+(ns bh.csrf)
 
 
 (def ?csrf-token js/csrfToken)

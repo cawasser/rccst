@@ -23,10 +23,10 @@
              (if (= direction :outputs)
                {source-port (if (= :source/local target-type)
                               [(ui-utils/path->keyword container-id :blackboard target)]
-                              [:rccst.subs/source remote])}
+                              [:bh.subs/source remote])}
                {target-port (if (= :source/local target-type)
                               [(ui-utils/path->keyword container-id :blackboard target)]
-                              [:rccst.subs/source remote])}))))
+                              [:bh.subs/source remote])}))))
     (into {})))
 
 
@@ -79,10 +79,10 @@
     ;(log/info "component->ui :source/remote" node "//" remote)
 
     ; 1. subscribe to the server (if needed)
-    (re-frame/dispatch-sync [:rccst.events/subscribe-to #{remote}])
+    (re-frame/dispatch-sync [:bh.events/subscribe-to #{remote}])
 
     ; 2. return the signal vector to the new data-source key
-    [:rccst.subs/source remote]))
+    [:bh.subs/source remote]))
 
 
 (defmethod component->ui :source/fn [{:keys [node configuration container-id]}]

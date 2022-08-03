@@ -41,11 +41,7 @@
                              :model password]]]
                 [rc/gap :size "20px"]
                 [rc/h-box
-                 :children [[button/button "Register"
-                             #(re-frame/dispatch
-                                [:rccst.events/register @user-id @password])]
+                 :children [[button/button "Register"]
                             [rc/gap :size "10px"]
-                            [button/button "Login"
-                             #(re-frame/dispatch
-                                [:rccst.events/login @user-id @password])]]]]]))
+                            [button/button "Login"]]]]]))
 

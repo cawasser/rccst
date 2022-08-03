@@ -1,5 +1,5 @@
 (ns rccst.views.molecule.example.composite.coverage-plan
-  (:require [rccst.subs :as subs]
+  (:require [bh.subs :as subs]
             [bh.ui-component.molecule.composite.coverage-plan :as coverage-plan]
             [bh.ui-component.molecule.grid-container :as grid]
             [bh.ui-component.utils.helpers :as h]
@@ -16,8 +16,8 @@
 
 (defn ww-example []
   (let [container-id     "coverage-plan-demo-ww"
-        logged-in?       (re-frame/subscribe [::subs/logged-in?])
-        pub-sub-started? (re-frame/subscribe [::subs/pub-sub-started?])]
+        logged-in?       (re-frame/subscribe [:rccst.subs/logged-in?])
+        pub-sub-started? (re-frame/subscribe [:bh.subs/pub-sub-started?])]
 
     (if (not @logged-in?)
       (re-frame/dispatch [:rccst.events/login "test-user" "test-pwd"]))
@@ -50,8 +50,8 @@
 
 (defn r-example []
   (let [container-id     "coverage-plan-demo-r"
-        logged-in?       (re-frame/subscribe [::subs/logged-in?])
-        pub-sub-started? (re-frame/subscribe [::subs/pub-sub-started?])]
+        logged-in?       (re-frame/subscribe [:rccst.subs/logged-in?])
+        pub-sub-started? (re-frame/subscribe [:bh.subs/pub-sub-started?])]
 
     (if (not @logged-in?)
       (re-frame/dispatch [:rccst.events/login "test-user" "test-pwd"]))
@@ -89,7 +89,7 @@
 
 
 (comment
-  (def logged-in? (re-frame/subscribe [::subs/logged-in?]))
+  (def logged-in? (re-frame/subscribe [:rccst.subs/logged-in?]))
 
   (if (not @logged-in?)
     (re-frame/dispatch [:rccst.events/login "test-user" "test-pwd"]))

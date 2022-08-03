@@ -4,8 +4,8 @@
             [day8.re-frame.tracing :refer-macros [fn-traced]]
             [day8.re-frame.http-fx]
 
-            [rccst.events :refer [default-header]]
-            [rccst.subscriptions :as pub-sub]))
+            [bh.events :refer [default-header]]
+            [bh.subscriptions :as pub-sub]))
 
 
 (log/info "rccst.events.login")

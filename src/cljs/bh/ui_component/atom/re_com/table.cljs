@@ -127,7 +127,7 @@
 
 (comment
 
-  (def value [{:generated-by "rccst.data-source.targets",
+  (def value [{:generated-by "dummy.data-source.targets",
                :at           #inst "2022-03-17T20:40:28.006-00:00",
                :signature    "53dbe964-a4cc-4c36-965a-3e03fdd84b53"}])
   (def opts nil)
@@ -147,7 +147,7 @@
 
   (seq (:c-o-c {:c-o-c []}))
 
-  (def data [:rccst.subs/source :source/targets])
+  (def data [:bh.subs/source :source/targets])
   (def d (h/resolve-value data))
 
   (seq (:c-o-c @d))

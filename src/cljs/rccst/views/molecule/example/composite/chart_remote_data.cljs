@@ -1,6 +1,5 @@
 (ns rccst.views.molecule.example.composite.chart-remote-data
-  (:require [rccst.subs :as subs]
-            [bh.ui-component.molecule.composite.chart-remote-data :as chart-remote-data]
+  (:require [bh.ui-component.molecule.composite.chart-remote-data :as chart-remote-data]
             [bh.ui-component.molecule.grid-container :as grid]
             [bh.ui-component.utils.helpers :as h]
             [re-com.core :as rc]
@@ -16,8 +15,8 @@
 
 (defn example []
   (let [container-id     "chart-remote-data-demo"
-        logged-in?       (re-frame/subscribe [::subs/logged-in?])
-        pub-sub-started? (re-frame/subscribe [::subs/pub-sub-started?])]
+        logged-in?       (re-frame/subscribe [:rccst.subs/logged-in?])
+        pub-sub-started? (re-frame/subscribe [:bh.subs/pub-sub-started?])]
 
     (if (not @logged-in?)
       (re-frame/dispatch [:rccst.events/login "test-user" "test-pwd"]))

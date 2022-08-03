@@ -1,5 +1,5 @@
 (ns bh.ui-component.utils.example-data
-  (:require [rccst.subs :as subs]
+  (:require [bh.subs :as subs]
             [cljs-uuid-utils.core :as uuid]
             [cljs.spec.alpha :as spec]
             [clojure.test.check.generators :as gen]
@@ -33,7 +33,7 @@
 ;; region
 (def default-coc [{:coc/step      :generated
                    :coc/by        "bh.ui-component.atom.bh.table"
-                   :coc/version   (or @(re-frame/subscribe [::subs/version]) "no version")
+                   :coc/version   "no version"
                    :coc/at        (str (js/Date.))
                    :coc/signature (uuid/uuid-string (uuid/make-random-uuid))}])
 
@@ -50,7 +50,7 @@
 (comment
   (spec/valid? :coc/entry {:coc/step      :generated
                            :coc/by        "bh.ui-component.atom.bh.table"
-                           :coc/version   (or @(re-frame/subscribe [:rccst.subs/version]) "no version")
+                           :coc/version   "no version"
                            :coc/at        (str (js/Date.))
                            :coc/signature (uuid/uuid-string (uuid/make-random-uuid))})
   (spec/valid? :coc/entry {:coc/step      :generated
@@ -89,7 +89,7 @@
 
   (def entry {:coc/step      :generated
               :coc/by        "bh.ui-component.atom.bh.table"
-              :coc/version   (or @(re-frame/subscribe [:rccst.subs/version]) "no version")
+              :coc/version   "no version"
               :coc/at        (str (js/Date.))
               :coc/signature (uuid/uuid-string (uuid/make-random-uuid))})
 

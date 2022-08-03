@@ -3,7 +3,6 @@
             [bh.ui-component.molecule.grid-container :as grid]
             [bh.ui-component.utils.helpers :as h]
             [woolybear.ad.catalog.utils :as acu]
-            [rccst.subs :as subs]
             [re-frame.core :as re-frame]
             [re-com.core :as rc]
             [woolybear.ad.layout :as layout]))
@@ -11,8 +10,8 @@
 
 (defn example []
   (let [container-id     "widget-grid-demo"
-        logged-in?       (re-frame/subscribe [::subs/logged-in?])
-        pub-sub-started? (re-frame/subscribe [::subs/pub-sub-started?])]
+        logged-in?       (re-frame/subscribe [:rccst.subs/logged-in?])
+        pub-sub-started? (re-frame/subscribe [:bh.subs/pub-sub-started?])]
 
     (if (not @logged-in?)
       (re-frame/dispatch [:rccst.events/login "test-user" "test-pwd"]))

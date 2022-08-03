@@ -6,60 +6,10 @@
             [woolybear.ad.layout :as layout]))
 
 
-(defn component-example [& {:keys [title
-                                   description
-                                   component
-                                   component-id
-                                   source-code
-                                   extra-classes] :as params}]
-
-  (ui-utils/init-container component-id)
-
-  (let [input-params (dissoc params :title :sample-data :description :extra-classes :source-code :component)
-        paramed-component (reduce into [component] (seq input-params))]
-
-    ;(log/info "component-example" params
-      ;"////" input-params
-      ;"////" paramed-component
-
-    (acu/demo
-      title
-      description
-      [layout/centered (or extra-classes {})
-       ;;
-       ;; NOTE: the :height MUST be specified here since the ResponsiveContainer down in bowels of the chart needs a height
-       ;; in order to actually draw the Recharts components. just saying "100%" doesn't work, since the
-       ;; that really means "be as big as you need" and ResponsiveContainer then doesn't know what to do.
-       ;;
-       [:div.component-example {:style {:width "100%" :height "700px"}}
-        paramed-component]]
-
-      source-code)))
 
 
-(defn example [& {:keys [title container-id description
-                         data config
-                         data-panel config-panel component-panel
-                         source-code] :as params}]
 
-  ;(log/info "example" params)
 
-  (ui-utils/init-container-locals container-id config)
-
-  (let [config-key (keyword container-id "config")
-        data-key (keyword container-id "data")
-        tab-panel (keyword container-id "tab-panel")
-        selected-tab (keyword container-id "tab-panel.value")]
-
-    (bcu/configurable-demo
-      title
-      description
-      [config-key data-key tab-panel selected-tab]
-      [data-panel data]
-      [config-panel data container-id]
-      ;[:div.configurable-demo-component {:style {:width "100%" :height "100%"}} ;{:width "1500px" :height "700px"}}
-      [component-panel data container-id]
-      source-code)))
 
 
 

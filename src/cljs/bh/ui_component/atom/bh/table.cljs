@@ -175,10 +175,10 @@
   (map-indexed vector body)
 
 
-  (h/resolve-value [:rccst.subs/source :source/targets])
-  (h/resolve-value [:rccst.subs/source :source/targets] :title)
+  (h/resolve-value [:bh.subs/source :source/targets])
+  (h/resolve-value [:bh.subs/source :source/targets] :title)
 
-  (re-frame/subscribe [:rccst.subs/source :source/targets :data])
+  (re-frame/subscribe [:bh.subs/source :source/targets :data])
 
   (get-in @re-frame.db/app-db [:sources :source/targets :data])
 

@@ -27,7 +27,6 @@
                    :source/measurements {:source/type :source/remote
                                          :source/returns :source/vector-of-entity-meta-coc
                                          :source/entity-contents []}}
-   :sources          {:number 0
-                      :string "empty"}})
+   :sources          {}})
 
 

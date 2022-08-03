@@ -589,13 +589,6 @@
 
 
 ;; region ; Rich comments
-(comment
-  (re-frame/dispatch [:rccst.events/login "test-user" "test-pwd"])
-
-  (re-frame/subscribe [:rccst.subs/source :string])
-
-  ())
-
 
 ; work out making actual shapes for the coverage data we get from the server
 (comment
@@ -655,15 +648,15 @@
     :color)
 
 
-  @(re-frame/subscribe [:rccst.subs/source :source/targets])
+  @(re-frame/subscribe [:bh.subs/source :source/targets])
 
   ; can we change the data in :source/targets and have the UI update?
   ;
-  (re-frame/dispatch [:rccst.events/data-update
+  (re-frame/dispatch [:bh.events/data-update
                       {:id    :source/targets
                        :value {:title    "Targets",
                                :c-o-c    [{:step      :generated,
-                                           :by        "rccst.data-source.targets",
+                                           :by        "dummy.data-source.targets",
                                            :version   "0.6.0",
                                            :at        "Mon May 23 14:21:10 EDT 2022",
                                            :signature "73f7a470-ddc9-44d9-84fa-cf1ce1acc8f9"}],

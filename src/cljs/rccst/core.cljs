@@ -1,13 +1,12 @@
 (ns rccst.core
-  (:require [reagent.dom :as rdom]
-            [re-frame.core :as re-frame]
-            [taoensso.timbre :as log]
-
+  (:require [bh.subscriptions]
+            [rccst.config :as config]
             [rccst.events :as events]
             [rccst.events.login]
-            [rccst.config :as config]
-            [rccst.subscriptions]
-            [rccst.views :as views]))
+            [rccst.views :as views]
+            [re-frame.core :as re-frame]
+            [reagent.dom :as rdom]
+            [taoensso.timbre :as log]))
 
 
 (defn dev-setup []

@@ -1,6 +1,4 @@
-(ns rccst.subscriptions
-  ;(:require-macros
-  ;  [cljs.core.async.macros :as asyncm :refer (go go-loop)])
+(ns bh.subscriptions
   (:require
     [re-frame.core :as re-frame]
     [day8.re-frame.tracing :refer-macros [fn-traced]]
@@ -8,9 +6,9 @@
     [taoensso.sente :as sente]
     [taoensso.sente.packers.transit :as sente-transit]
 
-    [rccst.subscription-handlers :as handlers]
-    [rccst.csrf :refer [?csrf-token]]
-    [rccst.events :refer [default-header]]))
+    [bh.subscription-handlers :as handlers]
+    [bh.csrf :refer [?csrf-token]]
+    [bh.events :refer [default-header]]))
 
 
 (declare start!)
@@ -78,13 +76,13 @@
 
 
 (defn start! [id]
-  (log/info "starting the rccst.websocket" id)
+  (log/info "starting the subscription websocket" id)
   (create-client! id)
   (start-router!))
 
 
 (comment
-  (start!)
+  (start! "dummy")
 
 
   ())

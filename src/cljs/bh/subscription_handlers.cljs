@@ -1,7 +1,7 @@
-(ns rccst.subscription-handlers
+(ns bh.subscription-handlers
   (:require [re-frame.core :as rf]
             [taoensso.timbre :as log]
-            [rccst.data-source-handler :as dh]))
+            [bh.data-source-handler :as dh]))
 
 
 (defmulti -event-msg-handler :id)

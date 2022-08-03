@@ -581,7 +581,7 @@ distinction, so we can quickly build all the Nodes and Handles used for the diag
     :coverage-plan-demo.component.blackboard.topic.layers
     :<- [:coverage-plan-demo.component.blackboard.topic.selected-targets]
     :<- [:coverage-plan-demo.component.blackboard.topic.selected-satellites]
-    :<- [:rccst.subs/source :topic/coverage-data]
+    :<- [:bh.subs/source :topic/coverage-data]
     (fn [t s c _]
       [{:layer-1 {} :layer-2 {}}]))
 
@@ -593,9 +593,9 @@ distinction, so we can quickly build all the Nodes and Handles used for the diag
   (re-frame/subscribe [:coverage-plan-demo.component.blackboard.topic.current-time])
   (re-frame/subscribe [:coverage-plan-demo.component.blackboard.topic.selected-targets])
   (re-frame/subscribe [:coverage-plan-demo.component.blackboard.topic.selected-satellites])
-  (re-frame/subscribe [:rccst.subs/source :source/targets])
-  (re-frame/subscribe [:rccst.subs/source :source/satellites])
-  (re-frame/subscribe [:rccst.subs/source :source/coverages])
+  (re-frame/subscribe [:bh.subs/source :source/targets])
+  (re-frame/subscribe [:bh.subs/source :source/satellites])
+  (re-frame/subscribe [:bh.subs/source :source/coverages])
 
   (re-frame/subscribe [:coverage-plan-demo.component.blackboard.topic.layers])
   (re-frame/subscribe [:coverage-plan-demo.component.blackboard.topic.time-range])

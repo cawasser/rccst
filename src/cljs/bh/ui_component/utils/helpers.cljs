@@ -73,7 +73,7 @@
   [subs opts]
   (let [[target & _] subs]
     ;(log/info "resolve-subscription" subs "//" target)
-    (if (= target :rccst.subs/source)
+    (if (= target :bh.subs/source)
       (re-frame/subscribe (reduce conj subs opts))
       (re-frame/subscribe (reduce conj [(path->keyword subs)] opts)))))
 
