@@ -44,10 +44,10 @@
 (def chsk-state (atom nil))
 
 (def config {:type     :auto
-             :packer   (sente-transit/get-transit-packer) ;:edn
-             :protocol :http
-             :host     "localhost"
-             :port     8280})   ; this is the port of the "real server"
+             :packer   (sente-transit/get-transit-packer)}) ;:edn
+             ;:protocol :http
+             ;:host     "localhost"
+             ;:port     8280})   ; this is the port of the "real server"
 
 
 (defn state-watcher [_key _atom _old-state new-state]

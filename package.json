@@ -7,7 +7,7 @@
 		"build-report": "npx shadow-cljs run shadow.cljs.build-report app target/build-report.html"
 	},
 	"dependencies": {
-		"@astrouxds/react": "^6.5.1",
+		"@astrouxds/react": "^6.11.0",
 		"@dagrejs/graphlib": "^2.1.4",
 		"@fortawesome/fontawesome-svg-core": "^1.2.36",
 		"@fortawesome/free-brands-svg-icons": "^5.15.4",
@@ -44,7 +44,7 @@
 		"copy-webpack-plugin": "^10.2.4",
 		"imports-loader": "^3.1.1",
 		"shadow-cljs": "2.16.12",
-		"webpack": "^5.72.0",
-		"webpack-cli": "^4.9.2"
+		"webpack": "^5.74.0",
+		"webpack-cli": "^4.10.0"
 	}
 }
