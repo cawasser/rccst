@@ -27,3 +27,7 @@
 (defmethod -data-source-msg-handler :publish/data-update
   [[_ content]]
   (rf/dispatch [::events/data-update content]))
+
+(defmethod -data-source-msg-handler :chsk/ws-ping
+  [[_ content]]
+  (log/info "Data Source Messenger socket PING"))

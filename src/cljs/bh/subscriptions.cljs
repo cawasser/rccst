@@ -17,10 +17,11 @@
 
 (re-frame/reg-event-fx
   ::start
-  (fn-traced [{:keys [db]} [_ id]]
-    (log/info "::pub-sub/start" id "//" (:pub-sub-started? db))
+  (fn-traced [_ [_ id]]
+    (log/info "::pub-sub/start" id)
     (start! id)
-    {:db (assoc db :pub-sub-started? true)}))
+             {}))
+    ;;{:db (assoc db :pub-sub-started? true)}))
 
 (re-frame/reg-event-fx
   ::stop
